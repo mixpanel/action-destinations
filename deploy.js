@@ -3,12 +3,6 @@ const { NodeHttpTransport } = require('grpc-web-node-http-transport')
 grpc.setDefaultTransport(NodeHttpTransport())
 
 const { FunctionsClient } = require('@segment/connections-api/functions/v1beta/functions_pb_service')
-const {
-  Function,
-  ListFunctionsRequest,
-  CreateFunctionRequest
-} = require('@segment/connections-api/functions/v1beta/functions_pb')
-
 const functions = new FunctionsClient('http://connections-service.segment.local')
 
 const WORKSPACE_ID = 'lmD77Nebzz'
@@ -16,47 +10,117 @@ const METADATA = {
   'x-subject-id': 'users/i2VTJURQprNfqdwjLFPWYx',
   'x-subject-scope': 'workspace'
 }
+const FUNCTION_PREFIX = 'Fab 5 '
+const FUNCTION_BUILDPACK = 'boreal'
 
-const req = new ListFunctionsRequest()
-req.setWorkspaceId(WORKSPACE_ID)
-req.setType('DESTINATION')
-
+// returns promise that resolves to array of Fab 5 functions
 function listFunctions () {
   return new Promise((resolve, reject) => {
-    console.log('FUNCTIONS:')
+    const { ListFunctionsRequest } = require('@segment/connections-api/functions/v1beta/functions_pb')
+
+    const req = new ListFunctionsRequest()
+    req.setWorkspaceId(WORKSPACE_ID)
+    req.setType('DESTINATION')
+
     functions.list(req, METADATA, (err, resp) => {
       if (err) reject(err)
-      resp.toObject().functionsList.forEach((fn) => console.log('- ' + fn.displayName))
-      resolve(null)
+      resolve(
+        resp.toObject().functionsList
+          .filter((f) => f.displayName.startsWith(FUNCTION_PREFIX))
+      )
     })
   })
 }
 
-listFunctions().then(() => {
-  console.log()
-
+// returns promise that resolves to array of compiled destinations
+function compileDestinations () {
   const { readdirSync, statSync } = require('fs')
-  const { join } = require('path')
+  const { join, resolve } = require('path')
+  const { compile } = require('./compile')
 
-  const dirs = path => {
-    return readdirSync(path).filter(f => statSync(join(path, f)).isDirectory())
-  }
+  const root = './destinations'
 
-  console.log(dirs('./destinations'))
-})
+  return Promise.all(
+    readdirSync(root)
+      .filter(sub => statSync(join(root, sub)).isDirectory())
+      .map((destination) => {
+        const path = resolve(join(root, destination))
+        return compile(path).then((code) => {
+          return {
+            slug: destination,
+            code: code
+          }
+        })
+      })
+  )
+}
 
-// const fn = new Function()
-// fn.setDisplayName('API test')
-// fn.setBuildpack('boreal')
-// fn.setCode('async function onTrack(event, settings) {}')
+function createFunction (name, code) {
+  const { Function, CreateFunctionRequest } = require('@segment/connections-api/functions/v1beta/functions_pb')
 
-// const createReq = new CreateFunctionRequest()
-// createReq.setWorkspaceId('lmD77Nebzz')
-// createReq.setType('DESTINATION')
-// createReq.setFunction(fn)
+  const fn = new Function()
+  fn.setDisplayName(name)
+  fn.setBuildpack(FUNCTION_BUILDPACK)
+  fn.setCode(code)
 
-// functions.create(createReq, metadata, (err, resp) => {
-//   if (err) throw err
-//   console.log(err)
-//   console.log(resp.toObject())
-// })
+  const req = new CreateFunctionRequest()
+  req.setWorkspaceId(WORKSPACE_ID)
+  req.setType('DESTINATION')
+  req.setFunction(fn)
+
+  return new Promise((resolve, reject) => {
+    functions.create(req, METADATA, (err, resp) => {
+      if (err) return reject(err)
+      resolve(resp.toObject())
+    })
+  })
+}
+
+function updateFunction (id, code) {
+  const { Function, UpdateFunctionRequest } = require('@segment/connections-api/functions/v1beta/functions_pb')
+  const { FieldMask } = require('google-protobuf/google/protobuf/field_mask_pb.js')
+
+  const fn = new Function()
+  fn.setId(id)
+  fn.setWorkspaceId(WORKSPACE_ID)
+  fn.setBuildpack(FUNCTION_BUILDPACK)
+  fn.setCode(code)
+
+  const mask = new FieldMask()
+  mask.addPaths('function.code', 'function.buildpack')
+
+  const req = new UpdateFunctionRequest()
+  req.setFunction(fn)
+  req.setUpdateMask(mask)
+
+  return new Promise((resolve, reject) => {
+    functions.update(req, METADATA, (err, resp) => {
+      if (err) return reject(err)
+      resolve(resp.toObject())
+    })
+  })
+}
+
+console.log('Deploying...')
+
+Promise.all([
+  listFunctions(),
+  compileDestinations()
+]).then(([functions, destinations]) => {
+  const fnName = (slug) => `${FUNCTION_PREFIX}${slug}`
+  const fnWithSlug = (slug) => functions.find((f) => f.displayName.startsWith(fnName(slug)))
+
+  const createDestinations = destinations.filter((d) => !fnWithSlug(d.slug))
+  const updateDestinations = destinations.filter((d) => !createDestinations.includes(d))
+
+  return Promise.all([
+    ...createDestinations.map((d) => createFunction(fnName(d.slug), d.code)),
+    ...updateDestinations.map((d) => updateFunction(fnWithSlug(d.slug).id, d.code))
+  ])
+}).then((functions) => {
+  functions.forEach((fn) => {
+    console.log(`Deployed: ${fn.displayName} (${fn.id})`)
+  })
+}).catch((reason) =>
+  console.log('ERROR', reason)
+)

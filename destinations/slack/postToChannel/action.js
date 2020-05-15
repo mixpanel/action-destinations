@@ -5,8 +5,6 @@ const actionKit = {
 }
 
 actionKit.action()
-  .schema('./schema.json')
-  .map('./mapping.json')
   .fanOut({ on: 'settings.channels', as: 'channel' })
   .deliver(({ payload, settings, channel }) => {
     return actionKit
