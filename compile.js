@@ -9,11 +9,14 @@ const pack = async (inputDir) => {
 
   return new Promise((resolve, reject) => {
     webpack({
-      mode: 'production',
       entry: inputDir,
       output: {
         path: tmpdir,
         filename: tmpfile
+      },
+      mode: 'production',
+      optimization: {
+        usedExports: true
       }
     }, (err, stats) => {
       if (err || stats.hasErrors()) {
