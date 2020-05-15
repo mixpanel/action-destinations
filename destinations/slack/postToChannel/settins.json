@@ -1,0 +1,16 @@
+[
+    {
+        "label": "Channels",
+        "description": "Slack Channels to post messages to. Each channel receives a copy of messages sent to this Action.",
+        "slug": "channels",
+        "type": "strings",
+        "validations": [
+            {
+                "validation": "length",
+                "options": {
+                    "min": 1
+                }
+            }
+        ]
+    }
+]

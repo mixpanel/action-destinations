@@ -1,0 +1,16 @@
+[
+    {
+        "label": "Authentication Token",
+        "description": "OAuth 2.0 authentication token.",
+        "slug": "token",
+        "type": "string",
+        "validations": [
+            {
+                "validation": "length",
+                "options": {
+                    "min": 8
+                }
+            }
+        ]
+    }
+]
