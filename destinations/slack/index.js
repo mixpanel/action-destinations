@@ -1,22 +1,13 @@
 
 const destination = require('./destination.json')
-const settings = require('./settings.json')
+const destSettings = require('./settings.json')
 
 const postToChannel = require('./postToChannel')
 
-function handleEvent (event, s) {
+export default function (event, settings) {
   console.log('event', event)
-  console.log('func settings', s)
+  console.log('func settings', settings)
   console.log('destination config', destination)
-  console.log('destination settings', settings)
-
+  console.log('destination settings', destSettings)
   throw new Error('test')
 }
-
-async function onTrack (event, settings) { return handleEvent(event, settings) }
-async function onIdentify (event, settings) { return handleEvent(event, settings) }
-async function onGroup (event, settings) { return handleEvent(event, settings) }
-async function onPage (event, settings) { return handleEvent(event, settings) }
-async function onScreen (event, settings) { return handleEvent(event, settings) }
-async function onAlias (event, settings) { return handleEvent(event, settings) }
-async function onDelete (event, settings) { return handleEvent(event, settings) }
