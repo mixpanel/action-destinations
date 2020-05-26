@@ -2,7 +2,8 @@ module.exports = {
   env: {
     node: true,
     commonjs: true,
-    es6: true
+    es6: true,
+    'jest/globals': true
   },
   extends: [
     'standard'
@@ -14,6 +15,6 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 2018
   },
-  rules: {
-  }
+  rules: { },
+  plugins: ['jest']
 }
