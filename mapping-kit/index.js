@@ -66,11 +66,17 @@ function registerDirective (name, fn) {
   directives[name] = fn
 }
 
-function runDirective (name, opts, payload) {
+function runDirective (obj, payload) {
+  const name = Object.keys(obj)[0]
   const fn = directives[name]
+  const opts = obj[name]
+
   if (typeof fn !== 'function') throw new Error(`${name} is not a valid directive`)
+
   return fn(opts, payload)
 }
+
+// --
 
 registerDirective('@field', (field, payload) => {
   if (typeof field !== 'string') throw new Error(`@field: expected field string, got ${typeof field}`)
@@ -85,6 +91,8 @@ registerDirective('@handlebars', (template, payload) => {
     noEscape: true
   })(payload)
 })
+
+// --
 
 // safeGet pulls a field out of a nested object using a dot-notation path. ex.
 // safeGet({a: {b: 'cool'}}, 'a.b') === 'cool'
@@ -109,8 +117,12 @@ function validate (mapping) {
   const keys = Object.keys(mapping)
   const directiveKeys = keys.filter((k) => k.match(/^@/))
 
-  if (directiveKeys > 0 && directiveKeys.length != keys.length) {
-    throw new Error('object must have all directives or no directives; cannot mix them')
+  if (directiveKeys.length > 0 && directiveKeys.length !== keys.length) {
+    throw new Error('object must have either one directives or no directives; cannot mix them')
+  }
+
+  if (directiveKeys.length > 1) {
+    throw new Error(`object can only have one directive, found ${directiveKeys.length} directives: ${directiveKeys.join(', ')}`)
   }
 
   for (const key of Object.keys(mapping)) {
@@ -121,28 +133,29 @@ function validate (mapping) {
   }
 }
 
-// TODO handle payload
+function isDirective (obj) {
+  if (typeof obj !== 'object') return false
+  const keys = Object.keys(obj)
+  if (keys.length !== 1) return false
+  return keys[0].charAt(0) === '@'
+}
+
 function resolve (mapping, payload) {
+  // TODO
+  if (typeof mapping !== 'object') return mapping
+
+  if (isDirective(mapping)) {
+    return runDirective(mapping, payload)
+  }
+
   for (const key of Object.keys(mapping)) {
     const value = mapping[key]
 
-    switch (key) {
-      // TODO don't hardcode
-      case '@field':
-      case '@handlebars':
-        return runDirective(key, value, payload)
-
-      default:
-        switch (typeof value) {
-          case 'object':
-            mapping[key] = resolve(value, payload)
-
-            break
-
-          default:
-            break
-        }
+    if (typeof value === 'object') {
+      mapping[key] = resolve(value, payload)
     }
+
+    // TODO handle arrays // array directives
   }
 
   return mapping

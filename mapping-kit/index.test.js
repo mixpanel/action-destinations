@@ -12,6 +12,12 @@ describe('mapping validations', () => {
       transform({ foo: { bar: 1, '@field': 2 } }, {})
     }).toThrowError()
   })
+
+  test('multiple directives', () => {
+    expect(() => {
+      transform({ '@field': '', '@handlebars': '' }, {})
+    }).toThrowError()
+  })
 })
 
 describe('payload validations', () => {
