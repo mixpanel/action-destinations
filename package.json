@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "author": "Tyson Mote <tyson@segment.com>",
   "license": "UNLICENSED",
@@ -15,10 +15,12 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.1",
+    "jest": "^26.0.1",
     "webpack": "^4.43.0"
   },
   "dependencies": {
     "@segment/connections-api": "^0.1.6",
-    "@segment/domain-service-clients": "^0.13.3"
+    "@segment/domain-service-clients": "^0.13.3",
+    "handlebars": "^4.7.6"
   }
 }
