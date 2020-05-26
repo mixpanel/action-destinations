@@ -1,5 +1,19 @@
 [
     {
+        "label": "Webhook URL",
+        "description": "Slack webhook URL.",
+        "slug": "url",
+        "type": "string",
+        "validations": [
+            {
+                "validation": "length",
+                "options": {
+                    "min": 1
+                }
+            }
+        ]
+    },
+    {
         "label": "Channels",
         "description": "Slack Channels to post messages to. Each channel receives a copy of messages sent to this Action.",
         "slug": "channels",

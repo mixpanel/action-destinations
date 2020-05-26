@@ -5,15 +5,23 @@ grpc.setDefaultTransport(NodeHttpTransport())
 const { FunctionsClient } = require('@segment/connections-api/functions/v1beta/functions_pb_service')
 const functions = new FunctionsClient('http://connections-service.segment.local')
 
+// Hard-coded to `tyson` workspace for now.
 const WORKSPACE_ID = 'lmD77Nebzz'
+
+// Hard-coded to sloth@segment.com for now.
 const METADATA = {
   'x-subject-id': 'users/i2VTJURQprNfqdwjLFPWYx',
   'x-subject-scope': 'workspace'
 }
+
+// Cheap hack to identify and find our functions.
 const FUNCTION_PREFIX = 'Fab 5 '
+
+// We'll probably want our own buildpack in the future. For now, we'll use the
+// one Destination Functions use.
 const FUNCTION_BUILDPACK = 'boreal'
 
-// returns promise that resolves to array of Fab 5 functions
+// listFunctions returns a promise that resolves to array of Fab 5 functions.
 function listFunctions () {
   return new Promise((resolve, reject) => {
     const { ListFunctionsRequest } = require('@segment/connections-api/functions/v1beta/functions_pb')
@@ -32,7 +40,8 @@ function listFunctions () {
   })
 }
 
-// returns promise that resolves to array of compiled destinations
+// compileDestinations returns a promise that resolves to an array of compiled
+// destinations.
 function compileDestinations () {
   const { readdirSync, statSync } = require('fs')
   const { join, resolve } = require('path')
@@ -55,13 +64,28 @@ function compileDestinations () {
   )
 }
 
-function createFunction (name, code) {
-  const { Function, CreateFunctionRequest } = require('@segment/connections-api/functions/v1beta/functions_pb')
+function functionSettings () {
+  const { FunctionSetting } = require('@segment/connections-api/functions/v1beta/functions_pb')
 
-  const fn = new Function()
+  // yo dawg i heard...
+  const settingSetting = new FunctionSetting()
+  settingSetting.setType('string')
+  settingSetting.setLabel('Settings JSON')
+  settingSetting.setName('s')
+  settingSetting.setRequired(true)
+  settingSetting.setDescription('{"json": "goes here"}')
+
+  return [settingSetting]
+}
+
+function createFunction (name, code) {
+  const { Function: Fn, CreateFunctionRequest } = require('@segment/connections-api/functions/v1beta/functions_pb')
+
+  const fn = new Fn()
   fn.setDisplayName(name)
   fn.setBuildpack(FUNCTION_BUILDPACK)
   fn.setCode(code)
+  fn.setSettingsList(functionSettings())
 
   const req = new CreateFunctionRequest()
   req.setWorkspaceId(WORKSPACE_ID)
@@ -77,17 +101,18 @@ function createFunction (name, code) {
 }
 
 function updateFunction (id, code) {
-  const { Function, UpdateFunctionRequest } = require('@segment/connections-api/functions/v1beta/functions_pb')
+  const { Function: Fn, UpdateFunctionRequest } = require('@segment/connections-api/functions/v1beta/functions_pb')
   const { FieldMask } = require('google-protobuf/google/protobuf/field_mask_pb.js')
 
-  const fn = new Function()
+  const fn = new Fn()
   fn.setId(id)
   fn.setWorkspaceId(WORKSPACE_ID)
   fn.setBuildpack(FUNCTION_BUILDPACK)
   fn.setCode(code)
+  fn.setSettingsList(functionSettings())
 
   const mask = new FieldMask()
-  mask.addPaths('function.code', 'function.buildpack')
+  mask.setPathsList(['function.code', 'function.buildpack', 'function.settings'])
 
   const req = new UpdateFunctionRequest()
   req.setFunction(fn)

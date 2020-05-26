@@ -2,7 +2,7 @@
     "name": "Slack",
     "defaultSubscriptions": [
         {
-            "subscription": {
+            "subscribe": {
                 "type": "track"
             },
             "partnerAction": "postToChannel"
