@@ -1,6 +1,6 @@
 const action = require('./index')
 
-describe('ValidateSettings', () => {
+describe('settings()', () => {
   const execute = async (config, settings) => {
     return action().settings(config)._execute({ settings })
   }
@@ -123,5 +123,41 @@ describe('ValidateSettings', () => {
         ).rejects.toThrow()
       })
     })
+  })
+})
+
+describe('schema()', () => {
+  const schema = {
+    $schema: 'http://json-schema.org/schema#',
+    type: 'object',
+    properties: {
+      foo: {
+        type: 'string'
+      },
+      bar: {
+        type: 'string',
+        default: 'default value'
+      }
+    },
+    required: ['foo']
+  }
+
+  const execute = async (payload) => {
+    return action().schema(schema)._execute({ payload })
+  }
+
+  test('pass', async () => {
+    const payload = { foo: 'hello' }
+    await expect(execute(payload)).resolves.not.toThrow()
+    // Fill in default values as a side-effect
+    expect(payload.bar).toBe('default value')
+  })
+
+  test('fail', async () => {
+    await expect(execute({})).rejects.toThrow()
+  })
+
+  test('invalid schema', () => {
+    action().schema({ oops: true })
   })
 })

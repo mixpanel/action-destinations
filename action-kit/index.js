@@ -84,27 +84,28 @@ class ValidateSettings {
   }
 }
 
-const validator = new Ajv({
-  // Fill in any missing values with the default values.
-  useDefaults: true,
-  // Coerce types to be a bit more liberal.
-  coerceTypes: true
-})
-
 // ValidateSchema takes a JSON Schema and validates that the incoming payload
 // matches (required fields are present, the right type, etc.)
-//
-// TODO how do we get the defaults from the schema?
 class ValidateSchema {
   constructor (schema) {
-    this.schema = schema
+    const ajv = new Ajv({
+      // Fill in any missing values with the default values.
+      useDefaults: true,
+      // Coerce types to be a bit more liberal.
+      coerceTypes: true
+    })
+
+    this.validate = ajv.compile(schema)
   }
 
   _execute ({ payload }) {
-    const valid = validator.validate(this.schema, payload)
+    const valid = this.validate(payload)
     if (!valid) {
-      console.log('schema validation failed', validator.errorsText())
-      throw new Error('TODO Schema validation failed')
+      const message = []
+      for (const err of this.validate.errors) {
+        message.push(`${err.dataPath || 'root object'}: ${err.message}`)
+      }
+      throw new Error('TODO Schema validation failed:', message.join(', '))
     }
   }
 }
