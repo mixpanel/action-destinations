@@ -92,6 +92,13 @@ registerDirective('@handlebars', (template, payload) => {
   })(payload)
 })
 
+registerDirective('@merge', (arr, payload) => {
+  if (!Array.isArray(arr)) throw new Error(`@merge: expected array, got ${typeof arr}`)
+
+  const objects = arr.map((v) => resolve(v, payload))
+  return Object.assign({}, ...objects)
+})
+
 // --
 
 // safeGet pulls a field out of a nested object using a dot-notation path. ex.
@@ -110,6 +117,7 @@ function safeGet (obj, path) {
   return result
 }
 
+// TODO use JSON Schema
 function validate (mapping) {
   if (Array.isArray(mapping)) throw new Error('mapping is an array but expected an object')
   if (typeof mapping !== 'object') throw new Error(`mapping is a ${typeof mapping} but expected an object`)
@@ -141,7 +149,7 @@ function isDirective (obj) {
 }
 
 function resolve (mapping, payload) {
-  // TODO
+  // TODO this feels weird
   if (typeof mapping !== 'object') return mapping
 
   if (isDirective(mapping)) {

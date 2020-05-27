@@ -2,6 +2,8 @@
 //
 // TODO Add in base settings.json config
 
+const map = require('../../mapping-kit')
+
 const destination = require('./destination.json')
 
 // TODO validate incoming settings:
@@ -17,17 +19,17 @@ function subscribed (subscription, event) {
   return event.type === subscription.subscribe.type
 }
 
-const transforms = {
-  // TODO obviously this shouldn't be hard-coded. Mapping/transformations
-  // library is next!
-  postToChannel: function (event) {
-    return {
-      text: (event.properties || {}).text || 'Hello, world!',
-      username: 'Fab 5 Slack Destination',
-      icon_url: 'https://logo.clearbit.com/segment.com'
-    }
-  }
-}
+// const transforms = {
+//   // TODO obviously this shouldn't be hard-coded. Mapping/transformations
+//   // library is next!
+//   postToChannel: function (event) {
+//     return {
+//       text: (event.properties || {}).text || 'Hello, world!',
+//       username: 'Fab 5 Slack Destination',
+//       icon_url: 'https://logo.clearbit.com/segment.com'
+//     }
+//   }
+// }
 
 // Promise.allSettled isn't available in Node 10. It was added in 12.9.0, so
 // we'll hack it here.
@@ -49,22 +51,36 @@ process.on('unhandledRejection', (reason, p) => {
   throw new Error('TODO unhandled promise rejection')
 })
 
-export default async function (event, settings) {
+export default async function (event, rawSettings) {
   console.log('Running destination: ', destination.name)
+
+  // We're abusing the settings system to nest our JSON blob
+  const settings = JSON.parse(rawSettings.s)
 
   const runningActions = []
 
   destination.defaultSubscriptions.forEach((subscription) => {
     if (subscribed(subscription, event)) {
-      const action = partnerActions[subscription.partnerAction]
-      const transform = transforms[subscription.partnerAction]
+      console.log(`${subscription.partnerAction}: subscribed, running action`)
 
-      console.log(`${subscription.partnerAction} subscribed, running action`)
+      const action = partnerActions[subscription.partnerAction]
+      const mapping = (settings.mappings || {})[subscription.partnerAction]
+      console.log('settings', settings)
+      console.log('keys', Object.keys(settings).join(', '))
+      console.log('mapping', mapping)
+      if (mapping) {
+        console.log(`${subscription.partnerAction}: mapping`)
+        console.log(mapping)
+        // TODO rename to payload?
+        event = map(mapping, { settings, event })
+        console.log('event is now', event)
+      }
+
       runningActions.push(
         // TODO better API for calling actionKit thingy
         action._execute({
-          payload: transform(event),
-          settings: JSON.parse(settings.s)
+          payload: event,
+          settings: settings
         })
       )
     } else {

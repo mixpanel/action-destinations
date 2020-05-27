@@ -68,7 +68,8 @@ class ValidateSettings {
   // -- validators
 
   _STRING (slug, value) {
-    const type = typeof value if (type !== 'string') throw new Error(`${slug} is a ${type}, expected string`)
+    const type = typeof value
+    if (type !== 'string') throw new Error(`${slug} is a ${type}, expected string`)
   }
 
   _STRINGS (slug, value) {
