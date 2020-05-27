@@ -1,5 +1,5 @@
 {
-  "name": "Minimal",
+  "name": "No-op",
   "defaultSubscriptions": [
     {
       "subscribe": "all",

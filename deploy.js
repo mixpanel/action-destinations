@@ -79,6 +79,8 @@ function functionSettings () {
 }
 
 function createFunction (name, code) {
+  console.log(`Creating function ${name} (${code.length} bytes)`)
+
   const { Function: Fn, CreateFunctionRequest } = require('@segment/connections-api/functions/v1beta/functions_pb')
 
   const fn = new Fn()
@@ -101,6 +103,8 @@ function createFunction (name, code) {
 }
 
 function updateFunction (id, code) {
+  console.log(`Updating function ${id} (${code.length} bytes)`)
+
   const { Function: Fn, UpdateFunctionRequest } = require('@segment/connections-api/functions/v1beta/functions_pb')
   const { FieldMask } = require('google-protobuf/google/protobuf/field_mask_pb.js')
 
@@ -125,8 +129,6 @@ function updateFunction (id, code) {
     })
   })
 }
-
-console.log('Deploying...')
 
 Promise.all([
   listFunctions(),

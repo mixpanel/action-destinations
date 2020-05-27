@@ -1,5 +1,5 @@
 // TODO remove need for this
-require('../../../action-kit')
+require('../../../lib/action-kit')
 
 export default action()
   // TODO is there a better way to include settings/schema without manual config?

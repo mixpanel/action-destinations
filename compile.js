@@ -15,7 +15,7 @@ async function synthesizeIndex(inputDir) {
   console.log(`  - ${partnerActions.join(', ')}\n`)
 
   const js = [
-    "require('../../destination-kit')",
+    "require('../../lib/destination-kit')",
     "export default destination(require('./destination.json'))",
     ...partnerActions.map((n) => `\t.partnerAction(${JSON.stringify(n)}, require('./${n}'))`),
     '\t.handler()'
