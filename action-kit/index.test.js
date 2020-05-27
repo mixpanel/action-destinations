@@ -1,4 +1,4 @@
-const action = require('./index')
+require('./index')
 
 describe('settings()', () => {
   const execute = async (config, settings) => {

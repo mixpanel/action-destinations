@@ -1,16 +1,42 @@
 const webpack = require('webpack')
 const tmp = require('tmp')
-const { join } = require('path')
-const { readFileSync } = require('fs')
+const { join, basename } = require('path')
+const { readFileSync, readdirSync, writeFile, unlinkSync } = require('fs')
 
 // ENTRYPOINT is the name the default export function of the webpack-compiled JS
 // file so that we can add our adapter.
 const ENTRYPOINT = '__'
 
+async function synthesizeIndex(inputDir) {
+  const partnerActions = readdirSync(inputDir, {withFileTypes: true})
+    .filter(f => f.isDirectory())
+    .map(f => f.name)
+
+  console.log(`  - ${partnerActions.join(', ')}\n`)
+
+  const js = [
+    "require('../../destination-kit')",
+    "export default destination(require('./destination.json'))",
+    ...partnerActions.map((n) => `\t.partnerAction(${JSON.stringify(n)}, require('./${n}'))`),
+    '\t.handler()'
+  ].join('\n')
+
+  return new Promise((resolve, reject) => {
+    const path = join(inputDir, 'index.js')
+    writeFile(path, js, (err) => {
+      if(err) return reject(err)
+      resolve(path)
+    })
+  })
+}
+
 // pack takes a destination subdirectory and returns a promise that resolves to
 // the path to a webpack-compiled version of that destination with the default
 // export function available in the ENTRYPOINT variable.
-const pack = (inputDir) => {
+async function pack(inputDir) {
+  console.log(`Compiling ${basename(inputDir)}`)
+
+  const indexPath = await synthesizeIndex(inputDir)
   const tmpdir = tmp.dirSync().name
   const tmpfile = 'index.js'
 
@@ -29,6 +55,7 @@ const pack = (inputDir) => {
         usedExports: true
       }
     }, (err, stats) => {
+      unlinkSync(indexPath) // cleanup
       if (err || stats.hasErrors()) {
         reject(err || stats.toJson().errors || 'unknown error')
       }

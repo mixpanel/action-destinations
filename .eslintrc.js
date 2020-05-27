@@ -3,7 +3,13 @@ module.exports = {
     node: true,
     commonjs: true,
     es6: true,
-    'jest/globals': true
+    'jest/globals': true,
+    globals: {
+      // fetch API provided by the Destination Function buildpack
+      fetch: 'readonly',
+      // action-kit entrypoint
+      action: 'writable'
+    }
   },
   extends: [
     'standard'

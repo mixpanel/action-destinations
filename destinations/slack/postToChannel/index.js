@@ -1,11 +1,8 @@
-const action = require('../../../action-kit')
+// TODO remove need for this
+require('../../../action-kit')
 
-// TODO we should use a custom funk buildpack so we can skip this.
-// eslint-disable-next-line no-use-before-define
-const fetch = window.fetch || function () { throw new Error('node-fetch isn\'t available') }
-
-module.exports = action()
-  // TODO is there a better way to automatically include settings and schema?
+export default action()
+  // TODO is there a better way to include settings/schema without manual config?
   .settings(require('./settings.json'))
   .schema(require('./schema.json'))
   .fanOut({ on: 'settings.channels', as: 'channel' })

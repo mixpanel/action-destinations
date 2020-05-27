@@ -48,6 +48,8 @@ class ValidateSettings {
 
       // Validate type
       const typeFnName = `_${type.toUpperCase()}`
+      // TODO using dynamic names for these functions is obviously weird but an
+      // easy hack. fix later.
       if (typeof this[typeFnName] !== 'function') throw new Error(`'${type}' is not a valid setting type`)
       this[typeFnName](slug, value)
 
@@ -186,6 +188,6 @@ class Deliver {
   }
 }
 
-module.exports = () => {
+global.action = () => {
   return new Action()
 }

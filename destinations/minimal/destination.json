@@ -1,0 +1,9 @@
+{
+  "name": "Minimal",
+  "defaultSubscriptions": [
+    {
+      "subscribe": "all",
+      "partnerAction": "noop"
+    }
+  ]
+}
