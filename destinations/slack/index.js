@@ -65,15 +65,11 @@ export default async function (event, rawSettings) {
 
       const action = partnerActions[subscription.partnerAction]
       const mapping = (settings.mappings || {})[subscription.partnerAction]
-      console.log('settings', settings)
-      console.log('keys', Object.keys(settings).join(', '))
-      console.log('mapping', mapping)
       if (mapping) {
         console.log(`${subscription.partnerAction}: mapping`)
         console.log(mapping)
         // TODO rename to payload?
         event = map(mapping, { settings, event })
-        console.log('event is now', event)
       }
 
       runningActions.push(

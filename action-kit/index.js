@@ -43,7 +43,7 @@ class ValidateSettings {
   }
 
   _execute ({ settings }) {
-    for (const { slug, type, validations } of this.config) {
+    for (const { slug, type, validations = [] } of this.config) {
       const value = settings[slug]
 
       // Validate type
@@ -76,13 +76,20 @@ class ValidateSettings {
     if (!Array.isArray(value)) throw new Error(`${slug} is a ${typeof value}, expected array`)
   }
 
-  _LENGTH (slug, { options: { min, max } }, value) {
+  _LENGTH (slug, { min, max }, value) {
     const length = value.length
     if (typeof length !== 'number') throw new Error(`${slug} setting doesn't have a length because it is a ${typeof value}`)
     if (typeof min === 'number' && length < min) throw new Error(`${slug} setting is too short (${length}, minimum is ${min})`)
     if (typeof max === 'number' && length > max) throw new Error(`${slug} setting is too long (${length}, maximum is ${max})`)
   }
 }
+
+const validator = new Ajv({
+  // Fill in any missing values with the default values.
+  useDefaults: true,
+  // Coerce types to be a bit more liberal.
+  coerceTypes: true
+})
 
 // ValidateSchema takes a JSON Schema and validates that the incoming payload
 // matches (required fields are present, the right type, etc.)
@@ -94,7 +101,6 @@ class ValidateSchema {
   }
 
   _execute ({ payload }) {
-    const validator = new Ajv()
     const valid = validator.validate(this.schema, payload)
     if (!valid) {
       console.log('schema validation failed', validator.errorsText())
@@ -179,9 +185,6 @@ class Deliver {
   }
 }
 
-module.exports = {
-  // TODO remove the need for these args somehow
-  action () {
-    return new Action()
-  }
+module.exports = () => {
+  return new Action()
 }

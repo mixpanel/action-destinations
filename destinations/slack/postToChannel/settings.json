@@ -7,9 +7,7 @@
         "validations": [
             {
                 "validation": "length",
-                "options": {
-                    "min": 1
-                }
+                "min": 1
             }
         ]
     },
@@ -21,9 +19,7 @@
         "validations": [
             {
                 "validation": "length",
-                "options": {
-                    "min": 1
-                }
+                "min": 1
             }
         ]
     }
