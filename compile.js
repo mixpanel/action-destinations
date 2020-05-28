@@ -7,6 +7,9 @@ const { readFileSync, readdirSync, writeFile, unlinkSync } = require('fs')
 // file so that we can add our adapter.
 const ENTRYPOINT = '__'
 
+// synthesizeIndex takes a destination subdirectory and creates an index.js file
+// that exports an entrypoint using destination-kit. The index.js file should be
+// removed when we're done compiling the destination bundle.
 async function synthesizeIndex(inputDir) {
   const partnerActions = readdirSync(inputDir, {withFileTypes: true})
     .filter(f => f.isDirectory())
