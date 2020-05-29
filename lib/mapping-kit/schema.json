@@ -4,6 +4,7 @@
   "description": "A Fab 5 mapping is either a raw JSON value (object, string, etc.) or a directive, which is a mapping/transformation instruction that reduces to a raw JSON value.",
   "if": {
     "type": "object",
+    "minProperties": 1,
     "propertyNames": {
       "pattern": "^@"
     }
@@ -52,6 +53,9 @@
           "$ref": "#/definitions/directive:field"
         },
         {
+          "$ref": "#/definitions/directive:handlebars"
+        },
+        {
           "$ref": "#/definitions/directive:merge"
         }
       ]
@@ -72,6 +76,25 @@
       },
       "required": [
         "@field"
+      ],
+      "additionalProperties": false
+    },
+    "directive:handlebars": {
+      "type": "object",
+      "properties": {
+        "@handlebars": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/directive"
+            }
+          ]
+        }
+      },
+      "required": [
+        "@handlebars"
       ],
       "additionalProperties": false
     },
