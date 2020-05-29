@@ -1,0 +1,11 @@
+{
+  "@merge": [
+    {
+      "ok": true
+    },
+    {
+      "ok": false,
+      "@field": "foo"
+    }
+  ]
+}

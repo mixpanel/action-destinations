@@ -1,23 +1,62 @@
 {
   "$schema": "http://json-schema.org/schema#",
-  "$id": "http://segment.com/fab5/mapping/schema.json",
   "title": "Fab 5 mapping definition",
   "description": "A Fab 5 mapping is either a raw JSON value (object, string, etc.) or a directive, which is a mapping/transformation instruction that reduces to a raw JSON value.",
-  "type": "object",
+  "if": {
+    "type": "object",
+    "propertyNames": {
+      "pattern": "^@"
+    }
+  },
+  "then": {
+    "$ref": "#/definitions/directive"
+  },
+  "else": {
+    "$ref": "#/definitions/raw"
+  },
   "definitions": {
+    "raw": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/raw:object"
+        },
+        {
+          "not": {
+            "type": "object"
+          }
+        }
+      ]
+    },
+    "raw:object": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[^@]"
+      },
+      "additionalProperties": {
+        "oneOf": [
+          {
+            "$ref": "#/definitions/directive"
+          },
+          {
+            "$ref": "#/definitions/raw"
+          }
+        ]
+      }
+    },
     "directive": {
-      "$id": "#directive",
       "type": "object",
       "minProperties": 1,
       "maxProperties": 1,
       "oneOf": [
         {
-          "$ref": "#/definitions/@field"
+          "$ref": "#/definitions/directive:field"
+        },
+        {
+          "$ref": "#/definitions/directive:merge"
         }
       ]
     },
-    "@field": {
-      "$id": "@field",
+    "directive:field": {
       "type": "object",
       "properties": {
         "@field": {
@@ -26,7 +65,7 @@
               "type": "string"
             },
             {
-              "$ref": "#directive"
+              "$ref": "#/definitions/directive"
             }
           ]
         }
@@ -36,53 +75,27 @@
       ],
       "additionalProperties": false
     },
-    "raw": {
-      "$id": "raw",
-      "oneOf": [
-        {
-          "type": "object",
-          "propertyNames": {
-            "pattern": "^[^@]"
-          },
-          "additionalProperties": {
+    "directive:merge": {
+      "type": "object",
+      "properties": {
+        "@merge": {
+          "type": "array",
+          "items": {
             "oneOf": [
               {
-                "$ref": "#directive"
+                "$ref": "#/definitions/directive"
               },
               {
-                "$ref": "#raw"
+                "$ref": "#/definitions/raw:object"
               }
             ]
           }
-        },
-        {
-          "not": {
-            "type": "object"
-          }
-        }
-      ]
-    }
-  },
-  "allOf": [
-    {
-      "if": {
-        "propertyNames": {
-          "pattern": "^@"
         }
       },
-      "then": {
-        "$ref": "#directive"
-      }
-    },
-    {
-      "if": {
-        "propertyNames": {
-          "pattern": "^[^@]"
-        }
-      },
-      "then": {
-        "$ref": "#raw"
-      }
+      "required": [
+        "@merge"
+      ],
+      "additionalProperties": false
     }
-  ]
+  }
 }
