@@ -1,0 +1,88 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "$id": "http://segment.com/fab5/mapping/schema.json",
+  "title": "Fab 5 mapping definition",
+  "description": "A Fab 5 mapping is either a raw JSON value (object, string, etc.) or a directive, which is a mapping/transformation instruction that reduces to a raw JSON value.",
+  "type": "object",
+  "definitions": {
+    "directive": {
+      "$id": "#directive",
+      "type": "object",
+      "minProperties": 1,
+      "maxProperties": 1,
+      "oneOf": [
+        {
+          "$ref": "#/definitions/@field"
+        }
+      ]
+    },
+    "@field": {
+      "$id": "@field",
+      "type": "object",
+      "properties": {
+        "@field": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#directive"
+            }
+          ]
+        }
+      },
+      "required": [
+        "@field"
+      ],
+      "additionalProperties": false
+    },
+    "raw": {
+      "$id": "raw",
+      "oneOf": [
+        {
+          "type": "object",
+          "propertyNames": {
+            "pattern": "^[^@]"
+          },
+          "additionalProperties": {
+            "oneOf": [
+              {
+                "$ref": "#directive"
+              },
+              {
+                "$ref": "#raw"
+              }
+            ]
+          }
+        },
+        {
+          "not": {
+            "type": "object"
+          }
+        }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "propertyNames": {
+          "pattern": "^@"
+        }
+      },
+      "then": {
+        "$ref": "#directive"
+      }
+    },
+    {
+      "if": {
+        "propertyNames": {
+          "pattern": "^[^@]"
+        }
+      },
+      "then": {
+        "$ref": "#raw"
+      }
+    }
+  ]
+}
