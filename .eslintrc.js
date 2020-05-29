@@ -3,20 +3,18 @@ module.exports = {
     node: true,
     commonjs: true,
     es6: true,
-    'jest/globals': true,
-    globals: {
-      // fetch API provided by the Destination Function buildpack
-      fetch: 'readonly',
-      // action-kit entrypoint
-      action: 'writable'
-    }
+    'jest/globals': true
   },
   extends: [
     'standard'
   ],
   globals: {
     Atomics: 'readonly',
-    SharedArrayBuffer: 'readonly'
+    SharedArrayBuffer: 'readonly',
+    // fetch API provided by the Destination Function buildpack
+    fetch: 'readonly',
+    // action-kit entrypoint
+    action: 'writable'
   },
   parserOptions: {
     ecmaVersion: 2018
