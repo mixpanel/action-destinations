@@ -10,8 +10,8 @@ const ENTRYPOINT = '__'
 // synthesizeIndex takes a destination subdirectory and creates an index.js file
 // that exports an entrypoint using destination-kit. The index.js file should be
 // removed when we're done compiling the destination bundle.
-async function synthesizeIndex(inputDir) {
-  const partnerActions = readdirSync(inputDir, {withFileTypes: true})
+async function synthesizeIndex (inputDir) {
+  const partnerActions = readdirSync(inputDir, { withFileTypes: true })
     .filter(f => f.isDirectory())
     .map(f => f.name)
 
@@ -27,7 +27,7 @@ async function synthesizeIndex(inputDir) {
   return new Promise((resolve, reject) => {
     const path = join(inputDir, 'index.js')
     writeFile(path, js, (err) => {
-      if(err) return reject(err)
+      if (err) return reject(err)
       resolve(path)
     })
   })
@@ -36,7 +36,7 @@ async function synthesizeIndex(inputDir) {
 // pack takes a destination subdirectory and returns a promise that resolves to
 // the path to a webpack-compiled version of that destination with the default
 // export function available in the ENTRYPOINT variable.
-async function pack(inputDir) {
+async function pack (inputDir) {
   console.log(`Compiling ${basename(inputDir)}`)
 
   const indexPath = await synthesizeIndex(inputDir)
