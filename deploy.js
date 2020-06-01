@@ -100,8 +100,7 @@ function functionSettings (destination) {
         default:
           throw new Error(`${action.slug}: ${setting.type} setting type not implemented`)
       }
-      // TODO
-      // s.setRequired(true)
+      s.setRequired(true)
       settings.push(s)
     })
   })
