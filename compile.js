@@ -7,13 +7,17 @@ const { readFileSync, readdirSync, writeFile, unlinkSync } = require('fs')
 // file so that we can add our adapter.
 const ENTRYPOINT = '__'
 
+function actionSlugs (dir) {
+  return readdirSync(dir, { withFileTypes: true })
+    .filter(f => f.isDirectory())
+    .map(f => f.name)
+}
+
 // synthesizeIndex takes a destination subdirectory and creates an index.js file
 // that exports an entrypoint using destination-kit. The index.js file should be
 // removed when we're done compiling the destination bundle.
 async function synthesizeIndex (inputDir) {
-  const partnerActions = readdirSync(inputDir, { withFileTypes: true })
-    .filter(f => f.isDirectory())
-    .map(f => f.name)
+  const partnerActions = actionSlugs(inputDir)
 
   console.log(`  - ${partnerActions.join(', ')}\n`)
 
@@ -75,9 +79,36 @@ function adapter () {
   ).join('\n')
 }
 
+function loadSettings (dir) {
+  return safeRequire(join(dir, 'settings.json')) || []
+}
+
+function loadActions (dir) {
+  const slugs = actionSlugs(dir)
+
+  return slugs.map(slug => {
+    const settings = loadSettings(join(dir, slug)) || []
+    return { slug, settings }
+  })
+}
+
+function safeRequire (path) {
+  try {
+    return require(path)
+  } catch (e) {
+    if (e.code === 'MODULE_NOT_FOUND') return undefined
+    else throw e
+  }
+}
+
 // compile returns the compiled version of the given destination subdirectory
 // (.e.g './destinations/slack)
 module.exports.compile = async (dir) => {
   const f = await pack(dir)
-  return readFileSync(f).toString() + adapter()
+  const code = readFileSync(f).toString() + adapter()
+
+  const settings = loadSettings(dir)
+  const actions = loadActions(dir)
+
+  return { code, settings, actions }
 }

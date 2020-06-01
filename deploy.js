@@ -43,51 +43,82 @@ function listFunctions () {
 // compileDestinations returns a promise that resolves to an array of compiled
 // destinations.
 function compileDestinations () {
-  const { readdirSync, statSync } = require('fs')
+  const { readdirSync } = require('fs')
   const { join, resolve } = require('path')
   const { compile } = require('./compile')
 
   const root = './destinations'
 
   return Promise.all(
-    readdirSync(root)
-      .filter(sub => statSync(join(root, sub)).isDirectory())
-      .map((destination) => {
-        const path = resolve(join(root, destination))
-        return compile(path).then((code) => {
-          return {
-            slug: destination,
-            code: code
-          }
+    readdirSync(root, { withFileTypes: true })
+      .filter(sub => sub.isDirectory())
+      .map(async (f) => {
+        const path = resolve(join(root, f.name))
+        const destination = await compile(path)
+        return ({
+          slug: f.name,
+          ...destination
         })
       })
   )
 }
 
-function functionSettings () {
+function functionSettings (destination) {
   const { FunctionSetting } = require('@segment/connections-api/functions/v1beta/functions_pb')
 
-  // yo dawg i heard...
-  const settingSetting = new FunctionSetting()
-  settingSetting.setType('string')
-  settingSetting.setLabel('Settings JSON')
-  settingSetting.setName('s')
-  settingSetting.setRequired(true)
-  settingSetting.setDescription('{"json": "goes here"}')
+  const settings = []
 
-  return [settingSetting]
+  // Base settings
+  destination.settings.forEach(d => {
+    throw new Error('not implemented')
+  })
+
+  // Per-action settings
+  destination.actions.forEach(action => {
+    const mapping = new FunctionSetting()
+    mapping.setType('string')
+    mapping.setLabel(`${action.slug}: Mapping JSON`)
+    mapping.setName(`${action.slug}Mapping`)
+    mapping.setRequired(true)
+    mapping.setDescription('{"@field": "example.here"}')
+    settings.push(mapping)
+
+    action.settings.forEach(setting => {
+      const s = new FunctionSetting()
+
+      s.setLabel(`${action.slug}: ${setting.label}`)
+      s.setDescription(setting.description)
+      s.setName(`${action.slug}${setting.slug}`)
+
+      switch (setting.type) {
+        case 'string':
+          s.setType('string')
+          break
+        case 'strings':
+          s.setType('array')
+          break
+        default:
+          throw new Error(`${action.slug}: ${setting.type} setting type not implemented`)
+      }
+      // TODO
+      // s.setRequired(true)
+      settings.push(s)
+    })
+  })
+
+  return settings
 }
 
-function createFunction (name, code) {
-  console.log(`Creating function ${name} (${code.length} bytes)`)
+function createFunction (name, destination) {
+  console.log(`Creating function ${name} (${destination.code.length} bytes)`)
 
   const { Function: Fn, CreateFunctionRequest } = require('@segment/connections-api/functions/v1beta/functions_pb')
 
   const fn = new Fn()
   fn.setDisplayName(name)
   fn.setBuildpack(FUNCTION_BUILDPACK)
-  fn.setCode(code)
-  fn.setSettingsList(functionSettings())
+  fn.setCode(destination.code)
+  fn.setSettingsList(functionSettings(destination))
 
   const req = new CreateFunctionRequest()
   req.setWorkspaceId(WORKSPACE_ID)
@@ -102,8 +133,8 @@ function createFunction (name, code) {
   })
 }
 
-function updateFunction (id, code) {
-  console.log(`Updating function ${id} (${code.length} bytes)`)
+function updateFunction (id, destination) {
+  console.log(`Updating function ${id} (${destination.code.length} bytes)`)
 
   const { Function: Fn, UpdateFunctionRequest } = require('@segment/connections-api/functions/v1beta/functions_pb')
   const { FieldMask } = require('google-protobuf/google/protobuf/field_mask_pb.js')
@@ -112,8 +143,8 @@ function updateFunction (id, code) {
   fn.setId(id)
   fn.setWorkspaceId(WORKSPACE_ID)
   fn.setBuildpack(FUNCTION_BUILDPACK)
-  fn.setCode(code)
-  fn.setSettingsList(functionSettings())
+  fn.setCode(destination.code)
+  fn.setSettingsList(functionSettings(destination))
 
   const mask = new FieldMask()
   mask.setPathsList(['function.code', 'function.buildpack', 'function.settings'])
@@ -141,8 +172,8 @@ Promise.all([
   const updateDestinations = destinations.filter((d) => !createDestinations.includes(d))
 
   return Promise.all([
-    ...createDestinations.map((d) => createFunction(fnName(d.slug), d.code)),
-    ...updateDestinations.map((d) => updateFunction(fnWithSlug(d.slug).id, d.code))
+    ...createDestinations.map((d) => createFunction(fnName(d.slug), d)),
+    ...updateDestinations.map((d) => updateFunction(fnWithSlug(d.slug).id, d))
   ])
 }).then((functions) => {
   functions.forEach((fn) => {
