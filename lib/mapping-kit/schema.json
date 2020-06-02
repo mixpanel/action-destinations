@@ -59,6 +59,9 @@
           "$ref": "#/definitions/directive:handlebars"
         },
         {
+          "$ref": "#/definitions/directive:lowercase"
+        },
+        {
           "$ref": "#/definitions/directive:merge"
         },
         {
@@ -85,14 +88,7 @@
       "type": "object",
       "properties": {
         "@field": {
-          "oneOf": [
-            {
-              "type": "string"
-            },
-            {
-              "$ref": "#/definitions/directive"
-            }
-          ]
+          "$ref": "#/definitions/helpers:string-or-directive"
         }
       },
       "required": [
@@ -116,6 +112,18 @@
       },
       "required": [
         "@handlebars"
+      ],
+      "additionalProperties": false
+    },
+    "directive:lowercase": {
+      "type": "object",
+      "properties": {
+        "@lowercase": {
+          "$ref": "#/definitions/helpers:string-or-directive"
+        }
+      },
+      "required": [
+        "@lowercase"
       ],
       "additionalProperties": false
     },
