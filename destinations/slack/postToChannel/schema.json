@@ -1,6 +1,5 @@
 {
     "$schema": "http://json-schema.org/schema#",
-    "$id": "http://segment.com/fab5/slack/actions/postToChannel/schema.json",
     "title": "Slack: Post to channel",
     "description": "Post a text message to a Slack channel.",
     "type": "object",
