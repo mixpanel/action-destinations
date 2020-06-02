@@ -1,0 +1,14 @@
+[
+  {
+    "label": "API Key",
+    "description": "SendGrid API key, created under the \"API Keys\" tab of the Settings page.",
+    "slug": "apiKey",
+    "type": "string",
+    "validations": [
+      {
+        "validation": "length",
+        "min": 1
+      }
+    ]
+  }
+]

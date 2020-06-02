@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "title": "SendGrid: Create a list",
+  "description": "Create a new list.",
+  "type": "object",
+  "properties": {
+    "name": {
+      "description": "Name of the list to be created.",
+      "type": "string"
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

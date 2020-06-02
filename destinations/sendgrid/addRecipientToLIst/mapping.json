@@ -1,0 +1,12 @@
+{
+  "list_id": {
+    "@field": "list_id"
+  },
+  "recipient_id": {
+    "@base64": {
+      "@lowercase": {
+        "@field": "email"
+      }
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "@merge": [
+    {
+      "email": {
+        "@field": "email"
+      }
+    },
+    {
+      "@field": "custom_fields"
+    }
+  ]
+}
