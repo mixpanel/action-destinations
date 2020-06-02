@@ -1,0 +1,10 @@
+{
+  "@pick": {
+    "object": {
+      "@field": "foo.bar"
+    },
+    "fields": [
+      "a"
+    ]
+  }
+}

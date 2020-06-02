@@ -1,13 +1,14 @@
 # Mapping Kit
 
-Mapping Kit is a library that accepts a mapping configuration and a payload and outputs a mapped and
-transformed payload. A mapping configuration is a mixture of raw values (values that appear in the
-output payload as they appear in the mapping configuration) and directives, which can fetch data
-from the input payload and transform data.
+Mapping Kit is a library for mapping and transforming JSON payloads. It exposes a function that
+accepts a mapping configuration object and a payload object and outputs a mapped and transformed
+payload. A mapping configuration is a mixture of raw values (values that appear in the output
+payload as they appear in the mapping configuration) and directives, which can fetch and transform
+data from the input payload.
 
 For example:
 
-```
+```json
 Mapping:
 
 {
@@ -50,25 +51,38 @@ Output:
 
 <!--ts-->
    * [Mapping Kit](#mapping-kit)
-   * [Table of contents](#table-of-contents)
-   * [Terms](#terms)
-   * [Mixing raw values and directives](#mixing-raw-values-and-directives)
-   * [Validation](#validation)
-   * [Directives](#directives)
-      * [@field](#field)
-      * [@handlebars](#handlebars)
-      * [@merge](#merge)
+      * [Table of contents](#table-of-contents)
+      * [Terms](#terms)
+      * [Mixing raw values and directives](#mixing-raw-values-and-directives)
+      * [Validation](#validation)
+      * [Directives](#directives)
+         * [@field](#field)
+         * [@handlebars](#handlebars)
+         * [@merge](#merge)
 
-<!-- Added by: tysonmote, at: Mon Jun  1 14:39:13 PDT 2020 -->
+<!-- Added by: tysonmote, at: Mon Jun  1 21:33:01 PDT 2020 -->
 
 <!--te-->
+
+## Usage
+
+```js
+// Require using path
+const map = require('../mapping-kit')
+
+const mapping = { '@field': 'foo.bar' }
+const input = { foo: { bar: "Hello!" } }
+
+const output = map(mapping, input)
+// => "Hello!"
+```
 
 ## Terms
 
 In Mapping Kit, there are only two kinds of values: **raw values** and **directives**. Raw values
 can be any JSON value and Mapping Kit will return them in the output payload untouched:
 
-```
+```json
 42
 
 "Hello, world!"
@@ -81,7 +95,7 @@ can be any JSON value and Mapping Kit will return them in the output payload unt
 Directives are objects with a single @-prefixed key that tell Mapping Kit to fetch data from the
 input payload or transform some data:
 
-```
+```json
 { "@field": "properties.name" }
 
 { "@handlebars": "Hello there, {{traits.name}}" }
@@ -101,7 +115,7 @@ directive.
 
 Directives and raw values can be mixed to create complex mappings. For example:
 
-```
+```json
 Mapping:
 
 {
@@ -110,7 +124,7 @@ Mapping:
     "@field": "traits.email"
   },
   "userProperties": {
-    "@whitelist": {
+    "@pick": {
       "object": "traits",
       "fields": ["name", "email", "plan"]
     }
@@ -151,7 +165,7 @@ Output:
 
 A directive may not, however, be mixed in at the same level as a raw value:
 
-```
+```json
 Invalid:
 
 {
@@ -169,12 +183,12 @@ Valid:
 
 And a directive may only have one @-prefixed directive in it:
 
-```
+```json
 Invalid:
 
 {
   "@field": "foo.bar",
-  "@whitelist": {
+  "@pick": {
     "object: "biz.baz",
     "fields": ["a", "b", "c"]
   }
@@ -185,7 +199,7 @@ Valid:
 {
   "foo": { "@field": "foo.bar" },
   "baz": {
-    "@whitelist": {
+    "@pick": {
       "object: "biz.baz",
       "fields": ["a", "b", "c"]
     }
@@ -202,7 +216,6 @@ suite][schema.test.js] is a good source-of-truth for current implementation beha
 
 [schema.test.js]: https://github.com/segmentio/fab-5-engine/blob/master/lib/mapping-kit/schema.test.js
 
-
 ## Directives
 
 ### @field
@@ -211,7 +224,7 @@ suite][schema.test.js] is a good source-of-truth for current implementation beha
 
 The @field directive resolves to the value at the given dot-separated path in the input payload:
 
-```
+```json
 Input:
 
 {
@@ -241,7 +254,7 @@ Mappings:
 The @handlebars directive resolves to string using the given
 [Handlebars.js](https://handlebarsjs.com/guide/) template string.
 
-```
+```json
 Input:
 
 {
@@ -266,7 +279,7 @@ The @merge directive accepts a list of one or more objects (either raw objects o
 resolve to objects) and resolves to a single object. The resolved object is built by combining each
 object in turn, overwriting any duplicate keys.
 
-```
+```json
 Input:
 
 {
@@ -312,7 +325,7 @@ Mappings:
 
 The @merge directive is especially useful for providing default values:
 
-```
+```json
 Input:
 
 {
@@ -341,3 +354,127 @@ Output:
 }
 ```
 
+### @omit
+
+The @omit directive resolves an object with the given list of fields removed from it:
+
+```json
+Input:
+
+{
+  "foo": {
+    "a": 1,
+    "b": 2,
+    "c": 3
+  }
+}
+
+Mapping:
+
+{
+  "@omit": {
+    "object": { "@field": "foo" },
+    "fields": ["a", "c"]
+  }
+}
+=>
+{ "b": 2 }
+```
+
+The "fields" list can also be a directive that resolves to an array of strings or it can be an array
+of strings and directives that resolve to strings:
+
+```json
+Input:
+
+{
+  "fieldList": ["b"],
+  "singleField": "c"
+}
+
+Mappings:
+
+{
+  "@omit": {
+    "object": { "a": 1, "b": 2, "c": 3 },
+    "fields": { "@field": "fieldList" }
+  }
+}
+=>
+{ "a": 1, "c": 3 }
+
+{
+  "@omit": {
+    "object": { "a": 1, "b": 2, "c": 3 },
+    "fields": [
+      "a",
+      { "@field": "singleField" }
+    ]
+  }
+}
+=>
+{ "b": 2 }
+```
+
+
+### @pick
+
+The @pick directive resolves an object with the only the given list of fields in it:
+
+```json
+Input:
+
+{
+  "foo": {
+    "a": 1,
+    "b": 2,
+    "c": 3
+  }
+}
+
+Mapping:
+
+{
+  "@pick": {
+    "object": { "@field": "foo" },
+    "fields": ["a", "c"]
+  }
+}
+=>
+{ "a": 1, "c": 3 }
+```
+
+The "fields" list can also be a directive that resolves to an array of strings or it can be an array
+of strings and directives that resolve to strings:
+
+```json
+Input:
+
+{
+  "fieldList": ["b"],
+  "singleField": "c"
+}
+
+Mappings:
+
+{
+  "@pick": {
+    "object": { "a": 1, "b": 2, "c": 3 },
+    "fields": { "@field": "fieldList" }
+  }
+}
+=>
+{ "b": 2 }
+
+{
+  "@pick": {
+    "object": { "a": 1, "b": 2, "c": 3 },
+    "fields": [
+      "a",
+      { "@field": "singleField" }
+    ]
+  }
+}
+=>
+{ "a": 1, "c": 3 }
+```

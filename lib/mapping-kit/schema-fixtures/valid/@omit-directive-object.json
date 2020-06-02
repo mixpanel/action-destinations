@@ -1,0 +1,10 @@
+{
+  "@omit": {
+    "object": {
+      "@field": "foo.bar"
+    },
+    "fields": [
+      "a"
+    ]
+  }
+}

@@ -57,6 +57,12 @@
         },
         {
           "$ref": "#/definitions/directive:merge"
+        },
+        {
+          "$ref": "#/definitions/directive:omit"
+        },
+        {
+          "$ref": "#/definitions/directive:pick"
         }
       ]
     },
@@ -117,6 +123,70 @@
       },
       "required": [
         "@merge"
+      ],
+      "additionalProperties": false
+    },
+    "directive:omit": {
+      "type": "object",
+      "properties": {
+        "@omit": {
+          "$ref": "#/definitions/helpers:object-and-fields"
+        }
+      },
+      "required": [
+        "@omit"
+      ],
+      "additionalProperties": false
+    },
+    "directive:pick": {
+      "type": "object",
+      "properties": {
+        "@pick": {
+          "$ref": "#/definitions/helpers:object-and-fields"
+        }
+      },
+      "required": [
+        "@pick"
+      ],
+      "additionalProperties": false
+    },
+    "helpers:object-and-fields": {
+      "type": "object",
+      "properties": {
+        "object": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/raw:object"
+            },
+            {
+              "$ref": "#/definitions/directive"
+            }
+          ]
+        },
+        "fields": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "oneOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "$ref": "#/definitions/directive"
+                  }
+                ]
+              }
+            },
+            {
+              "$ref": "#/definitions/directive"
+            }
+          ]
+        }
+      },
+      "required": [
+        "object",
+        "fields"
       ],
       "additionalProperties": false
     }
