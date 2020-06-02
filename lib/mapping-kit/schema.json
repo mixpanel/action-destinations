@@ -50,6 +50,9 @@
       "maxProperties": 1,
       "oneOf": [
         {
+          "$ref": "#/definitions/directive:base64"
+        },
+        {
           "$ref": "#/definitions/directive:field"
         },
         {
@@ -65,6 +68,18 @@
           "$ref": "#/definitions/directive:pick"
         }
       ]
+    },
+    "directive:base64": {
+      "type": "object",
+      "properties": {
+        "@base64": {
+          "$ref": "#/definitions/helpers:string-or-directive"
+        }
+      },
+      "required": [
+        "@base64"
+      ],
+      "additionalProperties": false
     },
     "directive:field": {
       "type": "object",
@@ -149,6 +164,16 @@
         "@pick"
       ],
       "additionalProperties": false
+    },
+    "helpers:string-or-directive": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "$ref": "#/definitions/directive"
+        }
+      ]
     },
     "helpers:object-and-fields": {
       "type": "object",
