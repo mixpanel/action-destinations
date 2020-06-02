@@ -2,8 +2,10 @@
 require('../../../lib/action-kit')
 
 export default action()
+  // TODO make these automatic
   .schema(require('./schema.json'))
   .map(require('./mapping.json'))
+
   .deliver(({ payload, settings }) => (
     fetch(
       'https://api.sendgrid.com/v3/contactdb/recipients',
