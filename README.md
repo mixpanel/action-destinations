@@ -5,13 +5,49 @@ Fab 5 Engine is an early prototype implementation of five destinations following
 actions along with a mapping that maps the incoming event to a payload that matches the action's
 schema.
 
-This prototype deploys the Fab 5 destinations as Destination Functions to staging. This is currently
-hard-coded to the `tyson` workspace in staging. (TODO: make this configurable)
+<img alt="Destinations 2.0 flow" src="https://user-images.githubusercontent.com/111501/83700205-10f23e80-a5bb-11ea-9fbe-b1b10c1ed464.png">
 
-## Settings
+This prototype deploys the Fab 5 destinations as Destination Functions to staging. This is currently
+hard-coded to the `tyson` workspace in staging. If you want to deploy these to your own workspace,
+edit [deploy.js](https://github.com/segmentio/fab-5-engine/blob/master/deploy.js) and run `node
+deploy.js`.
+
+## Inspecting
+
+If you want to dump the definition for all destinations, run this:
+
+```
+$ node -e "console.log(JSON.stringify(require('./destinations')()))"
+[
+  {
+    "name": "No-op",
+    "defaultSubscriptions": [
+      {
+        "subscribe": "all",
+        "partnerAction": "noop"
+      }
+    ],
+    "slug": "noop",
+    "path": "/Users/tysonmote/dev/src/github.com/segmentio/fab-five-engine/destinations/noop",
+    "settings": [],
+    "partnerActions": [
+      {
+        "slug": "noop",
+        "settings": [],
+        "mapping": null,
+        "schema": null,
+        "code": "// TODO remove need for this\nrequire('../../../lib/action-kit')\n\nexport default action()\n"
+      }
+    ]
+  },
+...
+```
+
+## Configuring
 
 Fab 5 destinations are configured using a single Destination Function setting (`subscriptions`) that
-contains a JSON blob of all subscriptions for the destination. The format should look like this:
+should contain a JSON blob of all subscriptions for the destination. The format should look like
+this:
 
 
 ```js
@@ -19,7 +55,7 @@ contains a JSON blob of all subscriptions for the destination. The format should
   {
     // "type" subscriptions are the only ones supported currently
     "subscribe": {
-      "type": "track"
+      "type": "<eventType>"
     },
 
     "partnerAction": "<actionSlug>",
