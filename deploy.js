@@ -82,6 +82,13 @@ function functionSettings (destination) {
   const settings = []
 
   // Base settings
+  const subsSetting = new FunctionSetting()
+  subsSetting.setType('string')
+  subsSetting.setLabel('Subscriptions')
+  subsSetting.setName('subscriptions')
+  subsSetting.setDescription('[{"subscribe":{"type":"track"},"partnerAction":"postToChannel"}]')
+  settings.push(subsSetting)
+
   destination.settings.forEach(setting => {
     const s = new FunctionSetting()
     s.setType(functionSettingType(setting.type))
