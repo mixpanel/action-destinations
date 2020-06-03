@@ -79,36 +79,9 @@ function adapter () {
   ).join('\n')
 }
 
-function loadSettings (dir) {
-  return safeRequire(join(dir, 'settings.json')) || []
-}
-
-function loadActions (dir) {
-  const slugs = actionSlugs(dir)
-
-  return slugs.map(slug => {
-    const settings = loadSettings(join(dir, slug)) || []
-    return { slug, settings }
-  })
-}
-
-function safeRequire (path) {
-  try {
-    return require(path)
-  } catch (e) {
-    if (e.code === 'MODULE_NOT_FOUND') return undefined
-    else throw e
-  }
-}
-
-// compile returns the compiled version of the given destination subdirectory
-// (.e.g './destinations/slack)
-module.exports.compile = async (dir) => {
-  const f = await pack(dir)
-  const code = readFileSync(f).toString() + adapter()
-
-  const settings = loadSettings(dir)
-  const actions = loadActions(dir)
-
-  return { code, settings, actions }
+// compile returns the compiled version of the destination at the given path
+// (e.g. './destinations/slack)
+module.exports.compile = async (path) => {
+  const f = await pack(path)
+  return readFileSync(f).toString() + adapter()
 }

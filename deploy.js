@@ -5,6 +5,8 @@ grpc.setDefaultTransport(NodeHttpTransport())
 const { FunctionsClient } = require('@segment/connections-api/functions/v1beta/functions_pb_service')
 const functions = new FunctionsClient('http://connections-service.segment.local')
 
+const { compile } = require('./compile')
+
 // Hard-coded to `tyson` workspace for now.
 const WORKSPACE_ID = 'lmD77Nebzz'
 
@@ -43,24 +45,15 @@ function listFunctions () {
 // compileDestinations returns a promise that resolves to an array of compiled
 // destinations.
 function compileDestinations () {
-  const { readdirSync } = require('fs')
-  const { join, resolve } = require('path')
-  const { compile } = require('./compile')
+  const destinations = require('./destinations')()
+  return Promise.all(destinations.map(d => compileDestination(d)))
+}
 
-  const root = './destinations'
-
-  return Promise.all(
-    readdirSync(root, { withFileTypes: true })
-      .filter(sub => sub.isDirectory())
-      .map(async (f) => {
-        const path = resolve(join(root, f.name))
-        const destination = await compile(path)
-        return ({
-          slug: f.name,
-          ...destination
-        })
-      })
-  )
+async function compileDestination (destination) {
+  return {
+    ...destination,
+    compiled: await compile(destination.path)
+  }
 }
 
 const functionSettingTypes = {
@@ -100,7 +93,7 @@ function functionSettings (destination) {
   })
 
   // Per-action settings
-  destination.actions.forEach(action => {
+  destination.partnerActions.forEach(action => {
     const mapping = new FunctionSetting()
     mapping.setType('string')
     mapping.setLabel(`${action.slug}: Mapping JSON`)
@@ -125,14 +118,14 @@ function functionSettings (destination) {
 }
 
 function createFunction (name, destination) {
-  console.log(`Creating function ${name} (${destination.code.length} bytes)`)
+  console.log(`Creating function ${name} (${destination.compiled.length} bytes)`)
 
   const { Function: Fn, CreateFunctionRequest } = require('@segment/connections-api/functions/v1beta/functions_pb')
 
   const fn = new Fn()
   fn.setDisplayName(name)
   fn.setBuildpack(FUNCTION_BUILDPACK)
-  fn.setCode(destination.code)
+  fn.setCode(destination.compiled)
   fn.setSettingsList(functionSettings(destination))
 
   const req = new CreateFunctionRequest()
@@ -149,7 +142,7 @@ function createFunction (name, destination) {
 }
 
 function updateFunction (id, destination) {
-  console.log(`Updating function ${id} (${destination.code.length} bytes)`)
+  console.log(`Updating function ${id} (${destination.compiled.length} bytes)`)
 
   const { Function: Fn, UpdateFunctionRequest } = require('@segment/connections-api/functions/v1beta/functions_pb')
   const { FieldMask } = require('google-protobuf/google/protobuf/field_mask_pb.js')
@@ -158,7 +151,7 @@ function updateFunction (id, destination) {
   fn.setId(id)
   fn.setWorkspaceId(WORKSPACE_ID)
   fn.setBuildpack(FUNCTION_BUILDPACK)
-  fn.setCode(destination.code)
+  fn.setCode(destination.compiled)
   fn.setSettingsList(functionSettings(destination))
 
   const mask = new FieldMask()
