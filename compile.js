@@ -57,10 +57,7 @@ async function pack (inputDir) {
         libraryExport: 'default',
         libraryTarget: 'var'
       },
-      mode: 'none',
-      optimization: {
-        usedExports: true
-      }
+      mode: 'production'
     }, (err, stats) => {
       unlinkSync(indexPath) // cleanup
       if (err || stats.hasErrors()) {
