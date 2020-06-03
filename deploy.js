@@ -74,12 +74,12 @@ function functionSettings (destination) {
 
   const settings = []
 
-  // Base settings
   const subsSetting = new FunctionSetting()
   subsSetting.setType('string')
   subsSetting.setLabel('Subscriptions')
   subsSetting.setName('subscriptions')
-  subsSetting.setDescription('[{"subscribe":{"type":"track"},"partnerAction":"postToChannel"}]')
+  subsSetting.setDescription('\\[{"subscribe":{"type":"track"},"partnerAction":"postToChannel","mapping":{...}}]')
+  subsSetting.setRequired(true)
   settings.push(subsSetting)
 
   destination.settings.forEach(setting => {
@@ -90,28 +90,6 @@ function functionSettings (destination) {
     s.setRequired(true)
     s.setDescription(setting.description)
     settings.push(s)
-  })
-
-  // Per-action settings
-  destination.partnerActions.forEach(action => {
-    const mapping = new FunctionSetting()
-    mapping.setType('string')
-    mapping.setLabel(`${action.slug}: Mapping JSON`)
-    mapping.setName(`${action.slug}Mapping`)
-    mapping.setRequired(true)
-    mapping.setDescription('{"@field": "example.here"}')
-    settings.push(mapping)
-
-    action.settings.forEach(setting => {
-      const s = new FunctionSetting()
-
-      s.setLabel(`${action.slug}: ${setting.label}`)
-      s.setDescription(setting.description)
-      s.setName(`${action.slug}${setting.slug}`)
-      s.setType(functionSettingType(setting.type))
-      s.setRequired(true)
-      settings.push(s)
-    })
   })
 
   return settings
