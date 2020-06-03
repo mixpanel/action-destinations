@@ -63,14 +63,33 @@ function compileDestinations () {
   )
 }
 
+const functionSettingTypes = {
+  string: 'string',
+  strings: 'array'
+}
+
+function functionSettingType (type) {
+  const fnSettingType = functionSettingTypes[type]
+  if (!fnSettingType) {
+    throw new Error(`${type} setting type not implemented`)
+  }
+  return fnSettingType
+}
+
 function functionSettings (destination) {
   const { FunctionSetting } = require('@segment/connections-api/functions/v1beta/functions_pb')
 
   const settings = []
 
   // Base settings
-  destination.settings.forEach(d => {
-    throw new Error('not implemented')
+  destination.settings.forEach(setting => {
+    const s = new FunctionSetting()
+    s.setType(functionSettingType(setting.type))
+    s.setLabel(setting.label)
+    s.setName(setting.slug)
+    s.setRequired(true)
+    s.setDescription(setting.description)
+    settings.push(s)
   })
 
   // Per-action settings
@@ -89,17 +108,7 @@ function functionSettings (destination) {
       s.setLabel(`${action.slug}: ${setting.label}`)
       s.setDescription(setting.description)
       s.setName(`${action.slug}${setting.slug}`)
-
-      switch (setting.type) {
-        case 'string':
-          s.setType('string')
-          break
-        case 'strings':
-          s.setType('array')
-          break
-        default:
-          throw new Error(`${action.slug}: ${setting.type} setting type not implemented`)
-      }
+      s.setType(functionSettingType(setting.type))
       s.setRequired(true)
       settings.push(s)
     })
