@@ -69,6 +69,15 @@ function functionSettingType (type) {
   return fnSettingType
 }
 
+function metadataForDescriptionField (destination) {
+  const { path, compiled, ...cleanDestination } = destination
+  cleanDestination.partnerActions = cleanDestination.partnerActions.map(action => {
+    const { code, ...cleanAction } = action
+    return cleanAction
+  })
+  return JSON.stringify(cleanDestination)
+}
+
 function functionSettings (destination) {
   const { FunctionSetting } = require('@segment/connections-api/functions/v1beta/functions_pb')
 
@@ -91,6 +100,13 @@ function functionSettings (destination) {
     s.setDescription(setting.description)
     settings.push(s)
   })
+
+  const metaSetting = new FunctionSetting()
+  metaSetting.setType('string')
+  metaSetting.setLabel('Destination Metadata')
+  metaSetting.setName('_metadata')
+  metaSetting.setDescription(metadataForDescriptionField(destination))
+  settings.push(metaSetting)
 
   return settings
 }
