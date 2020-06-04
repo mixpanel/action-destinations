@@ -69,6 +69,9 @@
         },
         {
           "$ref": "#/definitions/directive:pick"
+        },
+        {
+          "$ref": "#/definitions/directive:timestamp"
         }
       ]
     },
@@ -170,6 +173,31 @@
       },
       "required": [
         "@pick"
+      ],
+      "additionalProperties": false
+    },
+    "directive:timestamp": {
+      "type": "object",
+      "properties": {
+        "@timestamp": {
+          "type": "object",
+          "properties": {
+            "timestamp": {
+              "$ref": "#/definitions/helpers:string-or-directive"
+            },
+            "format": {
+              "$ref": "#/definitions/helpers:string-or-directive"
+            }
+          },
+          "required": [
+            "timestamp",
+            "format"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "@timestamp"
       ],
       "additionalProperties": false
     },

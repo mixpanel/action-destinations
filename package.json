@@ -23,6 +23,7 @@
     "@segment/connections-api": "^0.1.6",
     "@segment/domain-service-clients": "^0.13.3",
     "@segment/fab5-subscriptions": "^0.1.0",
-    "handlebars": "^4.7.6"
+    "handlebars": "^4.7.6",
+    "moment": "^2.26.0"
   }
 }

@@ -1,0 +1,10 @@
+{
+  "@timestamp": {
+    "timestamp": {
+      "@field": "properties.timestamp"
+    },
+    "format": {
+      "@field": "properties.format"
+    }
+  }
+}
