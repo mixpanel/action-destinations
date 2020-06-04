@@ -1,0 +1,7 @@
+{
+  "@timestamp": {
+    "timestamp": "2020-06-01",
+    "inputFormat": "YYYY-MM-DD",
+    "format": "json"
+  }
+}

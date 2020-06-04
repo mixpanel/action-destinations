@@ -198,6 +198,9 @@
             "timestamp": {
               "$ref": "#/definitions/helpers:string-or-directive"
             },
+            "inputFormat": {
+              "$ref": "#/definitions/helpers:string-or-directive"
+            },
             "format": {
               "$ref": "#/definitions/helpers:string-or-directive"
             }
