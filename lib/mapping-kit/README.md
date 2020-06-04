@@ -51,15 +51,22 @@ Output:
 <!--ts-->
    * [Mapping Kit](#mapping-kit)
       * [Table of contents](#table-of-contents)
+      * [Usage](#usage)
       * [Terms](#terms)
       * [Mixing raw values and directives](#mixing-raw-values-and-directives)
       * [Validation](#validation)
       * [Directives](#directives)
+         * [@base64](#base64)
          * [@field](#field)
          * [@handlebars](#handlebars)
+         * [@lowercase](#lowercase)
          * [@merge](#merge)
+         * [@omit](#omit)
+         * [@pick](#pick)
+         * [@root](#root)
+         * [@timestamp](#timestamp)
 
-<!-- Added by: tysonmote, at: Mon Jun  1 21:33:01 PDT 2020 -->
+<!-- Added by: tysonmote, at: Thu Jun  4 11:57:58 PDT 2020 -->
 
 <!--te-->
 
@@ -217,6 +224,23 @@ suite][schema.test.js] is a good source-of-truth for current implementation beha
 
 ## Directives
 
+### @base64
+
+The @base64 directive resolves to the base64-encoded version of the given string:
+
+```json
+Input:
+
+{
+  "hello": "world!"
+}
+
+Mappings:
+
+{ "@base64": "x" } => "eAo="
+{ "@base64": { "@field": "hello" } } => "d29ybGQhCg=="
+```
+
 ### @field
 
 **TODO:** Support JSONPath
@@ -248,8 +272,6 @@ Mappings:
 
 ### @handlebars
 
-**TODO:** Support Handlebars.js or use a custom format that embeds JSONPath?
-
 The @handlebars directive resolves to string using the given
 [Handlebars.js](https://handlebarsjs.com/guide/) template string.
 
@@ -270,6 +292,23 @@ Mappings:
 { "@handlebars": "Hello, {{traits.fullName}}!" } => "Hello, !"
 
 { "@handlebars": "{{traits.name}} ({{userId}})" } => "Mr.Rogers (abc123)"
+```
+
+### @lowercase
+
+The @lowercase directive resolves to the lowercase version of the given string.
+
+```json
+Input:
+
+{
+  "greeting": "Hello, world!"
+}
+
+Mappings:
+
+{ "@lowercase": "HELLO" } => "hello"
+{ "@lowercase": { "@field": "greeting" } } => "hello, world!"
 ```
 
 ### @merge
@@ -415,7 +454,6 @@ Mappings:
 { "b": 2 }
 ```
 
-
 ### @pick
 
 The @pick directive resolves an object with the only the given list of fields in it:
@@ -477,3 +515,105 @@ Mappings:
 =>
 { "a": 1, "c": 3 }
 ```
+
+### @root
+
+The @root directive resolves to the root of the input JSON object. The value of the "@root" key is
+ignored.
+
+```json
+Input:
+
+{
+  "cool": true
+}
+
+Mappings:
+
+{ "@root": true } => { "cool": true }
+{ "@root": {} } => { "cool": true }
+{ "@root": '' => { "cool": true }
+```
+
+The @root directive is useful for adding or overriding keys to the root input JSON object:
+
+```json
+Input:
+
+{
+  "a": 1,
+  "b": 2
+}
+
+Mappings:
+
+{
+  "@merge": [
+    { "@root": {} },
+    { "b": 22, "c": 33 }
+  ]
+}
+=>
+{
+  "a": 1,
+  "b": 22,
+  "c": 33
+}
+```
+
+### @timestamp
+
+The @timestamp directive parses a string or number timestamp and resolves to a string timestamp
+using the given format. The @timestamp directive uses [moment.js](https://momentjs.com) to parse and
+format timestamps.
+
+```json
+Input:
+
+{
+  "ts": "Mon, 01 Jun 2020 00:00:00"
+}
+
+Mappings:
+
+{
+  "timestamp": "Mon, 01 Jun 2020 00:00:00",
+  "format": "YYYY-MM-DD"
+}
+=>
+"2020-06-01"
+
+{
+  "timestamp": { "@field": "ts" },
+  "format": "json"
+}
+=>
+"2020-06-01T07:00:00.000Z"
+```
+
+The @timestamp directive is fairly liberal in what it accepts by default. In order, it checks for
+the ISO 8601 format, RFC 2822 format, and then it falls back to `new Date(...)`. In Node.js, `new
+Date(...)` also accepts a UNIX timestamp (seconds since epoch) as a number or string. If you want to
+use a custom format, supply a `inputFormat` value using the [format specified by
+moment.js](https://momentjs.com/docs/#/parsing/string-format/):
+
+```json
+Mappings:
+
+{
+  "timestamp": "20-6-1",
+  "inputFormat": "YY-M-D",
+  "format": "json"
+}
+=>
+"2020-06-01T07:00:00.000Z"
+
+{
+  "timestamp": "MMM Do, YYYY",
+  "inputFormat": "June 1st, 2020",
+  "format": "json"
+}
+=>
+"2020-06-01T07:00:00.000Z"
+```
+
