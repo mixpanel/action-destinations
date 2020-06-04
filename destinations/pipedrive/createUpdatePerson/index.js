@@ -6,27 +6,19 @@ const querystring = require('querystring')
 export default action()
   // TODO make these automatic
   .schema(require('./schema.json'))
-  // TODO need a *much* better way to map a single value. Maybe `.mapField`?
-  .map({
-    '@merge': [
-      { '@root': {} },
-      {
-        person: {
-          '@merge': [
-            { '@path': 'person' },
-            {
-              add_time: {
-                '@timestamp': {
-                  timestamp: { '@field': 'person.add_time' },
-                  format: 'YYYY-MM-DD HH:MM:SS'
-                }
-              }
-            }
-          ]
+  .map(
+    {
+      person: {
+        add_time: {
+          '@timestamp': {
+            timestamp: { '@field': 'person.add_time' },
+            format: 'YYYY-MM-DD HH:MM:SS'
+          }
         }
       }
-    ]
-  })
+    },
+    { merge: true }
+  )
   .deliver(async ({ payload, settings }) => {
     const url = (path, params = {}) => {
       const qs = querystring.stringify({ api_token: settings.apiToken, ...params })

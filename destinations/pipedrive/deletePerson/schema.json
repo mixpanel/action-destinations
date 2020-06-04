@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "title": "Pipedrive: Delete person",
+  "description": "Delete a person in Pipedrive.",
+  "type": "object",
+  "properties": {
+    "personIdentifier": {
+      "description": "Identifier used to find person to delete in Pipedrive. Can be an email, name, phone number, or custom field value.",
+      "type": "string"
+    }
+  },
+  "required": [
+    "personIdentifier"
+  ]
+}
