@@ -68,6 +68,9 @@
           "$ref": "#/definitions/directive:omit"
         },
         {
+          "$ref": "#/definitions/directive:root"
+        },
+        {
           "$ref": "#/definitions/directive:pick"
         },
         {
@@ -173,6 +176,16 @@
       },
       "required": [
         "@pick"
+      ],
+      "additionalProperties": false
+    },
+    "directive:root": {
+      "type": "object",
+      "properties": {
+        "@root": {}
+      },
+      "required": [
+        "@root"
       ],
       "additionalProperties": false
     },
