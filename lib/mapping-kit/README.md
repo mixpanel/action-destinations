@@ -32,8 +32,7 @@ Input:
     "neighborhood": "Latrobe",
     "noun": "neighbor",
     "sweaterColor": "red"
-  },
-
+  }
 }
 
 Output:
@@ -128,7 +127,7 @@ Mapping:
       "object": "traits",
       "fields": ["name", "email", "plan"]
     }
-  },
+  }
 }
 
 Input:
@@ -170,7 +169,7 @@ Invalid:
 
 {
   "foo": "bar",
-  "@field:
+  "@field": "properties.biz"
 }
 
 Valid:
@@ -189,7 +188,7 @@ Invalid:
 {
   "@field": "foo.bar",
   "@pick": {
-    "object: "biz.baz",
+    "object": "biz.baz",
     "fields": ["a", "b", "c"]
   }
 }
@@ -200,7 +199,7 @@ Valid:
   "foo": { "@field": "foo.bar" },
   "baz": {
     "@pick": {
-      "object: "biz.baz",
+      "object": "biz.baz",
       "fields": ["a", "b", "c"]
     }
   }
@@ -229,9 +228,9 @@ Input:
 
 {
   "foo": {
-    "bar" {
+    "bar": {
       "baz": 42
-    },
+    }
   },
   "hello": "world"
 }
