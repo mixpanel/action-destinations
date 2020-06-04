@@ -222,6 +222,78 @@ suite][schema.test.js] is a good source-of-truth for current implementation beha
 
 [schema.test.js]: https://github.com/segmentio/fab-5-engine/blob/master/lib/mapping-kit/schema.test.js
 
+## Options
+
+Options can be passed to the `map()` function as the third parameter:
+
+```js
+const output = map(mapping, input, options)
+```
+
+Available options:
+
+```js
+{
+  merge: true // default false
+}
+```
+
+### merge
+
+If true, `merge` will cause the mapped value to be merged onto the input payload. This is useful
+when you only want to map/transform a small number of fields:
+
+```json
+Input:
+
+{
+  "a": {
+    "b": 1
+  },
+  "c": 2
+}
+
+Options:
+
+{
+  "merge": true
+}
+
+Mappings:
+
+{}
+=>
+{
+  "a": {
+    "b": 1
+  },
+  "c": 2
+}
+
+{
+  "a": 3
+}
+=>
+{
+  "a": 3,
+  "c": 2
+}
+
+{
+  "a": {
+    "c": 3
+  }
+}
+=>
+{
+  "a": {
+    "b": 1,
+    "c": 3
+  },
+  "c": 2
+}
+```
+
 ## Directives
 
 ### @base64
