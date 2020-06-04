@@ -11,13 +11,13 @@ export default action()
     '@merge': [
       { '@root': {} },
       {
-        person: {
+        organization: {
           '@merge': [
-            { '@path': 'person' },
+            { '@path': 'organization' },
             {
               add_time: {
                 '@timestamp': {
-                  timestamp: { '@field': 'person.add_time' },
+                  timestamp: { '@field': 'organization.add_time' },
                   format: 'YYYY-MM-DD HH:MM:SS'
                 }
               }
@@ -33,31 +33,31 @@ export default action()
       return `https://${settings.domain}.pipedrive.com/api/v1/${path}?${qs}`
     }
 
-    const resp = await fetch(url('persons/search', { term: payload.personIdentifier }))
-    if (!resp.ok) throw new Error(`Failed to find person in pipedrive, got: ${resp.status} ${resp.statusText}`)
+    const resp = await fetch(url('organizations/search', { term: payload.organizationIdentifier }))
+    if (!resp.ok) throw new Error(`Failed to find organization in pipedrive, got: ${resp.status} ${resp.statusText}`)
 
     const body = await resp.json()
-    let personId = null
+    let organizationId = null
     try {
-      if (body.data.length > 0) personId = body.data[0].item.id
+      if (body.data.length > 0) organizationId = body.data[0].item.id
     } catch (e) {
       throw new Error(`Pipedrive response was missing an expected field: ${e.message}`)
     }
 
-    if (personId) {
-      // Update person
-      return fetch(url('persons'), {
+    if (organizationId) {
+      // Update organization
+      return fetch(url('organizations'), {
         method: 'put',
         body: JSON.stringify({
-          id: personId,
-          ...payload.person
+          id: organizationId,
+          ...payload.organization
         })
       })
     } else {
-      // Create person
-      return fetch(url('persons'), {
+      // Create organization
+      return fetch(url('organizations'), {
         method: 'post',
-        body: JSON.stringify(payload.person)
+        body: JSON.stringify(payload.organization)
       })
     }
   })

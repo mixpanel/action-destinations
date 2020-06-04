@@ -30,6 +30,7 @@ export default action()
   .deliver(async ({ payload, settings }) => {
     const url = (path, params = {}) => {
       const qs = querystring.stringify({ api_token: settings.apiToken, ...params })
+
       return `https://${settings.domain}.pipedrive.com/api/v1/${path}?${qs}`
     }
 
@@ -46,18 +47,6 @@ export default action()
 
     if (personId) {
       // Update person
-      return fetch(url('persons'), {
-        method: 'put',
-        body: JSON.stringify({
-          id: personId,
-          ...payload.person
-        })
-      })
-    } else {
-      // Create person
-      return fetch(url('persons'), {
-        method: 'post',
-        body: JSON.stringify(payload.person)
-      })
+      return fetch(url(`persons/${personId}`), { method: 'delete' })
     }
   })
