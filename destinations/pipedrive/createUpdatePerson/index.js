@@ -1,8 +1,6 @@
 // TODO remove need for this
 require('../../../lib/action-kit')
 
-const querystring = require('querystring')
-
 export default action()
   // TODO make these automatic
   .schema(require('./schema.json'))
@@ -21,7 +19,7 @@ export default action()
   )
   .deliver(async ({ payload, settings }) => {
     const url = (path, params = {}) => {
-      const qs = querystring.stringify({ api_token: settings.apiToken, ...params })
+      const qs = (new URLSearchParams({ api_token: settings.apiToken, ...params })).toString()
       return `https://${settings.domain}.pipedrive.com/api/v1/${path}?${qs}`
     }
 
