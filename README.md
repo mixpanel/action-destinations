@@ -61,7 +61,7 @@ this:
     "partnerAction": "<actionSlug>",
 
     // See ./lib/mapping-kit/README.md for documentation. The schema for each partner action is
-    defined in ./destinations/<destinationSlug/<actionSlug>/schema.json
+    // defined in ./destinations/<destinationSlug/<actionSlug>/schema.json
     "mapping": { ... },
 
     // See ./destinations/<destinationSlug>/<actionSlug>/settings.json
