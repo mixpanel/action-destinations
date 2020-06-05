@@ -2,7 +2,7 @@
   "recipient_id": {
     "@base64": {
       "@lowercase": {
-        "@field": "email"
+        "@path": "$.email"
       }
     }
   }

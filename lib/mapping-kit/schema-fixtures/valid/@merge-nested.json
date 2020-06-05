@@ -4,7 +4,7 @@
       "foo": "bar"
     },
     {
-      "@field": "a.b.c"
+      "@path": "$.a.b.c"
     },
     {
       "@merge": [

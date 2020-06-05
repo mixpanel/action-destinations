@@ -13,7 +13,7 @@ Mapping:
 
 {
   "name": "Mr. Rogers",
-  "neighborhood": { "@field": "properties.neighborhood" },
+  "neighborhood": { "@path": "$.properties.neighborhood" },
   "greeting": { "@handlebars": "Won't you be my {{properties.noun}}?" }
 }
 
@@ -55,18 +55,20 @@ Output:
       * [Terms](#terms)
       * [Mixing raw values and directives](#mixing-raw-values-and-directives)
       * [Validation](#validation)
+      * [Options](#options)
+         * [merge](#merge)
       * [Directives](#directives)
          * [@base64](#base64)
-         * [@field](#field)
          * [@handlebars](#handlebars)
          * [@lowercase](#lowercase)
-         * [@merge](#merge)
+         * [@merge](#merge-1)
          * [@omit](#omit)
+         * [@path](#path)
          * [@pick](#pick)
          * [@root](#root)
          * [@timestamp](#timestamp)
 
-<!-- Added by: tysonmote, at: Thu Jun  4 11:57:58 PDT 2020 -->
+<!-- Added by: tysonmote, at: Thu Jun  4 20:48:07 PDT 2020 -->
 
 <!--te-->
 
@@ -76,7 +78,7 @@ Output:
 // Require using path
 const map = require('../mapping-kit')
 
-const mapping = { '@field': 'foo.bar' }
+const mapping = { '@path': '$.foo.bar' }
 const input = { foo: { bar: "Hello!" } }
 
 const output = map(mapping, input)
@@ -102,14 +104,14 @@ Directives are objects with a single @-prefixed key that tell Mapping Kit to fet
 input payload or transform some data:
 
 ```json
-{ "@field": "properties.name" }
+{ "@path": "$.properties.name" }
 
 { "@handlebars": "Hello there, {{traits.name}}" }
 
 {
   "@merge": [
     { "name": "No name found" },
-    { "@field": "traits" }
+    { "@path": "$.traits" }
   ]
 }
 ```
@@ -127,7 +129,7 @@ Mapping:
 {
   "action": "create",
   "userId": {
-    "@field": "traits.email"
+    "@path": "$.traits.email"
   },
   "userProperties": {
     "@pick": {
@@ -176,14 +178,14 @@ Invalid:
 
 {
   "foo": "bar",
-  "@field": "properties.biz"
+  "@path": "$.properties.biz"
 }
 
 Valid:
 
 {
   "foo": "bar",
-  "baz": { "@field": "properties.biz" }
+  "baz": { "@path": "$.properties.biz" }
 }
 ```
 
@@ -193,7 +195,7 @@ And a directive may only have one @-prefixed directive in it:
 Invalid:
 
 {
-  "@field": "foo.bar",
+  "@path": "$.foo.bar",
   "@pick": {
     "object": "biz.baz",
     "fields": ["a", "b", "c"]
@@ -203,7 +205,7 @@ Invalid:
 Valid:
 
 {
-  "foo": { "@field": "foo.bar" },
+  "foo": { "@path": "$.foo.bar" },
   "baz": {
     "@pick": {
       "object": "biz.baz",
@@ -310,36 +312,7 @@ Input:
 Mappings:
 
 { "@base64": "x" } => "eAo="
-{ "@base64": { "@field": "hello" } } => "d29ybGQhCg=="
-```
-
-### @field
-
-**TODO:** Support JSONPath
-
-The @field directive resolves to the value at the given dot-separated path in the input payload:
-
-```json
-Input:
-
-{
-  "foo": {
-    "bar": {
-      "baz": 42
-    }
-  },
-  "hello": "world"
-}
-
-Mappings:
-
-{ "@field": "hello" } => "world"
-
-{ "@field": "foo.bar" } => { "baz": 42 }
-
-{ "@field": "foo.bar.baz" } => 42
-
-{ "@field": "foo.oops" } => null
+{ "@base64": { "@path": "$.hello" } } => "d29ybGQhCg=="
 ```
 
 ### @handlebars
@@ -380,7 +353,7 @@ Input:
 Mappings:
 
 { "@lowercase": "HELLO" } => "hello"
-{ "@lowercase": { "@field": "greeting" } } => "hello, world!"
+{ "@lowercase": { "@path": "$.greeting" } } => "hello, world!"
 ```
 
 ### @merge
@@ -408,8 +381,8 @@ Mappings:
 
 {
   "@merge": [
-    { "@field": "traits" },
-    { "@field": "properties" }
+    { "@path": "$.traits" },
+    { "@path": "$.properties" }
   ]
 }
 =>
@@ -421,8 +394,8 @@ Mappings:
 
 {
   "@merge": [
-    { "@field": "properties" },
-    { "@field": "traits" }
+    { "@path": "$.properties" },
+    { "@path": "$.traits" }
   ]
 }
 =>
@@ -452,7 +425,7 @@ Mapping:
       "name": "Missing name",
       "neighborhood": "Missing neighborhood"
     },
-    { "@field": "traits" }
+    { "@path": "$.traits" }
   ]
 }
 
@@ -483,7 +456,7 @@ Mapping:
 
 {
   "@omit": {
-    "object": { "@field": "foo" },
+    "object": { "@path": "$.foo" },
     "fields": ["a", "c"]
   }
 }
@@ -507,7 +480,7 @@ Mappings:
 {
   "@omit": {
     "object": { "a": 1, "b": 2, "c": 3 },
-    "fields": { "@field": "fieldList" }
+    "fields": { "@path": "$.fieldList" }
   }
 }
 =>
@@ -518,12 +491,38 @@ Mappings:
     "object": { "a": 1, "b": 2, "c": 3 },
     "fields": [
       "a",
-      { "@field": "singleField" }
+      { "@path": "$.singleField" }
     ]
   }
 }
 =>
 { "b": 2 }
+```
+
+### @path
+
+The @path directive resolves to the value at the given
+[JSONPath](https://goessner.net/articles/JsonPath/) location. @path supports the
+[`jsonpath-plus`](https://github.com/s3u/JSONPath) extensions.
+
+```json
+Input:
+
+{
+  "foo": {
+    "bar": 42,
+    "baz": [{ "num": 1 }, { "num": 2 }]
+  },
+  "hello": "world"
+}
+
+Mappings:
+
+{ "@path": "$.hello" } => "world"
+
+{ "@path": "$.foo.bar" } => 42
+
+{ "@path": "$.foo.baz..num" } => [1, 2]
 ```
 
 ### @pick
@@ -545,7 +544,7 @@ Mapping:
 
 {
   "@pick": {
-    "object": { "@field": "foo" },
+    "object": { "@path": "$.foo" },
     "fields": ["a", "c"]
   }
 }
@@ -569,7 +568,7 @@ Mappings:
 {
   "@pick": {
     "object": { "a": 1, "b": 2, "c": 3 },
-    "fields": { "@field": "fieldList" }
+    "fields": { "@path": "$.fieldList" }
   }
 }
 =>
@@ -580,7 +579,7 @@ Mappings:
     "object": { "a": 1, "b": 2, "c": 3 },
     "fields": [
       "a",
-      { "@field": "singleField" }
+      { "@path": "$.singleField" }
     ]
   }
 }
@@ -656,7 +655,7 @@ Mappings:
 "2020-06-01"
 
 {
-  "timestamp": { "@field": "ts" },
+  "timestamp": { "@path": "$.ts" },
   "format": "json"
 }
 =>

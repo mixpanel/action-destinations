@@ -1,7 +1,7 @@
 {
   "@omit": {
     "object": {
-      "@field": "foo.bar"
+      "@path": "$.foo.bar"
     },
     "fields": [
       "a"

@@ -5,7 +5,7 @@
     },
     {
       "ok": false,
-      "@field": "foo"
+      "@path": "$.foo"
     }
   ]
 }

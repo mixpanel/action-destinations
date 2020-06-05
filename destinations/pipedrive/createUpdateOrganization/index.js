@@ -9,7 +9,7 @@ export default action()
       organization: {
         add_time: {
           '@timestamp': {
-            timestamp: { '@field': 'organization.add_time' },
+            timestamp: { '@path': '$.organization.add_time' },
             format: 'YYYY-MM-DD HH:MM:SS'
           }
         }

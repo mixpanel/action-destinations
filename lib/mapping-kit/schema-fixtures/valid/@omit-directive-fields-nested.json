@@ -7,7 +7,7 @@
     "fields": [
       "a",
       {
-        "@field": "foo.bar"
+        "@path": "$.foo.bar"
       }
     ]
   }

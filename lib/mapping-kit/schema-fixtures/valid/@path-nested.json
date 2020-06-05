@@ -1,5 +1,5 @@
 {
-  "@lowercase": {
+  "@path": {
     "@path": "$.foo.bar"
   }
 }

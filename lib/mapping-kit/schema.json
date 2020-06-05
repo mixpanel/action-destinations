@@ -53,9 +53,6 @@
           "$ref": "#/definitions/directive:base64"
         },
         {
-          "$ref": "#/definitions/directive:field"
-        },
-        {
           "$ref": "#/definitions/directive:handlebars"
         },
         {
@@ -68,10 +65,13 @@
           "$ref": "#/definitions/directive:omit"
         },
         {
-          "$ref": "#/definitions/directive:root"
+          "$ref": "#/definitions/directive:path"
         },
         {
           "$ref": "#/definitions/directive:pick"
+        },
+        {
+          "$ref": "#/definitions/directive:root"
         },
         {
           "$ref": "#/definitions/directive:timestamp"
@@ -87,18 +87,6 @@
       },
       "required": [
         "@base64"
-      ],
-      "additionalProperties": false
-    },
-    "directive:field": {
-      "type": "object",
-      "properties": {
-        "@field": {
-          "$ref": "#/definitions/helpers:string-or-directive"
-        }
-      },
-      "required": [
-        "@field"
       ],
       "additionalProperties": false
     },
@@ -164,6 +152,18 @@
       },
       "required": [
         "@omit"
+      ],
+      "additionalProperties": false
+    },
+    "directive:path": {
+      "type": "object",
+      "properties": {
+        "@path": {
+          "$ref": "#/definitions/helpers:string-or-directive"
+        }
+      },
+      "required": [
+        "@path"
       ],
       "additionalProperties": false
     },

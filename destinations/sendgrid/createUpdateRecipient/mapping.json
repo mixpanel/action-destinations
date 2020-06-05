@@ -2,11 +2,11 @@
   "@merge": [
     {
       "email": {
-        "@field": "email"
+        "@path": "$.email"
       }
     },
     {
-      "@field": "custom_fields"
+      "@path": "$.custom_fields"
     }
   ]
 }

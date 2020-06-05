@@ -1,4 +1,4 @@
 {
-  "@field": "foo",
+  "@path": "$.foo",
   "bar": "baz"
 }

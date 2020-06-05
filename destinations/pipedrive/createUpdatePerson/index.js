@@ -9,7 +9,7 @@ export default action()
       person: {
         add_time: {
           '@timestamp': {
-            timestamp: { '@field': 'person.add_time' },
+            timestamp: { '@path': '$.person.add_time' },
             format: 'YYYY-MM-DD HH:MM:SS'
           }
         }
