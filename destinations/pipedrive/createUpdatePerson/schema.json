@@ -30,7 +30,8 @@
         },
         "add_time": {
           "description": "If the person is created, use this timestamp as the creation timestamp. Format: YYY-MM-DD HH:MM:SS",
-          "type": "string"
+          "type": "string",
+          "format": "date-time"
         }
       }
     }
