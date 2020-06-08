@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "title": "Customer.io: Create or update device",
+  "description": "Update a customer's device in Customer.io or create it if it does not exist.",
+  "type": "object",
+  "properties": {
+    "customer_id": {
+      "description": "ID of the customer to add or update the device of.",
+      "type": "string"
+    },
+    "device_id": {
+      "description": "Unique ID for this device.",
+      "type": "string"
+    },
+    "platform": {
+      "description": "The device platform.",
+      "type": "string",
+      "enum": [
+        "ios",
+        "android"
+      ]
+    },
+    "last_used": {
+      "description": "last_used",
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "customer_id",
+    "device_id",
+    "platform"
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "title": "Customer.io: Track a customer event",
+  "description": "Track an event for a given customer.",
+  "type": "object",
+  "properties": {
+    "id": {
+      "description": "Customer ID used to uniquely identify customer in Customer.io.",
+      "type": "string"
+    },
+    "name": {
+      "description": "Event name.",
+      "type": "string"
+    },
+    "type": {
+      "description": "Override event type. Ex. \"page\".",
+      "type": "string"
+    },
+    "data": {
+      "description": "Custom data to include with the event.",
+      "type": "object"
+    }
+  },
+  "required": [
+    "id",
+    "name"
+  ]
+}

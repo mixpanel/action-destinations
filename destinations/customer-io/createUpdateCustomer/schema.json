@@ -1,0 +1,29 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "title": "Customer.io: Create or update customer",
+  "description": "Update a customer in Customer.io or create them if they do not exist.",
+  "type": "object",
+  "properties": {
+    "id": {
+      "description": "Customer ID used to uniquely identify customer in Customer.io.",
+      "type": "string"
+    },
+    "email": {
+      "description": "Customer email address.",
+      "type": "string"
+    },
+    "created_at": {
+      "description": "Timestamp for when the customer was created.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "attributes": {
+      "description": "Optional custom attributes for this customer.",
+      "type": "object"
+    }
+  },
+  "required": [
+    "id",
+    "email"
+  ]
+}
