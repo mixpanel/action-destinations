@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "title": "Customer.io: Trigger broadcast campaign",
+  "description": "Trigger a Customer.io broadcast campaign.",
+  "type": "object",
+  "properties": {
+    "id": {
+      "description": "Campaign ID to trigger.",
+      "type": "string"
+    },
+    "data": {
+      "description": "Custom Liquid merge data to include with the trigger.",
+      "type": "string"
+    },
+    "recipients": {
+      "description": "Additional recipient conditions to filter recipients. If this is used, \"ids\" may not be used.",
+      "type": "object"
+    },
+    "ids": {
+      "description": "List of profile IDs to use as campaign recipients. If this is used, \"recipients\" may not be used.",
+      "type": "object"
+    }
+  },
+  "required": [
+    "id"
+  ]
+}
