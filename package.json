@@ -26,6 +26,7 @@
     "handlebars": "^4.7.6",
     "jsonpath-plus": "^4.0.0",
     "lodash": "^4.17.15",
-    "moment": "^2.26.0"
+    "moment": "^2.26.0",
+    "uuid": "^8.1.0"
   }
 }
