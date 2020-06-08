@@ -67,8 +67,9 @@ Output:
          * [@pick](#pick)
          * [@root](#root)
          * [@timestamp](#timestamp)
+         * [@uuid](#uuid)
 
-<!-- Added by: tysonmote, at: Thu Jun  4 20:48:07 PDT 2020 -->
+<!-- Added by: tysonmote, at: Mon Jun  8 11:20:00 PDT 2020 -->
 
 <!--te-->
 
@@ -688,3 +689,18 @@ Mappings:
 "2020-06-01T07:00:00.000Z"
 ```
 
+### @uuid
+
+The @uuid directive resolves to a v4 UUID string generated using the [uuid
+package](https://www.npmjs.com/package/uuid).
+
+
+```json
+Mappings:
+
+{
+  "uuid": {}
+}
+=>
+"a3c8e5ac-fff9-43d1-b053-3049a62fcbeb"
+```

@@ -75,6 +75,9 @@
         },
         {
           "$ref": "#/definitions/directive:timestamp"
+        },
+        {
+          "$ref": "#/definitions/directive:uuid"
         }
       ]
     },
@@ -214,6 +217,16 @@
       },
       "required": [
         "@timestamp"
+      ],
+      "additionalProperties": false
+    },
+    "directive:uuid": {
+      "type": "object",
+      "properties": {
+        "@uuid": {}
+      },
+      "required": [
+        "@uuid"
       ],
       "additionalProperties": false
     },
