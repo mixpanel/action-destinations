@@ -10,7 +10,7 @@
     },
     "data": {
       "description": "Custom Liquid merge data to include with the trigger.",
-      "type": "string"
+      "type": "object"
     },
     "recipients": {
       "description": "Additional recipient conditions to filter recipients. If this is used, \"ids\" may not be used.",
@@ -18,7 +18,7 @@
     },
     "ids": {
       "description": "List of profile IDs to use as campaign recipients. If this is used, \"recipients\" may not be used.",
-      "type": "object"
+      "type": "array"
     }
   },
   "required": [
