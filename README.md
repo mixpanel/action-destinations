@@ -36,7 +36,7 @@ $ node -e "console.log(JSON.stringify(require('./destinations')()))"
         "settings": [],
         "mapping": null,
         "schema": null,
-        "code": "// TODO remove need for this\nrequire('../../../lib/action-kit')\n\nexport default action()\n"
+        "code": "require('../../../lib/action-kit')\n\nmodule.exports = action()\n ..."
       }
     ]
   },

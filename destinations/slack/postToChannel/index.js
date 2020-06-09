@@ -1,7 +1,7 @@
 // TODO remove need for this
 require('../../../lib/action-kit')
 
-export default action()
+module.exports = action()
   // TODO is there a better way to include settings/schema without manual config?
   .settings(require('./settings.json'))
   .schema(require('./schema.json'))

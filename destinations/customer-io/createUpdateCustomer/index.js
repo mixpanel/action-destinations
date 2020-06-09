@@ -1,7 +1,7 @@
 // TODO remove need for this
 require('../../../lib/action-kit')
 
-export default action()
+module.exports = action()
   // TODO make these automatic
   .schema(require('./schema.json'))
   // TODO maybe this kind of thing doesn't need to be a mapping but could just
