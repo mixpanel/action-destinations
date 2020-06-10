@@ -77,7 +77,7 @@ Output:
 
 ```js
 // Require using path
-const map = require('../mapping-kit')
+const {map} = require('../mapping-kit')
 
 const mapping = { '@path': '$.foo.bar' }
 const input = { foo: { bar: "Hello!" } }

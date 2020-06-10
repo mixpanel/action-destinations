@@ -12,6 +12,76 @@ hard-coded to the `tyson` workspace in staging. If you want to deploy these to y
 edit [deploy.js](https://github.com/segmentio/fab-5-engine/blob/master/deploy.js) and run `node
 deploy.js`.
 
+## Running Locally
+
+You can run actions locally with the `run-local.js` script:
+
+```
+run-local.js [action]
+
+Run a partner action locally.
+
+Positionals:
+  action  The aciton to run.                    [default: "slack/postToChannel"]
+
+Options:
+  --help          Show help                                            [boolean]
+  --version       Show version number                                  [boolean]
+  --payload, -p   path to payload JSON file
+                                     [string] [default: "./sample/payload.json"]
+  --mapping, -m   path to mapping configuration JSON file
+                                     [string] [default: "./sample/mapping.json"]
+  --settings, -s  path to settings configuration JSON file
+                                    [string] [default: "./sample/settings.json"]
+```
+
+For example:
+
+```
+% node ./run-local.js slack/postToChannel -p ./sample/payload.json -m ./sample/mapping.json -s ./sample/settings.json
+MapPayload1: Starting
+MapPayload1: Finished (17 ms)
+ValidateSettings2: Starting
+ValidateSettings2: Finished (<1 ms)
+ValidateSchema3: Starting
+ValidateSchema3: Finished (<1 ms)
+FanOut4: Starting
+FanOut4->Deliver5: Starting
+FanOut4->Deliver5: Finished (299 ms)
+FanOut4: Finished (299 ms)
+Result:
+[
+  {
+    step: 'MapPayload1',
+    output: 'payload mapped successfully',
+    error: null,
+    startedAt: 2020-06-10T04:47:56.185Z,
+    finishedAt: 2020-06-10T04:47:56.202Z
+  },
+  {
+    step: 'ValidateSettings2',
+    output: 'settings validated successfully',
+    error: null,
+    startedAt: 2020-06-10T04:47:56.202Z,
+    finishedAt: 2020-06-10T04:47:56.202Z
+  },
+  {
+    step: 'ValidateSchema3',
+    output: 'payload validated against schema successfully',
+    error: null,
+    startedAt: 2020-06-10T04:47:56.202Z,
+    finishedAt: 2020-06-10T04:47:56.202Z
+  },
+  {
+    step: 'FanOut4',
+    output: [ [Array] ],
+    error: null,
+    startedAt: 2020-06-10T04:47:56.203Z,
+    finishedAt: 2020-06-10T04:47:56.502Z
+  }
+]
+```
+
 ## Inspecting
 
 If you want to dump the definition for all destinations, run this:
