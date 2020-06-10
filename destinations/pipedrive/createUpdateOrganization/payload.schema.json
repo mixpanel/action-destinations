@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/schema#",
   "title": "Pipedrive: Create or update organization",
-  "description": "Update an organization in Pipedrive or create it if they do not exist yet.",
+  "description": "Update an organization in Pipedrive or create it if it does not exist yet.",
   "type": "object",
   "properties": {
     "organizationIdentifier": {
@@ -16,12 +16,18 @@
           "description": "Name of the organization.",
           "type": "string"
         },
+        "owner_id": {
+          "description": "ID of the user who will be marked as the owner of this organization. Default is the user who ownes the API token.",
+          "type": "number"
+        },
         "add_time": {
           "description": "If the organization is created, use this timestamp as the creation timestamp. Format: YYY-MM-DD HH:MM:SS",
-          "type": "string",
-          "format": "date-time"
+          "type": "string"
         }
-      }
+      },
+      "required": [
+        "name"
+      ]
     }
   },
   "required": [

@@ -21,8 +21,11 @@
           "type": "number"
         },
         "email": {
-          "description": "Email address for the person.",
-          "type": "string"
+          "description": "Email addresses for this person.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         },
         "phone": {
           "description": "Phone number for the person.",
@@ -30,10 +33,12 @@
         },
         "add_time": {
           "description": "If the person is created, use this timestamp as the creation timestamp. Format: YYY-MM-DD HH:MM:SS",
-          "type": "string",
-          "format": "date-time"
+          "type": "string"
         }
-      }
+      },
+      "required": [
+        "name"
+      ]
     }
   },
   "required": [

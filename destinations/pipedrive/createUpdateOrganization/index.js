@@ -1,9 +1,13 @@
 // TODO remove need for this
 require('../../../lib/action-kit')
 
+const lodash = require('lodash')
+
 module.exports = action()
   // TODO make these automatic
-  .schema(require('./schema.json'))
+  .validateSettings(require('../settings.schema.json'))
+  .validatePayload(require('./payload.schema.json'))
+
   .map(
     {
       organization: {
@@ -23,30 +27,30 @@ module.exports = action()
       return `https://${settings.domain}.pipedrive.com/api/v1/${path}?${qs}`
     }
 
-    const resp = await fetch(url('organizations/search', { term: payload.organizationIdentifier }))
+    const headers = { 'Content-Type': 'application/json' }
+
+    const resp = await fetch(
+      url('organizations/search', { term: payload.organizationIdentifier }),
+      { headers }
+    )
     if (!resp.ok) throw new Error(`Failed to find organization in pipedrive, got: ${resp.status} ${resp.statusText}`)
 
     const body = await resp.json()
-    let organizationId = null
-    try {
-      if (body.data.length > 0) organizationId = body.data[0].item.id
-    } catch (e) {
-      throw new Error(`Pipedrive response was missing an expected field: ${e.message}`)
-    }
+    const organizationId = lodash.get(body, 'data.items[0].item.id')
 
     if (organizationId) {
+      const { add_time: x, ...organization } = payload.organization
       // Update organization
-      return fetch(url('organizations'), {
+      return fetch(url(`organizations/${organizationId}`), {
         method: 'put',
-        body: JSON.stringify({
-          id: organizationId,
-          ...payload.organization
-        })
+        headers,
+        body: JSON.stringify(organization)
       })
     } else {
       // Create organization
       return fetch(url('organizations'), {
         method: 'post',
+        headers,
         body: JSON.stringify(payload.organization)
       })
     }
