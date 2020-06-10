@@ -5,7 +5,7 @@
   "type": "object",
   "properties": {
     "id": {
-      "description": "Campaign ID to trigger.",
+      "description": "ID of the campaign to trigger.",
       "type": "string"
     },
     "data": {

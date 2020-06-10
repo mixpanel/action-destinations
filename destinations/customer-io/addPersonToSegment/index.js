@@ -3,10 +3,15 @@ require('../../../lib/action-kit')
 
 module.exports = action()
   // TODO make these automatic
-  .schema(require('./schema.json'))
+  .validateSettings(require('../settings.schema.json'))
+  .validatePayload(require('./payload.schema.json'))
+
   .deliver(async ({ payload, settings }) => {
-    const { segment_id: segmentId, customer_id: customerId } = payload
-    const userPass = Buffer.from(`${settings.site_id}:${settings.api_key}`)
+    const { segmentId, personId } = payload
+    const userPass = Buffer.from(`${settings.siteId}:${settings.apiKey}`)
+
+    console.log(userPass)
+    console.log(userPass.toString('base64'))
 
     return fetch(`https://track.customer.io/api/v1/segments/${segmentId}/add_customers`, {
       method: 'post',
@@ -14,6 +19,6 @@ module.exports = action()
         Authorization: `Basic ${userPass.toString('base64')}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ ids: [customerId] })
+      body: JSON.stringify({ ids: [personId] })
     })
   })

@@ -3,7 +3,9 @@ require('../../../lib/action-kit')
 
 module.exports = action()
   // TODO make these automatic
-  .schema(require('./schema.json'))
+  .validateSettings(require('../settings.schema.json'))
+  .validatePayload(require('./payload.schema.json'))
+
   // TODO maybe this kind of thing doesn't need to be a mapping but could just
   // be code?
   .map(
@@ -18,8 +20,8 @@ module.exports = action()
     { merge: true }
   )
   .deliver(async ({ payload, settings }) => {
-    const { customer_id: customerId, device_id: deviceId, ...body } = payload
-    const userPass = Buffer.from(`${settings.site_id}:${settings.api_key}`)
+    const { person_id: customerId, device_id: deviceId, ...body } = payload
+    const userPass = Buffer.from(`${settings.siteId}:${settings.apiKey}`)
 
     return fetch(`https://track.customer.io/api/v1/customers/${customerId}/devices`, {
       method: 'put',

@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "title": "Customer.io: Track an anonymous event",
+  "description": "Track an anonymous event (an event not tied to a known person).",
+  "type": "object",
+  "properties": {
+    "name": {
+      "description": "Event name.",
+      "type": "string"
+    },
+    "data": {
+      "description": "Custom data to include with the event. If \"recipient\", \"from_address\", or \"reply_to\" are sent, they will override settings on any campaigns triggered by this event. \"recipient\" is required if the event is used to trigger a campaign.",
+      "type": "object"
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

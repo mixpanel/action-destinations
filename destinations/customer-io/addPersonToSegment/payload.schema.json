@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "title": "Customer.io: Add person to segment",
+  "description": "Add a person to a segment in Customer.io.",
+  "type": "object",
+  "properties": {
+    "segmentId": {
+      "description": "ID of the Customer.io segment to add the person to.",
+      "type": "number"
+    },
+    "personId": {
+      "description": "ID of the person to add.",
+      "type": "string"
+    }
+  },
+  "required": [
+    "segmentId",
+    "personId"
+  ]
+}

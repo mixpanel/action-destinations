@@ -3,9 +3,11 @@ require('../../../lib/action-kit')
 
 module.exports = action()
   // TODO make these automatic
-  .schema(require('./schema.json'))
+  .validateSettings(require('../settings.schema.json'))
+  .validatePayload(require('./payload.schema.json'))
+
   .deliver(async ({ payload, settings }) => {
-    const userPass = Buffer.from(`${settings.site_id}:${settings.api_key}`)
+    const userPass = Buffer.from(`${settings.siteId}:${settings.apiKey}`)
 
     return fetch('https://track.customer.io/api/v1/events', {
       method: 'post',

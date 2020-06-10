@@ -3,10 +3,12 @@ require('../../../lib/action-kit')
 
 module.exports = action()
   // TODO make these automatic
-  .schema(require('./schema.json'))
+  .validateSettings(require('../settings.schema.json'))
+  .validatePayload(require('./payload.schema.json'))
+
   .deliver(async ({ payload, settings }) => {
-    const { segment_id: segmentId, customer_id: customerId } = payload
-    const userPass = Buffer.from(`${settings.site_id}:${settings.api_key}`)
+    const { segment_id: segmentId, person_id: customerId } = payload
+    const userPass = Buffer.from(`${settings.siteId}:${settings.apiKey}`)
 
     return fetch(`https://track.customer.io/api/v1/segments/${segmentId}/remove_customers`, {
       method: 'post',

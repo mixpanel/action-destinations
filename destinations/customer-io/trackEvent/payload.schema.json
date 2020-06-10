@@ -1,11 +1,11 @@
 {
   "$schema": "http://json-schema.org/schema#",
-  "title": "Customer.io: Track a customer event",
-  "description": "Track an event for a given customer.",
+  "title": "Customer.io: Track event",
+  "description": "Track an event for a known person.",
   "type": "object",
   "properties": {
     "id": {
-      "description": "Customer ID used to uniquely identify customer in Customer.io.",
+      "description": "ID of the person who triggered this event.",
       "type": "string"
     },
     "name": {

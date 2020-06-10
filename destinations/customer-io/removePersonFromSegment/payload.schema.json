@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "title": "Customer.io: Remove a person from a segment",
+  "description": "Remove a person from a segment in Customer.io.",
+  "type": "object",
+  "properties": {
+    "segment_id": {
+      "description": "ID of the Customer.io segment to remove the person from.",
+      "type": "number"
+    },
+    "person_id": {
+      "description": "ID of the person to remove.",
+      "type": "string"
+    }
+  },
+  "required": [
+    "segment_id",
+    "person_id"
+  ]
+}
