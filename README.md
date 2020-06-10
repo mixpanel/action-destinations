@@ -1,9 +1,9 @@
 # Fab 5 Engine
 
 Fab 5 Engine is an early prototype implementation of five destinations following the Destinations
-2.0 vision. 2.0 destinations are comprised of one or more subscriptions ("if") that trigger partner
-actions along with a mapping that maps the incoming event to a payload that matches the action's
-schema.
+2.0 vision. 2.0 destinations are comprised of one or more subscriptions ("if" statements) that
+trigger partner actions along with a mapping that maps the incoming event to a payload that matches
+the action's schema.
 
 <img alt="Destinations 2.0 flow" src="https://user-images.githubusercontent.com/111501/83700205-10f23e80-a5bb-11ea-9fbe-b1b10c1ed464.png">
 
@@ -134,7 +134,8 @@ this:
     // defined in ./destinations/<destinationSlug/<actionSlug>/schema.json
     "mapping": { ... },
 
-    // See ./destinations/<destinationSlug>/<actionSlug>/settings.json
+    // See ./destinations/<destinationSlug>/<actionSlug>/settings.json. This can be a mapping-kit
+    // mapping definition. See ./lib/mapping-kit/README.md for documentation.
     "settings": { ... }
   }
 ]
