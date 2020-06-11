@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/schema#",
-  "title": "SendGrid: Create a list",
-  "description": "Create a new list.",
+  "title": "SendGrid: Create contact list",
+  "description": "Create a new marketing contact list.",
   "type": "object",
   "properties": {
     "name": {

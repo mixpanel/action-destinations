@@ -6,7 +6,7 @@
   "properties": {
     "list_id": {
       "description": "The ID of the SendGrid list to remove the user from.",
-      "type": "number"
+      "type": "string"
     },
     "email": {
       "description": "Email address of the user to be removed from the list.",

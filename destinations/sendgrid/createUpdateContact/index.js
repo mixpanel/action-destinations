@@ -6,16 +6,21 @@ module.exports = action()
   .validateSettings(require('../settings.schema.json'))
   .validatePayload(require('./payload.schema.json'))
 
-  .deliver(async ({ payload, settings }) => (
-    fetch(
-      'https://api.sendgrid.com/v3/marketing/lists',
+  .deliver(({ payload, settings }) => {
+    const { list_id: listId, contact } = payload
+
+    return fetch(
+      'https://api.sendgrid.com/v3/marketing/contacts',
       {
-        method: 'post',
+        method: 'put',
         headers: {
           Authorization: `Bearer ${settings.apiKey}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({
+          list_ids: [listId],
+          contacts: [contact]
+        })
       }
     )
-  ))
+  })

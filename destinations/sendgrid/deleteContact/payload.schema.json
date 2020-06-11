@@ -1,11 +1,11 @@
 {
   "$schema": "http://json-schema.org/schema#",
-  "title": "SendGrid: Delete recipient",
-  "description": "Delete a recipient from SendGrid.",
+  "title": "SendGrid: Delete contact",
+  "description": "Delete a contact from SendGrid.",
   "type": "object",
   "properties": {
     "email": {
-      "description": "Email address of the user to delete.",
+      "description": "Email address of the contact to delete.",
       "type": "string"
     }
   },

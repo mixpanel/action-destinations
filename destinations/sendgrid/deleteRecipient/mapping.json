@@ -1,9 +1,0 @@
-{
-  "recipient_id": {
-    "@base64": {
-      "@lowercase": {
-        "@path": "$.email"
-      }
-    }
-  }
-}

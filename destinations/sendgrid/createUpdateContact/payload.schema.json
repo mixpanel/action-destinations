@@ -1,0 +1,75 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "title": "SendGrid: Create or update contact",
+  "description": "Update an existing marketing contact or create them if they do not exist. Additions and updates are asynchronous in SendGrid, so you may not immediately see the contact in the SendGrid dashboard.",
+  "type": "object",
+  "properties": {
+    "list_id": {
+      "description": "ID of the marketing contact list you want the contact added to.",
+      "type": "string"
+    },
+    "contact": {
+      "type": "object",
+      "properties": {
+        "address_line_1": {
+          "type": "string",
+          "description": "The first line of the address.",
+          "maxLength": 100
+        },
+        "address_line_2": {
+          "type": "string",
+          "description": "Optional second line for the address.",
+          "maxLength": 100
+        },
+        "alternate_emails": {
+          "type": "array",
+          "description": "Additional emails associated with the contact.",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 5
+        },
+        "city": {
+          "type": "string",
+          "description": "The city of the contact.",
+          "maxLength": 60
+        },
+        "country": {
+          "type": "string",
+          "description": "The country of the contacts address. Accepts full name or abbreviation.",
+          "maxLength": 50
+        },
+        "email": {
+          "type": "string",
+          "description": "The primary email for the contact. This is required to be a valid email.",
+          "maxLength": 254
+        },
+        "first_name": {
+          "type": "string",
+          "description": "The contacts personal name.",
+          "maxLength": 50
+        },
+        "last_name": {
+          "type": "string",
+          "description": "The contacts family name.",
+          "maxLength": 50
+        },
+        "postal_code": {
+          "type": "string",
+          "description": "The postcode, post code, Eircode, PIN code or ZIP code."
+        },
+        "state_province_region": {
+          "type": "string",
+          "description": "The state, province, or region of the contacts address.",
+          "maxLength": 50
+        },
+        "custom_fields": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "email"
+      ]
+    }
+  }
+}
