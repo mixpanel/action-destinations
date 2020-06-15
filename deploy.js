@@ -58,7 +58,7 @@ async function compileDestination (destination) {
 
 const functionSettingTypes = {
   string: 'string',
-  strings: 'array'
+  array: 'array'
 }
 
 function functionSettingType (type) {
@@ -91,20 +91,21 @@ function functionSettings (destination) {
   subsSetting.setRequired(true)
   settings.push(subsSetting)
 
-  destination.settings.forEach(setting => {
+  for (const slug in destination.settings.properties) {
+    const setting = destination.settings.properties[slug]
     const s = new FunctionSetting()
     s.setType(functionSettingType(setting.type))
-    s.setLabel(setting.label)
-    s.setName(setting.slug)
+    s.setLabel(setting.title)
+    s.setName(slug)
     s.setRequired(true)
     s.setDescription(setting.description)
     settings.push(s)
-  })
+  }
 
   const metaSetting = new FunctionSetting()
   metaSetting.setType('string')
   metaSetting.setLabel('Destination Metadata')
-  metaSetting.setName('_metadata')
+  metaSetting.setName('metadata')
   metaSetting.setDescription(metadataForDescriptionField(destination))
   settings.push(metaSetting)
 
