@@ -130,7 +130,7 @@ function createFunction (name, destination) {
 
   return new Promise((resolve, reject) => {
     functions.create(req, METADATA, (err, resp) => {
-      if (err) return reject(err)
+      if (err) return reject(new Error(`${name}: ${err.message}`))
       resolve(resp.toObject())
     })
   })
@@ -158,7 +158,7 @@ function updateFunction (id, destination) {
 
   return new Promise((resolve, reject) => {
     functions.update(req, METADATA, (err, resp) => {
-      if (err) return reject(err)
+      if (err) return reject(new Error(`${destination.name} (${id}): ${err.message}`))
       resolve(resp.toObject())
     })
   })
@@ -174,14 +174,16 @@ Promise.all([
   const createDestinations = destinations.filter((d) => !fnWithSlug(d.slug))
   const updateDestinations = destinations.filter((d) => !createDestinations.includes(d))
 
-  return Promise.all([
+  return Promise.allSettled([
     ...createDestinations.map((d) => createFunction(fnName(d.slug), d)),
     ...updateDestinations.map((d) => updateFunction(fnWithSlug(d.slug).id, d))
   ])
-}).then((functions) => {
-  functions.forEach((fn) => {
-    console.log(`Deployed: ${fn.displayName} (${fn.id})`)
+}).then((results) => {
+  results.forEach(result => {
+    if (result.status === 'fulfilled') {
+      console.log(`Deployed: ${result.value.displayName} (${result.value.id})`)
+    } else {
+      console.log(`FAILED: ${result.reason}`)
+    }
   })
-}).catch((reason) =>
-  console.log('ERROR', reason)
-)
+})
