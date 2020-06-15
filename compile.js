@@ -5,7 +5,7 @@ const { readFileSync, readdirSync, writeFile, unlinkSync } = require('fs')
 
 // ENTRYPOINT is the name the default export function of the webpack-compiled JS
 // file so that we can add our adapter.
-const ENTRYPOINT = '__'
+const ENTRYPOINT = '_segmentEntrypoint'
 
 function actionSlugs (dir) {
   return readdirSync(dir, { withFileTypes: true })
@@ -54,7 +54,6 @@ async function pack (inputDir) {
         path: tmpdir,
         filename: tmpfile,
         library: ENTRYPOINT,
-        libraryExport: 'default',
         libraryTarget: 'var'
       },
       mode: 'production'

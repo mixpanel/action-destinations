@@ -19,7 +19,6 @@ describe('metadata', () => {
         expect(Object.keys(action).sort()).toStrictEqual([
           'slug',
           'settings',
-          'mapping',
           'schema',
           'code'
         ].sort())
