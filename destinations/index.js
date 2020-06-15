@@ -34,7 +34,7 @@ const destinationMetadata = (slug) => {
     ...require(filePath(slug, 'destination.json')),
     slug,
     path: filePath(slug),
-    settings: requireOr(filePath(slug, 'settings.json'), []),
+    settings: requireOr(filePath(slug, 'settings.schema.json'), []),
     partnerActions: partnerActions(slug)
   }
 }
@@ -55,9 +55,8 @@ const partnerActions = (destinationSlug) => {
 const partnerAction = (path) => {
   return {
     slug: basename(path),
-    settings: requireOr(join(path, 'settings.json'), []),
-    mapping: requireOr(join(path, 'mapping.json'), null),
-    schema: requireOr(join(path, 'schema.json'), null),
+    settings: requireOr(join(path, 'settings.schema.json'), []),
+    schema: requireOr(join(path, 'payload.schema.json'), null),
     code: readFileSync(join(path, 'index.js'), 'utf-8')
   }
 }
