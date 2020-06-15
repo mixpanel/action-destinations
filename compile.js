@@ -2,6 +2,7 @@ const webpack = require('webpack')
 const tmp = require('tmp')
 const { join, basename } = require('path')
 const { readFileSync, readdirSync, writeFile, unlinkSync } = require('fs')
+const TerserPlugin = require('terser-webpack-plugin')
 
 // ENTRYPOINT is the name the default export function of the webpack-compiled JS
 // file so that we can add our adapter.
@@ -56,7 +57,19 @@ async function pack (inputDir) {
         library: ENTRYPOINT,
         libraryTarget: 'var'
       },
-      mode: 'production'
+      mode: 'production',
+      optimization: {
+        minimize: true,
+        minimizer: [
+          new TerserPlugin({
+            terserOptions: {
+              // We use class names for logging in action-kit. If that gets fixed, this whole
+              // 'optimization' block can go away.
+              keep_classnames: true
+            }
+          })
+        ]
+      }
     }, (err, stats) => {
       unlinkSync(indexPath) // cleanup
       if (err || stats.hasErrors()) {
