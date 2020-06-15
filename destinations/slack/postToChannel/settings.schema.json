@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "url": {
+      "title": "Webhook URL",
+      "description": "Slack webhook URL.",
+      "type": "string",
+      "format": "uri"
+    },
+    "channels": {
+      "title": "Channels",
+      "description": "Slack Channels to post messages to. Each channel receives a copy of messages sent to this Action.",
+      "type": "array",
+      "minLength": 20,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "required": [
+    "url",
+    "channels"
+  ]
+}
