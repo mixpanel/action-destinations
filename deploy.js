@@ -69,12 +69,8 @@ function functionSettingType (type) {
   return fnSettingType
 }
 
-function metadataForDescriptionField (destination) {
+function destMetaDescription (destination) {
   const { path, compiled, ...cleanDestination } = destination
-  cleanDestination.partnerActions = cleanDestination.partnerActions.map(action => {
-    const { code, ...cleanAction } = action
-    return cleanAction
-  })
   return JSON.stringify(cleanDestination)
 }
 
@@ -102,12 +98,24 @@ function functionSettings (destination) {
     settings.push(s)
   }
 
+  const { partnerActions, ...destinationMeta } = destination
+
   const metaSetting = new FunctionSetting()
   metaSetting.setType('string')
   metaSetting.setLabel('Destination Metadata')
   metaSetting.setName('metadata')
-  metaSetting.setDescription(metadataForDescriptionField(destination))
+  metaSetting.setDescription(destMetaDescription(destinationMeta))
   settings.push(metaSetting)
+
+  for (const action of partnerActions) {
+    const actionSetting = new FunctionSetting()
+    const { code, ...cleanAction } = action
+    actionSetting.setType('string')
+    actionSetting.setLabel(`Action Metadata: ${action.slug}`)
+    actionSetting.setName(`action${action.slug}`)
+    actionSetting.setDescription(JSON.stringify(cleanAction))
+    settings.push(actionSetting)
+  }
 
   return settings
 }
