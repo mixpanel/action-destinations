@@ -1,34 +1,25 @@
-// TODO remove need for this
-require('../../../lib/action-kit')
+module.exports = (action) => {
+  action
+    // TODO make these automatic
+    .validatePayload(require('./payload.schema.json'))
 
-module.exports = action()
-  // TODO make these automatic
-  .validateSettings(require('../settings.schema.json'))
-  .validatePayload(require('./payload.schema.json'))
-
-  // TODO maybe this kind of thing doesn't need to be a mapping but could just
-  // be code?
-  .map(
-    {
-      created_at: {
-        '@timestamp': {
-          timestamp: { '@path': '$.created_at' },
-          format: 'X'
+    // TODO maybe this kind of thing doesn't need to be a mapping but could just be code?
+    .map(
+      {
+        created_at: {
+          '@timestamp': {
+            timestamp: { '@path': '$.created_at' },
+            format: 'X'
+          }
         }
-      }
-    },
-    { merge: true }
-  )
-  .deliver(async ({ payload, settings }) => {
-    const { id, custom_attributes: customAttrs, ...body } = payload
-    const userPass = Buffer.from(`${settings.siteId}:${settings.apiKey}`)
-
-    return fetch(`https://track.customer.io/api/v1/customers/${id}`, {
-      method: 'put',
-      headers: {
-        Authorization: `Basic ${userPass.toString('base64')}`,
-        'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ ...customAttrs, ...body })
+      { merge: true }
+    )
+
+    .request(async (req, { payload }) => {
+      const { id, custom_attributes: customAttrs, ...body } = payload
+      return req.put(`customers/${id}`, {
+        json: { ...customAttrs, ...body }
+      })
     })
-  })
+}

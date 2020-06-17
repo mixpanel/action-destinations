@@ -1,4 +1,5 @@
-// TODO remove need for this
-require('../../../lib/action-kit')
-
-module.exports = action()
+module.exports = (action) => {
+  action.do(() => {
+    console.log('Hello, world!')
+  })
+}
