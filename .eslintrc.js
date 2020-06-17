@@ -10,11 +10,7 @@ module.exports = {
   ],
   globals: {
     Atomics: 'readonly',
-    SharedArrayBuffer: 'readonly',
-    // fetch API provided by the Destination Function buildpack
-    fetch: 'readonly',
-    // action-kit entrypoint
-    action: 'writable'
+    SharedArrayBuffer: 'readonly'
   },
   parserOptions: {
     ecmaVersion: 2018

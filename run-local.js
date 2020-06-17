@@ -1,13 +1,14 @@
-// hack because fetch is global in destination functions.
-global.fetch = require('node-fetch')
-
 // eslint-disable-next-line no-unused-expressions
 require('yargs')
-  .command('$0 [action]', 'Run a partner action locally.', (yargs) => {
+  .command('$0 [destination] [action]', 'Run a partner action locally.', (yargs) => {
     yargs
+      .positional('destination', {
+        describe: 'The destination to run.',
+        default: 'slack'
+      })
       .positional('action', {
         describe: 'The aciton to run.',
-        default: 'slack/postToChannel'
+        default: 'postToChannel'
       })
       .option('payload', {
         alias: 'p',
@@ -28,14 +29,13 @@ require('yargs')
         default: './sample/settings.json'
       })
   }, async (argv) => {
-    const action = require(`./destinations/${argv.action}`)
+    const destination = require(`./destinations/${argv.destination}`)
 
-    const result = await action._execute({
+    const result = await destination.partnerActions[argv.action]._execute({
       payload: require(argv.payload),
       settings: require(argv.settings),
       mapping: require(argv.mapping)
     })
 
-    console.log('Result:')
-    console.log(result)
+    console.log('Result:', result)
   }).argv

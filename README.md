@@ -17,12 +17,13 @@ deploy.js`.
 You can run actions locally with the `run-local.js` script:
 
 ```
-run-local.js [action]
+run-local.js [destination] [action]
 
 Run a partner action locally.
 
 Positionals:
-  action  The aciton to run.                    [default: "slack/postToChannel"]
+  destination  The destination to run.                        [default: "slack"]
+  action       The aciton to run.                     [default: "postToChannel"]
 
 Options:
   --help          Show help                                            [boolean]
@@ -38,46 +39,45 @@ Options:
 For example:
 
 ```
-% node ./run-local.js slack/postToChannel -p ./sample/payload.json -m ./sample/mapping.json -s ./sample/settings.json
-MapPayload1: Starting
-MapPayload1: Finished (17 ms)
-ValidateSettings2: Starting
-ValidateSettings2: Finished (<1 ms)
-ValidateSchema3: Starting
-ValidateSchema3: Finished (<1 ms)
+% node ./run-local.js slack postToChannel -p ./sample/payload.json -m ./sample/mapping.json -s ./sample/settings.json
+MapInput1: Starting
+MapInput1: Finished (24 ms)
+Validate2: Starting
+Validate2: Finished (<1 ms)
+Validate3: Starting
+Validate3: Finished (<1 ms)
 FanOut4: Starting
-FanOut4->Deliver5: Starting
-FanOut4->Deliver5: Finished (299 ms)
-FanOut4: Finished (299 ms)
-Result:
-[
+FanOut4->Request5: Starting
+FanOut4->Request5: Finished (265 ms)
+FanOut4: Finished (267 ms)
+Result: [
   {
-    step: 'MapPayload1',
-    output: 'payload mapped successfully',
+    step: 'MapInput1',
+    output: undefined,
     error: null,
-    startedAt: 2020-06-10T04:47:56.185Z,
-    finishedAt: 2020-06-10T04:47:56.202Z
+    startedAt: 2020-06-17T20:19:06.110Z,
+    finishedAt: 2020-06-17T20:19:06.134Z
   },
   {
-    step: 'ValidateSettings2',
-    output: 'settings validated successfully',
+    step: 'Validate2',
+    output: undefined,
     error: null,
-    startedAt: 2020-06-10T04:47:56.202Z,
-    finishedAt: 2020-06-10T04:47:56.202Z
+    startedAt: 2020-06-17T20:19:06.134Z,
+    finishedAt: 2020-06-17T20:19:06.134Z
   },
   {
-    step: 'ValidateSchema3',
-    output: 'payload validated against schema successfully',
+    step: 'Validate3',
+    output: undefined,
     error: null,
-    startedAt: 2020-06-10T04:47:56.202Z,
-    finishedAt: 2020-06-10T04:47:56.202Z
+    startedAt: 2020-06-17T20:19:06.134Z,
+    finishedAt: 2020-06-17T20:19:06.134Z
   },
   {
     step: 'FanOut4',
     output: [ [Array] ],
     error: null,
-    startedAt: 2020-06-10T04:47:56.203Z,
-    finishedAt: 2020-06-10T04:47:56.502Z
+    startedAt: 2020-06-17T20:19:06.134Z,
+    finishedAt: 2020-06-17T20:19:06.401Z
   }
 ]
 ```
