@@ -17,67 +17,63 @@ deploy.js`.
 You can run actions locally with the `run-local.js` script:
 
 ```
-run-local.js [destination] [action]
+run-local.js [action] -i <inputPath>
 
 Run a partner action locally.
 
 Positionals:
-  destination  The destination to run.                        [default: "slack"]
-  action       The aciton to run.                     [default: "postToChannel"]
+  action  Path to destination action to run.
+                                           [default: "./destinations/noop/noop"]
 
 Options:
-  --help          Show help                                            [boolean]
-  --version       Show version number                                  [boolean]
-  --payload, -p   path to payload JSON file
-                                     [string] [default: "./sample/payload.json"]
-  --mapping, -m   path to mapping configuration JSON file
-                                     [string] [default: "./sample/mapping.json"]
-  --settings, -s  path to settings configuration JSON file
-                                    [string] [default: "./sample/settings.json"]
+  --help       Show help                                               [boolean]
+  --version    Show version number                                     [boolean]
+  --input, -i  Path to input directory containing settings.json, payload.json,
+               and mapping.json                                         [string]
 ```
 
 For example:
 
 ```
-% node ./run-local.js slack postToChannel -p ./sample/payload.json -m ./sample/mapping.json -s ./sample/settings.json
+node run-local.js ./destinations/slack/postToChannel -i ./sample/slack
 MapInput1: Starting
-MapInput1: Finished (24 ms)
+MapInput1: Finished (30 ms)
 Validate2: Starting
-Validate2: Finished (<1 ms)
+Validate2: Finished (1 ms)
 Validate3: Starting
 Validate3: Finished (<1 ms)
 FanOut4: Starting
 FanOut4->Request5: Starting
-FanOut4->Request5: Finished (265 ms)
-FanOut4: Finished (267 ms)
+FanOut4->Request5: Finished (329 ms)
+FanOut4: Finished (330 ms)
 Result: [
   {
     step: 'MapInput1',
     output: undefined,
     error: null,
-    startedAt: 2020-06-17T20:19:06.110Z,
-    finishedAt: 2020-06-17T20:19:06.134Z
+    startedAt: 2020-06-18T18:30:49.365Z,
+    finishedAt: 2020-06-18T18:30:49.395Z
   },
   {
     step: 'Validate2',
     output: undefined,
     error: null,
-    startedAt: 2020-06-17T20:19:06.134Z,
-    finishedAt: 2020-06-17T20:19:06.134Z
+    startedAt: 2020-06-18T18:30:49.395Z,
+    finishedAt: 2020-06-18T18:30:49.396Z
   },
   {
     step: 'Validate3',
     output: undefined,
     error: null,
-    startedAt: 2020-06-17T20:19:06.134Z,
-    finishedAt: 2020-06-17T20:19:06.134Z
+    startedAt: 2020-06-18T18:30:49.396Z,
+    finishedAt: 2020-06-18T18:30:49.396Z
   },
   {
     step: 'FanOut4',
     output: [ [Array] ],
     error: null,
-    startedAt: 2020-06-17T20:19:06.134Z,
-    finishedAt: 2020-06-17T20:19:06.401Z
+    startedAt: 2020-06-18T18:30:49.396Z,
+    finishedAt: 2020-06-18T18:30:49.726Z
   }
 ]
 ```
