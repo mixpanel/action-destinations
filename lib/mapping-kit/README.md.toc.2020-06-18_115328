@@ -1,0 +1,22 @@
+   * [Mapping Kit](#mapping-kit)
+      * [Table of contents](#table-of-contents)
+      * [Usage](#usage)
+      * [Terms](#terms)
+      * [Mixing raw values and directives](#mixing-raw-values-and-directives)
+      * [Validation](#validation)
+      * [Options](#options)
+         * [merge](#merge)
+      * [Directives](#directives)
+         * [@base64](#base64)
+         * [@handlebars](#handlebars)
+         * [@lowercase](#lowercase)
+         * [@merge](#merge-1)
+         * [@omit](#omit)
+         * [@path](#path)
+         * [@pick](#pick)
+         * [@root](#root)
+         * [@timestamp](#timestamp)
+         * [@uuid](#uuid)
+
+<!-- Added by: tysonmote, at: Thu Jun 18 11:53:28 PDT 2020 -->
+
