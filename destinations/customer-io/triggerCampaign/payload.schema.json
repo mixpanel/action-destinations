@@ -6,7 +6,7 @@
   "properties": {
     "id": {
       "description": "ID of the campaign to trigger.",
-      "type": "string"
+      "type": "number"
     },
     "data": {
       "description": "Custom Liquid merge data to include with the trigger.",
