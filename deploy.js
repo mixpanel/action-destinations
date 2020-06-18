@@ -23,6 +23,11 @@ const FUNCTION_PREFIX = 'Fab 5 '
 // one Destination Functions use.
 const FUNCTION_BUILDPACK = 'boreal'
 
+process.on('unhandledRejection', (reason, p) => {
+  console.log('Unhandled rejection at: Promise', p, 'reason:', reason)
+  throw new Error('TODO unhandled promise rejection')
+})
+
 // listFunctions returns a promise that resolves to array of Fab 5 functions.
 function listFunctions () {
   return new Promise((resolve, reject) => {
