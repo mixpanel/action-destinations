@@ -2,7 +2,7 @@ const { destination } = require('../../lib/destination-kit')
 
 module.exports = destination(require('./destination.json'))
   .extendRequest(({ settings }) => ({
-    prefixUrl: 'https://api.sendgrid.com/v3',
+    prefixUrl: 'https://api.sendgrid.com/v3/',
     headers: { Authorization: `Bearer ${settings.apiKey}` },
     responseType: 'json'
   }))

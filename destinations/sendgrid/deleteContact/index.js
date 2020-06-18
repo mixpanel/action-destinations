@@ -12,12 +12,12 @@ module.exports = action => action
   .validatePayload(require('./payload.schema.json'))
 
   .request(async (req, { payload }) => {
-    const search = await req.post('/marketing/contacts/search', {
+    const search = await req.post('marketing/contacts/search', {
       json: { query: `email = '${sgqlEscape(payload.email)}'` }
     })
 
     const id = lodash.get(search.body, 'result[0].id')
     if (id === undefined) return null
 
-    return req.delete(`/marketing/contacts?ids=${id}`)
+    return req.delete(`marketing/contacts?ids=${id}`)
   })

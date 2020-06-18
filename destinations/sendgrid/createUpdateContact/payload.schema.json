@@ -71,5 +71,6 @@
         "email"
       ]
     }
-  }
+  },
+  "required": ["contact"]
 }
