@@ -18,7 +18,7 @@ module.exports = (action) => {
       })
 
       const id = lodash.get(search.body, 'result[0].id')
-      if (id === undefined || id === null) return null
+      if (id === undefined) return null
 
       return req.delete(`/marketing/contacts?ids=${id}`)
     })

@@ -25,11 +25,11 @@ module.exports = (action) => {
 
       const organizationId = lodash.get(search.body, 'data.items[0].item.id')
 
-      if (organizationId !== null && organizationId !== undefined) {
+      if (organizationId === undefined) {
+        return req.post('organizations', { json: payload.organization })
+      } else {
         const { add_time: x, ...organization } = payload.organization
         return req.put(`organizations/${organizationId}`, { json: organization })
-      } else {
-        return req.post('organizations', { json: payload.organization })
       }
     })
 }

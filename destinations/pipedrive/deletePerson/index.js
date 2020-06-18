@@ -11,7 +11,7 @@ module.exports = (action) => {
       })
 
       const personId = lodash.get(search.body, 'data.items[0].item.id')
-      if (personId === null || personId === undefined) return null
+      if (personId === undefined) return null
 
       return req.delete(`persons/${personId}`)
     })
