@@ -4,13 +4,11 @@ const { join, basename } = require('path')
 const { readFileSync } = require('fs')
 const TerserPlugin = require('terser-webpack-plugin')
 
-// ENTRYPOINT is the name the default export function of the webpack-compiled JS
-// file so that we can add our adapter.
-const ENTRYPOINT = '_segmentEntrypoint'
+const DESTINATION = '_destination'
 
 // pack takes a destination subdirectory and returns a promise that resolves to
 // the path to a webpack-compiled version of that destination with the default
-// export function available in the ENTRYPOINT variable.
+// export function available in the DESTINATION variable.
 async function pack (inputDir) {
   console.log(`Compiling ${basename(inputDir)}`)
 
@@ -23,7 +21,7 @@ async function pack (inputDir) {
       output: {
         path: tmpdir,
         filename: tmpfile,
-        library: ENTRYPOINT,
+        library: DESTINATION,
         libraryTarget: 'var'
       },
       mode: 'production',
@@ -52,7 +50,7 @@ async function pack (inputDir) {
 // webpack-compiled file. There's probably a better way to do this.
 function adapter () {
   return ['Track', 'Identify', 'Group', 'Page', 'Screen', 'Alias', 'Delete'].map(
-    (event) => (`async function on${event} (...a) { return ${ENTRYPOINT}(...a) };`)
+    (event) => (`async function on${event} (...a) { return ${DESTINATION}.onEvent(...a) };`)
   ).join('\n')
 }
 
