@@ -3,6 +3,7 @@ const tmp = require('tmp')
 const { join, basename } = require('path')
 const { readFileSync } = require('fs')
 const TerserPlugin = require('terser-webpack-plugin')
+const MomentLocalesPlugin = require('moment-locales-webpack-plugin')
 
 const DESTINATION = '_destination'
 
@@ -35,6 +36,9 @@ async function pack (inputDir) {
               keep_classnames: true
             }
           })
+        ],
+        plugins: [
+          new MomentLocalesPlugin()
         ]
       }
     }, (err, stats) => {
