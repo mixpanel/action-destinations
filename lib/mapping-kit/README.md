@@ -14,7 +14,7 @@ Mapping:
 {
   "name": "Mr. Rogers",
   "neighborhood": { "@path": "$.properties.neighborhood" },
-  "greeting": { "@handlebars": "Won't you be my {{properties.noun}}?" }
+  "greeting": { "@template": "Won't you be my {{properties.noun}}?" }
 }
 
 Input:
@@ -59,17 +59,17 @@ Output:
          * [merge](#merge)
       * [Directives](#directives)
          * [@base64](#base64)
-         * [@handlebars](#handlebars)
          * [@lowercase](#lowercase)
          * [@merge](#merge-1)
          * [@omit](#omit)
          * [@path](#path)
          * [@pick](#pick)
          * [@root](#root)
+         * [@template](#template)
          * [@timestamp](#timestamp)
          * [@uuid](#uuid)
 
-<!-- Added by: tysonmote, at: Thu Jun 18 11:53:28 PDT 2020 -->
+<!-- Added by: tysonmote, at: Mon Jun 22 16:42:44 PDT 2020 -->
 
 <!--te-->
 
@@ -107,7 +107,7 @@ input payload or transform some data:
 ```json
 { "@path": "$.properties.name" }
 
-{ "@handlebars": "Hello there, {{traits.name}}" }
+{ "@template": "Hello there, {{traits.name}}" }
 
 {
   "@merge": [
@@ -314,30 +314,6 @@ Mappings:
 
 { "@base64": "x" } => "eAo="
 { "@base64": { "@path": "$.hello" } } => "d29ybGQhCg=="
-```
-
-### @handlebars
-
-The @handlebars directive resolves to string using the given
-[Handlebars.js](https://handlebarsjs.com/guide/) template string.
-
-```json
-Input:
-
-{
-  "traits": {
-    "name": "Mr. Rogers"
-  },
-  "userId": "abc123"
-}
-
-Mappings:
-
-{ "@handlebars": "Hello, {{traits.name}}!" } => "Hello, Mr. Rogers!"
-
-{ "@handlebars": "Hello, {{traits.fullName}}!" } => "Hello, !"
-
-{ "@handlebars": "{{traits.name}} ({{userId}})" } => "Mr.Rogers (abc123)"
 ```
 
 ### @lowercase
@@ -604,7 +580,7 @@ Mappings:
 
 { "@root": true } => { "cool": true }
 { "@root": {} } => { "cool": true }
-{ "@root": '' => { "cool": true }
+{ "@root": "" => { "cool": true }
 ```
 
 The @root directive is useful for adding or overriding keys to the root input JSON object:
@@ -631,6 +607,30 @@ Mappings:
   "b": 22,
   "c": 33
 }
+```
+
+### @template
+
+The @template directive resolves to a string using the given
+[mustache.js](http://mustache.github.io/) template string.
+
+```json
+Input:
+
+{
+  "traits": {
+    "name": "Mr. Rogers"
+  },
+  "userId": "abc123"
+}
+
+Mappings:
+
+{ "@template": "Hello, {{traits.name}}!" } => "Hello, Mr. Rogers!"
+
+{ "@template": "Hello, {{traits.fullName}}!" } => "Hello, !"
+
+{ "@template": "{{traits.name}} ({{userId}})" } => "Mr.Rogers (abc123)"
 ```
 
 ### @timestamp

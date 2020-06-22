@@ -1,5 +1,5 @@
 {
     "text": {
-        "@handlebars": "Event = {{event}}, properties.text = {{properties.text}}"
+        "@template": "Event = {{event}}, properties.text = {{properties.text}}"
     }
 }

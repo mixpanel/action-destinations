@@ -148,7 +148,7 @@ Here's a full example:
     "partnerAction": "postToChannel",
     "mapping": {
       "text": {
-        "@handlebars": "Tracked! event={{event}}, {{properties.text}}"
+        "@template": "Tracked! event={{event}}, {{properties.text}}"
       }
     },
     "settings": {
@@ -163,7 +163,7 @@ Here's a full example:
     "partnerAction": "postToChannel",
     "mapping": {
       "text": {
-        "@handlebars": "User identified! email={{email}}"
+        "@template": "User identified! email={{email}}"
       }
     },
     "settings": {
