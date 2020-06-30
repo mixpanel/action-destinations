@@ -1,5 +1,0 @@
-{
-    "text": {
-        "@handlebars": "Event = {{event}}, properties.text = {{properties.text}}"
-    }
-}

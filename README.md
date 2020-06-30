@@ -17,67 +17,63 @@ deploy.js`.
 You can run actions locally with the `run-local.js` script:
 
 ```
-run-local.js [action]
+run-local.js [action] -i <inputPath>
 
 Run a partner action locally.
 
 Positionals:
-  action  The aciton to run.                    [default: "slack/postToChannel"]
+  action  Path to destination action to run.
+                                           [default: "./destinations/noop/noop"]
 
 Options:
-  --help          Show help                                            [boolean]
-  --version       Show version number                                  [boolean]
-  --payload, -p   path to payload JSON file
-                                     [string] [default: "./sample/payload.json"]
-  --mapping, -m   path to mapping configuration JSON file
-                                     [string] [default: "./sample/mapping.json"]
-  --settings, -s  path to settings configuration JSON file
-                                    [string] [default: "./sample/settings.json"]
+  --help       Show help                                               [boolean]
+  --version    Show version number                                     [boolean]
+  --input, -i  Path to input directory containing settings.json, payload.json,
+               and mapping.json                                         [string]
 ```
 
 For example:
 
 ```
-% node ./run-local.js slack/postToChannel -p ./sample/payload.json -m ./sample/mapping.json -s ./sample/settings.json
-MapPayload1: Starting
-MapPayload1: Finished (17 ms)
-ValidateSettings2: Starting
-ValidateSettings2: Finished (<1 ms)
-ValidateSchema3: Starting
-ValidateSchema3: Finished (<1 ms)
+node run-local.js ./destinations/slack/postToChannel -i ./sample/slack
+MapInput1: Starting
+MapInput1: Finished (30 ms)
+Validate2: Starting
+Validate2: Finished (1 ms)
+Validate3: Starting
+Validate3: Finished (<1 ms)
 FanOut4: Starting
-FanOut4->Deliver5: Starting
-FanOut4->Deliver5: Finished (299 ms)
-FanOut4: Finished (299 ms)
-Result:
-[
+FanOut4->Request5: Starting
+FanOut4->Request5: Finished (329 ms)
+FanOut4: Finished (330 ms)
+Result: [
   {
-    step: 'MapPayload1',
-    output: 'payload mapped successfully',
+    step: 'MapInput1',
+    output: undefined,
     error: null,
-    startedAt: 2020-06-10T04:47:56.185Z,
-    finishedAt: 2020-06-10T04:47:56.202Z
+    startedAt: 2020-06-18T18:30:49.365Z,
+    finishedAt: 2020-06-18T18:30:49.395Z
   },
   {
-    step: 'ValidateSettings2',
-    output: 'settings validated successfully',
+    step: 'Validate2',
+    output: undefined,
     error: null,
-    startedAt: 2020-06-10T04:47:56.202Z,
-    finishedAt: 2020-06-10T04:47:56.202Z
+    startedAt: 2020-06-18T18:30:49.395Z,
+    finishedAt: 2020-06-18T18:30:49.396Z
   },
   {
-    step: 'ValidateSchema3',
-    output: 'payload validated against schema successfully',
+    step: 'Validate3',
+    output: undefined,
     error: null,
-    startedAt: 2020-06-10T04:47:56.202Z,
-    finishedAt: 2020-06-10T04:47:56.202Z
+    startedAt: 2020-06-18T18:30:49.396Z,
+    finishedAt: 2020-06-18T18:30:49.396Z
   },
   {
     step: 'FanOut4',
     output: [ [Array] ],
     error: null,
-    startedAt: 2020-06-10T04:47:56.203Z,
-    finishedAt: 2020-06-10T04:47:56.502Z
+    startedAt: 2020-06-18T18:30:49.396Z,
+    finishedAt: 2020-06-18T18:30:49.726Z
   }
 ]
 ```
@@ -152,7 +148,7 @@ Here's a full example:
     "partnerAction": "postToChannel",
     "mapping": {
       "text": {
-        "@handlebars": "Tracked! event={{event}}, {{properties.text}}"
+        "@template": "Tracked! event={{event}}, {{properties.text}}"
       }
     },
     "settings": {
@@ -167,7 +163,7 @@ Here's a full example:
     "partnerAction": "postToChannel",
     "mapping": {
       "text": {
-        "@handlebars": "User identified! email={{email}}"
+        "@template": "User identified! email={{email}}"
       }
     },
     "settings": {

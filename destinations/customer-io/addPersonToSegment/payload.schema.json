@@ -4,17 +4,17 @@
   "description": "Add a person to a segment in Customer.io.",
   "type": "object",
   "properties": {
-    "segmentId": {
+    "segment_id": {
       "description": "ID of the Customer.io segment to add the person to.",
       "type": "number"
     },
-    "personId": {
+    "person_id": {
       "description": "ID of the person to add.",
       "type": "string"
     }
   },
   "required": [
-    "segmentId",
-    "personId"
+    "segment_id",
+    "person_id"
   ]
 }

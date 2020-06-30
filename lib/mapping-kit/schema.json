@@ -53,9 +53,6 @@
           "$ref": "#/definitions/directive:base64"
         },
         {
-          "$ref": "#/definitions/directive:handlebars"
-        },
-        {
           "$ref": "#/definitions/directive:lowercase"
         },
         {
@@ -74,6 +71,9 @@
           "$ref": "#/definitions/directive:root"
         },
         {
+          "$ref": "#/definitions/directive:template"
+        },
+        {
           "$ref": "#/definitions/directive:timestamp"
         },
         {
@@ -90,25 +90,6 @@
       },
       "required": [
         "@base64"
-      ],
-      "additionalProperties": false
-    },
-    "directive:handlebars": {
-      "type": "object",
-      "properties": {
-        "@handlebars": {
-          "oneOf": [
-            {
-              "type": "string"
-            },
-            {
-              "$ref": "#/definitions/directive"
-            }
-          ]
-        }
-      },
-      "required": [
-        "@handlebars"
       ],
       "additionalProperties": false
     },
@@ -189,6 +170,25 @@
       },
       "required": [
         "@root"
+      ],
+      "additionalProperties": false
+    },
+    "directive:template": {
+      "type": "object",
+      "properties": {
+        "@template": {
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "$ref": "#/definitions/directive"
+            }
+          ]
+        }
+      },
+      "required": [
+        "@template"
       ],
       "additionalProperties": false
     },

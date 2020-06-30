@@ -1,41 +1,43 @@
-// hack because fetch is global in destination functions.
-global.fetch = require('node-fetch')
+const { join, dirname, basename } = require('path')
 
 // eslint-disable-next-line no-unused-expressions
 require('yargs')
   .command('$0 [action]', 'Run a partner action locally.', (yargs) => {
     yargs
       .positional('action', {
-        describe: 'The aciton to run.',
-        default: 'slack/postToChannel'
+        describe: 'Path to destination action to run.',
+        default: './destinations/noop/noop'
       })
-      .option('payload', {
-        alias: 'p',
+      .option('input', {
+        alias: 'i',
         type: 'string',
-        description: 'path to payload JSON file',
-        default: './sample/payload.json'
-      })
-      .option('mapping', {
-        alias: 'm',
-        type: 'string',
-        description: 'path to mapping configuration JSON file',
-        default: './sample/mapping.json'
-      })
-      .option('settings', {
-        alias: 's',
-        type: 'string',
-        description: 'path to settings configuration JSON file',
-        default: './sample/settings.json'
+        description: 'Path to input directory containing settings.json, payload.json, and mapping.json'
       })
   }, async (argv) => {
-    const action = require(`./destinations/${argv.action}`)
+    const destinationPath = dirname(argv.action)
+    const actionName = basename(argv.action)
 
-    const result = await action._execute({
-      payload: require(argv.payload),
-      settings: require(argv.settings),
-      mapping: require(argv.mapping)
+    const destination = require(destinationPath)
+
+    const load = (file) => {
+      const path = './' + join(argv.input, file)
+      try {
+        return require(path)
+      } catch (e) {
+        if (e.code === 'MODULE_NOT_FOUND') {
+          console.log(`${path} does not exist, using '{}'`)
+          return {}
+        } else {
+          throw e
+        }
+      }
+    }
+
+    const result = await destination.partnerActions[actionName]._execute({
+      payload: load('payload.json'),
+      settings: load('settings.json'),
+      mapping: load('mapping.json')
     })
 
-    console.log('Result:')
-    console.log(result)
+    console.log('Result:', result)
   }).argv

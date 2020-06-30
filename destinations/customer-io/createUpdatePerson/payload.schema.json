@@ -17,7 +17,7 @@
       "type": "string"
     },
     "custom_attributes": {
-      "description": "Optional custom attributes for this person.",
+      "description": "Optional custom attributes for this person. When updating a person, attributes are added and not removed.",
       "type": "object"
     }
   },

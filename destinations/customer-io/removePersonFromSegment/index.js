@@ -1,21 +1,10 @@
-// TODO remove need for this
-require('../../../lib/action-kit')
-
-module.exports = action()
+module.exports = (action) => action
   // TODO make these automatic
-  .validateSettings(require('../settings.schema.json'))
   .validatePayload(require('./payload.schema.json'))
 
-  .deliver(async ({ payload, settings }) => {
+  .request(async (req, { payload }) => {
     const { segment_id: segmentId, person_id: customerId } = payload
-    const userPass = Buffer.from(`${settings.siteId}:${settings.apiKey}`)
-
-    return fetch(`https://track.customer.io/api/v1/segments/${segmentId}/remove_customers`, {
-      method: 'post',
-      headers: {
-        Authorization: `Basic ${userPass.toString('base64')}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ ids: [customerId] })
+    return req.post(`segments/${segmentId}/remove_customers`, {
+      json: { ids: [customerId] }
     })
   })
