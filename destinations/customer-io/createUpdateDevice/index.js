@@ -16,7 +16,6 @@ module.exports = action => action
   )
 
   .request(async (req, { payload }) => {
-    console.log(payload)
     const { person_id: customerId, device_id: deviceId, ...body } = payload
     return req.put(`customers/${customerId}/devices`, {
       json: { device: { id: deviceId, ...body } }
