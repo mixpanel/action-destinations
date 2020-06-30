@@ -1,4 +1,4 @@
-const lodash = require('lodash')
+const get = require('lodash/get')
 
 module.exports = action => action
   // TODO make these automatic
@@ -22,7 +22,7 @@ module.exports = action => action
       searchParams: { term: payload.organizationIdentifier }
     })
 
-    const organizationId = lodash.get(search.body, 'data.items[0].item.id')
+    const organizationId = get(search.body, 'data.items[0].item.id')
 
     if (organizationId === undefined) {
       return req.post('organizations', { json: payload.organization })

@@ -1,4 +1,4 @@
-const lodash = require('lodash')
+const get = require('lodash/get')
 
 // SendGrid uses a custom "SGQL" query language for finding contacts. To protect us from basic
 // injection attacks (e.g. "email = 'x@x.com' or email like '%@%'"), we can just strip all quotes
@@ -16,7 +16,7 @@ module.exports = action => action
       json: { query: `email = '${sgqlEscape(payload.email)}'` }
     })
 
-    const id = lodash.get(search.body, 'result[0].id')
+    const id = get(search.body, 'result[0].id')
     if (id === undefined) return null
 
     return req.delete(`marketing/contacts?ids=${id}`)
