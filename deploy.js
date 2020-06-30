@@ -19,9 +19,7 @@ const METADATA = {
 // Cheap hack to identify and find our functions.
 const FUNCTION_PREFIX = 'Fab 5 '
 
-// We'll probably want our own buildpack in the future. For now, we'll use the
-// one Destination Functions use.
-const FUNCTION_BUILDPACK = 'boreal'
+const FUNCTION_BUILDPACK = 'raw'
 
 process.on('unhandledRejection', (reason, p) => {
   console.log('Unhandled rejection at: Promise', p, 'reason:', reason)

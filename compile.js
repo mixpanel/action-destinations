@@ -18,6 +18,7 @@ async function pack (inputDir) {
 
   return new Promise((resolve, reject) => {
     webpack({
+      target: 'node',
       entry: inputDir,
       output: {
         path: tmpdir,
@@ -36,11 +37,11 @@ async function pack (inputDir) {
               keep_classnames: true
             }
           })
-        ],
-        plugins: [
-          new MomentLocalesPlugin()
         ]
-      }
+      },
+      plugins: [
+        new MomentLocalesPlugin()
+      ]
     }, (err, stats) => {
       if (err || stats.hasErrors()) {
         reject(err || stats.toJson().errors || 'unknown error')
@@ -50,12 +51,8 @@ async function pack (inputDir) {
   })
 }
 
-// adapter is a hack to bridge between funk's custom module handling and our
-// webpack-compiled file. There's probably a better way to do this.
 function adapter () {
-  return ['Track', 'Identify', 'Group', 'Page', 'Screen', 'Alias', 'Delete'].map(
-    (event) => (`async function on${event} (...a) { return ${DESTINATION}.onEvent(...a) };`)
-  ).join('\n')
+  return `module.exports.onEvent = ${DESTINATION}.onEvent`
 }
 
 // compile returns the compiled version of the destination at the given path
