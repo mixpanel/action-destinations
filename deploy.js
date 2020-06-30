@@ -36,7 +36,7 @@ function listFunctions () {
     req.setType('DESTINATION')
 
     functions.list(req, METADATA, (err, resp) => {
-      if (err) reject(err)
+      if (err) return reject(err)
       resolve(
         resp.toObject().functionsList
           .filter((f) => f.displayName.startsWith(FUNCTION_PREFIX))
@@ -197,4 +197,6 @@ Promise.all([
       console.log(`FAILED: ${result.reason}`)
     }
   })
+}).catch((err) => {
+  console.log('FAILED', err)
 })
