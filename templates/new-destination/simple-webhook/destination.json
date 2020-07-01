@@ -1,5 +1,5 @@
 {
-  "name": "New Destination",
+  "name": "Webhook",
   "defaultSubscriptions": [
     {
       "subscribe": {
@@ -7,7 +7,7 @@
         "operator": "=",
         "value": "track"
       },
-      "partnerAction": "trackUser"
+      "partnerAction": "postWebhook"
     }
   ]
 }

@@ -9,4 +9,4 @@ module.exports = destination(require('./destination.json'))
     responseType: 'json'
   }))
 
-  .partnerAction('trackUser', require('./trackUser'))
+  .partnerAction('postWebhook', require('./postWebhook'))

@@ -9,6 +9,5 @@ module.exports = destination(require('./destination.json'))
     responseType: 'json'
   }))
 
-  // TODO do this automatically in a way that works with webpack
   .partnerAction('trackUser', require('./trackUser'))
   .partnerAction('complexTrackUser', require('./complexTrackUser'))

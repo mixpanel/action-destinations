@@ -6,6 +6,12 @@
         "type": "track"
       },
       "partnerAction": "trackUser"
+    },
+    {
+      "subscribe": {
+        "type": "track"
+      },
+      "partnerAction": "complexTrackUser"
     }
   ]
 }

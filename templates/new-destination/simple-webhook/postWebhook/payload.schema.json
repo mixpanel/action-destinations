@@ -1,0 +1,6 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "title": "Post to webhook",
+  "description": "Post anything as long as it's a JSON object.",
+  "type": "object"
+}
