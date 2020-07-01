@@ -5,6 +5,9 @@ module.exports = (action) => action
 
   .fanOut({ on: 'settings.channels', as: 'channel' })
   .request((req, { payload, settings, channel }) => (
-    req.post(settings.url, { json: { ...payload, channel } })
+    req.post(settings.url, {
+      json: { ...payload, channel },
+      responseType: 'text'
+    })
   ))
   .fanIn()
