@@ -12,6 +12,8 @@ hard-coded to the `tyson` workspace in staging. If you want to deploy these to y
 edit [deploy.js](https://github.com/segmentio/fab-5-engine/blob/master/deploy.js) and run `node cli
 deploy`.
 
+See also: [Beginner's Guide](https://paper.dropbox.com/doc/Fab-5-Engine-Beginners-Guide--A2~KoOcu4qM1rlyX_ZfpyCFTAg-BMfDUPaKMvghmXEtaZpq2)
+
 ## Running Locally
 
 You can run actions locally with the `run-local.js` script:
