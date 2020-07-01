@@ -1,0 +1,18 @@
+{
+  "type": "track",
+  "event": "Button Clicked",
+  "context": {
+    "library": {
+      "name": "fab-five-engine",
+      "version": "0.0.1a"
+    },
+    "page": {
+      "path": "/sample.html"
+    }
+  },
+  "properties": {
+    "email": "foo@bar.com",
+    "buttonTitle": "Click Here!",
+    "number": 56
+  }
+}
