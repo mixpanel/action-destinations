@@ -580,7 +580,7 @@ Mappings:
 
 { "@root": true } => { "cool": true }
 { "@root": {} } => { "cool": true }
-{ "@root": "" => { "cool": true }
+{ "@root": "" } => { "cool": true }
 ```
 
 The @root directive is useful for adding or overriding keys to the root input JSON object:
