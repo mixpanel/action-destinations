@@ -1,0 +1,13 @@
+{
+  "name": "New Destination",
+  "defaultSubscriptions": [
+    {
+      "subscribe": {
+        "type": "event-type",
+        "operator": "=",
+        "value": "track"
+      },
+      "partnerAction": "trackUser"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "title": "Track user",
+  "description": "Track a user by email address.",
+  "type": "object",
+  "properties": {
+    "email": {
+      "description": "Email address that uniquely identifies the user.",
+      "type": "string",
+      "format": "email"
+    },
+    "event": {
+      "description": "Event that the user performed.",
+      "type": "string"
+    },
+    "properties": {
+      "description": "Properties of the user",
+      "type": "object"
+    }
+  },
+  "required": [
+    "email",
+    "event"
+  ]
+}

@@ -17,7 +17,7 @@ deploy`.
 You can run actions locally with the `run-local.js` script:
 
 ```
-node cli run-local [action] -i <inputPath>
+./cli.js run-local [action] -i <inputPath>
 
 Run a partner action locally.
 
@@ -35,7 +35,7 @@ Options:
 For example:
 
 ```
-node cli run-local ./destinations/slack/postToChannel -i ./sample/slack
+./cli.js run-local ./destinations/slack/postToChannel -i ./sample/slack
 MapInput1: Starting
 MapInput1: Finished (30 ms)
 Validate2: Starting
