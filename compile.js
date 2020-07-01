@@ -52,7 +52,7 @@ async function pack (inputDir) {
 }
 
 function adapter () {
-  return `module.exports.onEvent = ${DESTINATION}.onEvent`
+  return `module.exports.onEvent = ${DESTINATION}.onEvent.bind(${DESTINATION})`
 }
 
 // compile returns the compiled version of the destination at the given path
