@@ -9,15 +9,15 @@ the action's schema.
 
 This prototype deploys the Fab 5 destinations as Destination Functions to staging. This is currently
 hard-coded to the `tyson` workspace in staging. If you want to deploy these to your own workspace,
-edit [deploy.js](https://github.com/segmentio/fab-5-engine/blob/master/deploy.js) and run `node
-deploy.js`.
+edit [deploy.js](https://github.com/segmentio/fab-5-engine/blob/master/deploy.js) and run `node cli
+deploy`.
 
 ## Running Locally
 
 You can run actions locally with the `run-local.js` script:
 
 ```
-run-local.js [action] -i <inputPath>
+node cli run-local [action] -i <inputPath>
 
 Run a partner action locally.
 
@@ -35,7 +35,7 @@ Options:
 For example:
 
 ```
-node run-local.js ./destinations/slack/postToChannel -i ./sample/slack
+node cli run-local ./destinations/slack/postToChannel -i ./sample/slack
 MapInput1: Starting
 MapInput1: Finished (30 ms)
 Validate2: Starting
