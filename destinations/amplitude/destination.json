@@ -1,0 +1,11 @@
+{
+  "name": "Amplitude",
+  "defaultSubscriptions": [
+    {
+      "subscribe": {
+        "type": "track"
+      },
+      "partnerAction": "trackUser"
+    }
+  ]
+}

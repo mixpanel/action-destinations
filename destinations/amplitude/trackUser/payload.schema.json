@@ -1,0 +1,156 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "title": "Track User",
+  "description": "TODO",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "A readable ID specified by you. Must have a minimum length of 5 characters. Required unless device_id is present."
+    },
+    "device_id": {
+      "type": "string",
+      "description": "A device-specific identifier, such as the Identifier for Vendor on iOS. Required unless user_id is present. If a device_id is not sent with the event, it will be set to a hashed version of the user_id."
+    },
+    "event_type": {
+      "type": "string",
+      "description": "A unique identifier for your event.",
+      "examples": [
+        "watch_tutorial"
+      ]
+    },
+    "time": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The timestamp of the event in milliseconds since epoch. If time is not sent with the event, it will be set to the request upload time."
+    },
+    "event_properties": {
+      "type": "object",
+      "description": "A dictionary of key-value pairs that represent additional data to be sent along with the event. You can store property values in an array. Date values are transformed into string values. Object depth may not exceed 40 layers."
+    },
+    "user_properties": {
+      "type": "object",
+      "description": "A dictionary of key-value pairs that represent additional data tied to the user. You can store property values in an array. Date values are transformed into string values. Object depth may not exceed 40 layers."
+    },
+    "groups": {
+      "type": "object",
+      "description": "This Amplitude feature is only available to Enterprise customers who have purchased the Accounts add-on. This field adds a dictionary of key-value pairs that represent groups of users to the event as an event-level group. You can only track up to 5 groups."
+    },
+    "app_version": {
+      "type": "string",
+      "description": "The current version of your application."
+    },
+    "platform": {
+      "type": "string",
+      "description": "Platform of the device."
+    },
+    "os_name": {
+      "type": "string",
+      "description": "The name of the mobile operating system or browser that the user is using."
+    },
+    "os_version": {
+      "type": "string",
+      "description": "The version of the mobile operating system or browser the user is using."
+    },
+    "device_brand": {
+      "type": "string",
+      "description": "The device brand that the user is using."
+    },
+    "device_manufacturer": {
+      "type": "string",
+      "description": "The device manufacturer that the user is using."
+    },
+    "device_model": {
+      "type": "string",
+      "description": "The device model that the user is using."
+    },
+    "carrier": {
+      "type": "string",
+      "description": "The carrier that the user is using."
+    },
+    "country": {
+      "type": "string",
+      "description": "The current country of the user."
+    },
+    "region": {
+      "type": "string",
+      "description": "The current region of the user."
+    },
+    "city": {
+      "type": "string",
+      "description": "The current city of the user."
+    },
+    "dma": {
+      "type": "string",
+      "description": "The current Designated Market Area of the user."
+    },
+    "language": {
+      "type": "string",
+      "description": "The language set by the user."
+    },
+    "price": {
+      "type": "number",
+      "description": "The price of the item purchased. Required for revenue data if the revenue field is not sent. You can use negative values to indicate refunds."
+    },
+    "quantity": {
+      "type": "integer",
+      "description": "The quantity of the item purchased. Defaults to 1 if not specified."
+    },
+    "revenue": {
+      "type": "number",
+      "description": "revneue = price quantity. If you send all 3 fields of price, quantity, and revenue, then (price quantity) will be used as the revenue value. You can use negative values to indicate refunds."
+    },
+    "productId": {
+      "type": "string",
+      "description": "An identifier for the item purchased. You must send a price and quantity or revenue with this field."
+    },
+    "revenueType": {
+      "type": "string",
+      "description": "The type of revenue for the item purchased. You must send a price and quantity or revenue with this field."
+    },
+    "location_lat": {
+      "type": "number",
+      "description": "The current Latitude of the user."
+    },
+    "location_lng": {
+      "type": "number",
+      "description": "The current Longitude of the user."
+    },
+    "ip": {
+      "type": "string",
+      "description": "The IP address of the user. Use \"$remote\" to use the IP address on the upload request. Amplitude will use the IP address to reverse lookup a user's location (city, country, region, and DMA). Amplitude has the ability to drop the location and IP address from events once it reaches our servers. You can submit a request to Amplitude's platform specialist team here to configure this for you."
+    },
+    "idfa": {
+      "type": "string",
+      "description": "(iOS) Identifier for Advertiser."
+    },
+    "idfv": {
+      "type": "string",
+      "description": "(iOS) Identifier for Vendor."
+    },
+    "adid": {
+      "type": "string",
+      "description": "(Android) Google Play Services advertising ID"
+    },
+    "android_id": {
+      "type": "string",
+      "description": "(Android) Android ID (not the advertising ID)"
+    },
+    "event_id": {
+      "type": "integer",
+      "description": "(Optional) An incrementing counter to distinguish events with the same user_id and timestamp from each other. Amplitude recommends you send an event_id, increasing over time, especially if you expect events to occur simultanenously."
+    },
+    "session_id": {
+      "type": "string",
+      "format": "date-time",
+      "description": "(Optional) The start time of the session, necessary if you want to associate events with a particular system."
+    },
+    "insert_id": {
+      "type": "string",
+      "description": "(Optional) A unique identifier for the event. Amplitude will deduplicate subsequent events sent with an insert_id we have already seen before within the past 7 days. Amplitude recommends generating a UUID or using some combination of device_id, user_id, event_type, event_id, and time."
+    }
+  },
+  "required": [
+    "event_type"
+  ]
+}
