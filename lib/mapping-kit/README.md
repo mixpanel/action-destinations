@@ -297,6 +297,35 @@ Mappings:
 }
 ```
 
+## Removing values from object
+
+`undefined` values in objects are removed from the mapped output while `null` is not:
+
+```json
+Input:
+
+{
+  "a": 1
+}
+
+Mappings:
+
+{
+  "foo": {
+    "@path": "$.a"
+  },
+  "bar": {
+    "@path": "$.b"
+  },
+  "baz": null
+}
+=>
+{
+  "foo": 1,
+  "baz": null
+}
+```
+
 ## Directives
 
 ### @base64
