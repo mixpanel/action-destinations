@@ -16,7 +16,7 @@ See also: [Beginner's Guide](https://paper.dropbox.com/doc/Fab-5-Engine-Beginner
 
 ## Running Locally
 
-You can run actions locally with the `run-local.js` script:
+You can run actions locally with the `cli.js` script:
 
 ```
 ./cli.js run-local [action] -i <inputPath>
