@@ -2,19 +2,7 @@
   "$schema": "http://json-schema.org/schema#",
   "title": "Fab 5 mapping definition",
   "description": "A Fab 5 mapping is either a raw JSON value (object, string, etc.) or a directive, which is a mapping/transformation instruction that reduces to a raw JSON value.",
-  "if": {
-    "type": "object",
-    "minProperties": 1,
-    "propertyNames": {
-      "pattern": "^@"
-    }
-  },
-  "then": {
-    "$ref": "#/definitions/directive"
-  },
-  "else": {
-    "$ref": "#/definitions/raw"
-  },
+  "$ref": "#/definitions/helpers:directive-or-raw",
   "definitions": {
     "raw": {
       "oneOf": [
@@ -51,6 +39,9 @@
       "oneOf": [
         {
           "$ref": "#/definitions/directive:base64"
+        },
+        {
+          "$ref": "#/definitions/directive:if"
         },
         {
           "$ref": "#/definitions/directive:lowercase"
@@ -90,6 +81,28 @@
       },
       "required": [
         "@base64"
+      ],
+      "additionalProperties": false
+    },
+    "directive:if": {
+      "type": "object",
+      "properties": {
+        "@if": {
+          "properties": {
+            "exists": {
+              "$ref": "#/definitions/helpers:directive-or-raw"
+            },
+            "then": {
+              "$ref": "#/definitions/helpers:directive-or-raw"
+            },
+            "else": {
+              "$ref": "#/definitions/helpers:directive-or-raw"
+            }
+          }
+        }
+      },
+      "required": [
+        "@if"
       ],
       "additionalProperties": false
     },
@@ -229,6 +242,21 @@
         "@uuid"
       ],
       "additionalProperties": false
+    },
+    "helpers:directive-or-raw": {
+      "if": {
+        "type": "object",
+        "minProperties": 1,
+        "propertyNames": {
+          "pattern": "^@"
+        }
+      },
+      "then": {
+        "$ref": "#/definitions/directive"
+      },
+      "else": {
+        "$ref": "#/definitions/raw"
+      }
     },
     "helpers:string-or-directive": {
       "oneOf": [
