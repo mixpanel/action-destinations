@@ -17,13 +17,18 @@ module.exports = (action) => action
     }
   })
 
-  .request((req, { payload, settings }) => (
-    req.post(
+  .request((req, { payload, settings }) => {
+    const { amplitude_id: amplitudeId, user_id: userId, ...body } = payload
+
+    if (amplitudeId !== undefined) body.amplitude_ids = [amplitudeId]
+    if (userId !== undefined) body.user_ids = [userId]
+
+    return req.post(
       'https://amplitude.com/api/2/deletions/users',
       {
         username: settings.apiKey,
         password: settings.secretKey,
-        json: payload
+        json: body
       }
     )
-  ))
+  })

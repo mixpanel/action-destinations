@@ -4,17 +4,11 @@
   "description": "Delete a user from Amplitude.",
   "type": "object",
   "properties": {
-    "amplitude_ids": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
+    "amplitude_id": {
+      "type": "string"
     },
-    "user_ids": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
+    "user_id": {
+      "type": "string"
     },
     "requester": {
       "type": "string"
