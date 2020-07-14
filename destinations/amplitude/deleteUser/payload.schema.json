@@ -1,0 +1,29 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "title": "Delete User",
+  "description": "Delete a user from Amplitude.",
+  "type": "object",
+  "properties": {
+    "amplitude_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "user_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "requester": {
+      "type": "string"
+    },
+    "ignore_invalid_id": {
+      "type": "boolean"
+    },
+    "delete_from_org": {
+      "type": "boolean"
+    }
+  }
+}
