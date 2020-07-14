@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "title": "Annotate Chart",
+  "description": "Annotate important dates (feature releases, mmarketing campaigns, etc.) on Amplitude charts.",
+  "type": "object",
+  "properties": {
+    "app_id": {
+      "type": "integer",
+      "description": "The Project ID of the project your chart belongs to."
+    },
+    "date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Date of the annotation."
+    },
+    "label": {
+      "type": "string",
+      "description": "The title of your annotation."
+    },
+    "chart_id": {
+      "type": "string",
+      "description": "The ID of the chart (found in Amplitude chart's URL) you wish to annotate."
+    },
+    "details": {
+      "type": "string",
+      "description": "Additional details you would like to add to the annotation."
+    }
+  },
+  "required": [
+    "app_id",
+    "date",
+    "label"
+  ]
+}

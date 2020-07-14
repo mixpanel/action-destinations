@@ -1,0 +1,84 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "title": "Identify User",
+  "description": "Set the user ID for a particular device ID or update user properties without sending an event to Amplitude.",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "(required unless device_id is present) A UUID (unique user ID) specified by you. Note: If you send a request with a user_id that is not in the Amplitude system yet, then the user tied to the user_id will not be marked new until their first event."
+    },
+    "device_id": {
+      "type": "string",
+      "description": "(required unless user_id is present) A device specific identifier, such as the Identifier for Vendor (IDFV) on iOS."
+    },
+    "user_properties": {
+      "type": "object",
+      "description": "A dictionary of key-value pairs that represent additional data tied to the user in Amplitude. Each distinct value will show up as a user segment on the Amplitude dashboard. Object depth may not exceed 40 layers. Note: You can store property values in an array and date values are transformed into string values."
+    },
+    "groups": {
+      "type": "string",
+      "description": "(Enterprise only) This feature is only available to Amplitude Enterprise customers who have purchased the Amplitude Accounts add-on. A dictionary of key-value pairs that represent groups of users. Setting groups will allow you to use Amplitude's account-level reporting feature. Note: You can only track up to 5 groups. Any groups past that threshold will not be tracked."
+    },
+    "app_version": {
+      "type": "string",
+      "description": "What version of the app the user is on."
+    },
+    "platform": {
+      "type": "string",
+      "description": "What platform is sending the data."
+    },
+    "os_name": {
+      "type": "string",
+      "description": "What mobile operating system or browser the user is on."
+    },
+    "os_version": {
+      "type": "string",
+      "description": "What version of the mobile operating system or browser the user is on."
+    },
+    "device_brand": {
+      "type": "string",
+      "description": "What device brand the user is on."
+    },
+    "device_manufacturer": {
+      "type": "string",
+      "description": "What device manufacturer the user is on."
+    },
+    "device_model": {
+      "type": "string",
+      "description": "What device model the user is on."
+    },
+    "carrier": {
+      "type": "string",
+      "description": "What carrier the user has."
+    },
+    "country": {
+      "type": "string",
+      "description": "What country the user is in."
+    },
+    "region": {
+      "type": "string",
+      "description": "What geographical region the user is in."
+    },
+    "city": {
+      "type": "string",
+      "description": "What city the user is in."
+    },
+    "dma": {
+      "type": "string",
+      "description": "The Designated Market Area of the user."
+    },
+    "language": {
+      "type": "string",
+      "description": "What language the user has set."
+    },
+    "paying": {
+      "type": "string",
+      "description": "Whether the user is paying or not."
+    },
+    "start_version": {
+      "type": "string",
+      "description": "What version of the app the user was first on."
+    }
+  }
+}
