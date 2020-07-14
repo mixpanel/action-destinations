@@ -12,6 +12,8 @@ module.exports = (action) => action
     req.post(
       'https://amplitude.com/api/2/annotations',
       {
+        username: settings.apiKey,
+        password: settings.secretKey,
         form: payload
       })
   ))
