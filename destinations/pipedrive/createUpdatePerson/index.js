@@ -4,19 +4,13 @@ module.exports = action => action
   // TODO make these automatic
   .validatePayload(require('./payload.schema.json'))
 
-  .map(
-    {
-      person: {
-        add_time: {
-          '@timestamp': {
-            timestamp: { '@path': '$.person.add_time' },
-            format: 'YYYY-MM-DD HH:MM:SS'
-          }
-        }
-      }
-    },
-    { merge: true }
-  )
+  .mapField('$.person.add_time', {
+    '@timestamp': {
+      timestamp: { '@path': '$.person.add_time' },
+      format: 'YYYY-MM-DD HH:MM:SS'
+    }
+  })
+
   .request(async (req, { payload }) => {
     const search = await req.get('persons/search', {
       searchParams: { term: payload.personIdentifier }

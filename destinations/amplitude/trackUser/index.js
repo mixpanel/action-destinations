@@ -1,8 +1,20 @@
-// TODO convert 'time' to ms since epoch
-// TODO convert 'session_id' to ms since epoch
-//
 module.exports = (action) => action
   .validatePayload(require('./payload.schema.json'))
+
+  .mapField('$.time', {
+    '@timestamp': {
+      timestamp: { '@path': '$.time' },
+      format: 'x'
+    }
+  })
+
+  .mapField('$.session_id', {
+    '@timestamp': {
+      timestamp: { '@path': '$.session_id' },
+      format: 'x'
+    }
+  })
+
   .request((req, { payload, settings }) => (
     req.post(
       'https://api2.amplitude.com/2/httpapi',
