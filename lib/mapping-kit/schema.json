@@ -92,6 +92,9 @@
             "exists": {
               "$ref": "#/definitions/helpers:directive-or-raw"
             },
+            "true": {
+              "$ref": "#/definitions/helpers:directive-or-raw"
+            },
             "then": {
               "$ref": "#/definitions/helpers:directive-or-raw"
             },

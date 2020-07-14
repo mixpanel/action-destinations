@@ -57,8 +57,10 @@ Output:
       * [Validation](#validation)
       * [Options](#options)
          * [merge](#merge)
+      * [Removing values from object](#removing-values-from-object)
       * [Directives](#directives)
          * [@base64](#base64)
+         * [@if](#if)
          * [@lowercase](#lowercase)
          * [@merge](#merge-1)
          * [@omit](#omit)
@@ -69,7 +71,7 @@ Output:
          * [@timestamp](#timestamp)
          * [@uuid](#uuid)
 
-<!-- Added by: tysonmote, at: Mon Jun 22 16:42:44 PDT 2020 -->
+<!-- Added by: tysonmote, at: Tue Jul 14 14:36:21 PDT 2020 -->
 
 <!--te-->
 
@@ -343,6 +345,106 @@ Mappings:
 
 { "@base64": "x" } => "eAo="
 { "@base64": { "@path": "$.hello" } } => "d29ybGQhCg=="
+```
+
+### @if
+
+The @if directive resolves to different values based on a given conditional. It must have at least
+one conditional (see below) and one branch ("then" or "else").
+
+The supported conditional values are:
+
+* "exists": If the given value is not undefined or null, the @if directive resolves to the "then"
+  value. Otherwise, the "else" value is used.
+
+* "true": If the given value resolves to `true` or "true" (case-insensitive), the "then" value is
+  used. Otherwise, the "else" value is used.
+
+```json
+Input:
+
+{
+  "a": "cool",
+  "b": true
+}
+
+Mappings:
+
+{
+  "@if": {
+    "exists": { "@path": "$.a" },
+    "then": "yep",
+    "else": "nope"
+  }
+}
+=>
+"yep"
+
+{
+  "@if": {
+    "exists": { "@path": "$.nope" },
+    "then": "yep",
+    "else": "nope"
+  }
+}
+=>
+"nope"
+
+{
+  "@if": {
+    "true": { "@path": "$.b" },
+    "then": "yep",
+    "else": "nope"
+  }
+}
+=>
+"yep"
+
+{
+  "@if": {
+    "true": { "@path": "$.doesnt.exist" },
+    "then": 1,
+    "else": 2
+  }
+}
+=>
+"nope"
+```
+
+If "then" or "else" are not defined and the conditional indicates that their value should be used,
+the field will not appear in the resolved output. This is useful for including a field only if it
+(or some other field) exists:
+
+```json
+Input:
+
+{
+  "a": "cool"
+}
+
+Mappings:
+
+{
+  "foo-exists": {
+    "@if": {
+      "exists": { "@path": "$.foo" },
+      "then": true
+    }
+  }
+}
+=>
+{}
+
+{
+  "a": {
+    "@if": {
+      "exists": { "@path": "$.oops" },
+      "then": { "@path": "$.a" }
+    }
+  }
+}
+=>
+{}
 ```
 
 ### @lowercase
