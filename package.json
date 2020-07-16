@@ -21,7 +21,7 @@
     "yargs": "^15.3.1"
   },
   "dependencies": {
-    "@segment/connections-api": "^0.1.6",
+    "@segment/connections-api": "^0.1.8",
     "@segment/domain-service-clients": "^0.13.3",
     "@segment/fab5-subscriptions": "^0.1.0",
     "got": "^11.3.0",

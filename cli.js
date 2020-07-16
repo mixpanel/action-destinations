@@ -4,6 +4,7 @@
 require('yargs')
   .command(require('./lib/cli/run-local'))
   .command(require('./lib/cli/deploy'))
+  .command(require('./lib/cli/undeploy'))
   .command(require('./lib/cli/list-deployed'))
   .command(require('./lib/cli/new-destination'))
   .command(require('./lib/cli/new-action'))
