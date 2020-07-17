@@ -13,9 +13,10 @@ steps:
       npm install
 
       echo '--- Snyk scan'
-      ## bk-snyk does what most people expect from snyk. If you need to do something else,
-      ## call the `snyk` CLI directly
       bk-snyk
+
+      echo '--- Linting'
+      eslint .
 
       echo '--- Testing'
       npm test
