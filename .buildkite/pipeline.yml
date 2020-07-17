@@ -1,0 +1,21 @@
+steps:
+  - label: "Test"
+    env:
+      SEGMENT_CONTEXTS: "snyk,npm,aws-credentials"
+      SEGMENT_BUILDKITE_IMAGE: 'buildkite-agent-node12'
+    agents:
+      queue: v1
+    commands: |
+      echo '--- Configuring NPM auth'
+      npm config set "//registry.npmjs.org/:_authToken" $${NPM_TOKEN}
+
+      echo '--- Fetching dependencies'
+      npm install
+
+      echo '--- Snyk scan'
+      ## bk-snyk does what most people expect from snyk. If you need to do something else,
+      ## call the `snyk` CLI directly
+      bk-snyk
+
+      echo '--- Testing'
+      npm test
