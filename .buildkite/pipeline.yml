@@ -11,6 +11,7 @@ steps:
 
       echo '--- Fetching dependencies'
       npm install
+      PATH=$(npm bin):$PATH
 
       echo '--- Snyk scan'
       bk-snyk
