@@ -1,6 +1,6 @@
 # Fab 5 Engine
 
-[![Build status](https://badge.buildkite.com/ec5e2cfa66d153ebaf3477af80de2a23f17b647e11e148c63c.svg)](https://buildkite.com/segment/fab-5-engine)
+[![Build status](https://badge.buildkite.com/ec5e2cfa66d153ebaf3477af80de2a23f17b647e11e148c63c.svg?branch=master)](https://buildkite.com/segment/fab-5-engine)
 
 Fab 5 Engine is an early prototype implementation of five destinations following the Destinations
 2.0 vision. 2.0 destinations are comprised of one or more subscriptions ("if" statements) that
