@@ -5,36 +5,52 @@ Fab 5 Engine is an early prototype implementation of five destinations following
 trigger partner actions along with a mapping that maps the incoming event to a payload that matches
 the action's schema.
 
-<img alt="Destinations 2.0 flow" src="https://user-images.githubusercontent.com/111501/83700205-10f23e80-a5bb-11ea-9fbe-b1b10c1ed464.png">
+![Destinations 2.0 flow][architecture]
 
-This prototype deploys the Fab 5 destinations as Destination Functions to staging. This is currently
-hard-coded to the `tyson` workspace in staging. If you want to deploy these to your own workspace,
-edit [deploy.js](https://github.com/segmentio/fab-5-engine/blob/master/deploy.js) and run `node cli
-deploy`.
+Using the included `./cli.js` command, you can deploy the Fab 5 destinations to staging or, from
+a workbench, production.
 
-See also: [Beginner's Guide](https://paper.dropbox.com/doc/Fab-5-Engine-Beginners-Guide--A2~KoOcu4qM1rlyX_ZfpyCFTAg-BMfDUPaKMvghmXEtaZpq2)
+See also: [Beginner's Guide][beginner]
 
-## Running Locally
+[architecture]: https://user-images.githubusercontent.com/111501/83700205-10f23e80-a5bb-11ea-9fbe-b1b10c1ed464.png
+[beginner]: https://paper.dropbox.com/doc/Fab-5-Engine-Beginners-Guide--A2~KoOcu4qM1rlyX_ZfpyCFTAg-BMfDUPaKMvghmXEtaZpq2
 
-You can run actions locally with the `cli.js` script:
+## CLI
+
+The `./cli.js` command allows you to create destinations and actions from templates, deploy
+destinations, and run actions locally:
 
 ```
-./cli.js run-local [action] -i <inputPath>
+cli.js <command>
 
-Run a partner action locally.
-
-Positionals:
-  action  Path to destination action to run.
-                                           [default: "./destinations/noop/noop"]
+Commands:
+  cli.js run-local <action>                 Run a partner action locally.
+  cli.js deploy [workspace]                 Deploy Fab 5 functions to a workspace.
+  cli.js undeploy [workspace]               Delete Fab 5 functions from a workspace.
+  cli.js list-deployed [workspace]          List deployed Fab 5 destinations.
+  cli.js new-destination <slug>             Create a new destination from a template.
+  cli.js new-action <destination> <action>  Create a new action from a template.
 
 Options:
-  --help       Show help                                               [boolean]
-  --version    Show version number                                     [boolean]
-  --input, -i  Path to input directory containing settings.json, payload.json,
-               and mapping.json                                         [string]
+  --version  Show version number  [boolean]
+  --help     Show help  [boolean]
 ```
 
-For example:
+To run commands in staging, run `robo sshuttle` in another terminal session on your local machine
+and then run `./cli.js` locally. To run commands in production, SSH in to the workbench and check
+out this repository:
+
+```
+% robo prod.ssh
+% git clone git@github.com:segmentio/fab-5-engine.git
+% cd fab-5-engine
+% npm install
+% ./cli.js
+```
+
+## Test Actions Locally
+
+To test actions locally, you can use `./cli.js run-local`. For example:
 
 ```
 ./cli.js run-local ./destinations/slack/postToChannel -i ./sample/slack
@@ -82,7 +98,7 @@ Result: [
 
 ## Inspecting
 
-If you want to dump the definition for all destinations, run this:
+If you want to dump the definition metadata for all destinations, run this:
 
 ```
 $ node -e "console.log(JSON.stringify(require('./destinations')()))"
