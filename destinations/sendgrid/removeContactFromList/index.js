@@ -11,15 +11,21 @@ module.exports = action => action
   // TODO make these automatic
   .validatePayload(require('./payload.schema.json'))
 
-  .request(async (req, { payload }) => {
-    const search = await req.post('marketing/contacts/search', {
-      json: {
-        query: `email = '${sgqlEscape(payload.email)}' AND CONTAINS(list_ids, '${sgqlEscape(payload.list_id)}')`
-      }
-    })
+  .cachedRequest({
+    ttl: 60,
+    key: ({ payload }) => (`${payload.email}-${payload.list_id}`),
+    value: async (req, { payload }) => {
+      const search = await req.post('marketing/contacts/search', {
+        json: {
+          query: `email = '${sgqlEscape(payload.email)}' AND CONTAINS(list_ids, '${sgqlEscape(payload.list_id)}')`
+        }
+      })
+      return get(await search.body, 'result[0].id')
+    },
+    as: 'contactId'
+  })
 
-    const id = get(await search.body, 'result[0].id')
-    if (id === undefined) return null
-
-    return req.delete(`marketing/lists/${payload.list_id}/contacts?contact_ids=${id}`)
+  .request(async (req, { payload, contactId }) => {
+    if (contactId === null || contactId === undefined) return null
+    return req.delete(`marketing/lists/${payload.list_id}/contacts?contact_ids=${contactId}`)
   })

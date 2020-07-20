@@ -11,14 +11,20 @@ module.exports = action => action
     }
   })
 
-  .request(async (req, { payload }) => {
-    const search = await req.get('organizations/search', {
-      searchParams: { term: payload.organizationIdentifier }
-    })
+  .cachedRequest({
+    ttl: 60,
+    key: ({ payload }) => (payload.organizationIdentifier),
+    value: async (req, { payload }) => {
+      const search = await req.get('organizations/search', {
+        searchParams: { term: payload.organizationIdentifier }
+      })
+      return get(search.body, 'data.items[0].item.id')
+    },
+    as: 'organizationId'
+  })
 
-    const organizationId = get(search.body, 'data.items[0].item.id')
-
-    if (organizationId === undefined) {
+  .request(async (req, { payload, organizationId }) => {
+    if (organizationId === undefined || organizationId === null) {
       return req.post('organizations', { json: payload.organization })
     } else {
       const { add_time: x, ...organization } = payload.organization

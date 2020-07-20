@@ -4,13 +4,21 @@ module.exports = action => action
   // TODO make these automatic
   .validatePayload(require('./payload.schema.json'))
 
-  .request(async (req, { payload }) => {
-    const search = await req.get('persons/search', {
-      searchParams: { term: payload.personIdentifier }
-    })
+  .cachedRequest({
+    ttl: 60,
+    key: ({ payload }) => (payload.personIdentifier),
+    value: async (req, { payload }) => {
+      const search = await req.get('persons/search', {
+        searchParams: { term: payload.personIdentifier }
+      })
+      return get(search.data, 'data.items[0].item.id')
+    },
+    as: 'personId'
+  })
 
-    const personId = get(search.body, 'data.items[0].item.id')
-    if (personId === undefined) return null
-
+  .request(async (req, { payload, personId }) => {
+    if (personId === undefined || personId === null) {
+      return null
+    }
     return req.delete(`persons/${personId}`)
   })

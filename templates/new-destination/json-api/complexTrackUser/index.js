@@ -1,18 +1,22 @@
 module.exports = (action) => action
   .validatePayload(require('./payload.schema.json'))
 
-  .request(async (req, { payload }) => {
-    const resp = await req.get(`${payload.number}/trivia`, {
-      prefixUrl: 'http://numbersapi.com',
-      responseType: 'text'
-    })
-    payload.properties.number = {
-      value: payload.number,
-      trivia: resp.body
-    }
-    delete payload.number
-    return resp
+  .cachedRequest({
+    ttl: 10,
+    key: ({ payload }) => (payload.number),
+    value: async (req, { payload }) => {
+      const url = `http://numbersapi.com/${payload.number}/trivia`
+      const resp = await req.get(url, { responseType: 'text' })
+      payload.properties.number = {
+        value: payload.number,
+        trivia: resp.body
+      }
+      delete payload.number
+      return resp
+    },
+    as: 'trivia'
   })
-  .request((req, { payload, settings }) => (
-    req.post('', { json: payload })
+
+  .request((req, { settings, trivia }) => (
+    req.post(settings.url, { json: trivia })
   ))

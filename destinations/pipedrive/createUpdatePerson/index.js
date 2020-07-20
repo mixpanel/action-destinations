@@ -11,14 +11,20 @@ module.exports = action => action
     }
   })
 
-  .request(async (req, { payload }) => {
-    const search = await req.get('persons/search', {
-      searchParams: { term: payload.personIdentifier }
-    })
+  .cachedRequest({
+    ttl: 60,
+    key: ({ payload }) => (payload.personIdentifier),
+    value: async (req, { payload }) => {
+      const search = await req.get('persons/search', {
+        searchParams: { term: payload.personIdentifier }
+      })
+      return get(search.data, 'data.items[0].item.id')
+    },
+    as: 'personId'
+  })
 
-    const personId = get(search.body, 'data.items[0].item.id')
-
-    if (personId === undefined) {
+  .request(async (req, { payload, personId }) => {
+    if (personId === undefined || personId === null) {
       return req.post('persons', { json: payload.person })
     } else {
       const { add_time: x, ...person } = payload.person
