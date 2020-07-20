@@ -30,6 +30,7 @@
     "moment": "^2.26.0",
     "moment-locales-webpack-plugin": "^1.2.0",
     "mustache": "^4.0.1",
+    "node-cache": "^5.1.2",
     "prompts": "^2.3.2",
     "uuid": "^8.1.0"
   }
