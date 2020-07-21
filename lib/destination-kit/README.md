@@ -109,9 +109,9 @@ destination() instantiates a new Destination object with the given configuration
 
 The configuration object accepts the following fields:
 
-* `name` -- `string` -- The human-readable name of the destination. E.g. "Amplitude"
+* `name` — `string` — The human-readable name of the destination. E.g. "Amplitude"
 
-* `defaultSubscriptions` -- `object` -- TODO (not sure if we want to keep this)
+* `defaultSubscriptions` — `object` — TODO (not sure if we want to keep this)
 
 ```js
 const { destination } = require('./lib/destination-kit')
@@ -196,19 +196,19 @@ Some notes on the cache implementation:
 
 The config object accepts the following fields (all fields are required unless otherwise noted):
 
-* `ttl` -- `number` -- Time, in seconds, that values are cached before they are expunged. E.g. `60` = 1 minute
+* `ttl` — `number` — Time, in seconds, that values are cached before they are expunged. E.g. `60` = 1 minute
 
-* `key` -- `function(Context)` -- A callback function that receives the [Context](#context) object and should return
+* `key` — `function(Context)` — A callback function that receives the [Context](#context) object and should return
   a unique string that identifies the object fetched by the `value` callback for the given payload.
 
-* `value` -- `function(Got, Context)` -- A callback function that receives the
+* `value` — `function(Got, Context)` — A callback function that receives the
   [`got`-based](https://github.com/sindresorhus/got) request object and the [Context](#context)
   object and returns the value that should be associated with the key.
 
-* `as` -- `string` -- The field name to store the value under in the Context object. See below for
+* `as` — `string` — The field name to store the value under in the Context object. See below for
   an example
 
-* `negative` -- `boolean` -- (Optional) Set this to `true` to cache negative values (null,
+* `negative` — `boolean` — (Optional) Set this to `true` to cache negative values (null,
   undefined).
 
 ```js
@@ -264,11 +264,11 @@ parallel. Parallel execution continues until fanIn() is called on the FanOut obj
 
 The config object requires the following fields:
 
-* `on` -- `string` -- A [JSONPath expression](https://goessner.net/articles/JsonPath/) that is
+* `on` — `string` — A [JSONPath expression](https://goessner.net/articles/JsonPath/) that is
   applied to the Context object and should resolve to an array of values. A parallel flow of
   execution will be run for each of these values.
 
-* `as` -- `string` -- The field name that each value will be available as on the Context object to
+* `as` — `string` — The field name that each value will be available as on the Context object to
   callbacks in each parallel flow of execution.
 
 fanOut() supports only a subset of the steps available on the parent Action object:
@@ -388,6 +388,6 @@ to an Action object. The Context object is used to propagate the incoming payloa
 other values created at runtime among the various steps. While there is currently no set schema for
 this, we're currently using at least the following two fields:
 
-* `paylaod` -- `object` -- Incoming Segment event payload.
+* `paylaod` — `object` — Incoming Segment event payload.
 
-* `settings` -- `object` -- Per-destination and per-action setting values. E.g. `apiKey`
+* `settings` — `object` — Per-destination and per-action setting values. E.g. `apiKey`
