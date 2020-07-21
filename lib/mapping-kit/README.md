@@ -46,34 +46,31 @@ Output:
 
 ## Table of contents
 
-<!-- To update, run: ./scripts/gh-md-toc --insert ./lib/mapping-kit/README.md -->
+<!-- ./node_modules/.bin/markdown-toc -i ./lib/mapping-kit/README.md -->
 
-<!--ts-->
-   * [Mapping Kit](#mapping-kit)
-      * [Table of contents](#table-of-contents)
-      * [Usage](#usage)
-      * [Terms](#terms)
-      * [Mixing raw values and directives](#mixing-raw-values-and-directives)
-      * [Validation](#validation)
-      * [Options](#options)
-         * [merge](#merge)
-      * [Removing values from object](#removing-values-from-object)
-      * [Directives](#directives)
-         * [@base64](#base64)
-         * [@if](#if)
-         * [@lowercase](#lowercase)
-         * [@merge](#merge-1)
-         * [@omit](#omit)
-         * [@path](#path)
-         * [@pick](#pick)
-         * [@root](#root)
-         * [@template](#template)
-         * [@timestamp](#timestamp)
-         * [@uuid](#uuid)
+<!-- toc -->
 
-<!-- Added by: tysonmote, at: Tue Jul 14 14:36:21 PDT 2020 -->
+- [Usage](#usage)
+- [Terms](#terms)
+- [Mixing raw values and directives](#mixing-raw-values-and-directives)
+- [Validation](#validation)
+- [Options](#options)
+  * [merge](#merge)
+- [Removing values from object](#removing-values-from-object)
+- [Directives](#directives)
+  * [@base64](#base64)
+  * [@if](#if)
+  * [@lowercase](#lowercase)
+  * [@merge](#merge)
+  * [@omit](#omit)
+  * [@path](#path)
+  * [@pick](#pick)
+  * [@root](#root)
+  * [@template](#template)
+  * [@timestamp](#timestamp)
+  * [@uuid](#uuid)
 
-<!--te-->
+<!-- tocstop -->
 
 ## Usage
 
