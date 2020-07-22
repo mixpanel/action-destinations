@@ -1,0 +1,16 @@
+{
+  "a": {
+    "@json": true
+  },
+  "b": {
+    "@json": null
+  },
+  "c": {
+    "@json": "hello"
+  },
+  "d": {
+    "@json": {
+      "cool": true
+    }
+  }
+}

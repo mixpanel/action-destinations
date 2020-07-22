@@ -44,6 +44,9 @@
           "$ref": "#/definitions/directive:if"
         },
         {
+          "$ref": "#/definitions/directive:json"
+        },
+        {
           "$ref": "#/definitions/directive:lowercase"
         },
         {
@@ -106,6 +109,18 @@
       },
       "required": [
         "@if"
+      ],
+      "additionalProperties": false
+    },
+    "directive:json": {
+      "type": "object",
+      "properties": {
+        "@json": {
+          "$ref": "#/definitions/helpers:directive-or-raw"
+        }
+      },
+      "required": [
+        "@json"
       ],
       "additionalProperties": false
     },
