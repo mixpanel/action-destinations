@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "type": "object",
+  "properties": {
+    "url": {
+      "title": "URL",
+      "description": "URL to send payloads to.",
+      "type": "string",
+      "format": "uri"
+    }
+  },
+  "required": [
+    "url"
+  ]
+}
