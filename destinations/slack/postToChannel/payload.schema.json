@@ -5,15 +5,18 @@
   "type": "object",
   "properties": {
     "text": {
-      "description": "The text message to post to Slack. Accpets all [Slack formatting](https://api.slack.com/reference/surfaces/formatting) syntax.",
+      "title": "Message",
+      "description": "The text message to post to Slack. You can use [Slack's formatting syntax.](https://api.slack.com/reference/surfaces/formatting)",
       "type": "string"
     },
     "username": {
+      "title": "User",
       "description": "User name to post messages as.",
       "type": "string",
       "default": "Segment"
     },
     "icon_url": {
+      "title": "Icon URL",
       "description": "URL for user icon image.",
       "type": "string",
       "default": "https://logo.clearbit.com/segment.com"

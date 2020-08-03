@@ -10,7 +10,7 @@
     },
     "channels": {
       "title": "Channels",
-      "description": "Slack Channels to post messages to. Each channel receives a copy of messages sent to this Action.",
+      "description": "Slack channels to post message to. Each channel receives a copy of messages sent to this action.",
       "type": "array",
       "minLength": 20,
       "items": {
