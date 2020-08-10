@@ -4,19 +4,19 @@ module.exports = action => action
   // TODO make these automatic
   .validatePayload(require('./payload.schema.json'))
 
-  .mapField('$.person.add_time', {
+  .mapField('$.add_time', {
     '@timestamp': {
-      timestamp: { '@path': '$.person.add_time' },
+      timestamp: { '@path': '$.add_time' },
       format: 'YYYY-MM-DD HH:MM:SS'
     }
   })
 
   .cachedRequest({
     ttl: 60,
-    key: ({ payload }) => (payload.personIdentifier),
+    key: ({ payload }) => (payload.identifier),
     value: async (req, { payload }) => {
       const search = await req.get('persons/search', {
-        searchParams: { term: payload.personIdentifier }
+        searchParams: { term: payload.identifier }
       })
       return get(search.data, 'data.items[0].item.id')
     },
@@ -24,10 +24,13 @@ module.exports = action => action
   })
 
   .request(async (req, { payload, personId }) => {
+    const { identifier, ...person } = payload
+
     if (personId === undefined || personId === null) {
-      return req.post('persons', { json: payload.person })
+      return req.post('persons', { json: person })
     } else {
-      const { add_time: x, ...person } = payload.person
-      return req.put(`persons/${personId}`, { json: person })
+      // Don't need add_time if we're only upading the person
+      const { add_time: x, ...cleanPerson } = person
+      return req.put(`persons/${personId}`, { json: cleanPerson })
     }
   })

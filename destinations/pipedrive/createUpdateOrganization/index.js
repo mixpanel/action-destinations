@@ -4,19 +4,19 @@ module.exports = action => action
   // TODO make these automatic
   .validatePayload(require('./payload.schema.json'))
 
-  .mapField('$.organization.add_time', {
+  .mapField('$.add_time', {
     '@timestamp': {
-      timestamp: { '@path': '$.organization.add_time' },
+      timestamp: { '@path': '$.add_time' },
       format: 'YYYY-MM-DD HH:MM:SS'
     }
   })
 
   .cachedRequest({
     ttl: 60,
-    key: ({ payload }) => (payload.organizationIdentifier),
+    key: ({ payload }) => (payload.identifier),
     value: async (req, { payload }) => {
       const search = await req.get('organizations/search', {
-        searchParams: { term: payload.organizationIdentifier }
+        searchParams: { term: payload.identifier }
       })
       return get(search.body, 'data.items[0].item.id')
     },
@@ -24,10 +24,13 @@ module.exports = action => action
   })
 
   .request(async (req, { payload, organizationId }) => {
+    const { identifier, ...organization } = payload
+
     if (organizationId === undefined || organizationId === null) {
-      return req.post('organizations', { json: payload.organization })
+      return req.post('organizations', { json: organization })
     } else {
-      const { add_time: x, ...organization } = payload.organization
-      return req.put(`organizations/${organizationId}`, { json: organization })
+      // Don't need add_time when we're only updating the org
+      const { add_time: x, ...cleanOrganization } = organization
+      return req.put(`organizations/${organizationId}`, { json: cleanOrganization })
     }
   })

@@ -6,10 +6,10 @@ module.exports = action => action
 
   .cachedRequest({
     ttl: 60,
-    key: ({ payload }) => (payload.personIdentifier),
+    key: ({ payload }) => (payload.identifier),
     value: async (req, { payload }) => {
       const search = await req.get('persons/search', {
-        searchParams: { term: payload.personIdentifier }
+        searchParams: { term: payload.identifier }
       })
       return get(search.data, 'data.items[0].item.id')
     },
