@@ -5,6 +5,7 @@
   "type": "object",
   "properties": {
     "name": {
+      "title": "Name",
       "description": "Name of the list to be created.",
       "type": "string"
     }

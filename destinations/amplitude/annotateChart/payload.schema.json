@@ -5,29 +5,35 @@
   "type": "object",
   "properties": {
     "app_id": {
+      "title": "App ID",
       "type": "integer",
       "description": "The Project ID of the project your chart belongs to."
     },
+    "chart_id": {
+      "title": "Chart ID",
+      "type": "string",
+      "description": "The ID of the chart (found in Amplitude chart's URL) you wish to annotate."
+    },
+    "label": {
+      "title": "Title",
+      "type": "string",
+      "description": "The title of your annotation."
+    },
     "date": {
+      "title": "Date",
       "type": "string",
       "format": "date-time",
       "description": "Date of the annotation."
     },
-    "label": {
-      "type": "string",
-      "description": "The title of your annotation."
-    },
-    "chart_id": {
-      "type": "string",
-      "description": "The ID of the chart (found in Amplitude chart's URL) you wish to annotate."
-    },
     "details": {
+      "title": "Additional details",
       "type": "string",
       "description": "Additional details you would like to add to the annotation."
     }
   },
   "required": [
     "app_id",
+    "chart_id",
     "date",
     "label"
   ]

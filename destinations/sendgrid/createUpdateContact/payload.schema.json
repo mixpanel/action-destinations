@@ -5,20 +5,18 @@
   "type": "object",
   "properties": {
     "list_id": {
+      "title": "List ID",
       "description": "ID of the marketing contact list you want the contact added to.",
       "type": "string"
     },
-    "address_line_1": {
+    "email": {
+      "title": "Email address",
       "type": "string",
-      "description": "The first line of the address.",
-      "maxLength": 100
-    },
-    "address_line_2": {
-      "type": "string",
-      "description": "Optional second line for the address.",
-      "maxLength": 100
+      "description": "The primary email for the contact.",
+      "maxLength": 254
     },
     "alternate_emails": {
+      "title": "Additional email addresses",
       "type": "array",
       "description": "Additional emails associated with the contact.",
       "items": {
@@ -26,42 +24,57 @@
       },
       "maxItems": 5
     },
+    "address_line_1": {
+      "title": "Address line (1)",
+      "type": "string",
+      "description": "The first line of the address.",
+      "maxLength": 100
+    },
+    "address_line_2": {
+      "title": "Address line (2)",
+      "type": "string",
+      "description": "Optional second line for the address.",
+      "maxLength": 100
+    },
     "city": {
+      "title": "City",
       "type": "string",
       "description": "The city of the contact.",
       "maxLength": 60
     },
     "country": {
+      "title": "Country",
       "type": "string",
       "description": "The country of the contacts address. Accepts full name or abbreviation.",
       "maxLength": 50
     },
-    "email": {
-      "type": "string",
-      "description": "The primary email for the contact. This is required to be a valid email.",
-      "maxLength": 254
-    },
     "first_name": {
+      "title": "First name",
       "type": "string",
       "description": "The contacts personal name.",
       "maxLength": 50
     },
     "last_name": {
+      "title": "Last name",
       "type": "string",
       "description": "The contacts family name.",
       "maxLength": 50
     },
     "postal_code": {
+      "title": "Postal code",
       "type": "string",
       "description": "The postcode, post code, Eircode, PIN code or ZIP code."
     },
     "state_province_region": {
+      "title": "Region",
       "type": "string",
       "description": "The state, province, or region of the contacts address.",
       "maxLength": 50
     },
     "custom_fields": {
-      "type": "object"
+      "title": "Custom fields",
+      "type": "object",
+      "description": "Object with custom data to associate with this contact."
     }
   },
   "required": [

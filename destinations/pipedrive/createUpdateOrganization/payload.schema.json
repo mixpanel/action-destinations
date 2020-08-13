@@ -5,18 +5,21 @@
   "type": "object",
   "properties": {
     "identifier": {
+      "title": "Organization ID",
       "description": "Identifier used to find existing organization in Pipedrive. Typically this is the name but it can also be a custom field value.",
       "type": "string"
     },
     "name": {
-      "description": "Name of the organization.",
+      "title": "Organization name",
       "type": "string"
     },
     "owner_id": {
+      "title": "Owner ID",
       "description": "ID of the user who will be marked as the owner of this organization. Default is the user who ownes the API token.",
       "type": "number"
     },
     "add_time": {
+      "title": "Created at",
       "description": "If the organization is created, use this timestamp as the creation timestamp. Format: YYY-MM-DD HH:MM:SS",
       "type": "string"
     }

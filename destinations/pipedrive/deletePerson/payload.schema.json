@@ -5,6 +5,7 @@
   "type": "object",
   "properties": {
     "identifier": {
+      "title": "Person ID",
       "description": "Identifier used to find person to delete in Pipedrive. Can be an email, name, phone number, or custom field value.",
       "type": "string"
     }

@@ -5,10 +5,12 @@
   "type": "object",
   "properties": {
     "segment_id": {
+      "title": "Segment ID",
       "description": "ID of the Customer.io segment to remove the person from.",
       "type": "number"
     },
     "person_id": {
+      "title": "Person ID",
       "description": "ID of the person to remove.",
       "type": "string"
     }

@@ -5,19 +5,23 @@
   "type": "object",
   "properties": {
     "id": {
+      "title": "Campaign ID",
       "description": "ID of the campaign to trigger.",
       "type": "number"
     },
     "data": {
+      "title": "Data",
       "description": "Custom Liquid merge data to include with the trigger.",
       "type": "object"
     },
     "recipients": {
-      "description": "Additional recipient conditions to filter recipients. If this is used, \"ids\" may not be used.",
+      "title": "Recipients",
+      "description": "Additional recipient conditions to filter recipients. If this is used, \"IDs\" may not be used.",
       "type": "object"
     },
     "ids": {
-      "description": "List of profile IDs to use as campaign recipients. If this is used, \"recipients\" may not be used.",
+      "title": "Profile IDs",
+      "description": "List of profile IDs to use as campaign recipients. If this is used, \"Recipients\" may not be used.",
       "type": "array"
     }
   },

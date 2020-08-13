@@ -5,18 +5,23 @@
   "type": "object",
   "properties": {
     "amplitude_id": {
+      "title": "Amplitude ID",
       "type": "string"
     },
     "user_id": {
+      "title": "User ID",
       "type": "string"
     },
     "requester": {
+      "title": "Requester",
       "type": "string"
     },
     "ignore_invalid_id": {
+      "title": "Ignore invalid ID",
       "type": "boolean"
     },
     "delete_from_org": {
+      "title": "Delete from organization",
       "type": "boolean"
     }
   }
