@@ -5,18 +5,22 @@
   "type": "object",
   "properties": {
     "id": {
+      "title": "Person ID",
       "description": "ID used to uniquely identify person in Customer.io.",
       "type": "string"
     },
     "email": {
+      "title": "Email address",
       "description": "Person's email address.",
       "type": "string"
     },
     "created_at": {
+      "title": "Created at",
       "description": "Timestamp for when the person was created. Default is current date and time.",
       "type": "string"
     },
     "custom_attributes": {
+      "title": "Custom attributes",
       "description": "Optional custom attributes for this person. When updating a person, attributes are added and not removed.",
       "type": "object"
     }

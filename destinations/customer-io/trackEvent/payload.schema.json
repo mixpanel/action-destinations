@@ -5,18 +5,21 @@
   "type": "object",
   "properties": {
     "id": {
+      "title": "Person ID",
       "description": "ID of the person who triggered this event.",
       "type": "string"
     },
     "name": {
-      "description": "Event name.",
+      "title": "Event name",
       "type": "string"
     },
     "type": {
+      "title": "Event type",
       "description": "Override event type. Ex. \"page\".",
       "type": "string"
     },
     "data": {
+      "title": "Data",
       "description": "Custom data to include with the event.",
       "type": "object"
     }

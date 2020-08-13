@@ -5,6 +5,7 @@
   "type": "object",
   "properties": {
     "email": {
+      "title": "Email address",
       "description": "Email address of the contact to delete.",
       "type": "string"
     }

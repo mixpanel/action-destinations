@@ -5,18 +5,21 @@
   "type": "object",
   "properties": {
     "identifier": {
+      "title": "Person ID",
       "description": "Identifier used to find existing person in Pipedrive. Can be an email, name, phone number, or custom field value.",
       "type": "string"
     },
     "name": {
-      "description": "Name of the person.",
+      "title": "Person name",
       "type": "string"
     },
     "org_id": {
+      "title": "Organization ID",
       "description": "ID of the organization this person will belong to.",
       "type": "number"
     },
     "email": {
+      "title": "Email address",
       "description": "Email addresses for this person.",
       "type": "array",
       "items": {
@@ -24,10 +27,12 @@
       }
     },
     "phone": {
+      "title": "Phone number",
       "description": "Phone number for the person.",
       "type": "string"
     },
     "add_time": {
+      "title": "Created at",
       "description": "If the person is created, use this timestamp as the creation timestamp. Format: YYY-MM-DD HH:MM:SS",
       "type": "string"
     }
