@@ -1,11 +1,13 @@
 {
-  "@omit": {
-    "object": {
-      "a": 1,
-      "b": 2
-    },
-    "fields": [
-      "a"
-    ]
+  "mapping": {
+    "@omit": {
+      "object": {
+        "a": 1,
+        "b": 2
+      },
+      "fields": [
+        "a"
+      ]
+    }
   }
 }

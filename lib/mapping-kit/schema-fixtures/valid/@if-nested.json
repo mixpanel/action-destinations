@@ -1,13 +1,15 @@
 {
-  "@if": {
-    "exists": {
-      "@path": "$.foo"
-    },
-    "then": {
-      "@path": "$.bar"
-    },
-    "else": {
-      "@path": "$.baz"
+  "mapping": {
+    "@if": {
+      "exists": {
+        "@path": "$.foo"
+      },
+      "then": {
+        "@path": "$.bar"
+      },
+      "else": {
+        "@path": "$.baz"
+      }
     }
   }
 }

@@ -1,10 +1,12 @@
 {
-  "@timestamp": {
-    "timestamp": {
-      "@path": "$.properties.timestamp"
-    },
-    "format": {
-      "@path": "$.properties.format"
+  "mapping": {
+    "@timestamp": {
+      "timestamp": {
+        "@path": "$.properties.timestamp"
+      },
+      "format": {
+        "@path": "$.properties.format"
+      }
     }
   }
 }

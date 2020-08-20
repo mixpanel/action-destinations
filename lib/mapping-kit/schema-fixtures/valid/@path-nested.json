@@ -1,5 +1,7 @@
 {
-  "@path": {
-    "@path": "$.foo.bar"
+  "mapping": {
+    "@path": {
+      "@path": "$.foo.bar"
+    }
   }
 }

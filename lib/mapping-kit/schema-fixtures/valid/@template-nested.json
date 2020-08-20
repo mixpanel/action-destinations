@@ -1,5 +1,7 @@
 {
-  "@template": {
-    "@path": "$.my.template"
+  "mapping": {
+    "@template": {
+      "@path": "$.my.template"
+    }
   }
 }

@@ -1,6 +1,8 @@
 {
-  "@if": {
-    "exists": 1,
-    "else": 3
+  "mapping": {
+    "@if": {
+      "exists": 1,
+      "else": 3
+    }
   }
 }

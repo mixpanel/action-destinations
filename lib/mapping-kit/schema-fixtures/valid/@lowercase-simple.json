@@ -1,3 +1,5 @@
 {
-  "@lowercase": "Foo Bar"
+  "mapping": {
+    "@lowercase": "Foo Bar"
+  }
 }

@@ -1,8 +1,11 @@
 {
-  "@merge": [
-    {
-      "ok": true
-    },
-    "uh oh"
-  ]
+  "mapping": {
+    "@merge": [
+      {
+        "ok": true
+      },
+      "uh oh"
+    ]
+  },
+  "expectError": "/@merge/1 should be a mapping directive or an object but it is a string."
 }

@@ -1,5 +1,7 @@
 {
-  "hello": {
-    "world!": true
+  "mapping": {
+    "hello": {
+      "world!": true
+    }
   }
 }

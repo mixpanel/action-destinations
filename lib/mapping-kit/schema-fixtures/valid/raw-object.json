@@ -1,4 +1,6 @@
 {
-  "cool": true,
-  "string": "right here!"
+  "mapping": {
+    "cool": true,
+    "string": "right here!"
+  }
 }

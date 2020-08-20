@@ -1,3 +1,6 @@
 {
-  "@path": false
+  "mapping": {
+    "@path": false
+  },
+  "expectError": "/@path should be a string or a mapping directive but it is a boolean."
 }

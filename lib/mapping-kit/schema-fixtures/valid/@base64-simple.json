@@ -1,3 +1,5 @@
 {
-  "@base64": "hello"
+  "mapping": {
+    "@base64": "hello"
+  }
 }

@@ -1,10 +1,12 @@
 {
-  "@merge": [
-    {
-      "foo": "bar"
-    },
-    {
-      "baz": "biz"
-    }
-  ]
+  "mapping": {
+    "@merge": [
+      {
+        "foo": "bar"
+      },
+      {
+        "baz": "biz"
+      }
+    ]
+  }
 }

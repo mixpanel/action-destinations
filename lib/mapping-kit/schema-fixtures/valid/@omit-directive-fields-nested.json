@@ -1,14 +1,16 @@
 {
-  "@omit": {
-    "object": {
-      "a": 1,
-      "b": 2
-    },
-    "fields": [
-      "a",
-      {
-        "@path": "$.foo.bar"
-      }
-    ]
+  "mapping": {
+    "@omit": {
+      "object": {
+        "a": 1,
+        "b": 2
+      },
+      "fields": [
+        "a",
+        {
+          "@path": "$.foo.bar"
+        }
+      ]
+    }
   }
 }

@@ -1,0 +1,17 @@
+{
+  "mapping": {
+    "time": {
+      "@timestamp": {
+        "format": "YYYY-MM-DD"
+      }
+    },
+    "obj": {
+      "@merge": {},
+      "oops": true
+    },
+    "hash": {
+      "@base64": true
+    }
+  },
+  "expectError": "/time/@timestamp should have field \"timestamp\" but it doesn't. /obj should only have one @-prefixed key but it has 2 keys. /hash/@base64 should be a string or a mapping directive but it is a boolean."
+}

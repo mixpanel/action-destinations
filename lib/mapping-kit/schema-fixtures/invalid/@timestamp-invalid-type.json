@@ -1,3 +1,6 @@
 {
-  "@timestamp": "2020-06-01"
+  "mapping": {
+    "@timestamp": "2020-06-01"
+  },
+  "expectError": "/@timestamp should be an object but it is a string."
 }

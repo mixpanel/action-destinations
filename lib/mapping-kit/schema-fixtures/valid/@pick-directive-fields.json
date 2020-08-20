@@ -1,11 +1,13 @@
 {
-  "@pick": {
-    "object": {
-      "a": 1,
-      "b": 2
-    },
-    "fields": {
-      "@path": "$.foo.bar"
+  "mapping": {
+    "@pick": {
+      "object": {
+        "a": 1,
+        "b": 2
+      },
+      "fields": {
+        "@path": "$.foo.bar"
+      }
     }
   }
 }

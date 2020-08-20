@@ -1,5 +1,7 @@
 {
-  "@json": {
-    "@path": "$.properties"
+  "mapping": {
+    "@json": {
+      "@path": "$.properties"
+    }
   }
 }

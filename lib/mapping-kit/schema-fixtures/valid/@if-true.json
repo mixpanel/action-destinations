@@ -1,7 +1,9 @@
 {
-  "@if": {
-    "true": true,
-    "then": 2,
-    "else": 3
+  "mapping": {
+    "@if": {
+      "true": true,
+      "then": 2,
+      "else": 3
+    }
   }
 }

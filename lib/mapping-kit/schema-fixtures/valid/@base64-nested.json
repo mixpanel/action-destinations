@@ -1,5 +1,7 @@
 {
-  "@base64": {
-    "@path": "$.foo"
+  "mapping": {
+    "@base64": {
+      "@path": "$.foo"
+    }
   }
 }
