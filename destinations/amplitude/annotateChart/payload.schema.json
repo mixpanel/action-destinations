@@ -31,10 +31,5 @@
       "description": "Additional details you would like to add to the annotation."
     }
   },
-  "required": [
-    "app_id",
-    "chart_id",
-    "date",
-    "label"
-  ]
+  "required": ["app_id", "chart_id", "date", "label"]
 }

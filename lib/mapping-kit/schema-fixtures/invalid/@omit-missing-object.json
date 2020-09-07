@@ -1,9 +1,7 @@
 {
   "mapping": {
     "@omit": {
-      "fields": [
-        "foo"
-      ]
+      "fields": ["foo"]
     }
   },
   "expectError": "/@omit should have field \"object\" but it doesn't."

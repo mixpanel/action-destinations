@@ -55,20 +55,20 @@ Output:
 - [Mixing raw values and directives](#mixing-raw-values-and-directives)
 - [Validation](#validation)
 - [Options](#options)
-  * [merge](#merge)
+  - [merge](#merge)
 - [Removing values from object](#removing-values-from-object)
 - [Directives](#directives)
-  * [@base64](#base64)
-  * [@if](#if)
-  * [@lowercase](#lowercase)
-  * [@merge](#merge)
-  * [@omit](#omit)
-  * [@path](#path)
-  * [@pick](#pick)
-  * [@root](#root)
-  * [@template](#template)
-  * [@timestamp](#timestamp)
-  * [@uuid](#uuid)
+  - [@base64](#base64)
+  - [@if](#if)
+  - [@lowercase](#lowercase)
+  - [@merge](#merge)
+  - [@omit](#omit)
+  - [@path](#path)
+  - [@pick](#pick)
+  - [@root](#root)
+  - [@template](#template)
+  - [@timestamp](#timestamp)
+  - [@uuid](#uuid)
 
 <!-- tocstop -->
 
@@ -76,10 +76,10 @@ Output:
 
 ```js
 // Require using path
-const {map} = require('../mapping-kit')
+const { map } = require('../mapping-kit')
 
 const mapping = { '@path': '$.foo.bar' }
-const input = { foo: { bar: "Hello!" } }
+const input = { foo: { bar: 'Hello!' } }
 
 const output = map(mapping, input)
 // => "Hello!"
@@ -221,7 +221,6 @@ Mapping configurations can be validated using [JSON Schema][schema.json]. The [t
 suite][schema.test.js] is a good source-of-truth for current implementation behavior.
 
 [schema.json]: https://github.com/segmentio/fab-5-engine/blob/master/lib/mapping-kit/schema.json
-
 [schema.test.js]: https://github.com/segmentio/fab-5-engine/blob/master/lib/mapping-kit/schema.test.js
 
 ## Options
@@ -351,10 +350,10 @@ one conditional (see below) and one branch ("then" or "else").
 
 The supported conditional values are:
 
-* "exists": If the given value is not undefined or null, the @if directive resolves to the "then"
+- "exists": If the given value is not undefined or null, the @if directive resolves to the "then"
   value. Otherwise, the "else" value is used.
 
-* "true": If the given value resolves to `true` or "true" (case-insensitive), the "then" value is
+- "true": If the given value resolves to `true` or "true" (case-insensitive), the "then" value is
   used. Otherwise, the "else" value is used.
 
 ```json
@@ -792,8 +791,7 @@ Mappings:
 ```
 
 The @timestamp directive is fairly liberal in what it accepts by default. In order, it checks for
-the ISO 8601 format, RFC 2822 format, and then it falls back to `new Date(...)`. In Node.js, `new
-Date(...)` also accepts a UNIX timestamp (seconds since epoch) as a number or string. If you want to
+the ISO 8601 format, RFC 2822 format, and then it falls back to `new Date(...)`. In Node.js, `new Date(...)` also accepts a UNIX timestamp (seconds since epoch) as a number or string. If you want to
 use a custom format, supply a `inputFormat` value using the [format specified by
 moment.js](https://momentjs.com/docs/#/parsing/string-format/):
 
@@ -821,7 +819,6 @@ Mappings:
 
 The @uuid directive resolves to a v4 UUID string generated using the [uuid
 package](https://www.npmjs.com/package/uuid).
-
 
 ```json
 Mappings:

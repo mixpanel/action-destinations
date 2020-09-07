@@ -4,9 +4,9 @@ module.exports = destination(require('./destination.json'))
   .extendRequest(({ settings }) => ({
     prefixUrl: settings.url,
     headers: {
-      'User-Agent': 'Destinations/2.0'
+      'User-Agent': 'Destinations/2.0',
     },
-    responseType: 'json'
+    responseType: 'json',
   }))
 
   .partnerAction('postWebhook', require('./postWebhook'))

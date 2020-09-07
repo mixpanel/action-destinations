@@ -9,7 +9,5 @@
       "format": "uri"
     }
   },
-  "required": [
-    "url"
-  ]
+  "required": ["url"]
 }

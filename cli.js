@@ -10,5 +10,4 @@ require('yargs')
   .command(require('./lib/cli/new-action'))
   .demandCommand()
   .help()
-  .wrap(null)
-  .argv
+  .wrap(null).argv

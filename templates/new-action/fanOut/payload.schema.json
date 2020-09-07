@@ -21,8 +21,5 @@
       "type": "object"
     }
   },
-  "required": [
-    "emails",
-    "event"
-  ]
+  "required": ["emails", "event"]
 }

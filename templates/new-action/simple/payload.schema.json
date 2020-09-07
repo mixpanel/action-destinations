@@ -18,8 +18,5 @@
       "type": "object"
     }
   },
-  "required": [
-    "email",
-    "event"
-  ]
+  "required": ["email", "event"]
 }

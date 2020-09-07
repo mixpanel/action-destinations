@@ -7,7 +7,7 @@ module.exports = () => {
     .map(slug => destinationMetadata(slug))
 }
 
-const fileExists = (path) => {
+const fileExists = path => {
   try {
     statSync(path)
     return true
@@ -29,19 +29,21 @@ const filePath = (...path) => {
 //   defaultSubscriptions: [ ... ],
 //   partnerActions: [ ... ]
 // }
-const destinationMetadata = (slug) => {
+const destinationMetadata = slug => {
   return {
     ...require(filePath(slug, 'destination.json')),
     slug,
     path: filePath(slug),
     settings: requireOr(filePath(slug, 'settings.schema.json'), []),
-    partnerActions: partnerActions(slug)
+    partnerActions: partnerActions(slug),
   }
 }
 
-const partnerActions = (destinationSlug) => {
+const partnerActions = destinationSlug => {
   return readdirSync(filePath(destinationSlug))
-    .filter(actionSlug => fileExists(filePath(destinationSlug, actionSlug, 'index.js')))
+    .filter(actionSlug =>
+      fileExists(filePath(destinationSlug, actionSlug, 'index.js')),
+    )
     .map(actionSlug => partnerAction(filePath(destinationSlug, actionSlug)))
 }
 
@@ -52,12 +54,12 @@ const partnerActions = (destinationSlug) => {
 //   schema: { ... },
 //   code: "..."
 // }
-const partnerAction = (path) => {
+const partnerAction = path => {
   return {
     slug: basename(path),
     settings: requireOr(join(path, 'settings.schema.json'), []),
     schema: requireOr(join(path, 'payload.schema.json'), null),
-    code: readFileSync(join(path, 'index.js'), 'utf-8')
+    code: readFileSync(join(path, 'index.js'), 'utf-8'),
   }
 }
 

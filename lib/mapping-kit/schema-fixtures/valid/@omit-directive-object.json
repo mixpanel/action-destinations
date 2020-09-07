@@ -4,9 +4,7 @@
       "object": {
         "@path": "$.foo.bar"
       },
-      "fields": [
-        "a"
-      ]
+      "fields": ["a"]
     }
   }
 }

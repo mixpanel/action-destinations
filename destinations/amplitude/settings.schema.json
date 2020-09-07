@@ -13,8 +13,5 @@
       "type": "string"
     }
   },
-  "required": [
-    "apiKey",
-    "secretKey"
-  ]
+  "required": ["apiKey", "secretKey"]
 }

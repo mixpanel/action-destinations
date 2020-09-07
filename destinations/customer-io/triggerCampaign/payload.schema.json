@@ -25,7 +25,5 @@
       "type": "array"
     }
   },
-  "required": [
-    "id"
-  ]
+  "required": ["id"]
 }

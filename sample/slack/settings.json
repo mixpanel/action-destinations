@@ -1,6 +1,4 @@
 {
-    "channels": [
-        "test-fab-5"
-    ],
-    "url": "https://hooks.slack.com/services/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"
+  "channels": ["test-fab-5"],
+  "url": "https://hooks.slack.com/services/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"
 }

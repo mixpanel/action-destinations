@@ -15,8 +15,5 @@
       "type": "string"
     }
   },
-  "required": [
-    "segment_id",
-    "person_id"
-  ]
+  "required": ["segment_id", "person_id"]
 }

@@ -1,7 +1,7 @@
 steps:
-  - label: "Test"
+  - label: 'Test'
     env:
-      SEGMENT_CONTEXTS: "snyk,npm,aws-credentials"
+      SEGMENT_CONTEXTS: 'snyk,npm,aws-credentials'
       SEGMENT_BUILDKITE_IMAGE: 'buildkite-agent-node12'
     agents:
       queue: v1

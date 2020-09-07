@@ -15,8 +15,5 @@
       "type": "string"
     }
   },
-  "required": [
-    "list_id",
-    "email"
-  ]
+  "required": ["list_id", "email"]
 }

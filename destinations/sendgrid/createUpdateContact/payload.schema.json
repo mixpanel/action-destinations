@@ -77,8 +77,5 @@
       "description": "Object with custom data to associate with this contact."
     }
   },
-  "required": [
-    "list_id",
-    "email"
-  ]
+  "required": ["list_id", "email"]
 }

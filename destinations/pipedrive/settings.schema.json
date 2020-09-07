@@ -15,8 +15,5 @@
       "minLength": 20
     }
   },
-  "required": [
-    "domain",
-    "apiToken"
-  ]
+  "required": ["domain", "apiToken"]
 }

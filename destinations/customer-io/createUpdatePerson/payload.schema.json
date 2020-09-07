@@ -25,8 +25,5 @@
       "type": "object"
     }
   },
-  "required": [
-    "id",
-    "email"
-  ]
+  "required": ["id", "email"]
 }

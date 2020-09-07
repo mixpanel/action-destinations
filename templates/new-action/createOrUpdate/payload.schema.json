@@ -14,7 +14,5 @@
       "type": "object"
     }
   },
-  "required": [
-    "email"
-  ]
+  "required": ["email"]
 }

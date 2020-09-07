@@ -18,10 +18,7 @@
       "title": "Platform",
       "description": "The device platform.",
       "type": "string",
-      "enum": [
-        "ios",
-        "android"
-      ]
+      "enum": ["ios", "android"]
     },
     "last_used": {
       "title": "Last used",
@@ -29,9 +26,5 @@
       "type": "string"
     }
   },
-  "required": [
-    "person_id",
-    "device_id",
-    "platform"
-  ]
+  "required": ["person_id", "device_id", "platform"]
 }

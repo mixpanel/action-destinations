@@ -18,9 +18,7 @@
       "title": "Event type",
       "type": "string",
       "description": "A unique identifier for your event.",
-      "examples": [
-        "watch_tutorial"
-      ]
+      "examples": ["watch_tutorial"]
     },
     "time": {
       "title": "Timestamp",
@@ -185,7 +183,5 @@
       "description": "Amplitude will deduplicate subsequent events sent with this ID we have already seen before within the past 7 days. Amplitude recommends generating a UUID or using some combination of device ID, user ID, event type, event ID, and time."
     }
   },
-  "required": [
-    "event_type"
-  ]
+  "required": ["event_type"]
 }

@@ -1,10 +1,11 @@
 const { destination } = require('../../lib/destination-kit')
 
-module.exports = destination(require('./destination.json'))
-  .extendRequest(({ settings }) => ({
+module.exports = destination(require('./destination.json')).extendRequest(
+  ({ settings }) => ({
     headers: {
       'User-Agent': 'Segment/2.0',
-      Authorization: `Bearer ${settings.apiKey}`
+      Authorization: `Bearer ${settings.apiKey}`,
     },
-    responseType: 'json'
-  }))
+    responseType: 'json',
+  }),
+)

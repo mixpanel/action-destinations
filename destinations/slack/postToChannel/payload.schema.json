@@ -22,7 +22,5 @@
       "default": "https://logo.clearbit.com/segment.com"
     }
   },
-  "required": [
-    "text"
-  ]
+  "required": ["text"]
 }

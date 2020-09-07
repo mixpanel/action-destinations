@@ -24,8 +24,5 @@
       "type": "string"
     }
   },
-  "required": [
-    "identifier",
-    "name"
-  ]
+  "required": ["identifier", "name"]
 }

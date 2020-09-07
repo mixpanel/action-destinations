@@ -7,9 +7,9 @@ module.exports = destination(require('./destination.json'))
     return {
       prefixUrl: 'https://track.customer.io/api/v1',
       headers: {
-        Authorization: `Basic ${userPass.toString('base64')}`
+        Authorization: `Basic ${userPass.toString('base64')}`,
       },
-      responseType: 'json'
+      responseType: 'json',
     }
   })
 
@@ -17,7 +17,10 @@ module.exports = destination(require('./destination.json'))
   .partnerAction('addPersonToSegment', require('./addPersonToSegment'))
   .partnerAction('createUpdateDevice', require('./createUpdateDevice'))
   .partnerAction('createUpdatePerson', require('./createUpdatePerson'))
-  .partnerAction('removePersonFromSegment', require('./removePersonFromSegment'))
+  .partnerAction(
+    'removePersonFromSegment',
+    require('./removePersonFromSegment'),
+  )
   .partnerAction('trackAnonymousEvent', require('./trackAnonymousEvent'))
   .partnerAction('trackEvent', require('./trackEvent'))
   .partnerAction('triggerCampaign', require('./triggerCampaign'))

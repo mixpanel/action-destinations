@@ -15,8 +15,5 @@
       "type": "string"
     }
   },
-  "required": [
-    "siteId",
-    "apiKey"
-  ]
+  "required": ["siteId", "apiKey"]
 }

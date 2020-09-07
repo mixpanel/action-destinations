@@ -6,19 +6,19 @@
 
 - [Overview](#overview)
 - [Destination API](#destination-api)
-  * [destination(config)](#destinationconfig)
-    + [.extendRequest(...callbacks)](#extendrequestcallbacks)
-    + [.partnerAction(slug, callback)](#partneractionslug-callback)
+  - [destination(config)](#destinationconfig)
+    - [.extendRequest(...callbacks)](#extendrequestcallbacks)
+    - [.partnerAction(slug, callback)](#partneractionslug-callback)
 - [Action API](#action-api)
-  * [Action](#action)
-    + [.cachedRequest()](#cachedrequest)
-    + [.do()](#do)
-    + [.extendRequest(......)](#extendrequest)
-    + [.fanOut()](#fanout)
-    + [.mapField()](#mapfield)
-    + [.request(fn)](#requestfn)
-    + [.validatePayload()](#validatepayload)
-    + [.validateSettings()](#validatesettings)
+  - [Action](#action)
+    - [.cachedRequest()](#cachedrequest)
+    - [.do()](#do)
+    - [.extendRequest(......)](#extendrequest)
+    - [.fanOut()](#fanout)
+    - [.mapField()](#mapfield)
+    - [.request(fn)](#requestfn)
+    - [.validatePayload()](#validatepayload)
+    - [.validateSettings()](#validatesettings)
 
 <!-- tocstop -->
 
@@ -30,23 +30,24 @@ company", "track user", "trigger campaign").
 
 ```js
 // Create or update a customer record in Customer.io
-module.exports = action => action
-  .validatePayload(require('./payload.schema.json'))
+module.exports = action =>
+  action
+    .validatePayload(require('./payload.schema.json'))
 
-  // Customer.io wants Unix timestamps
-  .mapField('created_at', {
-    '@timestamp': {
-      timestamp: { '@path': '$.created_at' },
-      format: 'X'
-    }
-  })
-
-  .request(async (req, { payload }) => {
-    const { id, custom_attributes: customAttrs, ...body } = payload
-    return req.put(`customers/${id}`, {
-      json: { ...customAttrs, ...body }
+    // Customer.io wants Unix timestamps
+    .mapField('created_at', {
+      '@timestamp': {
+        timestamp: { '@path': '$.created_at' },
+        format: 'X',
+      },
     })
-  })
+
+    .request(async (req, { payload }) => {
+      const { id, custom_attributes: customAttrs, ...body } = payload
+      return req.put(`customers/${id}`, {
+        json: { ...customAttrs, ...body },
+      })
+    })
 ```
 
 The goals of Destination Kit are to minimize the amount of work it takes to build a destination (to
@@ -54,12 +55,12 @@ make them easy to build) and to standardize the most common patterns of destinat
 easy to build correctly). Additionally, by using a fluent interface and dependency injection rather
 than bare imperative JavaScript, we can use the same destination code to generate multiple things:
 
-* Lambda functions to handle transformation and delivery of events.
+- Lambda functions to handle transformation and delivery of events.
 
-* Documentation that outlines what a destination can do, what information it needs to perform each
+- Documentation that outlines what a destination can do, what information it needs to perform each
   action, and how the destination behaves.
 
-* Centrifuge GX job configuration to move logic and work out of Lambda piecemeal.
+- Centrifuge GX job configuration to move logic and work out of Lambda piecemeal.
 
 A fluent interface also makes it significantly easier to translate destination actions into UI. For
 example, the following code would require you to parse the full JavaScript AST to translate it into
@@ -109,16 +110,16 @@ destination() instantiates a new Destination object with the given configuration
 
 The configuration object accepts the following fields:
 
-| Field | Type | Description |
-| --- | --- | --- |
-| `name` | `string` | The human-readable name of the destination. E.g. "Amplitude" |
-| `defaultSubscriptions` | `object` | TODO (not sure if we want to keep this) |
+| Field                  | Type     | Description                                                  |
+| ---------------------- | -------- | ------------------------------------------------------------ |
+| `name`                 | `string` | The human-readable name of the destination. E.g. "Amplitude" |
+| `defaultSubscriptions` | `object` | TODO (not sure if we want to keep this)                      |
 
 ```js
 const { destination } = require('./lib/destination-kit')
 
 module.exports = destination({
-  name: 'Webhook'
+  name: 'Webhook',
 })
 ```
 
@@ -136,11 +137,10 @@ extendRequest() adds callback functions that can set default
 registered with this destination. It returns the base destination object.
 
 ```js
-destination({ name: 'Simple' })
-  .extendRequest(({ settings }) => ({
-    password: settings.apiKey,
-    responseType: 'json'
-  }))
+destination({ name: 'Simple' }).extendRequest(({ settings }) => ({
+  password: settings.apiKey,
+  responseType: 'json',
+}))
 ```
 
 extendRequest() calls should come before partnerAction() calls.
@@ -183,40 +183,40 @@ exists yet in the partner API.
 
 Some notes on the cache implementation:
 
-* cachedRequest() does not cache negative values (null, undefined) by default to avoid common errors
+- cachedRequest() does not cache negative values (null, undefined) by default to avoid common errors
   in the most common use cases like caching access tokens or determining if a user needs to be
   created or updated in the partner API. Caching of negative values can be turned on using the
   `negative` option (see below).
 
-* The backing cache is not shared among cachedRequest() calls. Every cachedRequest() block has its
+- The backing cache is not shared among cachedRequest() calls. Every cachedRequest() block has its
   own cache.
 
-* The cache holds a maximum of 1,000 keys currently. This could be expanded in the future if needs
+- The cache holds a maximum of 1,000 keys currently. This could be expanded in the future if needs
   dictate, but currently we run Fab 5 / Destinations 2.0 in Lambda where we have very little memory
   left after the Node runtime.
 
 The config object accepts the following fields (all fields are required unless otherwise noted):
 
-| Field | Type | Description |
-| --- | --- | --- |
-| `ttl` | `number` | Time, in seconds, that values are cached before they are expunged. E.g. `60` = 1 minute |
-| `key` | `function(Context)` | A callback function that receives the [Context](#context) object and should return a unique string that identifies the object fetched by the `value` callback for the given payload. |
-| `value` | `function(Got, Conntext)` | A callback function that receives the [`got`-based](https://github.com/sindresorhus/got) request object and the [Context](#context) object and returns the value that should be associated with the key. |
-| `as` | `string` | The field name to store the value under in the Context object. See below for an example |
-| `negative` | `boolean` | (Optional) Set this to `true` to cache negative values (null, undefined). |
+| Field      | Type                      | Description                                                                                                                                                                                              |
+| ---------- | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ttl`      | `number`                  | Time, in seconds, that values are cached before they are expunged. E.g. `60` = 1 minute                                                                                                                  |
+| `key`      | `function(Context)`       | A callback function that receives the [Context](#context) object and should return a unique string that identifies the object fetched by the `value` callback for the given payload.                     |
+| `value`    | `function(Got, Conntext)` | A callback function that receives the [`got`-based](https://github.com/sindresorhus/got) request object and the [Context](#context) object and returns the value that should be associated with the key. |
+| `as`       | `string`                  | The field name to store the value under in the Context object. See below for an example                                                                                                                  |
+| `negative` | `boolean`                 | (Optional) Set this to `true` to cache negative values (null, undefined).                                                                                                                                |
 
 ```js
 action
   .cachedRequest({
     ttl: 60, // 1 minute
-    key: ({payload}) => payload.userId,
-    value: (req, ({payload})) => {
+    key: ({ payload }) => payload.userId,
+    value: (req, { payload }) => {
       const resp = req.get(`http://example.com/users/${payload.userId}`)
       return resp.data
     },
     as: 'userEmail',
   })
-  .do(({payload, userEmail}) => {
+  .do(({ payload, userEmail }) => {
     console.log(`User: ${payload.userId} -> ${userEmail}`)
   })
 ```
@@ -226,10 +226,9 @@ action
 do() runs the given function at runtime. The return value of this callback function is ignored.
 
 ```js
-action
-  .do(({payload}) => {
-    console.log(`Processing user ${payload.userId}`)
-  })
+action.do(({ payload }) => {
+  console.log(`Processing user ${payload.userId}`)
+})
 ```
 
 #### .extendRequest(...function(Context))
@@ -243,11 +242,9 @@ options](https://github.com/sindresorhus/got#options).
 action
   .extendRequest(({ settings }) => ({
     password: settings.apiKey,
-    responseType: 'json'
+    responseType: 'json',
   }))
-  .request((req) => (
-    req.get('https://example.com')
-  ))
+  .request(req => req.get('https://example.com'))
 ```
 
 #### .fanOut(config: object)
@@ -258,30 +255,30 @@ parallel. Parallel execution continues until fanIn() is called on the FanOut obj
 
 The config object requires the following fields:
 
-| Field | Type | Description |
-| --- | --- | --- |
-| `on` | `string` | A [JSONPath expression](https://goessner.net/articles/JsonPath/) that is applied to the Context object and should resolve to an array of values. A parallel flow of execution will be run for each of these values. |
-| `as` | `string` | The field name that each value will be available as on the Context object to callbacks in each parallel flow of execution. |
+| Field | Type     | Description                                                                                                                                                                                                         |
+| ----- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `on`  | `string` | A [JSONPath expression](https://goessner.net/articles/JsonPath/) that is applied to the Context object and should resolve to an array of values. A parallel flow of execution will be run for each of these values. |
+| `as`  | `string` | The field name that each value will be available as on the Context object to callbacks in each parallel flow of execution.                                                                                          |
 
 fanOut() supports only a subset of the steps available on the parent Action object:
 
-* cachedRequest()
+- cachedRequest()
 
-* extendRequest()
+- extendRequest()
 
-* request()
+- request()
 
-* do()
+- do()
 
 fanIn() returns the parent Action object.
 
 ```js
 action
   .fanOut({ on: '$.payload.ids', as: 'userId' })
-    .request((req, { payload, userId }) => (
-      req.post(`http://example.com/${userId}/ping`)
-    ))
-    .do(({ userId }) => console.log(`${userId} pinged`))
+  .request((req, { payload, userId }) =>
+    req.post(`http://example.com/${userId}/ping`),
+  )
+  .do(({ userId }) => console.log(`${userId} pinged`))
   .fanIn()
 ```
 
@@ -293,19 +290,17 @@ a [JSONPath expression](https://goessner.net/articles/JsonPath/) path to the fie
 a `mapping-kit` mapping configuration. You can overwrite an existing field or add a new field.
 
 ```js
-action
-  .do(({ payload }) => {
-    payload.time = '2020-07-21T22:24:06.277Z'
-  })
-  mapField('$.time', {
-    '@timestamp': {
-      timestamp: { '@path': '$.time' },
-      format: 'x'
-    }
-  })
-  .do(({ payload }) => {
-    console.log(`Unix timestamp: ${payload.time}`)
-  })
+action.do(({ payload }) => {
+  payload.time = '2020-07-21T22:24:06.277Z'
+})
+mapField('$.time', {
+  '@timestamp': {
+    timestamp: { '@path': '$.time' },
+    format: 'x',
+  },
+}).do(({ payload }) => {
+  console.log(`Unix timestamp: ${payload.time}`)
+})
 ```
 
 #### .request(function(Got, Context))
@@ -315,16 +310,15 @@ a [`got`-based](https://github.com/sindresorhus/got) request object and the [Con
 object and returns the value that should be associated with the key.
 
 ```js
-action
-  .request((req, { payload, settings }) => (
-    req.put(`http://example.com/users/${payload.userId}`, {
-      headers: {
-        Authorization: `Bearer ${settings.apiKey}`
-      },
-      responseType: 'json',
-      json: payload.userProperties,
-    })
-  ))
+action.request((req, { payload, settings }) =>
+  req.put(`http://example.com/users/${payload.userId}`, {
+    headers: {
+      Authorization: `Bearer ${settings.apiKey}`,
+    },
+    responseType: 'json',
+    json: payload.userProperties,
+  }),
+)
 ```
 
 #### .validatePayload(schema: object)
@@ -338,9 +332,9 @@ action
   .validatePayload({
     type: 'object',
     properties: {
-      userId: { type: 'string' }
+      userId: { type: 'string' },
     },
-    required: ['userId']
+    required: ['userId'],
   })
   .do(({ payload }) => {
     console.log(`User's ID is ${payload.userId}`)
@@ -361,15 +355,15 @@ action
       apiKey: {
         title: 'API Key',
         type: 'string',
-        minLength: 32
-      }
+        minLength: 32,
+      },
     },
-    required: [apiKey]
+    required: [apiKey],
   })
   .extendRequest(({ settings }) => ({
     headers: {
-      Authorization: `Bearer ${settings.apiKey}`
-    }
+      Authorization: `Bearer ${settings.apiKey}`,
+    },
   }))
 ```
 
@@ -380,7 +374,7 @@ to an Action object. The Context object is used to propagate the incoming payloa
 other values created at runtime among the various steps. While there is currently no set schema for
 this, we're currently using at least the following two fields:
 
-| Field | Type | Description|
-|--- | --- | --- |
-| `paylaod` | `object` | Incoming Segment event payload. |
+| Field      | Type     | Description                                                  |
+| ---------- | -------- | ------------------------------------------------------------ |
+| `paylaod`  | `object` | Incoming Segment event payload.                              |
 | `settings` | `object` | Per-destination and per-action setting values. E.g. `apiKey` |

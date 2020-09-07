@@ -1,5 +1,5 @@
 {
-    "text": {
-        "@template": "Event = {{event}}, properties.text = {{properties.text}}"
-    }
+  "text": {
+    "@template": "Event = {{event}}, properties.text = {{properties.text}}"
+  }
 }

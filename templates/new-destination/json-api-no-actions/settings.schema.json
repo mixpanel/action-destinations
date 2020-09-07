@@ -9,7 +9,5 @@
       "minLength": 16
     }
   },
-  "required": [
-    "apiKey"
-  ]
+  "required": ["apiKey"]
 }

@@ -3,18 +3,16 @@ module.exports = {
     node: true,
     commonjs: true,
     es6: true,
-    'jest/globals': true
+    'jest/globals': true,
   },
-  extends: [
-    'standard'
-  ],
+  extends: ['standard'],
   globals: {
     Atomics: 'readonly',
-    SharedArrayBuffer: 'readonly'
+    SharedArrayBuffer: 'readonly',
   },
   parserOptions: {
-    ecmaVersion: 2018
+    ecmaVersion: 2018,
   },
-  rules: { },
-  plugins: ['jest']
+  rules: {},
+  plugins: ['jest'],
 }
