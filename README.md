@@ -135,7 +135,6 @@ Fab 5 destinations are configured using a single Destination Function setting (`
 should contain a JSON blob of all subscriptions for the destination. The format should look like
 this:
 
-
 ```js
 [
   {
@@ -193,3 +192,7 @@ Here's a full example:
   }
 ]
 ```
+
+## Misc.
+
+Code in this repo is formatted using `prettier-eslint`. You can format everything by running `npm run fmt`.

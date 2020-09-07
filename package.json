@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "fmt": "prettier-eslint --write"
   },
   "author": "Tyson Mote <tyson@segment.com>",
   "license": "UNLICENSED",
@@ -17,6 +18,8 @@
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.1",
     "jest": "^26.0.1",
+    "prettier-eslint": "^11.0.0",
+    "prettier-eslint-cli": "^5.0.0",
     "webpack": "^4.43.0",
     "yargs": "^15.3.1"
   },
