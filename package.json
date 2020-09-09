@@ -3,15 +3,16 @@
   "version": "1.0.0",
   "description": "",
   "engines": {
-    "node" : ">=12.18 <13"
+    "node": ">=12.18"
   },
+  "engineStrict": true,
+  "author": "Tyson Mote <tyson@segment.com>",
+  "license": "UNLICENSED",
   "main": "index.js",
   "scripts": {
     "test": "jest",
     "fmt": "prettier-eslint --write"
   },
-  "author": "Tyson Mote <tyson@segment.com>",
-  "license": "UNLICENSED",
   "devDependencies": {
     "eslint": "^7.0.0",
     "eslint-config-standard": "^14.1.1",

@@ -17,7 +17,7 @@ steps:
       bk-snyk
 
       echo '--- Linting'
-      eslint .
+      npm run fmt
 
       echo '--- Testing'
-      npm test
+      npm run test
