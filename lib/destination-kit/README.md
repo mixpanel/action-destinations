@@ -38,14 +38,14 @@ module.exports = action =>
     .mapField('created_at', {
       '@timestamp': {
         timestamp: { '@path': '$.created_at' },
-        format: 'X',
-      },
+        format: 'X'
+      }
     })
 
     .request(async (req, { payload }) => {
       const { id, custom_attributes: customAttrs, ...body } = payload
       return req.put(`customers/${id}`, {
-        json: { ...customAttrs, ...body },
+        json: { ...customAttrs, ...body }
       })
     })
 ```
@@ -119,7 +119,7 @@ The configuration object accepts the following fields:
 const { destination } = require('./lib/destination-kit')
 
 module.exports = destination({
-  name: 'Webhook',
+  name: 'Webhook'
 })
 ```
 
@@ -139,7 +139,7 @@ registered with this destination. It returns the base destination object.
 ```js
 destination({ name: 'Simple' }).extendRequest(({ settings }) => ({
   password: settings.apiKey,
-  responseType: 'json',
+  responseType: 'json'
 }))
 ```
 
@@ -214,7 +214,7 @@ action
       const resp = req.get(`http://example.com/users/${payload.userId}`)
       return resp.data
     },
-    as: 'userEmail',
+    as: 'userEmail'
   })
   .do(({ payload, userEmail }) => {
     console.log(`User: ${payload.userId} -> ${userEmail}`)
@@ -242,7 +242,7 @@ options](https://github.com/sindresorhus/got#options).
 action
   .extendRequest(({ settings }) => ({
     password: settings.apiKey,
-    responseType: 'json',
+    responseType: 'json'
   }))
   .request(req => req.get('https://example.com'))
 ```
@@ -276,7 +276,7 @@ fanIn() returns the parent Action object.
 action
   .fanOut({ on: '$.payload.ids', as: 'userId' })
   .request((req, { payload, userId }) =>
-    req.post(`http://example.com/${userId}/ping`),
+    req.post(`http://example.com/${userId}/ping`)
   )
   .do(({ userId }) => console.log(`${userId} pinged`))
   .fanIn()
@@ -296,8 +296,8 @@ action.do(({ payload }) => {
 mapField('$.time', {
   '@timestamp': {
     timestamp: { '@path': '$.time' },
-    format: 'x',
-  },
+    format: 'x'
+  }
 }).do(({ payload }) => {
   console.log(`Unix timestamp: ${payload.time}`)
 })
@@ -313,11 +313,11 @@ object and returns the value that should be associated with the key.
 action.request((req, { payload, settings }) =>
   req.put(`http://example.com/users/${payload.userId}`, {
     headers: {
-      Authorization: `Bearer ${settings.apiKey}`,
+      Authorization: `Bearer ${settings.apiKey}`
     },
     responseType: 'json',
-    json: payload.userProperties,
-  }),
+    json: payload.userProperties
+  })
 )
 ```
 
@@ -332,9 +332,9 @@ action
   .validatePayload({
     type: 'object',
     properties: {
-      userId: { type: 'string' },
+      userId: { type: 'string' }
     },
-    required: ['userId'],
+    required: ['userId']
   })
   .do(({ payload }) => {
     console.log(`User's ID is ${payload.userId}`)
@@ -355,15 +355,15 @@ action
       apiKey: {
         title: 'API Key',
         type: 'string',
-        minLength: 32,
-      },
+        minLength: 32
+      }
     },
-    required: [apiKey],
+    required: [apiKey]
   })
   .extendRequest(({ settings }) => ({
     headers: {
-      Authorization: `Bearer ${settings.apiKey}`,
-    },
+      Authorization: `Bearer ${settings.apiKey}`
+    }
   }))
 ```
 

@@ -17,7 +17,7 @@ steps:
       bk-snyk
 
       echo '--- Linting'
-      npm run fmt
+      npm run lint
 
       echo '--- Testing'
       npm run test

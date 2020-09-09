@@ -7,6 +7,6 @@ module.exports = action =>
       const { id, ...body } = payload
       return req.post(
         `https://api.customer.io/v1/api/campaigns/${id}/triggers`,
-        { json: body },
+        { json: body }
       )
     })

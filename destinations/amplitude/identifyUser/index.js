@@ -5,7 +5,7 @@ module.exports = action =>
       req.post('https://api.amplitude.com/identify', {
         form: {
           api_key: settings.apiKey,
-          identification: JSON.stringify(payload),
-        },
-      }),
+          identification: JSON.stringify(payload)
+        }
+      })
     )

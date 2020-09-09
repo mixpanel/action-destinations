@@ -8,7 +8,7 @@ module.exports = action =>
     .request((req, { payload, settings, channel }) =>
       req.post(settings.url, {
         json: { ...payload, channel },
-        responseType: 'text',
-      }),
+        responseType: 'text'
+      })
     )
     .fanIn()

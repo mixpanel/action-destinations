@@ -47,7 +47,7 @@ async function pack(inputDir) {
           reject(err || stats.toJson().errors || 'unknown error')
         }
         resolve(join(tmpdir, tmpfile))
-      },
+      }
     )
   })
 }
@@ -58,7 +58,7 @@ function adapter() {
 
 // compile returns the compiled version of the destination at the given path
 // (e.g. './destinations/slack)
-module.exports.compile = async path => {
+module.exports.compile = async (path) => {
   const f = await pack(path)
   return readFileSync(f).toString() + adapter()
 }

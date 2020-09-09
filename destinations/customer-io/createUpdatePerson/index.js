@@ -6,13 +6,13 @@ module.exports = action =>
     .mapField('created_at', {
       '@timestamp': {
         timestamp: { '@path': '$.created_at' },
-        format: 'X',
-      },
+        format: 'X'
+      }
     })
 
     .request(async (req, { payload }) => {
       const { id, custom_attributes: customAttrs, ...body } = payload
       return req.put(`customers/${id}`, {
-        json: { ...customAttrs, ...body },
+        json: { ...customAttrs, ...body }
       })
     })

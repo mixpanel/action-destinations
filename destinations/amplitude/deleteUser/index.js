@@ -6,16 +6,16 @@ module.exports = action =>
       '@if': {
         true: { '@path': '$.ignore_invalid_id' },
         then: 'True',
-        else: 'False',
-      },
+        else: 'False'
+      }
     })
 
     .mapField('$.delete_from_org', {
       '@if': {
         true: { '@path': '$.delete_from_org' },
         then: 'True',
-        else: 'False',
-      },
+        else: 'False'
+      }
     })
 
     .request((req, { payload, settings }) => {
@@ -27,6 +27,6 @@ module.exports = action =>
       return req.post('https://amplitude.com/api/2/deletions/users', {
         username: settings.apiKey,
         password: settings.secretKey,
-        json: body,
+        json: body
       })
     })

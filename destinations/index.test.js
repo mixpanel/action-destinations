@@ -13,13 +13,13 @@ describe('metadata', () => {
           'path',
           'settings',
           'defaultSubscriptions',
-          'partnerActions',
-        ].sort(),
+          'partnerActions'
+        ].sort()
       )
 
       for (const action of destination.partnerActions) {
         expect(Object.keys(action).sort()).toStrictEqual(
-          ['slug', 'settings', 'schema', 'code'].sort(),
+          ['slug', 'settings', 'schema', 'code'].sort()
         )
       }
     }

@@ -10,11 +10,11 @@ module.exports = action =>
       key: ({ payload }) => payload.identifier,
       value: async (req, { payload }) => {
         const search = await req.get('persons/search', {
-          searchParams: { term: payload.identifier },
+          searchParams: { term: payload.identifier }
         })
         return get(search.data, 'data.items[0].item.id')
       },
-      as: 'personId',
+      as: 'personId'
     })
 
     .request(async (req, { payload, personId }) => {

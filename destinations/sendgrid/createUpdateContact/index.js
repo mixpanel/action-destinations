@@ -6,6 +6,6 @@ module.exports = action =>
     .request((req, { payload }) => {
       const { list_id: listId, ...contact } = payload
       return req.put('marketing/contacts', {
-        json: { list_ids: [listId], contacts: [contact] },
+        json: { list_ids: [listId], contacts: [contact] }
       })
     })

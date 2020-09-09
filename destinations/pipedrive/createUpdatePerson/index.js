@@ -8,8 +8,8 @@ module.exports = action =>
     .mapField('$.add_time', {
       '@timestamp': {
         timestamp: { '@path': '$.add_time' },
-        format: 'YYYY-MM-DD HH:MM:SS',
-      },
+        format: 'YYYY-MM-DD HH:MM:SS'
+      }
     })
 
     .cachedRequest({
@@ -17,11 +17,11 @@ module.exports = action =>
       key: ({ payload }) => payload.identifier,
       value: async (req, { payload }) => {
         const search = await req.get('persons/search', {
-          searchParams: { term: payload.identifier },
+          searchParams: { term: payload.identifier }
         })
         return get(search.data, 'data.items[0].item.id')
       },
-      as: 'personId',
+      as: 'personId'
     })
 
     .request(async (req, { payload, personId }) => {

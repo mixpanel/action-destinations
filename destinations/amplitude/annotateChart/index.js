@@ -5,14 +5,14 @@ module.exports = action =>
     .mapField('$.date', {
       '@timestamp': {
         timestamp: { '@path': '$.date' },
-        format: 'x',
-      },
+        format: 'x'
+      }
     })
 
     .request((req, { payload, settings }) =>
       req.post('https://amplitude.com/api/2/annotations', {
         username: settings.apiKey,
         password: settings.secretKey,
-        form: payload,
-      }),
+        form: payload
+      })
     )

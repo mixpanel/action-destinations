@@ -8,7 +8,7 @@ module.exports = action =>
       // Remove emails from the final payload
       const { emails, ...cleanPayload } = payload
       req.post('http://example.com', {
-        json: { email, ...cleanPayload },
+        json: { email, ...cleanPayload }
       })
     })
     .fanIn()

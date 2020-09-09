@@ -19,18 +19,18 @@ module.exports = action =>
         const search = await req.post('marketing/contacts/search', {
           json: {
             query: `email = '${sgqlEscape(
-              payload.email,
-            )}' AND CONTAINS(list_ids, '${sgqlEscape(payload.list_id)}')`,
-          },
+              payload.email
+            )}' AND CONTAINS(list_ids, '${sgqlEscape(payload.list_id)}')`
+          }
         })
         return get(await search.body, 'result[0].id')
       },
-      as: 'contactId',
+      as: 'contactId'
     })
 
     .request(async (req, { payload, contactId }) => {
       if (contactId === null || contactId === undefined) return null
       return req.delete(
-        `marketing/lists/${payload.list_id}/contacts?contact_ids=${contactId}`,
+        `marketing/lists/${payload.list_id}/contacts?contact_ids=${contactId}`
       )
     })

@@ -8,8 +8,8 @@ module.exports = action =>
     .mapField('$.add_time', {
       '@timestamp': {
         timestamp: { '@path': '$.add_time' },
-        format: 'YYYY-MM-DD HH:MM:SS',
-      },
+        format: 'YYYY-MM-DD HH:MM:SS'
+      }
     })
 
     .cachedRequest({
@@ -17,11 +17,11 @@ module.exports = action =>
       key: ({ payload }) => payload.identifier,
       value: async (req, { payload }) => {
         const search = await req.get('organizations/search', {
-          searchParams: { term: payload.identifier },
+          searchParams: { term: payload.identifier }
         })
         return get(search.body, 'data.items[0].item.id')
       },
-      as: 'organizationId',
+      as: 'organizationId'
     })
 
     .request(async (req, { payload, organizationId }) => {
@@ -33,7 +33,7 @@ module.exports = action =>
         // Don't need add_time when we're only updating the org
         const { add_time: x, ...cleanOrganization } = organization
         return req.put(`organizations/${organizationId}`, {
-          json: cleanOrganization,
+          json: cleanOrganization
         })
       }
     })

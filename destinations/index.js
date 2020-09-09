@@ -35,14 +35,14 @@ const destinationMetadata = slug => {
     slug,
     path: filePath(slug),
     settings: requireOr(filePath(slug, 'settings.schema.json'), []),
-    partnerActions: partnerActions(slug),
+    partnerActions: partnerActions(slug)
   }
 }
 
 const partnerActions = destinationSlug => {
   return readdirSync(filePath(destinationSlug))
     .filter(actionSlug =>
-      fileExists(filePath(destinationSlug, actionSlug, 'index.js')),
+      fileExists(filePath(destinationSlug, actionSlug, 'index.js'))
     )
     .map(actionSlug => partnerAction(filePath(destinationSlug, actionSlug)))
 }
@@ -59,7 +59,7 @@ const partnerAction = path => {
     slug: basename(path),
     settings: requireOr(join(path, 'settings.schema.json'), []),
     schema: requireOr(join(path, 'payload.schema.json'), null),
-    code: readFileSync(join(path, 'index.js'), 'utf-8'),
+    code: readFileSync(join(path, 'index.js'), 'utf-8')
   }
 }
 

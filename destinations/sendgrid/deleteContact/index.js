@@ -17,11 +17,11 @@ module.exports = action =>
       key: ({ payload }) => payload.email,
       value: async (req, { payload }) => {
         const search = await req.post('marketing/contacts/search', {
-          json: { query: `email = '${sgqlEscape(payload.email)}'` },
+          json: { query: `email = '${sgqlEscape(payload.email)}'` }
         })
         return get(search.body, 'result[0].id')
       },
-      as: 'contactId',
+      as: 'contactId'
     })
 
     .request(async (req, { payload, contactId }) => {

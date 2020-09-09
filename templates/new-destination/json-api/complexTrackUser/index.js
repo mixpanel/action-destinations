@@ -10,14 +10,14 @@ module.exports = action =>
         const resp = await req.get(url, { responseType: 'text' })
         payload.properties.number = {
           value: payload.number,
-          trivia: resp.body,
+          trivia: resp.body
         }
         delete payload.number
         return resp
       },
-      as: 'trivia',
+      as: 'trivia'
     })
 
     .request((req, { settings, trivia }) =>
-      req.post(settings.url, { json: trivia }),
+      req.post(settings.url, { json: trivia })
     )

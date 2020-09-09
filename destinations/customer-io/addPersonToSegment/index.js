@@ -6,6 +6,6 @@ module.exports = action =>
     .request(async (req, { payload }) => {
       const { segment_id: segmentId, person_id: personId } = payload
       return req.post(`segments/${segmentId}/add_customers`, {
-        json: { ids: [personId] },
+        json: { ids: [personId] }
       })
     })
