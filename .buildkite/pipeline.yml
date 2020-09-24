@@ -1,8 +1,9 @@
+env:
+  SEGMENT_CONTEXTS: 'snyk,npm,aws-credentials'
+  SEGMENT_BUILDKITE_IMAGE: 'buildkite-agent-node12'
+
 steps:
   - label: 'Test'
-    env:
-      SEGMENT_CONTEXTS: 'snyk,npm,aws-credentials'
-      SEGMENT_BUILDKITE_IMAGE: 'buildkite-agent-node12'
     agents:
       queue: v1
     commands: |
@@ -21,3 +22,40 @@ steps:
 
       echo '--- Testing'
       npm run test
+
+  - label: ':mag: Check Production Dependencies'
+    agents:
+      queue: v1
+    commands: |
+      echo '--- Install production dependencies'
+      npm config set "//registry.npmjs.org/:_authToken" $${NPM_TOKEN}
+      npm install --only=production
+      echo '--- Test that the server can boot with just the production dependencies'
+      node -e "require('./src/boot'); process.exit(0)"
+    plugins:
+      - ssh://git@github.com/segmentio/cache-buildkite-plugin#v3.0.0:
+          key: "v1-cache-prod-{{ checksum 'package-lock.json' }}"
+          paths: ['node_modules/']
+          save: true
+
+  - wait: ~
+
+  - label: ':docker: Docker Build and Publish to Trebuchet'
+    agents:
+      queue: v1
+    branches: master staging
+    commands: |
+      echo '--- Build docker image'
+      docker build -t $${TREB_IMAGE_TAG} -t fab-five-engine:latest . | sed 's/^Step/--- Step/g'
+      echo '--- Tag docker image'
+      docker tag $${TREB_IMAGE_TAG} $${TREB_SHORT_IMAGE_TAG}
+      docker tag fab-five-engine:latest ${ECR_REPOSITORY}/fab-five-engine:latest
+      echo '--- Push docker image'
+      docker push $${TREB_IMAGE_TAG}
+      docker push ${ECR_REPOSITORY}/fab-five-engine:latest
+      echo '--- Publish to Trebuchet'
+      treb-publish .run/fab-five-engine.yml
+    plugins:
+      - ssh://git@github.com/segmentio/cache-buildkite-plugin#v3.0.0:
+          key: "v1-cache-prod-{{ checksum 'package-lock.json' }}"
+          paths: ['node_modules/']

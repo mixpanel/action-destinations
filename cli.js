@@ -2,12 +2,12 @@
 
 // eslint-disable-next-line no-unused-expressions
 require('yargs')
-  .command(require('./lib/cli/run-local'))
-  .command(require('./lib/cli/deploy'))
-  .command(require('./lib/cli/undeploy'))
-  .command(require('./lib/cli/list-deployed'))
-  .command(require('./lib/cli/new-destination'))
-  .command(require('./lib/cli/new-action'))
+  .command(require('./src/cli/run-local'))
+  .command(require('./src/cli/deploy'))
+  .command(require('./src/cli/undeploy'))
+  .command(require('./src/cli/list-deployed'))
+  .command(require('./src/cli/new-destination'))
+  .command(require('./src/cli/new-action'))
   .demandCommand()
   .help()
   .wrap(null).argv

@@ -46,7 +46,7 @@ Output:
 
 ## Table of contents
 
-<!-- ./node_modules/.bin/markdown-toc -i ./lib/mapping-kit/README.md -->
+<!-- ./node_modules/.bin/markdown-toc -i ./src/lib/mapping-kit/README.md -->
 
 <!-- toc -->
 

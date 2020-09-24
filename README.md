@@ -55,7 +55,7 @@ out this repository:
 To test actions locally, you can use `./cli.js run-local`. For example:
 
 ```
-./cli.js run-local ./destinations/slack/postToChannel -i ./sample/slack
+./cli.js run-local ./src/destinations/slack/postToChannel -i ./sample/slack
 MapInput1: Starting
 MapInput1: Finished (30 ms)
 Validate2: Starting

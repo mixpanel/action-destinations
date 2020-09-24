@@ -48,7 +48,7 @@ async function selectDestinations() {
 // compileDestinations returns a promise that resolves to an array of compiled destinations given
 // one or more destination slugs.
 function compileDestinations(destinations) {
-  const all = require('../../destinations')()
+  const all = require('../destinations')()
 
   return Promise.all(
     all

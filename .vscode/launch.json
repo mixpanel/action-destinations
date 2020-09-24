@@ -1,0 +1,29 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Start dev server",
+      "cwd": "${workspaceFolder}",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["start"],
+      "restart": true,
+      "console": "integratedTerminal",
+      "port": 47082,
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "type": "node",
+      "request": "attach",
+      "name": "Attach to running server",
+      "restart": true,
+      "address": "localhost",
+      "port": 47082,
+      "skipFiles": ["<node_internals>/**"]
+    }
+  ]
+}
