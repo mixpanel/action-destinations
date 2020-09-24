@@ -46,15 +46,15 @@ steps:
     branches: master staging
     commands: |
       echo '--- Build docker image'
-      docker build -t $${TREB_IMAGE_TAG} -t fab-five-engine:latest . | sed 's/^Step/--- Step/g'
+      docker build -t $${TREB_IMAGE_TAG} -t fab-5-engine:latest . | sed 's/^Step/--- Step/g'
       echo '--- Tag docker image'
       docker tag $${TREB_IMAGE_TAG} $${TREB_SHORT_IMAGE_TAG}
-      docker tag fab-five-engine:latest ${ECR_REPOSITORY}/fab-five-engine:latest
+      docker tag fab-5-engine:latest ${ECR_REPOSITORY}/fab-5-engine:latest
       echo '--- Push docker image'
       docker push $${TREB_IMAGE_TAG}
-      docker push ${ECR_REPOSITORY}/fab-five-engine:latest
+      docker push ${ECR_REPOSITORY}/fab-5-engine:latest
       echo '--- Publish to Trebuchet'
-      treb-publish .run/fab-five-engine.yml
+      treb-publish .run/fab-5-engine.yml
     plugins:
       - ssh://git@github.com/segmentio/cache-buildkite-plugin#v3.0.0:
           key: "v1-cache-prod-{{ checksum 'package-lock.json' }}"

@@ -114,7 +114,7 @@ $ node -e "console.log(JSON.stringify(require('./destinations')()))"
       }
     ],
     "slug": "noop",
-    "path": "/Users/tysonmote/dev/src/github.com/segmentio/fab-five-engine/destinations/noop",
+    "path": "/Users/tysonmote/dev/src/github.com/segmentio/fab-5-engine/destinations/noop",
     "settings": [],
     "partnerActions": [
       {

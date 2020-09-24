@@ -1,4 +1,4 @@
-name: fab-five-engine
+name: fab-5-engine
 
 labels:
   team: destinations
@@ -9,7 +9,7 @@ labels:
   Autoscale::Target::Mem: 70
 
 container:
-  image: fab-five-engine
+  image: fab-5-engine
   repository: 528451384384.dkr.ecr.us-west-2.amazonaws.com
 
 expose:

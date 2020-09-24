@@ -5,8 +5,8 @@ FROM 528451384384.dkr.ecr.us-west-2.amazonaws.com/segment-node:12.18
 # Install packages required for compiling native bindings
 RUN apk update && apk add make gcc g++ python
 
-COPY ./ /fab-five-engine
-WORKDIR /fab-five-engine
+COPY ./ /fab-5-engine
+WORKDIR /fab-5-engine
 
 # Rebuild any native bindings that were copied over from Buildkite
 RUN npm rebuild
@@ -22,8 +22,8 @@ FROM 528451384384.dkr.ecr.us-west-2.amazonaws.com/segment-node:12.18
 RUN addgroup -g 1001 -S unprivilegeduser && adduser -u 1001 -S -G unprivilegeduser unprivilegeduser
 USER unprivilegeduser
 
-COPY --chown=unprivilegeduser --from=0 /fab-five-engine /fab-five-engine
-WORKDIR /fab-five-engine
+COPY --chown=unprivilegeduser --from=0 /fab-5-engine /fab-5-engine
+WORKDIR /fab-5-engine
 
 EXPOSE 3000
 ENV PORT 3000
