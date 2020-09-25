@@ -1,5 +1,5 @@
 const express = require('express')
-const { UnprocessableEntity, NotImplemented } = require('http-errors')
+const { NotImplemented } = require('http-errors')
 const destinations = require('./destinations/destinations')
 const router = express.Router()
 
@@ -9,27 +9,12 @@ function asyncHandler(fn) {
   }
 }
 
-function parseJsonHeader(headers, header, fallback = null) {
-  const raw = headers[header]
-  if (!raw) {
-    return fallback
-  }
-
-  try {
-    return JSON.parse(raw)
-  } catch (error) {
-    throw new UnprocessableEntity(
-      `Invalid header "${header.replace('centrifuge-', '')}": ${error.message}`
-    )
-  }
-}
-
 router.post(
   '/integrations/actions/:destinationSlug',
   asyncHandler(async (req, res, _next) => {
     const slug = req.params.destinationSlug
-    const event = req.body
-    const settings = parseJsonHeader(req.headers, 'centrifuge-settings')
+    const event = req.body.data
+    const settings = req.body.settings
 
     // Prune quasar properties
     delete event.__quasar__controlRequests
