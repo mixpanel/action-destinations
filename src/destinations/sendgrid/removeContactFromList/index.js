@@ -1,4 +1,5 @@
 const get = require('lodash/get')
+const listIdAutocomplete = require('../autocomplete/list_id')
 
 // SendGrid uses a custom "SGQL" query language for finding contacts. To protect us from basic
 // injection attacks (e.g. "email = 'x@x.com' or email like '%@%'"), we can just strip all quotes
@@ -11,6 +12,7 @@ module.exports = action =>
   action
     // TODO make these automatic
     .validatePayload(require('./payload.schema.json'))
+    .autocomplete('list_id', listIdAutocomplete)
 
     .cachedRequest({
       ttl: 60,

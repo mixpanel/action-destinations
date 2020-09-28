@@ -3,17 +3,23 @@
   "type": "object",
   "properties": {
     "apiKey": {
-      "description": "Customer.io API key. This can by found on your [API Credentials page](https://fly.customer.io/settings/api_credentials).",
+      "description": "Customer.io API key. This can be found on your [API Credentials page](https://fly.customer.io/settings/api_credentials).",
       "minLength": 20,
       "title": "API Key",
       "type": "string"
     },
+    "appApiKey": {
+      "description": "Customer.io App API Key. This can be found on your [API Credentials page](https://fly.customer.io/settings/api_credentials?keyType=app).",
+      "minLength": 20,
+      "title": "App API Key",
+      "type": "string"
+    },
     "siteId": {
-      "description": "Customer.io site ID. This can by found on your [API Credentials page](https://fly.customer.io/settings/api_credentials).",
+      "description": "Customer.io site ID. This can be found on your [API Credentials page](https://fly.customer.io/settings/api_credentials).",
       "minLength": 20,
       "title": "Site ID",
       "type": "string"
     }
   },
-  "required": ["siteId", "apiKey"]
+  "required": ["siteId", "apiKey", "appApiKey"]
 }

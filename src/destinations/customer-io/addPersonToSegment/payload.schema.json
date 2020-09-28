@@ -7,7 +7,8 @@
     "segment_id": {
       "title": "Segment ID",
       "description": "ID of the Customer.io segment to add the person to.",
-      "type": "number"
+      "type": "number",
+      "autocomplete": true
     },
     "person_id": {
       "title": "Person ID",

@@ -4,6 +4,31 @@ module.exports = action =>
   action
     // TODO make these automatic
     .validatePayload(require('./payload.schema.json'))
+    .autocomplete('org_id', async (req, { payload, settings, page }) => {
+      const response = await req.get('organizations', {
+        searchParams: { start: page }
+      })
+
+      const items = response.body.data.map(organization => ({
+        label: organization.name,
+        value: organization.id
+      }))
+
+      let nextPage
+
+      if (
+        typeof response.body.additional_data.pagination.next_start === 'number'
+      ) {
+        nextPage = response.body.additional_data.pagination.next_start
+      }
+
+      return {
+        body: {
+          data: items,
+          pagination: { nextPage }
+        }
+      }
+    })
 
     .mapField('$.add_time', {
       '@timestamp': {

@@ -102,6 +102,7 @@ class Entrypoint extends Step {
     this.steps = new Steps()
     this.steps.push(new MapInput())
     this.requestExtensions = []
+    this._autocomplete = {}
   }
 
   // -- entrypoint
@@ -127,6 +128,26 @@ class Entrypoint extends Step {
   validatePayload(schema) {
     this.steps.push(new Validate('Payload is invalid:', 'payload', schema))
     return this
+  }
+
+  autocomplete(field, callback) {
+    this._autocomplete[field] = callback
+    return this
+  }
+
+  executeAutocomplete(field, ctx) {
+    if (!this._autocomplete[field]) {
+      return {
+        data: [],
+        pagination: {}
+      }
+    }
+
+    const request = new Request(
+      this.requestExtensions,
+      this._autocomplete[field]
+    )
+    return request._execute(ctx)
   }
 
   mapField(path, fieldMapping) {

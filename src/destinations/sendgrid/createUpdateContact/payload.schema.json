@@ -7,7 +7,8 @@
     "list_id": {
       "title": "List ID",
       "description": "ID of the marketing contact list you want the contact added to.",
-      "type": "string"
+      "type": "string",
+      "autocomplete": true
     },
     "email": {
       "title": "Email address",

@@ -16,7 +16,8 @@
     "org_id": {
       "title": "Organization ID",
       "description": "ID of the organization this person will belong to.",
-      "type": "number"
+      "type": "number",
+      "autocomplete": true
     },
     "email": {
       "title": "Email address",
