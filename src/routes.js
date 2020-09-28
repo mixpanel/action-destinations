@@ -10,7 +10,7 @@ function asyncHandler(fn) {
 }
 
 router.post(
-  '/integrations/actions/:destinationSlug',
+  '/actions/:destinationSlug',
   asyncHandler(async (req, res, _next) => {
     const slug = req.params.destinationSlug
     const event = req.body.data
