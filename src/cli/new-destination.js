@@ -18,7 +18,7 @@ exports.builder = {
 }
 
 async function getTemplate() {
-  const basePath = './templates/new-destination/'
+  const basePath = join(__dirname, '..', '..', 'templates', 'new-destination')
   const input = await prompts({
     type: 'select',
     name: 'value',
@@ -42,7 +42,7 @@ exports.handler = async function(argv) {
   let { template } = argv
   if (!template) template = await getTemplate()
 
-  const path = `./destinations/${slug}/`
+  const path = join(__dirname, '..', 'destinations', slug)
 
   console.log(`Copying template ${template} to ${path}`)
 

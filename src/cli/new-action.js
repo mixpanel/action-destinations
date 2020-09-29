@@ -21,7 +21,7 @@ exports.builder = {
 }
 
 async function getTemplate() {
-  const basePath = './templates/new-action/'
+  const basePath = join(__dirname, '..', '..', 'templates', 'new-action')
   const input = await prompts({
     type: 'select',
     name: 'value',

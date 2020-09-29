@@ -1,3 +1,4 @@
+const path = require('path')
 const { grpc } = require('grpc-web-client')
 const { NodeHttpTransport } = require('grpc-web-node-http-transport')
 grpc.setDefaultTransport(NodeHttpTransport())
@@ -31,7 +32,9 @@ process.on('unhandledRejection', (reason, p) => {
 })
 
 async function selectDestinations() {
-  const dirs = readdirSync('./destinations', { withFileTypes: true })
+  const dirs = readdirSync(path.join(__dirname, '..', 'destinations'), {
+    withFileTypes: true
+  })
     .filter(dirent => dirent.isDirectory())
     .map(dirent => dirent.name)
 
