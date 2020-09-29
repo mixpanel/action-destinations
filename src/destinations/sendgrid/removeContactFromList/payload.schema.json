@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/schema#",
-  "title": "SendGrid: Remove recipient from list",
+  "title": "Remove Recipient from List",
   "description": "Remove a recipient from a list given their email address",
   "type": "object",
   "properties": {
@@ -11,7 +11,7 @@
       "autocomplete": true
     },
     "email": {
-      "title": "Email address",
+      "title": "Email Address",
       "description": "Email address of the user to be removed from the list.",
       "type": "string"
     }

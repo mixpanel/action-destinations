@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/schema#",
-  "title": "Customer.io: Trigger broadcast campaign",
+  "title": "Trigger Broadcast Campaign",
   "description": "Trigger a Customer.io broadcast campaign.",
   "type": "object",
   "properties": {

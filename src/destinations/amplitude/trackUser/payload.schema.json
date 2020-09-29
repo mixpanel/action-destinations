@@ -1,7 +1,6 @@
 {
   "$schema": "http://json-schema.org/schema#",
   "title": "Track User",
-  "description": "TODO",
   "type": "object",
   "properties": {
     "user_id": {
@@ -15,7 +14,7 @@
       "description": "A device-specific identifier, such as the Identifier for Vendor on iOS. Required unless user ID is present. If a device ID is not sent with the event, it will be set to a hashed version of the user ID."
     },
     "event_type": {
-      "title": "Event type",
+      "title": "Event Type",
       "type": "string",
       "description": "A unique identifier for your event.",
       "examples": ["watch_tutorial"]
@@ -27,12 +26,12 @@
       "description": "The timestamp of the event in milliseconds since epoch. If time is not sent with the event, it will be set to the request upload time."
     },
     "event_properties": {
-      "title": "Event properties",
+      "title": "Event Properties",
       "type": "object",
       "description": "An object of key-value pairs that represent additional data to be sent along with the event. You can store property values in an array. Date values are transformed into string values. Object depth may not exceed 40 layers."
     },
     "user_properties": {
-      "title": "User properties",
+      "title": "User Properties",
       "type": "object",
       "description": "An object of key-value pairs that represent additional data tied to the user. You can store property values in an array. Date values are transformed into string values. Object depth may not exceed 40 layers."
     },
@@ -42,7 +41,7 @@
       "description": "Groups of users for the event as an event-level group. You can only track up to 5 groups. **Note:** This Amplitude feature is only available to Enterprise customers who have purchased the Accounts add-on."
     },
     "app_version": {
-      "title": "App version",
+      "title": "App Version",
       "type": "string",
       "description": "The current version of your application."
     },
@@ -52,27 +51,27 @@
       "description": "Platform of the device."
     },
     "os_name": {
-      "title": "OS name",
+      "title": "OS Name",
       "type": "string",
       "description": "The name of the mobile operating system or browser that the user is using."
     },
     "os_version": {
-      "title": "OS version",
+      "title": "OS Version",
       "type": "string",
       "description": "The version of the mobile operating system or browser the user is using."
     },
     "device_brand": {
-      "title": "Device brand",
+      "title": "Device Brand",
       "type": "string",
       "description": "The device brand that the user is using."
     },
     "device_manufacturer": {
-      "title": "Device manufacturer",
+      "title": "Device Manufacturer",
       "type": "string",
       "description": "The device manufacturer that the user is using."
     },
     "device_model": {
-      "title": "Device model",
+      "title": "Device Model",
       "type": "string",
       "description": "The device model that the user is using."
     },
@@ -97,7 +96,7 @@
       "description": "The current city of the user."
     },
     "dma": {
-      "title": "Designated market area",
+      "title": "Designated Market Area",
       "type": "string",
       "description": "The current Designated Market Area of the user."
     },
@@ -127,7 +126,7 @@
       "description": "An identifier for the item purchased. You must send a price and quantity or revenue with this field."
     },
     "revenueType": {
-      "title": "Revenue type",
+      "title": "Revenue Type",
       "type": "string",
       "description": "The type of revenue for the item purchased. You must send a price and quantity or revenue with this field."
     },
@@ -147,17 +146,17 @@
       "description": "The IP address of the user. Use \"$remote\" to use the IP address on the upload request. Amplitude will use the IP address to reverse lookup a user's location (city, country, region, and DMA). Amplitude has the ability to drop the location and IP address from events once it reaches our servers. You can submit a request to Amplitude's platform specialist team here to configure this for you."
     },
     "idfa": {
-      "title": "Identifier for Advertiser (IDFA)",
+      "title": "Identifier For Advertiser (IDFA)",
       "type": "string",
       "description": "Identifier for Advertiser. _(iOS)_"
     },
     "idfv": {
-      "title": "Identifier for Vendor (IDFV)",
+      "title": "Identifier For Vendor (IDFV)",
       "type": "string",
       "description": "Identifier for Vendor. _(iOS)_"
     },
     "adid": {
-      "title": "Google Play Services advertising ID",
+      "title": "Google Play Services Advertising ID",
       "type": "string",
       "description": "Google Play Services advertising ID. _(Android)_"
     },
@@ -178,7 +177,7 @@
       "description": "The start time of the session, necessary if you want to associate events with a particular system."
     },
     "insert_id": {
-      "title": "Unique identifier for the event",
+      "title": "Event ID",
       "type": "string",
       "description": "Amplitude will deduplicate subsequent events sent with this ID we have already seen before within the past 7 days. Amplitude recommends generating a UUID or using some combination of device ID, user ID, event type, event ID, and time."
     }

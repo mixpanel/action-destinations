@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/schema#",
-  "title": "Slack: Post to channel",
+  "title": "Post Message",
   "description": "Post a text message to a Slack channel.",
   "type": "object",
   "properties": {

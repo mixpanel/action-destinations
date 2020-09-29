@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/schema#",
   "title": "Annotate Chart",
-  "description": "Annotate important dates (feature releases, mmarketing campaigns, etc.) on Amplitude charts.",
+  "description": "Annotate important dates (feature releases, marketing campaigns, etc.) on Amplitude charts.",
   "type": "object",
   "properties": {
     "app_id": {

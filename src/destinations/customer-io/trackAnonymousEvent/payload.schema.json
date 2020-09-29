@@ -1,11 +1,11 @@
 {
   "$schema": "http://json-schema.org/schema#",
-  "title": "Customer.io: Track an anonymous event",
+  "title": "Track Anonymous Event",
   "description": "Track an anonymous event (an event not tied to a known person).",
   "type": "object",
   "properties": {
     "name": {
-      "title": "Event name",
+      "title": "Event Name",
       "type": "string"
     },
     "data": {

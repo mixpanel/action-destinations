@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/schema#",
-  "title": "Customer.io: Track event",
+  "title": "Track Event",
   "description": "Track an event for a known person.",
   "type": "object",
   "properties": {
@@ -10,11 +10,11 @@
       "type": "string"
     },
     "name": {
-      "title": "Event name",
+      "title": "Event Name",
       "type": "string"
     },
     "type": {
-      "title": "Event type",
+      "title": "Event Type",
       "description": "Override event type. Ex. \"page\".",
       "type": "string"
     },

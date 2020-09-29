@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/schema#",
-  "title": "Pipedrive: Create or update organization",
+  "title": "Create or Update Organization",
   "description": "Update an organization in Pipedrive or create it if it does not exist yet. Custom organization fields may be included by using the long hash keys of the custom fields. These look like \"33595c732cd7a027c458ea115a48a7f8a254fa86\".",
   "type": "object",
   "properties": {
@@ -10,7 +10,7 @@
       "type": "string"
     },
     "name": {
-      "title": "Organization name",
+      "title": "Organization Name",
       "type": "string"
     },
     "owner_id": {
@@ -19,7 +19,7 @@
       "type": "number"
     },
     "add_time": {
-      "title": "Created at",
+      "title": "Created At",
       "description": "If the organization is created, use this timestamp as the creation timestamp. Format: YYY-MM-DD HH:MM:SS",
       "type": "string"
     }

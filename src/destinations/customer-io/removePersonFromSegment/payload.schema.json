@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/schema#",
-  "title": "Customer.io: Remove a person from a segment",
+  "title": "Remove Person from Segment",
   "description": "Remove a person from a segment in Customer.io.",
   "type": "object",
   "properties": {

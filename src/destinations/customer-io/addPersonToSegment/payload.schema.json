@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/schema#",
-  "title": "Customer.io: Add person to segment",
+  "title": "Add Person to Segment",
   "description": "Add a person to a segment in Customer.io.",
   "type": "object",
   "properties": {

@@ -17,11 +17,13 @@
       "type": "string"
     },
     "ignore_invalid_id": {
-      "title": "Ignore invalid ID",
+      "title": "Ignore Invalid ID",
+      "description": "Ignore invalid user ID (user that doesn't exist in the project) that was passed in.",
       "type": "boolean"
     },
     "delete_from_org": {
-      "title": "Delete from organization",
+      "title": "Delete From Organization",
+      "description": "Delete from the entire organization rather than just this project.",
       "type": "boolean"
     }
   }

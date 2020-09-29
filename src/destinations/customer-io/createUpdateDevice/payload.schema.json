@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/schema#",
-  "title": "Customer.io: Create or update device",
-  "description": "Update a person's device in Customer.io or create it if it does not exist.",
+  "title": "Create or Update Device",
+  "description": "Update a person's device in Customer.io or create it if it doesn't exist.",
   "type": "object",
   "properties": {
     "person_id": {
@@ -21,8 +21,8 @@
       "enum": ["ios", "android"]
     },
     "last_used": {
-      "title": "Last used",
-      "description": "Timestamp for when the device was last used. Default is current date and time",
+      "title": "Last Used",
+      "description": "Timestamp for when the device was last used. Default is current date and time.",
       "type": "string"
     }
   },

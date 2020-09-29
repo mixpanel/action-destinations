@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/schema#",
-  "title": "SendGrid: Create or update contact",
+  "title": "Create or Update Contact",
   "description": "Update an existing marketing contact or create them if they do not exist. Additions and updates are asynchronous in SendGrid, so you may not immediately see the contact in the SendGrid dashboard.",
   "type": "object",
   "properties": {
@@ -11,13 +11,13 @@
       "autocomplete": true
     },
     "email": {
-      "title": "Email address",
+      "title": "Email Address",
       "type": "string",
       "description": "The primary email for the contact.",
       "maxLength": 254
     },
     "alternate_emails": {
-      "title": "Additional email addresses",
+      "title": "Additional Amail Addresses",
       "type": "array",
       "description": "Additional emails associated with the contact.",
       "items": {
@@ -26,13 +26,13 @@
       "maxItems": 5
     },
     "address_line_1": {
-      "title": "Address line (1)",
+      "title": "Address Line (1)",
       "type": "string",
       "description": "The first line of the address.",
       "maxLength": 100
     },
     "address_line_2": {
-      "title": "Address line (2)",
+      "title": "Address Line (2)",
       "type": "string",
       "description": "Optional second line for the address.",
       "maxLength": 100
@@ -50,19 +50,19 @@
       "maxLength": 50
     },
     "first_name": {
-      "title": "First name",
+      "title": "First Name",
       "type": "string",
       "description": "The contacts personal name.",
       "maxLength": 50
     },
     "last_name": {
-      "title": "Last name",
+      "title": "Last Name",
       "type": "string",
       "description": "The contacts family name.",
       "maxLength": 50
     },
     "postal_code": {
-      "title": "Postal code",
+      "title": "Postal Code",
       "type": "string",
       "description": "The postcode, post code, Eircode, PIN code or ZIP code."
     },
@@ -73,7 +73,7 @@
       "maxLength": 50
     },
     "custom_fields": {
-      "title": "Custom fields",
+      "title": "Custom Fields",
       "type": "object",
       "description": "Object with custom data to associate with this contact."
     }

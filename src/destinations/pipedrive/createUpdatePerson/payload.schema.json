@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/schema#",
-  "title": "Pipedrive: Create or update person",
+  "title": "Create or Update Person",
   "description": "Update a person in Pipedrive or create them if they do not exist yet. Custom person fields may be included by using the long hash keys of the custom fields. These look like \"33595c732cd7a027c458ea115a48a7f8a254fa86\".",
   "type": "object",
   "properties": {
@@ -10,7 +10,7 @@
       "type": "string"
     },
     "name": {
-      "title": "Person name",
+      "title": "Person Name",
       "type": "string"
     },
     "org_id": {
@@ -20,7 +20,7 @@
       "autocomplete": true
     },
     "email": {
-      "title": "Email address",
+      "title": "Email Address",
       "description": "Email addresses for this person.",
       "type": "array",
       "items": {
@@ -28,12 +28,12 @@
       }
     },
     "phone": {
-      "title": "Phone number",
+      "title": "Phone Number",
       "description": "Phone number for the person.",
       "type": "string"
     },
     "add_time": {
-      "title": "Created at",
+      "title": "Created At",
       "description": "If the person is created, use this timestamp as the creation timestamp. Format: YYY-MM-DD HH:MM:SS",
       "type": "string"
     }

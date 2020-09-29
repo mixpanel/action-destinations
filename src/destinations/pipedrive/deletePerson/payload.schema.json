@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/schema#",
-  "title": "Pipedrive: Delete person",
+  "title": "Delete Person",
   "description": "Delete a person in Pipedrive.",
   "type": "object",
   "properties": {
