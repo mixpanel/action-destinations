@@ -4,6 +4,22 @@
   "description": "Post a text message to a Slack channel.",
   "type": "object",
   "properties": {
+    "url": {
+      "title": "Webhook URL",
+      "description": "Slack webhook URL.",
+      "type": "string",
+      "format": "uri"
+    },
+    "channels": {
+      "title": "Channels",
+      "description": "Slack channels to post message to. Each channel receives a copy of messages sent to this action.",
+      "type": "array",
+      "minLength": 20,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
     "text": {
       "title": "Message",
       "description": "The text message to post to Slack. You can use [Slack's formatting syntax.](https://api.slack.com/reference/surfaces/formatting)",
@@ -22,5 +38,5 @@
       "default": "https://logo.clearbit.com/segment.com"
     }
   },
-  "required": ["text"]
+  "required": ["url", "channels", "text"]
 }

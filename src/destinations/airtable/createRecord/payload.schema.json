@@ -1,5 +1,20 @@
 {
   "$schema": "http://json-schema.org/schema#",
   "title": "Create Record",
-  "type": "object"
+  "description": "Create a new record in Airtable base.",
+  "type": "object",
+  "properties": {
+    "url": {
+      "title": "Base URL",
+      "description": "Base-specific API URL that records will be sent to.",
+      "type": "string",
+      "format": "uri"
+    },
+    "fields": {
+      "title": "Fields",
+      "description": "Object with record's fields.",
+      "type": "object"
+    }
+  },
+  "required": ["url"]
 }
