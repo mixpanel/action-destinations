@@ -1,4 +1,5 @@
 const path = require('path')
+const allSettled = require('promise.allsettled')
 const { grpc } = require('grpc-web-client')
 const { NodeHttpTransport } = require('grpc-web-node-http-transport')
 grpc.setDefaultTransport(NodeHttpTransport())
@@ -229,7 +230,7 @@ exports.handler = async function(argv) {
         d => !createDestinations.includes(d)
       )
 
-      return Promise.allSettled([
+      return allSettled([
         ...createDestinations.map(d =>
           createFunction(workspace, fnName(d.slug), d)
         ),

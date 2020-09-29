@@ -1,3 +1,4 @@
+const allSettled = require('promise.allsettled')
 const { grpc } = require('grpc-web-client')
 const { NodeHttpTransport } = require('grpc-web-node-http-transport')
 grpc.setDefaultTransport(NodeHttpTransport())
@@ -93,7 +94,7 @@ exports.handler = async function(argv) {
     })
   }
 
-  Promise.allSettled((input.values || []).map(fn => deleteFunction(fn)))
+  allSettled((input.values || []).map(fn => deleteFunction(fn)))
     .then(results => {
       results.forEach(result => {
         if (result.status === 'fulfilled') {

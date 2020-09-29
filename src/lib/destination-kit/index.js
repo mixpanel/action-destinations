@@ -1,3 +1,4 @@
+const allSettled = require('promise.allsettled')
 const validate = require('@segment/fab5-subscriptions')
 const action = require('./action.js')
 
@@ -65,21 +66,6 @@ class Destination {
       console.log('Results:', results)
     })
   }
-}
-
-// Promise.allSettled isn't available in Node 10. It was added in 12.9.0, so
-// we'll hack it here.
-function allSettled(promises) {
-  if (Promise.allSettled) return Promise.allSettled(promises)
-
-  return Promise.all(
-    promises.map(p =>
-      Promise.resolve(p).then(
-        val => ({ status: 'fulfilled', value: val }),
-        err => ({ status: 'rejected', reason: err })
-      )
-    )
-  )
 }
 
 module.exports = {
