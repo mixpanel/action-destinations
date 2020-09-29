@@ -1,12 +1,12 @@
 {
   "$schema": "http://json-schema.org/schema#",
   "title": "Create or Update Organization",
-  "description": "Update an organization in Pipedrive or create it if it does not exist yet. Custom organization fields may be included by using the long hash keys of the custom fields. These look like \"33595c732cd7a027c458ea115a48a7f8a254fa86\".",
+  "description": "Update an organization in Pipedrive or create it if it does not exist yet.",
   "type": "object",
   "properties": {
     "identifier": {
       "title": "Organization ID",
-      "description": "Identifier used to find existing organization in Pipedrive. Typically this is the name but it can also be a custom field value.",
+      "description": "Identifier used to find existing organization in Pipedrive. Typically this is the name but it can also be a custom field value. Custom organization fields may be included by using the long hash keys of the custom fields. These look like \"33595c732cd7a027c458ea115a48a7f8a254fa86\".",
       "type": "string"
     },
     "name": {
