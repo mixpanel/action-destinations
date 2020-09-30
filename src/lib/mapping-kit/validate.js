@@ -367,6 +367,16 @@ directive('@uuid', v => {
   // no-op
 })
 
+directive('@cast', (v, stack) => {
+  validateObjectWithFields(
+    v,
+    {
+      value: { required: validateDirectiveOrString }
+    },
+    stack
+  )
+})
+
 // -- util
 
 function realTypeOf(v) {

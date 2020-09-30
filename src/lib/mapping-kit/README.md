@@ -69,6 +69,7 @@ Output:
   - [@template](#template)
   - [@timestamp](#timestamp)
   - [@uuid](#uuid)
+  - [@cast](#cast)
 
 <!-- tocstop -->
 
@@ -828,4 +829,21 @@ Mappings:
 }
 =>
 "a3c8e5ac-fff9-43d1-b053-3049a62fcbeb"
+```
+
+### @cast
+
+The @cast directive can convert number to string or string to number.
+
+```json
+{
+  "count": {
+    "@cast": {
+      "value": {
+        "$path": "$.stringified_count"
+      },
+      "to": "number"
+    }
+  }
+}
 ```
