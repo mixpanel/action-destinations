@@ -439,3 +439,5 @@ class Do extends Step {
 module.exports = () => {
   return new Entrypoint()
 }
+
+module.exports.Validate = Validate

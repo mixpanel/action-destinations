@@ -1,6 +1,8 @@
+const got = require('got')
 const allSettled = require('promise.allsettled')
 const validate = require('@segment/fab5-subscriptions')
 const action = require('./action.js')
+const { Validate } = action
 
 class Destination {
   constructor(config) {
@@ -9,11 +11,56 @@ class Destination {
     this.defaultSubscriptions = config.defaultSubscriptions
     this.partnerActions = {}
     this.requestExtensions = []
+    this.settingsSchema = undefined
+    this.auth = undefined
   }
 
   extendRequest(...fns) {
     this.requestExtensions.push(...fns)
     return this
+  }
+
+  validateSettings(schema) {
+    this.settingsSchema = schema
+    return this
+  }
+
+  apiKeyAuth(options) {
+    this.auth = {
+      type: 'apiKey',
+      options
+    }
+
+    return this
+  }
+
+  async testCredentials(settings) {
+    const context = { settings }
+
+    if (this.settingsSchema) {
+      new Validate('', 'settings', this.settingsSchema)._execute(context)
+    }
+
+    if (!this.auth) {
+      return
+    }
+
+    const req = this.requestExtensions.reduce(
+      (acc, fn) => acc.extend(fn(context)),
+      got.extend({
+        retry: 0,
+        timeout: 3000,
+        headers: {
+          'user-agent': undefined
+        }
+      })
+    )
+
+    try {
+      await this.auth.options.testCredentials(req, { settings })
+    } catch (error) {
+      throw new Error('Credentials are invalid')
+    }
   }
 
   // TODO move slug and description to action.json files

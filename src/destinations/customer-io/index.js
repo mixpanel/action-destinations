@@ -1,6 +1,7 @@
 const { destination } = require('../../lib/destination-kit')
 
 module.exports = destination(require('./destination.json'))
+  .validateSettings(require('./settings.schema.json'))
   .extendRequest(({ settings }) => {
     const userPass = Buffer.from(`${settings.siteId}:${settings.apiKey}`)
 
@@ -10,6 +11,16 @@ module.exports = destination(require('./destination.json'))
         Authorization: `Basic ${userPass.toString('base64')}`
       },
       responseType: 'json'
+    }
+  })
+  .apiKeyAuth({
+    testCredentials: (req, { settings }) => {
+      return req('https://beta-api.customer.io/v1/api/segments', {
+        prefixUrl: '',
+        headers: {
+          authorization: `Bearer ${settings.appApiKey}`
+        }
+      })
     }
   })
 
