@@ -1,5 +1,5 @@
 const express = require('express')
-const { NotImplemented } = require('http-errors')
+const { NotImplemented, UnprocessableEntity } = require('http-errors')
 const destinations = require('./destinations/destinations')
 
 const router = express.Router()
@@ -10,16 +10,37 @@ function asyncHandler(fn) {
   }
 }
 
+function parseJsonHeader(headers, header, fallback = null) {
+  const raw = headers[header]
+  if (!raw) {
+    return fallback
+  }
+
+  try {
+    return JSON.parse(raw)
+  } catch (error) {
+    throw new UnprocessableEntity(
+      `Invalid header "${header.replace('centrifuge-', '')}": ${error.message}`
+    )
+  }
+}
+
 const idToSlug = {
   '5f736bae438ce7d3da5a7baa': 'slack'
 }
 
 router.post(
   '/actions/:destinationId',
+  // TODO support application/cloudevents+json` or `application/*+json`
+  express.json({ type: 'application/*' }),
   asyncHandler(async (req, res, _next) => {
     const id = req.params.destinationId
-    const event = req.body.data
-    const settings = req.body.settings
+    // Cloud Events send as `data`, but Segment Integrations send as the request body itself
+    // Assume the former, if possible, and fallback to the latter
+    // TODO make this more robust (based on the inbound content-type?)
+    const event = req.body.data || req.body
+    const settings =
+      req.body.settings || parseJsonHeader(req.headers, 'centrifuge-settings')
 
     // TODO support quasar
     // TODO support tracing
