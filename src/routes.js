@@ -10,15 +10,16 @@ function asyncHandler(fn) {
   }
 }
 
+const idToSlug = {
+  '5f736bae438ce7d3da5a7baa': 'slack'
+}
+
 router.post(
-  '/actions/:destinationSlug',
+  '/actions/:destinationId',
   asyncHandler(async (req, res, _next) => {
-    const slug = req.params.destinationSlug
+    const id = req.params.destinationId
     const event = req.body.data
     const settings = req.body.settings
-
-    // Prune quasar properties
-    delete event.__quasar__controlRequests
 
     // TODO support quasar
     // TODO support tracing
@@ -27,6 +28,8 @@ router.post(
     // TODO support `debug`?
     // TODO support `headers['centrifuge-features']`?
 
+    // Try to map the id param to a slug, or treat it as the slug (easier local testing)
+    const slug = idToSlug[id] || id
     const destination = destinations[slug]
     if (!destination) {
       throw new NotImplemented(`${slug} is not implemented.`)
