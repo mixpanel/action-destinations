@@ -1,6 +1,7 @@
 const express = require('express')
 const { NotImplemented } = require('http-errors')
 const destinations = require('./destinations/destinations')
+
 const router = express.Router()
 
 function asyncHandler(fn) {

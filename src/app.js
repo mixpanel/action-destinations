@@ -24,6 +24,7 @@ app.use((req, res, next) => {
   const afterResponse = () => {
     res.removeListener('finish', afterResponse)
     res.removeListener('close', afterResponse)
+
     const duration = Date.now() - start
     const statusCode = res.statusCode
 
@@ -32,9 +33,9 @@ app.use((req, res, next) => {
       ip: req.ip,
       method: req.method,
       path: req.path,
-      referer: req.headers.referer,
       statusCode,
-      userAgent: req.headers['user-agent']
+      headers: req.headers,
+      body: req.body
     }
 
     if (statusCode >= 500) {
@@ -52,6 +53,7 @@ app.use((req, res, next) => {
 
   res.once('finish', afterResponse)
   res.once('close', afterResponse)
+
   next()
 })
 
