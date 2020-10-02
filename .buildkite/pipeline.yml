@@ -3,59 +3,41 @@ env:
   SEGMENT_BUILDKITE_IMAGE: 'buildkite-agent-node12'
 
 steps:
-  - label: 'Test'
+  - label: '🐳 Test & Build'
     agents:
       queue: v1
-    commands: |
-      echo '--- Configuring NPM auth'
-      npm config set "//registry.npmjs.org/:_authToken" $${NPM_TOKEN}
-
-      echo '--- Fetching dependencies'
-      npm install
-      PATH=$(npm bin):$PATH
-
-      echo '--- Snyk scan'
-      bk-snyk
-
-      echo '--- Linting'
-      npm run lint
-
-      echo '--- Testing'
-      npm run test
-
-  - label: ':mag: Check Production Dependencies'
-    agents:
-      queue: v1
-    commands: |
-      echo '--- Install production dependencies'
-      npm config set "//registry.npmjs.org/:_authToken" $${NPM_TOKEN}
-      npm install --only=production
-      echo '--- Test that the server can boot with just the production dependencies'
-      node -e "require('./src/boot'); process.exit(0)"
+    commands:
+      - npm config set "//registry.npmjs.org/:_authToken" $${NPM_TOKEN}
+      - yarn install --frozen-lockfile
+      - NODE_ENV=production yarn build
+      - yarn lint
+      - yarn test
+      - mv node_modules node_modules_dev
+      - yarn install --frozen-lockfile --production
+      - node -e "require('./dist/src/boot'); process.exit(0)"
+      - make -f .buildkite/Makefile.ci ci-docker-build
+      - mv node_modules node_modules_prod
+      - mv node_modules_dev node_modules
     plugins:
       - ssh://git@github.com/segmentio/cache-buildkite-plugin#v3.0.0:
-          key: "v1-cache-prod-{{ checksum 'package-lock.json' }}"
-          paths: ['node_modules/']
+          key: "v1-cache-dev-{{ checksum 'yarn.lock' }}"
+          paths: ['node_modules/', 'dist/']
           save: true
+
+  - label: '🔒 Snyk Security Check'
+    agents:
+      queue: v1
+    plugins:
+      - ssh://git@github.com/segmentio/snyk-buildkite-plugin#v1.4.1:
+          runtime: npm
+          severity-threshold: high
+          fail-on: upgradable
 
   - wait: ~
 
-  - label: ':docker: Docker Build and Publish to Trebuchet'
-    agents:
-      queue: v1
+  - label: '📡 Publish to Trebuchet'
     branches: master staging
-    commands: |
-      echo '--- Build docker image'
-      docker build -t $${TREB_IMAGE_TAG} -t fab-5-engine:latest . | sed 's/^Step/--- Step/g'
-      echo '--- Tag docker image'
-      docker tag $${TREB_IMAGE_TAG} $${TREB_SHORT_IMAGE_TAG}
-      docker tag fab-5-engine:latest ${ECR_REPOSITORY}/fab-5-engine:latest
-      echo '--- Push docker image'
-      docker push $${TREB_IMAGE_TAG}
-      docker push ${ECR_REPOSITORY}/fab-5-engine:latest
-      echo '--- Publish to Trebuchet'
-      treb-publish .run/fab-5-engine.yml
     plugins:
-      - ssh://git@github.com/segmentio/cache-buildkite-plugin#v3.0.0:
-          key: "v1-cache-prod-{{ checksum 'package-lock.json' }}"
-          paths: ['node_modules/']
+      - ssh://git@github.com/segmentio/treb-publish-buildkite-plugin#v0.5.0:
+          configs:
+            - .run/fab-5-engine.yml

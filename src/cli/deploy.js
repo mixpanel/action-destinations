@@ -4,12 +4,8 @@ const { grpc } = require('grpc-web-client')
 const { NodeHttpTransport } = require('grpc-web-node-http-transport')
 grpc.setDefaultTransport(NodeHttpTransport())
 
-const {
-  FunctionsClient
-} = require('@segment/connections-api/functions/v1beta/functions_pb_service')
-const functions = new FunctionsClient(
-  'http://connections-service.segment.local'
-)
+const { FunctionsClient } = require('@segment/connections-api/functions/v1beta/functions_pb_service')
+const functions = new FunctionsClient('http://connections-service.segment.local')
 
 const listFunctions = require('./lib/list-functions')
 const { compile } = require('../../compile')
@@ -33,7 +29,7 @@ process.on('unhandledRejection', (reason, p) => {
 })
 
 async function selectDestinations() {
-  const dirs = readdirSync(path.join(__dirname, '..', 'destinations'), {
+  const dirs = readdirSync(path.join(__dirname, '../../dist/src', 'destinations'), {
     withFileTypes: true
   })
     .filter(dirent => dirent.isDirectory())
@@ -52,13 +48,9 @@ async function selectDestinations() {
 // compileDestinations returns a promise that resolves to an array of compiled destinations given
 // one or more destination slugs.
 function compileDestinations(destinations) {
-  const all = require('../destinations')()
+  const all = require('../destinations/all')()
 
-  return Promise.all(
-    all
-      .filter(d => destinations.includes(d.slug))
-      .map(d => compileDestination(d))
-  )
+  return Promise.all(all.filter(d => destinations.includes(d.slug)).map(d => compileDestination(d)))
 }
 
 async function compileDestination(destination) {
@@ -87,9 +79,7 @@ function destMetaDescription(destination) {
 }
 
 function functionSettings(destination) {
-  const {
-    FunctionSetting
-  } = require('@segment/connections-api/functions/v1beta/functions_pb')
+  const { FunctionSetting } = require('@segment/connections-api/functions/v1beta/functions_pb')
 
   const settings = []
 
@@ -97,9 +87,7 @@ function functionSettings(destination) {
   subsSetting.setType('string')
   subsSetting.setLabel('Subscriptions')
   subsSetting.setName('subscriptions')
-  subsSetting.setDescription(
-    '\\[{"subscribe":{"type":"track"},"partnerAction":"postToChannel","mapping":{...}}]'
-  )
+  subsSetting.setDescription('\\[{"subscribe":{"type":"track"},"partnerAction":"postToChannel","mapping":{...}}]')
   subsSetting.setRequired(true)
   settings.push(subsSetting)
 
@@ -137,14 +125,9 @@ function functionSettings(destination) {
 }
 
 function createFunction(workspaceId, name, destination) {
-  console.log(
-    `Creating function ${name} (${destination.compiled.length} bytes)`
-  )
+  console.log(`Creating function ${name} (${destination.compiled.length} bytes)`)
 
-  const {
-    Function: Fn,
-    CreateFunctionRequest
-  } = require('@segment/connections-api/functions/v1beta/functions_pb')
+  const { Function: Fn, CreateFunctionRequest } = require('@segment/connections-api/functions/v1beta/functions_pb')
 
   const fn = new Fn()
   fn.setDisplayName(name)
@@ -168,13 +151,8 @@ function createFunction(workspaceId, name, destination) {
 function updateFunction(workspaceId, id, destination) {
   console.log(`Updating function ${id} (${destination.compiled.length} bytes)`)
 
-  const {
-    Function: Fn,
-    UpdateFunctionRequest
-  } = require('@segment/connections-api/functions/v1beta/functions_pb')
-  const {
-    FieldMask
-  } = require('google-protobuf/google/protobuf/field_mask_pb.js')
+  const { Function: Fn, UpdateFunctionRequest } = require('@segment/connections-api/functions/v1beta/functions_pb')
+  const { FieldMask } = require('google-protobuf/google/protobuf/field_mask_pb.js')
 
   const fn = new Fn()
   fn.setId(id)
@@ -184,11 +162,7 @@ function updateFunction(workspaceId, id, destination) {
   fn.setSettingsList(functionSettings(destination))
 
   const mask = new FieldMask()
-  mask.setPathsList([
-    'function.code',
-    'function.buildpack',
-    'function.settings'
-  ])
+  mask.setPathsList(['function.code', 'function.buildpack', 'function.settings'])
 
   const req = new UpdateFunctionRequest()
   req.setFunction(fn)
@@ -196,8 +170,7 @@ function updateFunction(workspaceId, id, destination) {
 
   return new Promise((resolve, reject) => {
     functions.update(req, METADATA, (err, resp) => {
-      if (err)
-        return reject(new Error(`${destination.name} (${id}): ${err.message}`))
+      if (err) return reject(new Error(`${destination.name} (${id}): ${err.message}`))
       resolve(resp.toObject())
     })
   })
@@ -222,29 +195,20 @@ exports.handler = async function(argv) {
   Promise.all([listFunctions(workspace), compileDestinations(destinations)])
     .then(([functions, destinations]) => {
       const fnName = slug => `${FUNCTION_PREFIX}${slug}`
-      const fnWithSlug = slug =>
-        functions.find(f => f.displayName.startsWith(fnName(slug)))
+      const fnWithSlug = slug => functions.find(f => f.displayName.startsWith(fnName(slug)))
 
       const createDestinations = destinations.filter(d => !fnWithSlug(d.slug))
-      const updateDestinations = destinations.filter(
-        d => !createDestinations.includes(d)
-      )
+      const updateDestinations = destinations.filter(d => !createDestinations.includes(d))
 
       return allSettled([
-        ...createDestinations.map(d =>
-          createFunction(workspace, fnName(d.slug), d)
-        ),
-        ...updateDestinations.map(d =>
-          updateFunction(workspace, fnWithSlug(d.slug).id, d)
-        )
+        ...createDestinations.map(d => createFunction(workspace, fnName(d.slug), d)),
+        ...updateDestinations.map(d => updateFunction(workspace, fnWithSlug(d.slug).id, d))
       ])
     })
     .then(results => {
       results.forEach(result => {
         if (result.status === 'fulfilled') {
-          console.log(
-            `Deployed: ${result.value.displayName} (${result.value.id})`
-          )
+          console.log(`Deployed: ${result.value.displayName} (${result.value.id})`)
         } else {
           console.log(`FAILED: ${result.reason}`)
         }

@@ -1,0 +1,14 @@
+ci-docker-build:
+ifeq ($(BUILDKITE_BRANCH),master)
+	docker build -t $(TREB_IMAGE_TAG) . | sed 's/^Step/--- Build Docker Image Step/g'
+	echo "--- Push Docker Image"
+	docker tag $(TREB_IMAGE_TAG) $(TREB_SHORT_IMAGE_TAG)
+	docker push $(TREB_IMAGE_TAG)
+endif
+ifeq ($(BUILDKITE_BRANCH),staging)
+	docker build -t $(TREB_IMAGE_TAG) . | sed 's/^Step/--- Build Docker Image Step/g'
+	echo "--- Push Docker Image"
+	docker tag $(TREB_IMAGE_TAG) $(TREB_SHORT_IMAGE_TAG)
+	docker push $(TREB_IMAGE_TAG)
+endif
+.PHONY: ci-docker-build

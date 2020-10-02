@@ -2,3 +2,4 @@
 .vscode
 *.test.*
 /sample/
+node_modules_dev

@@ -3,16 +3,10 @@ const { grpc } = require('grpc-web-client')
 const { NodeHttpTransport } = require('grpc-web-node-http-transport')
 grpc.setDefaultTransport(NodeHttpTransport())
 
-const {
-  FunctionsClient
-} = require('@segment/connections-api/functions/v1beta/functions_pb_service')
-const functions = new FunctionsClient(
-  'http://connections-service.segment.local'
-)
+const { FunctionsClient } = require('@segment/connections-api/functions/v1beta/functions_pb_service')
+const functions = new FunctionsClient('http://connections-service.segment.local')
 
-const {
-  AppsClient
-} = require('@segment/connections-api/apps/v1beta/apps_pb_service')
+const { AppsClient } = require('@segment/connections-api/apps/v1beta/apps_pb_service')
 const apps = new AppsClient('http://connections-service.segment.local')
 
 const listFunctions = require('./lib/list-functions')
@@ -32,9 +26,7 @@ process.on('unhandledRejection', (reason, p) => {
 async function deleteFunction(fn) {
   console.log(`Deleting function "${fn.displayName}"`)
 
-  const {
-    DeleteFunctionRequest
-  } = require('@segment/connections-api/functions/v1beta/functions_pb')
+  const { DeleteFunctionRequest } = require('@segment/connections-api/functions/v1beta/functions_pb')
 
   const req = new DeleteFunctionRequest()
   req.setWorkspaceId(fn.workspaceId)
@@ -51,9 +43,7 @@ async function deleteFunction(fn) {
 async function cleanupOrphans(workspace) {
   console.log('Cleaning up orphan app records from workspace...')
 
-  const {
-    AppDeleteOrphansRequest
-  } = require('@segment/connections-api/apps/v1beta/apps_pb')
+  const { AppDeleteOrphansRequest } = require('@segment/connections-api/apps/v1beta/apps_pb')
 
   const req = new AppDeleteOrphansRequest()
   req.setWorkspaceId(workspace)
@@ -98,9 +88,7 @@ exports.handler = async function(argv) {
     .then(results => {
       results.forEach(result => {
         if (result.status === 'fulfilled') {
-          console.log(
-            `Undeployed: ${result.value.id}\t${result.value.displayName}`
-          )
+          console.log(`Undeployed: ${result.value.id}\t${result.value.displayName}`)
         } else {
           console.log(`FAILED: ${result.reason}`)
         }

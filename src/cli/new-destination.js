@@ -52,7 +52,5 @@ exports.handler = async function(argv) {
     }
   })
 
-  console.log(
-    `Done! Be sure to update the destination name in ${path}destination.json`
-  )
+  console.log(`Done! Be sure to update the destination name in ${path}destination.json`)
 }

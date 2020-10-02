@@ -25,7 +25,7 @@ async function pack(inputDir) {
           path: tmpdir,
           filename: tmpfile,
           library: DESTINATION,
-          libraryTarget: 'var',
+          libraryTarget: 'var'
         },
         mode: 'production',
         optimization: {
@@ -35,12 +35,12 @@ async function pack(inputDir) {
               terserOptions: {
                 // We use class names for logging in action-kit. If that gets fixed, this whole
                 // 'optimization' block can go away.
-                keep_classnames: true,
-              },
-            }),
-          ],
+                keep_classnames: true
+              }
+            })
+          ]
         },
-        plugins: [new MomentLocalesPlugin()],
+        plugins: [new MomentLocalesPlugin()]
       },
       (err, stats) => {
         if (err || stats.hasErrors()) {
@@ -53,12 +53,12 @@ async function pack(inputDir) {
 }
 
 function adapter() {
-  return `module.exports.onEvent = ${DESTINATION}.onEvent.bind(${DESTINATION})`
+  return `module.exports.onEvent = ${DESTINATION}.default.onEvent.bind(${DESTINATION}.default)`
 }
 
 // compile returns the compiled version of the destination at the given path
 // (e.g. './destinations/slack)
-module.exports.compile = async (path) => {
+module.exports.compile = async path => {
   const f = await pack(path)
   return readFileSync(f).toString() + adapter()
 }

@@ -45,11 +45,8 @@ exports.handler = async function(argv) {
   const path = join(destination, action, '')
 
   if (!existsSync(destination))
-    throw new Error(
-      `Error: ${destination} does not exist. Be sure to use the path to the destination.`
-    )
-  if (existsSync(path))
-    throw new Error(`Error: ${path} already exists. Choose a new action name.`)
+    throw new Error(`Error: ${destination} does not exist. Be sure to use the path to the destination.`)
+  if (existsSync(path)) throw new Error(`Error: ${path} already exists. Choose a new action name.`)
 
   let { template } = argv
   if (!template) template = await getTemplate()

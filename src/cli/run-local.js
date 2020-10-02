@@ -12,8 +12,7 @@ exports.builder = {
   input: {
     alias: 'i',
     type: 'string',
-    description:
-      'Path to input directory containing settings.json, payload.json, and mapping.json',
+    description: 'Path to input directory containing settings.json, payload.json, and mapping.json',
     default: './sample/slack'
   }
 }
@@ -40,7 +39,7 @@ exports.handler = async function(argv) {
     }
   }
 
-  const result = await destination.partnerActions[actionName]._execute({
+  const result = await destination.default.partnerActions[actionName]._execute({
     payload: load('payload.json'),
     settings: load('settings.json'),
     mapping: load('mapping.json')

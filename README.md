@@ -46,7 +46,7 @@ out this repository:
 % robo prod.ssh
 % git clone git@github.com:segmentio/fab-5-engine.git
 % cd fab-5-engine
-% npm install
+% yarn install
 % ./cli.js
 ```
 
@@ -55,7 +55,7 @@ out this repository:
 To test actions locally, you can use `./cli.js run-local`. For example:
 
 ```
-./cli.js run-local ./src/destinations/slack/postToChannel -i ./sample/slack
+./cli.js run-local ./dist/src/destinations/slack/postToChannel -i ./sample/slack
 MapInput1: Starting
 MapInput1: Finished (30 ms)
 Validate2: Starting
