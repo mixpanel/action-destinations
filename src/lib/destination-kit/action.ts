@@ -7,10 +7,10 @@ import NodeCache from 'node-cache'
 import get from 'lodash/get'
 
 const stepId = (): number => {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   const id = stepId.i || 0
-  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   stepId.i = id + 1
   return id
@@ -55,7 +55,7 @@ class Step {
     }
 
     try {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       result.output = await this._execute(ctx)
     } catch (e) {
@@ -519,7 +519,7 @@ export class Action extends Step {
   }
 
   mapField(path: string, fieldMapping: FieldMapping): Action {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     let pathParts = JSONPath.toPathArray(path)
     if (pathParts[0] === '$') {

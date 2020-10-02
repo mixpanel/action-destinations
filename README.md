@@ -195,4 +195,4 @@ Here's a full example:
 
 ## Misc.
 
-Code in this repo is formatted using `prettier-eslint`. You can format everything by running `npm run fmt`.
+Code in this repo is formatted using `eslint`. You can format everything by running `yarn lint`.

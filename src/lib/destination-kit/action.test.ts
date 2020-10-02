@@ -241,7 +241,7 @@ const serveJSON = (code: number, body: any): { url: string; close: Function } =>
 
   const addr = server.address()
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   const url = `http://[${addr.address}]:${addr.port}/`
 
