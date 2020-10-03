@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-// eslint-disable-next-line no-unused-expressions
 require('yargs')
   .command(require('./src/cli/run-local'))
   .command(require('./src/cli/deploy'))

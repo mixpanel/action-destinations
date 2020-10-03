@@ -4,7 +4,6 @@ import logger from '../lib/logger'
 import stats from '../lib/stats'
 
 /** Catch all error handler */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const errorHandler: ErrorRequestHandler = (error, req, res, _next): void => {
   const status = error.statusCode || error.status || 500
   const payload = { message: 'Internal server error', status }
