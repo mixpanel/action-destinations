@@ -175,10 +175,7 @@ describe('@json', () => {
   })
 
   test('nested', () => {
-    const output = map(
-      { '@json': { '@path': '$.properties.cool' } },
-      { properties: { cool: 'yep' } }
-    )
+    const output = map({ '@json': { '@path': '$.properties.cool' } }, { properties: { cool: 'yep' } })
     expect(output).toStrictEqual('"yep"')
   })
 })
@@ -221,10 +218,7 @@ describe('@merge', () => {
   })
 
   test('nested directive', () => {
-    const output = map(
-      { '@merge': [{ cool: true }, { '@path': '$.foo' }] },
-      { foo: { bar: 'baz' } }
-    )
+    const output = map({ '@merge': [{ cool: true }, { '@path': '$.foo' }] }, { foo: { bar: 'baz' } })
     expect(output).toStrictEqual({ cool: true, bar: 'baz' })
   })
 })
@@ -331,26 +325,17 @@ describe('@path', () => {
   })
 
   test('nested path', () => {
-    const output = map(
-      { neat: { '@path': '$.foo.bar' } },
-      { foo: { bar: 'baz' } }
-    )
+    const output = map({ neat: { '@path': '$.foo.bar' } }, { foo: { bar: 'baz' } })
     expect(output).toStrictEqual({ neat: 'baz' })
   })
 
   test('nested directive', () => {
-    const output = map(
-      { '@path': { '@path': '$.foo' } },
-      { foo: 'bar', bar: 'baz' }
-    )
+    const output = map({ '@path': { '@path': '$.foo' } }, { foo: 'bar', bar: 'baz' })
     expect(output).toStrictEqual('baz')
   })
 
   test('JSONPath features', () => {
-    const output = map(
-      { '@path': '$.foo..bar' },
-      { foo: [{ bar: 1 }, { bar: 2 }] }
-    )
+    const output = map({ '@path': '$.foo..bar' }, { foo: [{ bar: 1 }, { bar: 2 }] })
     expect(output).toStrictEqual([1, 2])
   })
 
@@ -480,21 +465,13 @@ describe('@template', () => {
   })
 
   test('nested fields', () => {
-    const output = map(
-      { '@template': 'Hello, {{who.name}}!' },
-      { who: { name: 'World' } }
-    )
+    const output = map({ '@template': 'Hello, {{who.name}}!' }, { who: { name: 'World' } })
     expect(output).toStrictEqual('Hello, World!')
   })
 
   test('no escaping', () => {
-    const output = map(
-      { '@template': '<blink>{{a}} {{{a}}}</blink>' },
-      { a: '<b>Hi</b>' }
-    )
-    expect(output).toStrictEqual(
-      '<blink>&lt;b&gt;Hi&lt;&#x2F;b&gt; <b>Hi</b></blink>'
-    )
+    const output = map({ '@template': '<blink>{{a}} {{{a}}}</blink>' }, { a: '<b>Hi</b>' })
+    expect(output).toStrictEqual('<blink>&lt;b&gt;Hi&lt;&#x2F;b&gt; <b>Hi</b></blink>')
   })
 
   test('missing fields', () => {

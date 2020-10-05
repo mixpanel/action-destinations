@@ -66,30 +66,20 @@ function validateDirective(obj, stack = []) {
 
   // "allow" non-directive objects so that we can throw a more descriptive error below
   if (type !== 'directive' && type !== 'object') {
-    throw new ValidationError(
-      `should be a directive object but it is ${indefiniteArticle(
-        type
-      )} ${type}`,
-      stack
-    )
+    throw new ValidationError(`should be a directive object but it is ${indefiniteArticle(type)} ${type}`, stack)
   }
 
   const keys = Object.keys(obj)
 
   if (keys.length !== 1) {
-    throw new ValidationError(
-      `should only have one @-prefixed key but it has ${keys.length} keys`,
-      stack
-    )
+    throw new ValidationError(`should only have one @-prefixed key but it has ${keys.length} keys`, stack)
   }
 
   const nonDirectiveKey = keys.find(k => k.charAt(0) !== '@')
 
   if (nonDirectiveKey) {
     throw new ValidationError(
-      `should only have one @-prefixed key but it has ${JSON.stringify(
-        nonDirectiveKey
-      )}`,
+      `should only have one @-prefixed key but it has ${JSON.stringify(nonDirectiveKey)}`,
       stack
     )
   }
@@ -119,9 +109,7 @@ function validateDirectiveOrRaw(v, stack = []) {
       return
     default:
       throw new ValidationError(
-        `should be a mapping directive or a JSON value but it is ${indefiniteArticle(
-          type
-        )} ${type}`,
+        `should be a mapping directive or a JSON value but it is ${indefiniteArticle(type)} ${type}`,
         stack
       )
   }
@@ -137,9 +125,7 @@ function validateDirectiveOrString(v, stack = []) {
       return
     default:
       throw new ValidationError(
-        `should be a string or a mapping directive but it is ${indefiniteArticle(
-          type
-        )} ${type}`,
+        `should be a string or a mapping directive but it is ${indefiniteArticle(type)} ${type}`,
         stack
       )
   }
@@ -155,9 +141,7 @@ function validateDirectiveOrObject(v, stack = []) {
       return validateObject(v, stack)
     default:
       throw new ValidationError(
-        `should be a mapping directive or an object but it is ${indefiniteArticle(
-          type
-        )} ${type}`,
+        `should be a mapping directive or an object but it is ${indefiniteArticle(type)} ${type}`,
         stack
       )
   }
@@ -173,9 +157,7 @@ function validateDirectiveOrArray(v, stack = []) {
       return validateArray(v, stack)
     default:
       throw new ValidationError(
-        `should be a mapping directive or an array but it is ${indefiniteArticle(
-          type
-        )} ${type}`,
+        `should be a mapping directive or an array but it is ${indefiniteArticle(type)} ${type}`,
         stack
       )
   }
@@ -185,10 +167,7 @@ function validateObject(obj, stack = []) {
   const type = realTypeOf(obj)
 
   if (type !== 'object') {
-    throw new ValidationError(
-      `should be an object but it is ${indefiniteArticle(type)} ${type}`,
-      stack
-    )
+    throw new ValidationError(`should be an object but it is ${indefiniteArticle(type)} ${type}`, stack)
   }
 
   const keys = Object.keys(obj)
@@ -196,9 +175,7 @@ function validateObject(obj, stack = []) {
   const directiveKey = keys.find(k => k.charAt(0) === '@')
   if (directiveKey) {
     throw new ValidationError(
-      `shouldn't have directive (@-prefixed) keys but it has ${JSON.stringify(
-        directiveKey
-      )}`,
+      `shouldn't have directive (@-prefixed) keys but it has ${JSON.stringify(directiveKey)}`,
       stack
     )
   }
@@ -225,10 +202,7 @@ function validateObjectWithFields(obj, fields, stack) {
     try {
       if (required) {
         if (obj[prop] === undefined) {
-          throw new ValidationError(
-            `should have field ${JSON.stringify(prop)} but it doesn't`,
-            stack
-          )
+          throw new ValidationError(`should have field ${JSON.stringify(prop)} but it doesn't`, stack)
         }
         required(obj[prop], [...stack, prop])
       } else if (optional) {
@@ -248,10 +222,7 @@ function validateArray(arr, stack = []) {
   const type = realTypeOf(arr)
 
   if (type !== 'array') {
-    throw new ValidationError(
-      `should be an array but it is ${indefiniteArticle(type)} ${type}`,
-      stack
-    )
+    throw new ValidationError(`should be an array but it is ${indefiniteArticle(type)} ${type}`, stack)
   }
 }
 

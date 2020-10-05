@@ -26,8 +26,7 @@ function realTypeOf(v) {
 }
 
 function registerDirective(name, fn) {
-  if (!name.match(/^@[a-z][a-zA-Z0-9]+$/))
-    throw new Error(`"${name}" is an invalid directive name`)
+  if (!name.match(/^@[a-z][a-zA-Z0-9]+$/)) throw new Error(`"${name}" is an invalid directive name`)
   directives[name] = fn
 }
 
@@ -35,8 +34,7 @@ function registerStringDirective(name, fn) {
   registerDirective(name, (value, payload) => {
     const str = resolve(value, payload)
     const strType = realTypeOf(str)
-    if (strType !== 'string')
-      throw new Error(`${name}: expected string, got ${strType}`)
+    if (strType !== 'string') throw new Error(`${name}: expected string, got ${strType}`)
 
     return fn(str, payload)
   })
@@ -48,8 +46,7 @@ function runDirective(obj, payload) {
   const opts = obj[name]
 
   const fnType = realTypeOf(fn)
-  if (fnType !== 'function')
-    throw new Error(`${name} is not a valid directive, got ${fnType}`)
+  if (fnType !== 'function') throw new Error(`${name} is not a valid directive, got ${fnType}`)
 
   return fn(opts, payload)
 }
@@ -90,8 +87,7 @@ registerStringDirective('@lowercase', (str, payload) => {
 
 registerDirective('@merge', (arr, payload) => {
   const arrType = realTypeOf(arr)
-  if (arrType !== 'array')
-    throw new Error(`@merge: expected array, got ${arrType}`)
+  if (arrType !== 'array') throw new Error(`@merge: expected array, got ${arrType}`)
 
   const objects = arr.map(v => resolve(v, payload))
   return Object.assign({}, ...objects)
@@ -100,13 +96,11 @@ registerDirective('@merge', (arr, payload) => {
 function resolveObjectAndFields(directive, opts, payload) {
   const obj = resolve(opts.object, payload)
   const objType = realTypeOf(obj)
-  if (objType !== 'object')
-    throw new Error(`${directive}: expected object, got ${objType}`)
+  if (objType !== 'object') throw new Error(`${directive}: expected object, got ${objType}`)
 
   const fields = resolve(opts.fields, payload)
   const fieldsType = realTypeOf(fields)
-  if (fieldsType !== 'array')
-    throw new Error(`${directive}: expected fields as array, got ${fieldsType}`)
+  if (fieldsType !== 'array') throw new Error(`${directive}: expected fields as array, got ${fieldsType}`)
 
   return [obj, fields]
 }
@@ -148,20 +142,16 @@ registerStringDirective('@template', (template, payload) => {
 registerDirective('@timestamp', (opts, payload) => {
   const ts = resolve(opts.timestamp, payload)
   const tsType = realTypeOf(ts)
-  if (tsType !== 'string')
-    throw new Error(`@timestamp: timestamp must be a string, got ${tsType}`)
+  if (tsType !== 'string') throw new Error(`@timestamp: timestamp must be a string, got ${tsType}`)
 
   const format = resolve(opts.format, payload)
   const formatType = realTypeOf(format)
-  if (formatType !== 'string')
-    throw new Error(`@timestamp: format must be a string, got ${formatType}`)
+  if (formatType !== 'string') throw new Error(`@timestamp: format must be a string, got ${formatType}`)
 
   const inputFormat = resolve(opts.inputFormat, payload)
   const inputFormatType = realTypeOf(inputFormat)
   if (inputFormat !== undefined && inputFormatType !== 'string')
-    throw new Error(
-      `@timestamp: inputFormat must be a string, got ${inputFormat}`
-    )
+    throw new Error(`@timestamp: inputFormat must be a string, got ${inputFormat}`)
 
   const momentTs = moment.utc(ts, inputFormat)
 
@@ -242,8 +232,7 @@ function removeUndefined(obj) {
 module.exports = {
   map: (mapping, payload = {}, options = {}) => {
     const payloadType = realTypeOf(payload)
-    if (payloadType !== 'object')
-      throw new Error(`payload must be an object, got ${payloadType}`)
+    if (payloadType !== 'object') throw new Error(`payload must be an object, got ${payloadType}`)
 
     validate(mapping) // throws if the mapping config is invalid
 

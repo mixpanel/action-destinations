@@ -4,9 +4,7 @@ const validate = require('./validate')
 
 function* fixtures(subdir) {
   const path = join(__dirname, 'schema-fixtures', subdir)
-  const files = readdirSync(path, { withFileTypes: true }).filter(
-    f => f.isFile() && f.name.match(/\.json$/)
-  )
+  const files = readdirSync(path, { withFileTypes: true }).filter(f => f.isFile() && f.name.match(/\.json$/))
 
   for (const f of files) {
     const { mapping, expectError } = require(join(path, f.name))
