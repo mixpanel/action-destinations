@@ -24,6 +24,7 @@
     "@types/jest": "^26.0.14",
     "@types/lodash": "^4.14.161",
     "@types/node": "^12.12.11",
+    "@types/whatwg-mimetype": "^2.1.0",
     "@typescript-eslint/eslint-plugin": "^4.3.0",
     "@typescript-eslint/parser": "^4.3.0",
     "concurrently": "^5.0.0",
@@ -70,7 +71,8 @@
     "node-cache": "^5.1.2",
     "promise.allsettled": "^1.0.2",
     "prompts": "^2.3.2",
-    "uuid": "^8.3.0"
+    "uuid": "^8.3.0",
+    "whatwg-mimetype": "^2.3.0"
   },
   "husky": {
     "hooks": {

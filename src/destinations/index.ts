@@ -6,8 +6,8 @@ import pipedrive from './pipedrive'
 import sendgrid from './sendgrid'
 import slack from './slack'
 
-export default function(id: string): Destination {
-  switch (id) {
+export default function(slug: string): Destination {
+  switch (slug) {
     case 'airtable':
       return airtable
     case 'amplitude':

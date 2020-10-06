@@ -814,6 +814,11 @@
   resolved "https://registry.yarnpkg.com/@types/stack-utils/-/stack-utils-1.0.1.tgz#0a851d3bd96498fa25c33ab7278ed3bd65f06c3e"
   integrity sha512-l42BggppR6zLmpfU6fq9HEa2oGPEI8yrSPL3GITjfRInppYFahObbIQOQK3UGxEnyQpltZLaPe75046NOZQikw==
 
+"@types/whatwg-mimetype@^2.1.0":
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@types/whatwg-mimetype/-/whatwg-mimetype-2.1.0.tgz#f981bbdf1813a75820a6ec3a7fdfa0d452552cc7"
+  integrity sha512-bJ/bZ+pA69lm+Ll8JJRoAD9saH7unIMfxPQQpl7bxa00qNqvUXSyk3xvoRMea1uCpAOxweI7CzjWx48ysX6yug==
+
 "@types/yargs-parser@*":
   version "15.0.0"
   resolved "https://registry.yarnpkg.com/@types/yargs-parser/-/yargs-parser-15.0.0.tgz#cb3f9f741869e20cce330ffbeb9271590483882d"
