@@ -2,6 +2,7 @@ const path = require('path')
 const allSettled = require('promise.allsettled')
 const { grpc } = require('grpc-web-client')
 const { NodeHttpTransport } = require('grpc-web-node-http-transport')
+const execa = require('execa')
 grpc.setDefaultTransport(NodeHttpTransport())
 
 const { FunctionsClient } = require('@segment/connections-api/functions/v1beta/functions_pb_service')
@@ -189,6 +190,14 @@ exports.builder = {
 
 exports.handler = async function(argv) {
   const { workspace } = argv
+
+  console.log('Building destinations')
+
+  try {
+    await execa('yarn', ['build'], { stdio: 'inherit' })
+  } catch (error) {
+    process.exit(error.exitCode)
+  }
 
   const destinations = await selectDestinations()
 
