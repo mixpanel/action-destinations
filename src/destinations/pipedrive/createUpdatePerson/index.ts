@@ -6,7 +6,7 @@ interface Organizations {
   data: Organization[]
   additional_data: {
     pagination: {
-      next_start: string
+      next_start?: number
     }
   }
 }
@@ -22,7 +22,9 @@ export default function(action: Action): Action {
 
     .autocomplete('org_id', async (req, { page }) => {
       const response = await req.get<Organizations>('organizations', {
-        searchParams: { start: page }
+        searchParams: {
+          start: typeof page === 'string' ? Number(page) : undefined
+        }
       })
 
       const items = response.body.data.map(organization => ({
@@ -30,10 +32,10 @@ export default function(action: Action): Action {
         value: organization.id
       }))
 
-      let nextPage
+      let nextPage: string | undefined
 
       if (typeof response.body.additional_data.pagination.next_start === 'number') {
-        nextPage = response.body.additional_data.pagination.next_start
+        nextPage = String(response.body.additional_data.pagination.next_start)
       }
 
       return {
