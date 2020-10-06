@@ -580,38 +580,6 @@ describe('@uuid', () => {
   })
 })
 
-describe('@cast', () => {
-  test('string to number', () => {
-    const output = map(
-      {
-        '@cast': {
-          value: '123',
-          to: 'number'
-        }
-      },
-      {}
-    )
-
-    expect(output).toEqual(123)
-  })
-
-  test('number to string', () => {
-    const output = map(
-      {
-        '@cast': {
-          value: { '@path': '$.value' },
-          to: 'string'
-        }
-      },
-      {
-        value: 123
-      }
-    )
-
-    expect(output).toEqual('123')
-  })
-})
-
 describe('remove undefined values in objects', () => {
   test('simple', () => {
     expect(map({ x: undefined }, {})).toEqual({})

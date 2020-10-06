@@ -162,21 +162,6 @@ registerDirective('@timestamp', (opts, payload) => {
 const uuid = require('uuid')
 registerDirective('@uuid', (_, payload) => uuid.v4())
 
-registerDirective('@cast', (options, payload) => {
-  const value = resolve(options.value, payload)
-  const { to } = options
-
-  if (to === 'number') {
-    return Number(value)
-  }
-
-  if (to === 'string') {
-    return String(value)
-  }
-
-  return value
-})
-
 // --
 
 function isDirective(obj) {
