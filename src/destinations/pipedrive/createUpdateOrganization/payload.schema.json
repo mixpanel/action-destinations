@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/schema#",
   "title": "Create or Update Organization",
-  "description": "Update an organization in Pipedrive or create it if it does not exist yet.",
+  "description": "Update an organization in Pipedrive or create it if it doesn't exist yet.",
   "type": "object",
   "properties": {
     "identifier": {

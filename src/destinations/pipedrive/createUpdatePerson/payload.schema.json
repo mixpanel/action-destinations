@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/schema#",
   "title": "Create or Update Person",
-  "description": "Update a person in Pipedrive or create them if they do not exist yet.",
+  "description": "Update a person in Pipedrive or create them if they don't exist yet.",
   "type": "object",
   "properties": {
     "identifier": {

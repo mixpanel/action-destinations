@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/schema#",
   "title": "Create or Update Contact",
-  "description": "Update an existing marketing contact or create them if they do not exist. Additions and updates are asynchronous in SendGrid, so you may not immediately see the contact in the SendGrid dashboard.",
+  "description": "Update an existing marketing contact or create them if they don't exist.",
   "type": "object",
   "properties": {
     "list_id": {

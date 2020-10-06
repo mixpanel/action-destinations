@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/schema#",
   "title": "Remove Recipient from List",
-  "description": "Remove a recipient from a list given their email address",
+  "description": "Remove a recipient from a list.",
   "type": "object",
   "properties": {
     "list_id": {

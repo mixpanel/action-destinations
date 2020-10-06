@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/schema#",
   "title": "Track Anonymous Event",
-  "description": "Track an anonymous event (an event not tied to a known person).",
+  "description": "Track an event not tied to a known person.",
   "type": "object",
   "properties": {
     "name": {
