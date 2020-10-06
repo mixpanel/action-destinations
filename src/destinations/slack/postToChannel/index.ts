@@ -2,25 +2,12 @@ import { Action } from '@/lib/destination-kit/action'
 import payloadSchema from './payload.schema.json'
 
 export default function(action: Action): Action {
-  return action
-    .validatePayload(payloadSchema)
+  return action.validatePayload(payloadSchema).request((req, { payload }) => {
+    const { url, ...fields } = payload
 
-    .fanOut({
-      on: 'payload.channels',
-      as: 'channel'
+    return req.post(url, {
+      json: fields,
+      responseType: 'text'
     })
-
-    .request((req, { payload, channel }) => {
-      return req.post(payload.url, {
-        json: {
-          channel,
-          text: payload.text,
-          username: payload.username,
-          icon_url: payload.icon_url
-        },
-        responseType: 'text'
-      })
-    })
-
-    .fanIn()
+  })
 }

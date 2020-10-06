@@ -10,15 +10,10 @@
       "type": "string",
       "format": "uri"
     },
-    "channels": {
-      "title": "Channels",
-      "description": "Slack channels to post message to. Each channel receives a copy of messages sent to this action.",
-      "type": "array",
-      "minLength": 20,
-      "items": {
-        "type": "string",
-        "minLength": 1
-      }
+    "channel": {
+      "title": "Channel",
+      "description": "Slack channel to post message to.",
+      "type": "string"
     },
     "text": {
       "title": "Message",
@@ -38,5 +33,5 @@
       "default": "https://logo.clearbit.com/segment.com"
     }
   },
-  "required": ["url", "channels", "text"]
+  "required": ["url", "channel", "text"]
 }
