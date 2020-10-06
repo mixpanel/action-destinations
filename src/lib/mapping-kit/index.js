@@ -182,8 +182,16 @@ registerDirective('@cast', (options, payload) => {
 function isDirective(obj) {
   if (realTypeOf(obj) !== 'object') return false
   const keys = Object.keys(obj)
-  if (keys.length !== 1) return false
-  return keys[0].charAt(0) === '@'
+
+  const directiveKey = keys.find(key => key.startsWith('@'))
+
+  if (!directiveKey) {
+    return false
+  }
+
+  // Check that there aren't any other keys besides @directive or _metadata
+  const otherKeys = keys.filter(key => !key.startsWith('@') && key !== '_metadata')
+  return otherKeys.length === 0
 }
 
 function resolve(mapping, payload) {

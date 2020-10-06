@@ -70,28 +70,27 @@ function validateDirective(obj, stack = []) {
   }
 
   const keys = Object.keys(obj)
+  const directiveKeys = keys.filter(key => key.startsWith('@'))
 
-  if (keys.length !== 1) {
+  if (directiveKeys.length > 1) {
+    throw new ValidationError(`should only have one @-prefixed key but it has ${directiveKeys.length} keys`, stack)
+  }
+
+  // Check that there aren't other keys besides @directive or _metadata
+  const otherKeys = keys.filter(key => !key.startsWith('@') && key !== '_metadata')
+
+  if (otherKeys.length > 0) {
     throw new ValidationError(`should only have one @-prefixed key but it has ${keys.length} keys`, stack)
   }
 
-  const nonDirectiveKey = keys.find(k => k.charAt(0) !== '@')
-
-  if (nonDirectiveKey) {
-    throw new ValidationError(
-      `should only have one @-prefixed key but it has ${JSON.stringify(nonDirectiveKey)}`,
-      stack
-    )
-  }
-
-  const key = keys[0]
-  const fn = directives[key]
+  const directiveKey = directiveKeys[0]
+  const fn = directives[directiveKey]
 
   if (typeof fn !== 'function') {
-    throw new ValidationError(`has an invalid directive: ${key}`, stack)
+    throw new ValidationError(`has an invalid directive: ${directiveKey}`, stack)
   }
 
-  fn(obj[key], stack)
+  fn(obj[directiveKey], stack)
 }
 
 function validateDirectiveOrRaw(v, stack = []) {
