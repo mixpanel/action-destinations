@@ -138,6 +138,22 @@ describe('validatePayload', () => {
     expect(result.error).toBeInstanceOf(Error)
     expect(result.error.toString()).toBe('AggregateAjvError: Foo should be a number but it was a string.')
   })
+
+  test('cast string to number when validating payload', async () => {
+    const mapping = { a: { '@path': '$.foo' } }
+    const payload = { foo: '1' }
+    let ctx: any = {}
+
+    const result = await new Action()
+      .validatePayload(schema)
+      .do((c: any) => {
+        ctx = c
+      })
+      .execute({ mapping, payload })
+
+    expect(result.error).toBeNull()
+    expect(ctx.payload).toStrictEqual({ a: 1 })
+  })
 })
 
 describe('fanOut()', () => {
