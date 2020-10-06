@@ -16,5 +16,5 @@
       "type": "object"
     }
   },
-  "required": ["url"]
+  "required": ["url", "fields"]
 }
