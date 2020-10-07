@@ -5,6 +5,7 @@ import { JSONPath } from 'jsonpath-plus'
 import got, { ExtendOptions, Got } from 'got'
 import NodeCache from 'node-cache'
 import get from 'lodash/get'
+import logger from '../logger'
 
 const stepId = (): number => {
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -76,7 +77,7 @@ class Step {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   _log(...args: any[]): void {
     if (process.env.NODE_ENV !== 'test') {
-      console.log(`${this.id}:`, ...args)
+      logger.info(`${this.id}:`, args)
     }
   }
 

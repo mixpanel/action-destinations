@@ -2,6 +2,7 @@ import validate from '@segment/fab5-subscriptions'
 import { BadRequest } from 'http-errors'
 import got, { CancelableRequest, Got, Response } from 'got'
 import { Extensions, Action, Validate } from './action'
+import logger from '../logger'
 
 export interface DestinationConfig {
   name: string
@@ -115,7 +116,11 @@ export class Destination {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private async runSubscription(subscription: any, payload: unknown, destinationSettings: Record<string, unknown>): Promise<unknown> {
+  private async runSubscription(
+    subscription: any,
+    payload: unknown,
+    destinationSettings: Record<string, unknown>
+  ): Promise<unknown> {
     if (!this.isSubscribed(subscription.subscribe, payload)) {
       return 'not subscribed'
     }
@@ -126,7 +131,7 @@ export class Destination {
       throw new BadRequest(`"${actionSlug}" is not a valid action`)
     }
 
-    console.log(`${actionSlug}: running`)
+    logger.info(`${actionSlug}: running`)
 
     // TODO better API for calling actionKit thingy
     const result = await action._execute({
@@ -138,7 +143,7 @@ export class Destination {
       mapping: subscription.mapping
     })
 
-    console.log(`${actionSlug}: done! result:`, result)
+    logger.info(`${actionSlug}: done! result:`, result)
 
     return result
   }
@@ -146,7 +151,7 @@ export class Destination {
   // TODO kinda gross but lets run with it for now.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public async onEvent(event: any, settings: Record<string, unknown>): Promise<unknown[]> {
-    console.log('Running destination: ', this.name)
+    logger.info(`Running destination: ${this.name}`)
 
     const { subscriptions, ...settingsNoSubscriptions } = settings
     const parsedSubscriptions = JSON.parse(subscriptions as string)
