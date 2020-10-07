@@ -74,10 +74,9 @@ class Step {
     return result
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  _log(...args: any[]): void {
+  _log(message: string): void {
     if (process.env.NODE_ENV !== 'test') {
-      logger.info(`${this.id}:`, args)
+      logger.info(message)
     }
   }
 
