@@ -1,6 +1,7 @@
 import validate from '@segment/fab5-subscriptions'
-import { Extensions, Action, Validate } from './action'
+import { BadRequest } from 'http-errors'
 import got, { CancelableRequest, Got, Response } from 'got'
+import { Extensions, Action, Validate } from './action'
 
 export interface DestinationConfig {
   name: string
@@ -32,23 +33,6 @@ interface TestAuthOptions {
 interface TestAuthSettings {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   settings: any
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function allSettled(promises: any): any {
-  if (Promise.allSettled) {
-    return Promise.allSettled(promises)
-  }
-
-  return Promise.all(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    promises.map((p: any) =>
-      Promise.resolve(p).then(
-        val => ({ status: 'fulfilled', value: val }),
-        err => ({ status: 'rejected', reason: err })
-      )
-    )
-  )
 }
 
 export class Destination {
@@ -131,7 +115,7 @@ export class Destination {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private async runSubscription(subscription: any, payload: any, destinationSettings: any): Promise<any> {
+  private async runSubscription(subscription: any, payload: unknown, destinationSettings: Record<string, unknown>): Promise<unknown> {
     if (!this.isSubscribed(subscription.subscribe, payload)) {
       return 'not subscribed'
     }
@@ -139,7 +123,7 @@ export class Destination {
     const actionSlug = subscription.partnerAction
     const action = this.partnerActions[actionSlug]
     if (!action) {
-      throw new Error(`"${actionSlug}" is not a valid action`)
+      throw new BadRequest(`"${actionSlug}" is not a valid action`)
     }
 
     console.log(`${actionSlug}: running`)
@@ -161,17 +145,21 @@ export class Destination {
 
   // TODO kinda gross but lets run with it for now.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public async onEvent(event: any, settings: any): Promise<any> {
+  public async onEvent(event: any, settings: Record<string, unknown>): Promise<unknown[]> {
     console.log('Running destination: ', this.name)
 
     const { subscriptions, ...settingsNoSubscriptions } = settings
-    const parsedSubscriptions = JSON.parse(subscriptions)
+    const parsedSubscriptions = JSON.parse(subscriptions as string)
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const promises = parsedSubscriptions.map((sub: any) => {
+    const promises = parsedSubscriptions.map((sub: unknown) => {
       return this.runSubscription(sub, event, settingsNoSubscriptions)
     })
 
-    return allSettled(promises)
+    /**
+     * Until we move subscriptions upstream (into int-consumer) we've opted
+     * to have failures abort the set of subscriptions and get potentially retried by centrifuge
+     */
+    return Promise.all(promises)
   }
 }

@@ -1,9 +1,9 @@
 import { Request, Response } from 'express'
 import { HttpError, UnprocessableEntity } from 'http-errors'
 import { IncomingHttpHeaders } from 'http'
-import getDestinationBySlug from '../destinations'
-import idToSlug from './id-to-slug'
+import { getDestinationByIdOrSlug } from '../destinations'
 import MIMEType from 'whatwg-mimetype'
+import { constructTrace, Span } from './tracing'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function parseJsonHeader(headers: IncomingHttpHeaders, header: string, fallback = null): any {
@@ -34,13 +34,12 @@ function parseContentType(req: Request): MIMEType {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function handleHttp(req: Request): Promise<any> {
-  const id = req.params.destinationId
+  const idOrSlug = req.params.destinationId
   const event = req.body
   const settings = parseJsonHeader(req.headers, 'centrifuge-settings')
 
   // Try to map the id param to a slug, or treat it as the slug (easier local testing)
-  const slug = idToSlug[id] || id
-  const destination = getDestinationBySlug(slug)
+  const destination = getDestinationByIdOrSlug(idOrSlug)
 
   const results = await destination.onEvent(event, settings)
 
@@ -59,14 +58,16 @@ function isStructuredCloudEvent(contentType: MIMEType): boolean {
   return contentType.type === 'application' && contentType.subtype === 'cloudevents+json'
 }
 
+type JsonObject<T = unknown> = Record<string, T>
+
 interface CloudEvent {
   id: string
   source: string
   destination: string
   specversion: string
   type: string
-  data: object
-  settings: object
+  data: JsonObject
+  settings: JsonObject
 }
 
 interface CloudEventResponse {
@@ -77,12 +78,22 @@ interface CloudEventResponse {
   type: string
   time: string
   status: number
-  data: object
+  data: JsonObject | JsonObject[]
   errortype?: string
   errormessage?: string
+  trace?: Span
 }
 
-function constructCloudSuccess(cloudEvent: CloudEvent, data: object): CloudEventResponse {
+interface RequestTracing {
+  start: Date
+}
+
+function constructCloudSuccess(cloudEvent: CloudEvent, data: any, tracing: RequestTracing): CloudEventResponse {
+  // Unwrap first item when it's the only one so `data` maps 1:1 with the request
+  if (Array.isArray(data) && data.length === 1) {
+    data = data[0]
+  }
+
   return {
     id: cloudEvent.id,
     source: cloudEvent.source,
@@ -91,12 +102,17 @@ function constructCloudSuccess(cloudEvent: CloudEvent, data: object): CloudEvent
     type: 'com.segment.event.ack',
     time: new Date().toISOString(),
     status: 201,
-    data
+    data,
+    trace: constructTrace({
+      name: 'invoke',
+      start: tracing.start,
+      duration: Date.now() - tracing.start.getTime()
+    })
   }
 }
 
-function constructCloudError(cloudEvent: CloudEvent, error: HttpError): CloudEventResponse {
-  const statusCode = (error && error.status) || 500
+function constructCloudError(cloudEvent: CloudEvent, error: HttpError, tracing: RequestTracing): CloudEventResponse {
+  const statusCode = error?.status ?? error?.response?.statusCode ?? 500
 
   return {
     id: cloudEvent.id,
@@ -107,34 +123,37 @@ function constructCloudError(cloudEvent: CloudEvent, error: HttpError): CloudEve
     time: new Date().toISOString(),
     status: statusCode,
     data: {},
+    // TODO support all error types
     errortype: 'MESSAGE_REJECTED',
-    errormessage: String((error && error.message) || '')
+    errormessage: String(error?.message ?? ''),
+    trace: constructTrace({
+      name: 'invoke',
+      start: tracing.start,
+      duration: Date.now() - tracing.start.getTime()
+    })
   }
 }
 
 async function handleCloudEvent(destinationId: string, cloudEvent: CloudEvent): Promise<CloudEventResponse> {
   const { data, settings } = cloudEvent
+  const start = new Date()
 
   try {
-    const slug = idToSlug[destinationId]
-    const destination = getDestinationBySlug(slug)
-    const result = await destination.onEvent(data, settings)
-    return constructCloudSuccess(cloudEvent, result)
+    const destination = getDestinationByIdOrSlug(destinationId)
+    const results = await destination.onEvent(data, settings)
+    return constructCloudSuccess(cloudEvent, results, { start })
   } catch (err) {
-    return constructCloudError(cloudEvent, err)
+    return constructCloudError(cloudEvent, err, { start })
   }
 }
 
 async function handleCloudEventBatch(destinationId: string, batch: CloudEvent[]): Promise<CloudEventResponse[]> {
   const promises = batch.map(event => handleCloudEvent(destinationId, event))
-
   const results = await Promise.all(promises)
-
   return results
 }
 
 // TODO support quasar
-// TODO support tracing
 // TODO support `deadline`/timeout?
 // TODO support `attempt` metrics?
 // TODO support `debug`?
