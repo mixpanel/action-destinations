@@ -12,7 +12,7 @@ export default function(slug: string): Destination {
       return airtable
     case 'amplitude':
       return amplitude
-    case 'customer-io':
+    case 'customerio':
       return customerio
     case 'pipedrive':
       return pipedrive

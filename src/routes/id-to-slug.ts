@@ -1,6 +1,10 @@
 const idToSlug: { [key: string]: string } = {
-  '5f736bae438ce7d3da5a7baa': 'slack',
-  '5f762c6225602421a54001b4': 'sendgrid'
+  '5f7dd5e61ad74fefa2b1fc46': 'airtable',
+  '5f7dd6d21ad74f3842b1fc47': 'amplitude',
+  '5f7dd78fe27ce7ff2b8bfa37': 'customerio',
+  '5f7dd8191ad74f868ab1fc48': 'pipedrive',
+  '5f7dd8848e9d93aafb6cecd8': 'sendgrid',
+  '5f7dd8e302173ff732db5cc4': 'slack'
 }
 
 export default idToSlug
