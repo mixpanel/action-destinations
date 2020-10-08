@@ -154,7 +154,9 @@ export class Destination {
     logger.info(`Running destination: ${this.name}`)
 
     const { subscriptions, ...settingsNoSubscriptions } = settings
-    const parsedSubscriptions = JSON.parse(subscriptions as string)
+    const parsedSubscriptions = typeof subscriptions === 'string'
+      ? JSON.parse(subscriptions)
+      : subscriptions
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const promises = parsedSubscriptions.map((sub: unknown) => {

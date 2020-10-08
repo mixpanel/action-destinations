@@ -113,6 +113,7 @@ function constructCloudSuccess(cloudEvent: CloudEvent, data: any, tracing: Reque
 
 function constructCloudError(cloudEvent: CloudEvent, error: HttpError, tracing: RequestTracing): CloudEventResponse {
   const statusCode = error?.status ?? error?.response?.statusCode ?? 500
+  const message = error?.message ?? 'Unknown error'
 
   return {
     id: cloudEvent.id,
@@ -122,10 +123,14 @@ function constructCloudError(cloudEvent: CloudEvent, error: HttpError, tracing: 
     type: 'com.segment.event.ack',
     time: new Date().toISOString(),
     status: statusCode,
-    data: {},
+    data: {
+      status: statusCode,
+      name: error?.name,
+      message
+    },
     // TODO support all error types
     errortype: 'MESSAGE_REJECTED',
-    errormessage: String(error?.message ?? ''),
+    errormessage: message,
     trace: constructTrace({
       name: 'invoke',
       start: tracing.start,
