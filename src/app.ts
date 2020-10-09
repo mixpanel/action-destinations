@@ -1,7 +1,6 @@
 import express from 'express'
-import stats from './lib/stats'
 import routes from './routes'
-import requestLogger from './middleware/request-logger'
+import core from './middleware/core'
 import errorHandler from './middleware/error-handler'
 
 const app = express()
@@ -14,11 +13,7 @@ app.get('/health', (_req, res) => {
   res.status(204).end()
 })
 
-// Request metrics/logging
-// Positioned first so that requests with JSON errors still get logged
-app.use(stats.middleware())
-
-app.use(requestLogger)
+app.use(core)
 
 app.use(routes)
 

@@ -1,12 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Action } from './action'
 
-describe('Step base class', () => {
-  test('toString()', () => {
-    expect(new Action().toString()).toStrictEqual('[step Action0]')
-  })
-})
-
 describe('action()', () => {
   test('basic settings', async () => {
     const settings = { a: 1 }

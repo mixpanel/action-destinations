@@ -5,54 +5,20 @@ import { JSONPath } from 'jsonpath-plus'
 import got, { ExtendOptions, Got } from 'got'
 import NodeCache from 'node-cache'
 import get from 'lodash/get'
-import logger from '../logger'
-
-const stepId = (): number => {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  const id = stepId.i || 0
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  stepId.i = id + 1
-  return id
-}
-
-const durationMs = (start: Date, end: Date): string => {
-  const ms = (end.getTime() - start.getTime()).toString()
-  if (ms === '0') return '<1 ms'
-  const msWithCommas = ms.replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ',')
-  return `${msWithCommas} ms`
-}
 
 interface StepResult {
-  step: string
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   output: any
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   error: any
-  startedAt: Date
-  finishedAt: Date | null
 }
 
 // Step is the base class for all discrete execution steps. It handles executing the step, logging,
 // catching errors, and returning a result object.
 class Step {
-  id: string
-
-  constructor() {
-    this.id = `${this.constructor.name}${stepId()}`
-  }
-
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async execute(ctx: any): Promise<StepResult> {
-    this._log('Starting')
-
     const result: StepResult = {
-      step: this.id,
       output: null,
-      error: null,
-      startedAt: new Date(),
-      finishedAt: null
+      error: null
     }
 
     try {
@@ -61,37 +27,17 @@ class Step {
       result.output = await this._execute(ctx)
     } catch (e) {
       result.error = e
-    } finally {
-      result.finishedAt = new Date()
-    }
-
-    if (result.error) {
-      this._log(`Failed after ${durationMs(result.startedAt, result.finishedAt)}: ${result.error.message}`)
-    } else {
-      this._log(`Finished (${durationMs(result.startedAt, result.finishedAt)})`)
     }
 
     return result
-  }
-
-  _log(message: string): void {
-    if (process.env.NODE_ENV !== 'test') {
-      logger.info(message)
-    }
-  }
-
-  toString(): string {
-    return `[step ${this.id}]`
   }
 }
 
 // Steps is a list of one or more Step instances that can be executed in-order.
 class Steps {
-  idPrefix: string
   steps: Step[]
 
-  constructor(idPrefix = '') {
-    this.idPrefix = idPrefix
+  constructor() {
     this.steps = []
   }
 
@@ -342,7 +288,7 @@ class FanOut extends Step {
     super()
     this.parent = parent
     this.opts = opts
-    this.steps = new Steps(`${this}-`)
+    this.steps = new Steps()
     this.requestExtensions = []
   }
 
@@ -399,7 +345,6 @@ class FanOut extends Step {
 
   cachedRequest(config: CachedRequestConfig): FanOut {
     const step = new CachedRequest([], config)
-    this._prependStepId(step)
     this.steps.push(step)
     return this
   }
@@ -411,24 +356,18 @@ class FanOut extends Step {
 
   request(fn: RequestFn): FanOut {
     const step = new Request([], fn)
-    this._prependStepId(step)
     this.steps.push(step)
     return this
   }
 
   do(fn: Function): FanOut {
     const step = new Do(fn)
-    this._prependStepId(step)
     this.steps.push(step)
     return this
   }
 
   fanIn(): Action {
     return this.parent
-  }
-
-  _prependStepId(step: Step): void {
-    step.id = `${this.id}->${step.id}`
   }
 }
 

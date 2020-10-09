@@ -2,7 +2,8 @@ import validate from '@segment/fab5-subscriptions'
 import { BadRequest } from 'http-errors'
 import got, { CancelableRequest, Got, Response } from 'got'
 import { Extensions, Action, Validate } from './action'
-import logger from '../logger'
+import Context from '../context'
+import { time, duration } from '../time'
 
 export interface DestinationConfig {
   name: string
@@ -34,6 +35,32 @@ interface TestAuthOptions {
 interface TestAuthSettings {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   settings: any
+}
+
+interface InstrumentSubscriptionParams {
+  context: Context
+  duration: number
+  destination: string
+  action: string
+  input: any
+  output: any
+}
+
+function instrumentSubscription({
+  context,
+  destination,
+  action,
+  duration,
+  input,
+  output
+}: InstrumentSubscriptionParams): void {
+  context.append('subscriptions', {
+    duration,
+    destination,
+    action,
+    input,
+    output
+  })
 }
 
 export class Destination {
@@ -111,17 +138,14 @@ export class Destination {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private isSubscribed(subscribe: any, event: any): any {
-    return validate(subscribe, event)
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private async runSubscription(
+    context: Context,
     subscription: any,
     payload: unknown,
     destinationSettings: Record<string, unknown>
   ): Promise<unknown> {
-    if (!this.isSubscribed(subscription.subscribe, payload)) {
+    const isSubscribed = validate(subscription.subscribe, payload)
+    if (!isSubscribed) {
       return 'not subscribed'
     }
 
@@ -131,36 +155,43 @@ export class Destination {
       throw new BadRequest(`"${actionSlug}" is not a valid action`)
     }
 
-    logger.info(`${actionSlug}: running`)
+    const subscriptionStartedAt = time()
 
-    // TODO better API for calling actionKit thingy
-    const result = await action._execute({
+    const input = {
       payload,
       settings: {
         ...destinationSettings,
         ...subscription.settings
       },
       mapping: subscription.mapping
-    })
+    }
 
-    logger.info(`${actionSlug}: done! result:`, result)
+    const result = await action._execute({ ...input })
+
+    const subscriptionEndedAt = time()
+    const subscriptionDuration = duration(subscriptionStartedAt, subscriptionEndedAt)
+
+    instrumentSubscription({
+      context,
+      duration: subscriptionDuration,
+      destination: this.name,
+      action: actionSlug,
+      input,
+      output: result
+    })
 
     return result
   }
 
   // TODO kinda gross but lets run with it for now.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public async onEvent(event: any, settings: Record<string, unknown>): Promise<unknown[]> {
-    logger.info(`Running destination: ${this.name}`)
-
+  public async onEvent(context: Context, event: any, settings: Record<string, unknown>): Promise<unknown[]> {
     const { subscriptions, ...settingsNoSubscriptions } = settings
-    const parsedSubscriptions = typeof subscriptions === 'string'
-      ? JSON.parse(subscriptions)
-      : subscriptions
+    const parsedSubscriptions = typeof subscriptions === 'string' ? JSON.parse(subscriptions) : subscriptions
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const promises = parsedSubscriptions.map((sub: unknown) => {
-      return this.runSubscription(sub, event, settingsNoSubscriptions)
+      return this.runSubscription(context, sub, event, settingsNoSubscriptions)
     })
 
     /**

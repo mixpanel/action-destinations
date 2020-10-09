@@ -24,14 +24,14 @@ steps:
           paths: ['node_modules/', 'dist/']
           save: true
 
-  - label: '🔒 Snyk Security Check'
-    agents:
-      queue: v1
-    plugins:
-      - ssh://git@github.com/segmentio/snyk-buildkite-plugin#v1.4.1:
-          runtime: npm
-          severity-threshold: high
-          fail-on: upgradable
+  # - label: '🔒 Snyk Security Check'
+  #   agents:
+  #     queue: v1
+  #   plugins:
+  #     - ssh://git@github.com/segmentio/snyk-buildkite-plugin#v1.4.1:
+  #         runtime: npm
+  #         severity-threshold: high
+  #         fail-on: upgradable
 
   - wait: ~
 

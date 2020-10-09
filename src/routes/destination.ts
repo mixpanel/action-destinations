@@ -4,6 +4,7 @@ import { IncomingHttpHeaders } from 'http'
 import { getDestinationByIdOrSlug } from '../destinations'
 import MIMEType from 'whatwg-mimetype'
 import { constructTrace, Span } from './tracing'
+import Context from '@/lib/context'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function parseJsonHeader(headers: IncomingHttpHeaders, header: string, fallback = null): any {
@@ -33,7 +34,7 @@ function parseContentType(req: Request): MIMEType {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function handleHttp(req: Request): Promise<any> {
+async function handleHttp(context: Context, req: Request): Promise<any> {
   const idOrSlug = req.params.destinationId
   const event = req.body
   const settings = parseJsonHeader(req.headers, 'centrifuge-settings')
@@ -41,7 +42,7 @@ async function handleHttp(req: Request): Promise<any> {
   // Try to map the id param to a slug, or treat it as the slug (easier local testing)
   const destination = getDestinationByIdOrSlug(idOrSlug)
 
-  const results = await destination.onEvent(event, settings)
+  const results = await destination.onEvent(context, event, settings)
 
   return results
 }
@@ -139,21 +140,29 @@ function constructCloudError(cloudEvent: CloudEvent, error: HttpError, tracing: 
   }
 }
 
-async function handleCloudEvent(destinationId: string, cloudEvent: CloudEvent): Promise<CloudEventResponse> {
+async function handleCloudEvent(
+  context: Context,
+  destinationId: string,
+  cloudEvent: CloudEvent
+): Promise<CloudEventResponse> {
   const { data, settings } = cloudEvent
   const start = new Date()
 
   try {
     const destination = getDestinationByIdOrSlug(destinationId)
-    const results = await destination.onEvent(data, settings)
+    const results = await destination.onEvent(context, data, settings)
     return constructCloudSuccess(cloudEvent, results, { start })
   } catch (err) {
     return constructCloudError(cloudEvent, err, { start })
   }
 }
 
-async function handleCloudEventBatch(destinationId: string, batch: CloudEvent[]): Promise<CloudEventResponse[]> {
-  const promises = batch.map(event => handleCloudEvent(destinationId, event))
+async function handleCloudEventBatch(
+  context: Context,
+  destinationId: string,
+  batch: CloudEvent[]
+): Promise<CloudEventResponse[]> {
+  const promises = batch.map(event => handleCloudEvent(context, destinationId, event))
   const results = await Promise.all(promises)
   return results
 }
@@ -164,12 +173,13 @@ async function handleCloudEventBatch(destinationId: string, batch: CloudEvent[])
 // TODO support `debug`?
 // TODO support `headers['centrifuge-features']`?
 async function destination(req: Request, res: Response): Promise<void> {
+  const { context } = req
   const destinationId = req.params.destinationId
   const contentType = parseContentType(req)
 
   if (isCloudEvent(contentType)) {
     if (isBatchedCloudEvent(contentType)) {
-      const result = await handleCloudEventBatch(destinationId, req.body)
+      const result = await handleCloudEventBatch(context, destinationId, req.body)
       res.set('Content-Type', 'application/cloudevents-batch+json; charset=utf-8')
       res.status(201)
       res.send(result)
@@ -177,7 +187,7 @@ async function destination(req: Request, res: Response): Promise<void> {
     }
 
     if (isStructuredCloudEvent(contentType)) {
-      const result = await handleCloudEvent(destinationId, req.body)
+      const result = await handleCloudEvent(context, destinationId, req.body)
       res.set('Content-Type', 'application/cloudevent+json; charset=utf-8')
       res.status(result.status)
       res.send(result)
@@ -187,7 +197,7 @@ async function destination(req: Request, res: Response): Promise<void> {
 
   // This will happen when the cloudevents flagon is disabled or when sending the event
   // via the "Segment Integration" plugin
-  const result = await handleHttp(req)
+  const result = await handleHttp(context, req)
   res.status(200)
   res.send(result)
 }
