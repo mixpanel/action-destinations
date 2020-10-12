@@ -19,17 +19,13 @@ See also: [Beginner's Guide][beginner]
 
 ## CLI
 
-The `./cli.js` command allows you to create destinations and actions from templates, deploy
-destinations, and run actions locally:
+The `./cli.js` command allows you to create destinations and actions from templates and run actions locally:
 
 ```
 cli.js <command>
 
 Commands:
   cli.js run-local <action>                 Run a partner action locally.
-  cli.js deploy [workspace]                 Deploy Fab 5 functions to a workspace.
-  cli.js undeploy [workspace]               Delete Fab 5 functions from a workspace.
-  cli.js list-deployed [workspace]          List deployed Fab 5 destinations.
   cli.js new-destination <slug>             Create a new destination from a template.
   cli.js new-action <destination> <action>  Create a new action from a template.
 
@@ -56,46 +52,6 @@ To test actions locally, you can use `./cli.js run-local`. For example:
 
 ```
 ./cli.js run-local ./dist/src/destinations/slack/postToChannel -i ./sample/slack
-MapInput1: Starting
-MapInput1: Finished (30 ms)
-Validate2: Starting
-Validate2: Finished (1 ms)
-Validate3: Starting
-Validate3: Finished (<1 ms)
-FanOut4: Starting
-FanOut4->Request5: Starting
-FanOut4->Request5: Finished (329 ms)
-FanOut4: Finished (330 ms)
-Result: [
-  {
-    step: 'MapInput1',
-    output: undefined,
-    error: null,
-    startedAt: 2020-06-18T18:30:49.365Z,
-    finishedAt: 2020-06-18T18:30:49.395Z
-  },
-  {
-    step: 'Validate2',
-    output: undefined,
-    error: null,
-    startedAt: 2020-06-18T18:30:49.395Z,
-    finishedAt: 2020-06-18T18:30:49.396Z
-  },
-  {
-    step: 'Validate3',
-    output: undefined,
-    error: null,
-    startedAt: 2020-06-18T18:30:49.396Z,
-    finishedAt: 2020-06-18T18:30:49.396Z
-  },
-  {
-    step: 'FanOut4',
-    output: [ [Array] ],
-    error: null,
-    startedAt: 2020-06-18T18:30:49.396Z,
-    finishedAt: 2020-06-18T18:30:49.726Z
-  }
-]
 ```
 
 ## Inspecting
