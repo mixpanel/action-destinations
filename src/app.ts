@@ -5,6 +5,8 @@ import errorHandler from './middleware/error-handler'
 
 const app = express()
 
+app.disable('x-powered-by')
+
 // Causes `req.ip` to be set to the `X-Forwarded-For` header value, which is set by the ELB
 app.set('trust proxy', true)
 
