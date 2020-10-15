@@ -166,7 +166,7 @@ export class Destination {
       mapping: subscription.mapping
     }
 
-    const result = await action._execute({ ...input })
+    const result = await action._execute(input)
 
     const subscriptionEndedAt = time()
     const subscriptionDuration = duration(subscriptionStartedAt, subscriptionEndedAt)

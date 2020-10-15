@@ -145,8 +145,11 @@ async function handleCloudEvent(
   destinationId: string,
   cloudEvent: CloudEvent
 ): Promise<CloudEventResponse> {
-  const { data, settings } = cloudEvent
+  const { data, settings, destination, source } = cloudEvent
   const start = new Date()
+
+  context.set('req_destination', destination)
+  context.set('req_source', source)
 
   try {
     const destination = getDestinationByIdOrSlug(destinationId)

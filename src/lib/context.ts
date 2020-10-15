@@ -16,6 +16,8 @@ interface Fields {
   // Service
   req_route?: string
   req_duration?: number
+  req_source?: string
+  req_destination?: string
   error?: unknown
 
   // Subscriptions executed during the request
@@ -47,6 +49,8 @@ export default class Context {
     http_res_size: undefined,
     req_route: undefined,
     req_duration: undefined,
+    req_source: undefined,
+    req_destination: undefined,
     error: undefined,
     subscriptions: []
   }
