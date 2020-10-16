@@ -15,7 +15,7 @@ export default function(action: Action): Action {
 
     .cachedRequest({
       ttl: 60,
-      key: ({ payload }) => payload.identifier,
+      key: ({ payload }) => payload.identifier as string,
       value: async (req, { payload }) => {
         const search = await req.get('organizations/search', {
           searchParams: { term: payload.identifier }

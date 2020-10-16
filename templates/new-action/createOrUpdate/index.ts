@@ -11,7 +11,7 @@ export default function(action: Action): Action {
 
     .cachedRequest({
       ttl: 60,
-      key: ({ payload }) => payload.email,
+      key: ({ payload }) => payload.email as string,
       value: async (req, { payload }) => {
         const user = await req.get<GetUserResponse>('users/search', {
           searchParams: { email: payload.email }

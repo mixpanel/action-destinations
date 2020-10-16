@@ -1,7 +1,8 @@
 import validate from '@segment/fab5-subscriptions'
 import { BadRequest } from 'http-errors'
 import got, { CancelableRequest, Got, Response } from 'got'
-import { Extensions, Action, Validate, StepResult } from './action'
+import { Extensions, Action, Validate } from './action'
+import { ExecuteInput, StepResult } from './step'
 import Context, { Subscriptions } from '../context'
 import { time, duration } from '../time'
 import { JSONObject } from '../json-object'
@@ -50,25 +51,25 @@ function instrumentSubscription(context: Context, input: Subscriptions): void {
 }
 
 export class Destination {
-  name: string
+  config: DestinationConfig
   defaultSubscriptions: Subscription[]
   partnerActions: PartnerActions
   requestExtensions: Extensions
   settingsSchema?: object
   auth?: TestAuth
+  responses: Response[]
 
   constructor(config: DestinationConfig) {
-    // TODO validate config with JSON schema
-    this.name = config.name
-    this.defaultSubscriptions = config.defaultSubscriptions
+    this.config = config
     this.partnerActions = {}
     this.requestExtensions = []
     this.settingsSchema = undefined
     this.auth = undefined
+    this.responses = []
   }
 
-  extendRequest(...fns: Extensions): Destination {
-    this.requestExtensions.push(...fns)
+  extendRequest(...extensions: Extensions): Destination {
+    this.requestExtensions.push(...extensions)
     return this
   }
 
@@ -87,42 +88,48 @@ export class Destination {
   }
 
   async testCredentials(settings: JSONObject): Promise<void> {
-    const context = { settings }
+    const context: ExecuteInput = { settings, payload: {} }
 
     if (this.settingsSchema) {
-      new Validate('', 'settings', this.settingsSchema)._execute(context)
+      const step = new Validate('', 'settings', this.settingsSchema)
+      await step.executeStep(context)
     }
 
     if (!this.auth) {
       return
     }
 
-    const req = this.requestExtensions.reduce(
-      (acc, fn) => acc.extend(fn(context)),
-      got.extend({
-        retry: 0,
-        timeout: 3000,
-        headers: {
-          'user-agent': undefined
-        }
-      })
-    )
+    let request = got.extend({
+      retry: 0,
+      timeout: 3000,
+      headers: {
+        'user-agent': undefined
+      }
+    })
+
+    for (const extension of this.requestExtensions) {
+      request = request.extend(extension(context))
+    }
 
     try {
-      await this.auth.options.testCredentials(req, { settings })
+      await this.auth.options.testCredentials(request, { settings })
     } catch (error) {
       throw new Error('Credentials are invalid')
     }
   }
 
-  // TODO move slug and description to action.json files
-  partnerAction(slug: string, fn: Function): Destination {
-    const a = new Action().extendRequest(...this.requestExtensions)
-    this.partnerActions[slug] = fn(a)
+  public partnerAction(slug: string, actionFn: (action: Action) => Action): Destination {
+    const action = new Action().extendRequest(...this.requestExtensions)
+
+    action.on('response', response => {
+      this.responses.push(response)
+    })
+
+    this.partnerActions[slug] = actionFn(action)
     return this
   }
 
-  private async runSubscription(
+  private async onSubscription(
     context: Context,
     subscription: Subscription,
     payload: JSONObject,
@@ -130,11 +137,7 @@ export class Destination {
   ): Promise<StepResult[]> {
     const isSubscribed = validate(subscription.subscribe, payload)
     if (!isSubscribed) {
-      return [
-        {
-          output: 'not subscribed'
-        }
-      ]
+      return [{ output: 'not subscribed' }]
     }
 
     const actionSlug = subscription.partnerAction
@@ -145,7 +148,7 @@ export class Destination {
 
     const subscriptionStartedAt = time()
 
-    const input = {
+    const input: ExecuteInput = {
       payload,
       settings: {
         ...settings,
@@ -154,20 +157,20 @@ export class Destination {
       mapping: subscription.mapping
     }
 
-    const result = await action._execute(input)
+    const results = await action.execute(input)
 
     const subscriptionEndedAt = time()
     const subscriptionDuration = duration(subscriptionStartedAt, subscriptionEndedAt)
 
     instrumentSubscription(context, {
       duration: subscriptionDuration,
-      destination: this.name,
+      destination: this.config.name,
       action: actionSlug,
       input,
-      output: result
+      output: results
     })
 
-    return result
+    return results
   }
 
   /**
@@ -178,7 +181,7 @@ export class Destination {
     const subscriptions = getSubscriptions(settings)
     const destinationSettings = getDestinationSettings(settings)
 
-    const promises = subscriptions.map(s => this.runSubscription(context, s, event, destinationSettings))
+    const promises = subscriptions.map(s => this.onSubscription(context, s, event, destinationSettings))
 
     const results = await Promise.all(promises)
 

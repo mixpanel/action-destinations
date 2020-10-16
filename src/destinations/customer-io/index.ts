@@ -10,38 +10,40 @@ import trackAnonymousEvent from './trackAnonymousEvent'
 import trackEvent from './trackEvent'
 import triggerCampaign from './triggerCampaign'
 
-const destination = new Destination(config)
-  .validateSettings(settings)
+export default function createDestination(): Destination {
+  const destination = new Destination(config)
+    .validateSettings(settings)
 
-  .extendRequest(({ settings }) => {
-    const userPass = Buffer.from(`${settings.siteId}:${settings.apiKey}`)
+    .extendRequest(({ settings }) => {
+      const userPass = Buffer.from(`${settings.siteId}:${settings.apiKey}`)
 
-    return {
-      prefixUrl: 'https://track.customer.io/api/v1',
-      headers: {
-        Authorization: `Basic ${userPass.toString('base64')}`
-      },
-      responseType: 'json'
-    }
-  })
-
-  .apiKeyAuth({
-    testCredentials: (req, { settings }) => {
-      return req('https://beta-api.customer.io/v1/api/segments', {
-        prefixUrl: '',
+      return {
+        prefixUrl: 'https://track.customer.io/api/v1',
         headers: {
-          authorization: `Bearer ${settings.appApiKey}`
-        }
-      })
-    }
-  })
+          Authorization: `Basic ${userPass.toString('base64')}`
+        },
+        responseType: 'json'
+      }
+    })
 
-  .partnerAction('addPersonToSegment', addPersonToSegment)
-  .partnerAction('createUpdateDevice', createUpdateDevice)
-  .partnerAction('createUpdatePerson', createUpdatePerson)
-  .partnerAction('removePersonFromSegment', removePersonFromSegment)
-  .partnerAction('trackAnonymousEvent', trackAnonymousEvent)
-  .partnerAction('trackEvent', trackEvent)
-  .partnerAction('triggerCampaign', triggerCampaign)
+    .apiKeyAuth({
+      testCredentials: (req, { settings }) => {
+        return req('https://beta-api.customer.io/v1/api/segments', {
+          prefixUrl: '',
+          headers: {
+            authorization: `Bearer ${settings.appApiKey}`
+          }
+        })
+      }
+    })
 
-export default destination
+    .partnerAction('addPersonToSegment', addPersonToSegment)
+    .partnerAction('createUpdateDevice', createUpdateDevice)
+    .partnerAction('createUpdatePerson', createUpdatePerson)
+    .partnerAction('removePersonFromSegment', removePersonFromSegment)
+    .partnerAction('trackAnonymousEvent', trackAnonymousEvent)
+    .partnerAction('trackEvent', trackEvent)
+    .partnerAction('triggerCampaign', triggerCampaign)
+
+  return destination
+}

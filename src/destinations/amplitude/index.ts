@@ -7,11 +7,13 @@ import identifyUser from './identifyUser'
 import annotateChart from './annotateChart'
 import deleteUser from './deleteUser'
 
-const destination = new Destination(config)
-  .validateSettings(settings)
-  .partnerAction('trackUser', trackUser)
-  .partnerAction('identifyUser', identifyUser)
-  .partnerAction('annotateChart', annotateChart)
-  .partnerAction('deleteUser', deleteUser)
+export default function createDestination(): Destination {
+  const destination = new Destination(config)
+    .validateSettings(settings)
+    .partnerAction('trackUser', trackUser)
+    .partnerAction('identifyUser', identifyUser)
+    .partnerAction('annotateChart', annotateChart)
+    .partnerAction('deleteUser', deleteUser)
 
-export default destination
+  return destination
+}

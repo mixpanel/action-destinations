@@ -7,7 +7,7 @@ export default function(action: Action): Action {
 
     .cachedRequest({
       ttl: 10,
-      key: ({ payload }) => payload.number,
+      key: ({ payload }) => payload.number as string,
       value: async (req, { payload }) => {
         const url = `http://numbersapi.com/${payload.number}/trivia`
         const resp = await req.get(url, { responseType: 'text' })

@@ -6,7 +6,8 @@ import MIMEType from 'whatwg-mimetype'
 import { constructTrace, Span } from './tracing'
 import Context from '@/lib/context'
 import { JSONObject } from '@/lib/json-object'
-import { StepResult } from '@/lib/destination-kit/action'
+import { StepResult } from '@/lib/destination-kit/step'
+import getEventTesterData, { EventTesterRequest } from './event-tester'
 
 function parseJsonHeader(headers: IncomingHttpHeaders, header: string, fallback = undefined): JSONObject | undefined {
   const raw = headers[header]
@@ -77,16 +78,22 @@ interface CloudEventResponse {
   type: string
   time: string
   status: number
-  data: StepResult | StepResult[] | CloudEventErrorData
+  data: CloudEventSuccessData | CloudEventErrorData
   errortype?: string
   errormessage?: string
   trace?: Span
+}
+
+interface CloudEventSuccessData {
+  results: StepResult | StepResult[]
+  requestsToDestination: EventTesterRequest[]
 }
 
 interface CloudEventErrorData {
   status: number
   name: string
   message: string
+  requestsToDestination: EventTesterRequest[]
 }
 
 interface RequestTracing {
@@ -96,6 +103,7 @@ interface RequestTracing {
 function constructCloudSuccess(
   cloudEvent: CloudEvent,
   result: StepResult[],
+  eventTesterRequests: EventTesterRequest[],
   tracing: RequestTracing
 ): CloudEventResponse {
   return {
@@ -106,7 +114,10 @@ function constructCloudSuccess(
     type: 'com.segment.event.ack',
     time: new Date().toISOString(),
     status: 201,
-    data: getSuccessData(result),
+    data: {
+      results: getSuccessData(result),
+      requestsToDestination: eventTesterRequests
+    },
     trace: constructTrace({
       name: 'invoke',
       start: tracing.start,
@@ -124,7 +135,12 @@ function getSuccessData(result: StepResult[]): StepResult | StepResult[] {
   return result
 }
 
-function constructCloudError(cloudEvent: CloudEvent, error: HttpError, tracing: RequestTracing): CloudEventResponse {
+function constructCloudError(
+  cloudEvent: CloudEvent,
+  error: HttpError,
+  eventTesterRequests: EventTesterRequest[],
+  tracing: RequestTracing
+): CloudEventResponse {
   const statusCode = error?.status ?? error?.response?.statusCode ?? 500
   const message = error?.message ?? 'Unknown error'
 
@@ -139,7 +155,8 @@ function constructCloudError(cloudEvent: CloudEvent, error: HttpError, tracing: 
     data: {
       status: statusCode,
       name: error?.name,
-      message
+      message,
+      requestsToDestination: eventTesterRequests
     },
     // TODO support all error types
     errortype: 'MESSAGE_REJECTED',
@@ -157,18 +174,20 @@ async function handleCloudEvent(
   destinationId: string,
   cloudEvent: CloudEvent
 ): Promise<CloudEventResponse> {
-  const { data, settings, destination, source } = cloudEvent
   const start = new Date()
 
-  context.set('req_destination', destination)
-  context.set('req_source', source)
+  context.set('req_destination', cloudEvent.destination)
+  context.set('req_source', cloudEvent.source)
+
+  const destination = getDestinationByIdOrSlug(destinationId)
 
   try {
-    const destination = getDestinationByIdOrSlug(destinationId)
-    const results = await destination.onEvent(context, data, settings)
-    return constructCloudSuccess(cloudEvent, results, { start })
+    const results = await destination.onEvent(context, cloudEvent.data, cloudEvent.settings)
+    const eventTesterData = getEventTesterData(destination.responses)
+    return constructCloudSuccess(cloudEvent, results, eventTesterData, { start })
   } catch (err) {
-    return constructCloudError(cloudEvent, err, { start })
+    const eventTesterData = getEventTesterData(destination.responses)
+    return constructCloudError(cloudEvent, err, eventTesterData, { start })
   }
 }
 

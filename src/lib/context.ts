@@ -1,4 +1,5 @@
 import { IncomingHttpHeaders, OutgoingHttpHeaders } from 'http'
+import { ExecuteInput, StepResult } from './destination-kit/step'
 import logger, { LEVEL } from './logger'
 import stats from './stats'
 
@@ -28,8 +29,8 @@ export interface Subscriptions {
   duration: number
   destination: string
   action: string
-  input: any
-  output: any
+  input: ExecuteInput
+  output: StepResult[]
 }
 
 type SetFields = Exclude<keyof Fields, AppendFields>

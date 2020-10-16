@@ -9,80 +9,78 @@ the action's schema.
 
 ![Destinations 2.0 flow][architecture]
 
-Using the included `./cli.js` command, you can deploy the Fab 5 destinations to staging or, from
-a workbench, production.
-
 See also: [Beginner's Guide][beginner]
 
 [architecture]: https://user-images.githubusercontent.com/111501/83700205-10f23e80-a5bb-11ea-9fbe-b1b10c1ed464.png
 [beginner]: https://paper.dropbox.com/doc/Fab-5-Engine-Beginners-Guide--A2~KoOcu4qM1rlyX_ZfpyCFTAg-BMfDUPaKMvghmXEtaZpq2
 
-## CLI
-
-The `./cli.js` command allows you to create destinations and actions from templates and run actions locally:
-
 ```
-cli.js <command>
-
-Commands:
-  cli.js run-local <action>                 Run a partner action locally.
-  cli.js new-destination <slug>             Create a new destination from a template.
-  cli.js new-action <destination> <action>  Create a new action from a template.
-
-Options:
-  --version  Show version number  [boolean]
-  --help     Show help  [boolean]
-```
-
-To run commands in staging, run `robo sshuttle` in another terminal session on your local machine
-and then run `./cli.js` locally. To run commands in production, SSH in to the workbench and check
-out this repository:
-
-```
-% robo prod.ssh
-% git clone git@github.com:segmentio/fab-5-engine.git
-% cd fab-5-engine
-% yarn install
-% ./cli.js
+$ robo prod.ssh
+$ git clone git@github.com:segmentio/fab-5-engine.git
+$ cd fab-5-engine
+$ yarn install
 ```
 
 ## Test Actions Locally
 
-To test actions locally, you can use `./cli.js run-local`. For example:
+To test actions locally, you send a curl request. For example:
 
-```
-./cli.js run-local ./dist/src/destinations/slack/postToChannel -i ./sample/slack
-```
-
-## Inspecting
-
-If you want to dump the definition metadata for all destinations, run this:
-
-```
-$ node -e "console.log(JSON.stringify(require('./destinations')()))"
-[
-  {
-    "name": "No-op",
-    "defaultSubscriptions": [
-      {
-        "subscribe": "all",
-        "partnerAction": "noop"
-      }
-    ],
-    "slug": "noop",
-    "path": "/Users/tysonmote/dev/src/github.com/segmentio/fab-5-engine/destinations/noop",
-    "settings": [],
-    "partnerActions": [
-      {
-        "slug": "noop",
-        "settings": [],
-        "mapping": null,
-        "schema": null,
-        "code": "require('../../../lib/action-kit')\n\nmodule.exports = action()\n ..."
-      }
-    ]
-  },
-...
+```sh
+curl --request POST \
+  --url http://localhost:3000/actions/5f7dd8e302173ff732db5cc4 \
+  --header 'content-type: application/cloudevents-batch+json' \
+  --data '[
+	{
+		"id": "dkjfksldfjiuhfenjk",
+		"source": "some-source",
+		"destination": "slack",
+		"data": {
+			"channel": "server",
+			"context": {
+				"library": {
+					"name": "unknown",
+					"version": "unknown"
+				}
+			},
+			"event": "Example Event",
+			"integrations": {},
+			"messageId": "api-1iI59hvBEtckNicjbfqG7VdjRw2",
+			"projectId": "29qHxXL9muph5R19vwAnDP",
+			"properties": {
+				"text": "Hello, from dev :blobcatwave:!"
+			},
+			"receivedAt": "2020-10-01T19:55:15.068Z",
+			"timestamp": "2020-10-01T19:55:15.068Z",
+			"type": "track",
+			"userId": "sloth@segment.com",
+			"version": 2
+		},
+		"settings": {
+			"subscriptions":  [
+			{
+				"mapping": {
+					"channel": "test-fab-5",
+					"url": "https://hooks.slack.com/services/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",
+					"text": {
+						"@template": "Event = {{event}}, properties.text = {{properties.text}}"
+					}
+				},
+				"partnerAction": "postToChannel",
+				"subscribe": {
+					"operator": "and",
+					"children": [
+						{
+							"operator": "=",
+							"type": "event-type",
+							"value": "track"
+						}
+					]
+				}
+			}
+		]
+		}
+	}
+]'
 ```
 
 ## Configuring

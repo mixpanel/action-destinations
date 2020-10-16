@@ -1,73 +1,16 @@
 import { map } from '../mapping-kit'
-import Ajv from 'ajv' // JSON Schema validator
+import Ajv from 'ajv'
 import { AggregateAjvError } from '@segment/ajv-human-errors'
 import { JSONPath } from 'jsonpath-plus'
-import got, { ExtendOptions, Got } from 'got'
+import got, { ExtendOptions, Got, Response } from 'got'
 import NodeCache from 'node-cache'
+import { EventEmitter } from 'events'
 import get from 'lodash/get'
 import { JSONObject } from '../json-object'
-
-export interface StepResult {
-  output?: JSONObject | string | null | undefined
-  error?: JSONObject | null
-}
-
-// Step is the base class for all discrete execution steps. It handles executing the step, logging,
-// catching errors, and returning a result object.
-class Step {
-  async execute(ctx: ExecuteInput): Promise<StepResult> {
-    const result: StepResult = {
-      output: null,
-      error: null
-    }
-
-    try {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      result.output = await this._execute(ctx)
-    } catch (e) {
-      result.error = e
-    }
-
-    return result
-  }
-}
-
-// Steps is a list of one or more Step instances that can be executed in-order.
-class Steps {
-  steps: Step[]
-
-  constructor() {
-    this.steps = []
-  }
-
-  push(step: Step): void {
-    this.steps.push(step)
-  }
-
-  async execute(ctx: ExecuteInput): Promise<StepResult[]> {
-    if (this.steps.length === 0) {
-      throw new Error('no steps defined')
-    }
-
-    const results: StepResult[] = []
-
-    for (const step of this.steps) {
-      const result = await step.execute(ctx)
-
-      results.push(result)
-
-      if (result.error) {
-        break
-      }
-    }
-
-    return results
-  }
-}
+import { Step, Steps, StepResult, ExecuteInput } from './step'
 
 class MapInput extends Step {
-  _execute(ctx: ExecuteInput): void {
+  executeStep(ctx: ExecuteInput): Promise<string> {
     if (ctx.settings) {
       ctx.settings = map(ctx.settings, ctx.payload)
     }
@@ -75,6 +18,8 @@ class MapInput extends Step {
     if (ctx.mapping) {
       ctx.payload = map(ctx.mapping, ctx.payload)
     }
+
+    return Promise.resolve('MapInput completed')
   }
 }
 
@@ -105,10 +50,12 @@ export class Validate extends Step {
     this.validate = ajv.compile(schema)
   }
 
-  _execute(ctx: ExecuteInput): void {
+  executeStep(ctx: ExecuteInput): Promise<string> {
     if (!this.validate(ctx[this.field])) {
       throw new AggregateAjvError(this.validate.errors)
     }
+
+    return Promise.resolve('Validate completed')
   }
 }
 
@@ -122,45 +69,54 @@ class MapPayload extends Step {
     this.options = options
   }
 
-  _execute(ctx: ExecuteInput): void {
+  executeStep(ctx: ExecuteInput): Promise<string> {
     ctx.payload = map(this.mapping, ctx.payload, this.options)
+    return Promise.resolve('MapPayload completed')
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Extensions = ((ctx: ExecuteInput) => ExtendOptions)[]
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type RequestFn = (req: Got, ctx: any) => any
 
-// Request handles delivering a payload to an external API. It uses the `got` library under the
-// hood.
-//
-// The callback should be  able to return the raw request instead of needing to do `return
-// response.data` etc.
+/**
+ * Request handles delivering a payload to an external API. It uses the `got` library under the hood.
+ *
+ * The callback should be  able to return the raw request instead of needing to do `return response.data` etc.
+ */
 class Request extends Step {
-  fn: RequestFn | undefined
+  requestFn: RequestFn | undefined
   extensions: Extensions
 
-  constructor(extensions: Extensions, fn?: RequestFn) {
+  constructor(extensions: Extensions, requestFn?: RequestFn) {
     super()
     this.extensions = extensions || []
-    this.fn = fn
+    this.requestFn = requestFn
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async _execute(ctx: ExecuteInput): Promise<any> {
-    if (!this.fn) {
-      return
+  async executeStep(ctx: ExecuteInput): Promise<string> {
+    if (!this.requestFn) {
+      return ''
     }
 
-    const request = this.baseRequest(ctx)
-    const response = await this.fn(request, ctx)
+    const baseRequest = this.baseRequest(ctx)
+    const request = this.requestFn(baseRequest, ctx)
+
+    let response: Response
+    try {
+      response = await request
+      this.emit('response', response)
+    } catch (e) {
+      this.emit('response', e.response)
+      throw e
+    }
+
     if (response === null) {
       return 'TODO: null'
     }
 
-    return response.body
+    return response.body as string
   }
 
   baseRequest(ctx: ExecuteInput): Got {
@@ -184,8 +140,7 @@ class Request extends Step {
 }
 
 interface CachedRequestConfig {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  key: (ctx: any) => string
+  key: (ctx: ExecuteInput) => string
   value: RequestFn
   as: string
   ttl: number
@@ -214,7 +169,7 @@ class CachedRequest extends Request {
     })
   }
 
-  async _execute(ctx: ExecuteInput): Promise<string> {
+  async executeStep(ctx: ExecuteInput): Promise<string> {
     const k = this.keyFn(ctx)
     let v = this.cache.get(k)
 
@@ -222,10 +177,10 @@ class CachedRequest extends Request {
       return 'cache hit'
     }
 
-    const req = this.baseRequest(ctx)
+    const request = this.baseRequest(ctx)
 
     try {
-      v = await this.valueFn(req, ctx)
+      v = await this.valueFn(request, ctx)
     } catch (e) {
       if (get(e, 'response.statusCode') === 404) {
         v = null
@@ -255,8 +210,7 @@ class Do extends Step {
     this.fn = fn
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async _execute(ctx: ExecuteInput): Promise<any> {
+  async executeStep(ctx: ExecuteInput): Promise<string> {
     return await this.fn(ctx)
   }
 }
@@ -266,7 +220,9 @@ interface FanOutOptions {
   as: string
 }
 
-// FanOut allows us to make multiple external requests in parallel based on a given array of values.
+/**
+ * FanOut allows us to make multiple external requests in parallel based on a given array of values.
+ */
 class FanOut extends Step {
   parent: Action
   steps: Steps
@@ -281,17 +237,15 @@ class FanOut extends Step {
     this.requestExtensions = []
   }
 
-  // --
-
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async _execute(ctx: ExecuteInput): Promise<any> {
+  async executeStep(ctx: ExecuteInput): Promise<any> {
     const values = this._on(this.opts.on, ctx)
 
     // Run steps for all values in parallel.
     return await Promise.all(
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       values.map((val: any) => {
-        return this._executeForValue.bind(this)(ctx, this.opts.as, val)
+        return this.executeForValue.bind(this)(ctx, this.opts.as, val)
       })
     )
   }
@@ -329,7 +283,7 @@ class FanOut extends Step {
   // Execute each step of the fan-out in sequence with the given context and
   // fan-out key/value pair.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async _executeForValue(ctx: ExecuteInput, key: string, value: any): Promise<any> {
+  async executeForValue(ctx: ExecuteInput, key: string, value: any): Promise<any> {
     // TODO handle ctx better, maybe propagate manually
     const ctxWithValue = {
       ...ctx,
@@ -393,35 +347,37 @@ interface FieldMapping {
   }
 }
 
-interface ExecuteInput {
+interface ExecuteAutocompleteInput {
   settings: JSONObject
-  payload?: JSONObject
-  mapping?: JSONObject
+  payload: JSONObject
+  page: string
 }
 
 type ExecuteInputField = 'payload' | 'settings' | 'mapping'
 
-// Action is the beginning step for all partner actions. Entrypoints always start with the
-// MapAndValidateInput step.
-export class Action extends Step {
+/**
+ * Action is the beginning step for all partner actions. Entrypoints always start with the
+ * MapAndValidateInput step.
+ */
+export class Action extends EventEmitter {
   steps: Steps
   requestExtensions: Extensions
-  _autocomplete: { [key: string]: RequestFn }
+  private autocompleteCache: { [key: string]: RequestFn }
 
   constructor() {
     super()
+
     this.steps = new Steps()
-    this.steps.push(new MapInput())
+    const step = new MapInput()
+    this.steps.push(step)
+
     this.requestExtensions = []
-    this._autocomplete = {}
+    this.autocompleteCache = {}
   }
 
-  // -- entrypoint
-
-  async _execute(ctx: ExecuteInput): Promise<StepResult[]> {
+  async execute(ctx: ExecuteInput): Promise<StepResult[]> {
     const results = await this.steps.execute(ctx)
 
-    // TODO don't throw
     const finalResult = results[results.length - 1]
     if (finalResult.error) {
       throw finalResult.error
@@ -429,8 +385,6 @@ export class Action extends Step {
 
     return results
   }
-
-  // -- builder functions
 
   validateSettings(schema: object): Action {
     const step = new Validate('Settings are invalid:', 'settings', schema)
@@ -445,28 +399,27 @@ export class Action extends Step {
   }
 
   autocomplete(field: string, callback: RequestFn): Action {
-    this._autocomplete[field] = callback
+    this.autocompleteCache[field] = callback
     return this
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  executeAutocomplete(field: string, ctx: any): any {
-    if (!this._autocomplete[field]) {
+  executeAutocomplete(field: string, ctx: ExecuteAutocompleteInput): any {
+    if (!this.autocompleteCache[field]) {
       return {
         data: [],
         pagination: {}
       }
     }
 
-    const step = new Request(this.requestExtensions, this._autocomplete[field])
+    const step = new Request(this.requestExtensions, this.autocompleteCache[field])
 
-    return step._execute(ctx)
+    return step.executeStep(ctx)
   }
 
   mapField(path: string, fieldMapping: FieldMapping): Action {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    let pathParts = JSONPath.toPathArray(path)
+    let pathParts: string[] = JSONPath.toPathArray(path)
     if (pathParts[0] === '$') {
       pathParts = pathParts.slice(1)
     }
@@ -504,14 +457,18 @@ export class Action extends Step {
     return step
   }
 
-  extendRequest(...fns: Extensions): Action {
-    this.requestExtensions.push(...fns)
+  extendRequest(...extensionFns: Extensions): Action {
+    this.requestExtensions.push(...extensionFns)
     return this
   }
 
-  request(fn: RequestFn): Action {
-    const step = new Request(this.requestExtensions, fn)
+  request(requestFn: RequestFn): Action {
+    const step = new Request(this.requestExtensions, requestFn)
+
+    step.on('response', response => this.emit('response', response))
+
     this.steps.push(step)
+
     return this
   }
 
