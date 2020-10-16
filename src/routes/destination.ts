@@ -5,9 +5,10 @@ import { getDestinationByIdOrSlug } from '../destinations'
 import MIMEType from 'whatwg-mimetype'
 import { constructTrace, Span } from './tracing'
 import Context from '@/lib/context'
+import { JSONObject } from '@/lib/json-object'
+import { StepResult } from '@/lib/destination-kit/action'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function parseJsonHeader(headers: IncomingHttpHeaders, header: string, fallback = null): any {
+function parseJsonHeader(headers: IncomingHttpHeaders, header: string, fallback = undefined): JSONObject | undefined {
   const raw = headers[header]
   if (!raw || Array.isArray(raw)) {
     return fallback
@@ -33,8 +34,7 @@ function parseContentType(req: Request): MIMEType {
   return new MIMEType('application/octet-stream')
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function handleHttp(context: Context, req: Request): Promise<any> {
+async function handleHttp(context: Context, req: Request): Promise<StepResult[]> {
   const idOrSlug = req.params.destinationId
   const event = req.body
   const settings = parseJsonHeader(req.headers, 'centrifuge-settings')
@@ -59,16 +59,14 @@ function isStructuredCloudEvent(contentType: MIMEType): boolean {
   return contentType.type === 'application' && contentType.subtype === 'cloudevents+json'
 }
 
-type JsonObject<T = unknown> = Record<string, T>
-
 interface CloudEvent {
   id: string
   source: string
   destination: string
   specversion: string
   type: string
-  data: JsonObject
-  settings: JsonObject
+  data: JSONObject
+  settings: JSONObject
 }
 
 interface CloudEventResponse {
@@ -79,22 +77,27 @@ interface CloudEventResponse {
   type: string
   time: string
   status: number
-  data: JsonObject | JsonObject[]
+  data: StepResult | StepResult[] | CloudEventErrorData
   errortype?: string
   errormessage?: string
   trace?: Span
+}
+
+interface CloudEventErrorData {
+  status: number
+  name: string
+  message: string
 }
 
 interface RequestTracing {
   start: Date
 }
 
-function constructCloudSuccess(cloudEvent: CloudEvent, data: any, tracing: RequestTracing): CloudEventResponse {
-  // Unwrap first item when it's the only one so `data` maps 1:1 with the request
-  if (Array.isArray(data) && data.length === 1) {
-    data = data[0]
-  }
-
+function constructCloudSuccess(
+  cloudEvent: CloudEvent,
+  result: StepResult[],
+  tracing: RequestTracing
+): CloudEventResponse {
   return {
     id: cloudEvent.id,
     source: cloudEvent.source,
@@ -103,13 +106,22 @@ function constructCloudSuccess(cloudEvent: CloudEvent, data: any, tracing: Reque
     type: 'com.segment.event.ack',
     time: new Date().toISOString(),
     status: 201,
-    data,
+    data: getSuccessData(result),
     trace: constructTrace({
       name: 'invoke',
       start: tracing.start,
       duration: Date.now() - tracing.start.getTime()
     })
   }
+}
+
+function getSuccessData(result: StepResult[]): StepResult | StepResult[] {
+  // Unwrap first item when it's the only one so `data` maps 1:1 with the request
+  if (Array.isArray(result) && result.length === 1) {
+    return result[0]
+  }
+
+  return result
 }
 
 function constructCloudError(cloudEvent: CloudEvent, error: HttpError, tracing: RequestTracing): CloudEventResponse {

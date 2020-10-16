@@ -12,7 +12,7 @@ const destination = new Destination(config)
   .extendRequest(({ settings }) => ({
     prefixUrl: `https://${settings.domain}.pipedrive.com/api/v1/`,
     searchParams: {
-      api_token: settings.apiToken
+      api_token: settings.apiToken as string
     },
     responseType: 'json'
   }))

@@ -1,22 +1,25 @@
 import validate from '@segment/fab5-subscriptions'
 import { BadRequest } from 'http-errors'
 import got, { CancelableRequest, Got, Response } from 'got'
-import { Extensions, Action, Validate } from './action'
-import Context from '../context'
+import { Extensions, Action, Validate, StepResult } from './action'
+import Context, { Subscriptions } from '../context'
 import { time, duration } from '../time'
+import { JSONObject } from '../json-object'
 
 export interface DestinationConfig {
   name: string
-  defaultSubscriptions: SubscriptionConfig[]
+  defaultSubscriptions: Subscription[]
 }
 
-interface SubscriptionConfig {
+interface Subscription {
+  partnerAction: string
   subscribe:
     | string
     | {
         type: string
       }
-  partnerAction: string
+  settings?: JSONObject
+  mapping?: JSONObject
 }
 
 interface PartnerActions {
@@ -33,39 +36,22 @@ interface TestAuthOptions {
 }
 
 interface TestAuthSettings {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  settings: any
+  settings: JSONObject
 }
 
-interface InstrumentSubscriptionParams {
-  context: Context
-  duration: number
-  destination: string
-  action: string
-  input: any
-  output: any
-}
-
-function instrumentSubscription({
-  context,
-  destination,
-  action,
-  duration,
-  input,
-  output
-}: InstrumentSubscriptionParams): void {
+function instrumentSubscription(context: Context, input: Subscriptions): void {
   context.append('subscriptions', {
-    duration,
-    destination,
-    action,
-    input,
-    output
+    duration: input.duration,
+    destination: input.destination,
+    action: input.action,
+    input: input.input,
+    output: input.output
   })
 }
 
 export class Destination {
   name: string
-  defaultSubscriptions: SubscriptionConfig[]
+  defaultSubscriptions: Subscription[]
   partnerActions: PartnerActions
   requestExtensions: Extensions
   settingsSchema?: object
@@ -100,8 +86,7 @@ export class Destination {
     return this
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async testCredentials(settings: any): Promise<void> {
+  async testCredentials(settings: JSONObject): Promise<void> {
     const context = { settings }
 
     if (this.settingsSchema) {
@@ -137,16 +122,19 @@ export class Destination {
     return this
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private async runSubscription(
     context: Context,
-    subscription: any,
-    payload: unknown,
-    destinationSettings: Record<string, unknown>
-  ): Promise<unknown> {
+    subscription: Subscription,
+    payload: JSONObject,
+    settings: JSONObject
+  ): Promise<StepResult[]> {
     const isSubscribed = validate(subscription.subscribe, payload)
     if (!isSubscribed) {
-      return 'not subscribed'
+      return [
+        {
+          output: 'not subscribed'
+        }
+      ]
     }
 
     const actionSlug = subscription.partnerAction
@@ -160,7 +148,7 @@ export class Destination {
     const input = {
       payload,
       settings: {
-        ...destinationSettings,
+        ...settings,
         ...subscription.settings
       },
       mapping: subscription.mapping
@@ -171,8 +159,7 @@ export class Destination {
     const subscriptionEndedAt = time()
     const subscriptionDuration = duration(subscriptionStartedAt, subscriptionEndedAt)
 
-    instrumentSubscription({
-      context,
+    instrumentSubscription(context, {
       duration: subscriptionDuration,
       destination: this.name,
       action: actionSlug,
@@ -183,21 +170,32 @@ export class Destination {
     return result
   }
 
-  // TODO kinda gross but lets run with it for now.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public async onEvent(context: Context, event: any, settings: Record<string, unknown>): Promise<unknown[]> {
-    const { subscriptions, ...settingsNoSubscriptions } = settings
-    const parsedSubscriptions = typeof subscriptions === 'string' ? JSON.parse(subscriptions) : subscriptions
+  /**
+   * Note: Until we move subscriptions upstream (into int-consumer) we've opted
+   * to have failures abort the set of subscriptions and get potentially retried by centrifuge
+   */
+  public async onEvent(context: Context, event: JSONObject, settings: JSONObject = {}): Promise<StepResult[]> {
+    const subscriptions = getSubscriptions(settings)
+    const destinationSettings = getDestinationSettings(settings)
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const promises = parsedSubscriptions.map((sub: unknown) => {
-      return this.runSubscription(context, sub, event, settingsNoSubscriptions)
-    })
+    const promises = subscriptions.map(s => this.runSubscription(context, s, event, destinationSettings))
 
-    /**
-     * Until we move subscriptions upstream (into int-consumer) we've opted
-     * to have failures abort the set of subscriptions and get potentially retried by centrifuge
-     */
-    return Promise.all(promises)
+    const results = await Promise.all(promises)
+
+    return results.flat()
   }
+}
+
+function getSubscriptions(settings: JSONObject): Subscription[] {
+  const { subscriptions } = settings
+
+  const parsedSubscriptions = typeof subscriptions === 'string' ? JSON.parse(subscriptions) : subscriptions
+
+  return parsedSubscriptions as Subscription[]
+}
+
+function getDestinationSettings(settings: JSONObject): JSONObject {
+  const { subscriptions, ...otherSettings } = settings
+
+  return otherSettings
 }

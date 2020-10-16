@@ -24,7 +24,7 @@ interface Fields {
   subscriptions: Subscriptions[]
 }
 
-interface Subscriptions {
+export interface Subscriptions {
   duration: number
   destination: string
   action: string

@@ -5,7 +5,7 @@ import postWebhook from './postWebhook'
 
 const destination = new Destination(config)
   .extendRequest(({ settings }) => ({
-    prefixUrl: settings.url,
+    prefixUrl: settings.url as string,
     headers: {
       'User-Agent': 'Destinations/2.0'
     },
