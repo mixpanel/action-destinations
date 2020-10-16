@@ -7,7 +7,7 @@ import { constructTrace, Span } from './tracing'
 import Context from '@/lib/context'
 import { JSONObject } from '@/lib/json-object'
 import { StepResult } from '@/lib/destination-kit/step'
-import getEventTesterData, { EventTesterRequest } from './event-tester'
+import getEventTesterData, { EventTesterRequest, RequestToDestination, ResponseFromDestination } from './event-tester'
 
 function parseJsonHeader(headers: IncomingHttpHeaders, header: string, fallback = undefined): JSONObject | undefined {
   const raw = headers[header]
@@ -86,14 +86,18 @@ interface CloudEventResponse {
 
 interface CloudEventSuccessData {
   results: StepResult | StepResult[]
-  requestsToDestination: EventTesterRequest[]
+  debugRequests: EventTesterRequest[]
+  requestsToDestination: RequestToDestination[]
+  responseFromDestination: ResponseFromDestination[]
 }
 
 interface CloudEventErrorData {
   status: number
   name: string
   message: string
-  requestsToDestination: EventTesterRequest[]
+  debugRequests: EventTesterRequest[]
+  requestsToDestination: RequestToDestination[]
+  responseFromDestination: ResponseFromDestination[]
 }
 
 interface RequestTracing {
@@ -116,7 +120,9 @@ function constructCloudSuccess(
     status: 201,
     data: {
       results: getSuccessData(result),
-      requestsToDestination: eventTesterRequests
+      debugRequests: eventTesterRequests,
+      requestsToDestination: eventTesterRequests.map(r => r.request),
+      responseFromDestination: eventTesterRequests.map(r => r.response)
     },
     trace: constructTrace({
       name: 'invoke',
@@ -156,7 +162,9 @@ function constructCloudError(
       status: statusCode,
       name: error?.name,
       message,
-      requestsToDestination: eventTesterRequests
+      debugRequests: eventTesterRequests,
+      requestsToDestination: eventTesterRequests.map(r => r.request),
+      responseFromDestination: eventTesterRequests.map(r => r.response)
     },
     // TODO support all error types
     errortype: 'MESSAGE_REJECTED',
