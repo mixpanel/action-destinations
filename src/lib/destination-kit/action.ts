@@ -8,6 +8,7 @@ import { EventEmitter } from 'events'
 import get from 'lodash/get'
 import { JSONObject } from '../json-object'
 import { Step, Steps, StepResult, ExecuteInput } from './step'
+import { lookup, beforeRequest } from '../dns'
 
 class MapInput extends Step {
   executeStep(ctx: ExecuteInput): Promise<string> {
@@ -128,6 +129,10 @@ class Request extends Step {
       headers: {
         // override got's default of 'got (https://github.com/sindresorhus/got)'
         'user-agent': undefined
+      },
+      lookup,
+      hooks: {
+        beforeRequest: [beforeRequest]
       }
     })
 

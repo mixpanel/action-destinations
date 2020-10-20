@@ -1,5 +1,6 @@
 .git
 .vscode
 *.test.*
+__tests__
 /sample/
 node_modules_dev

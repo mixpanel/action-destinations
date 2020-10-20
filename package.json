@@ -21,6 +21,7 @@
   "devDependencies": {
     "@types/express": "^4.17.8",
     "@types/http-errors": "^1.8.0",
+    "@types/ip": "^1.1.0",
     "@types/jest": "^26.0.14",
     "@types/lodash": "^4.14.161",
     "@types/node": "^12.12.11",
@@ -39,6 +40,7 @@
     "husky": "^4.3.0",
     "jest": "^26.4.2",
     "lint-staged": "^10.3.0",
+    "nock": "^13.0.4",
     "nodemon": "^2.0.4",
     "prettier": "^1.19.1",
     "ts-jest": "^26.4.1",
@@ -56,6 +58,7 @@
     "express": "^4.17.1",
     "got": "^11.6.1",
     "http-errors": "^1.8.0",
+    "ip": "^1.1.5",
     "jsonpath-plus": "^4.0.0",
     "lodash": "^4.17.20",
     "moment": "^2.27.0",
