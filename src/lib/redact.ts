@@ -1,4 +1,6 @@
 import { IncomingHttpHeaders, OutgoingHttpHeaders } from 'http'
+import { escapeRegExp } from 'lodash'
+import { JSONArray, JSONObject } from './json-object'
 
 const safeRequestHeaders = [
   // Standard request fields
@@ -157,4 +159,28 @@ function isSafeRequestHeader(value: string): boolean {
 
 function isSafeResponseHeader(value: string): boolean {
   return safeResponseHeaders.includes(value.toLowerCase())
+}
+
+function redactString(str: string): string {
+  if (str.length < 6) {
+    return '***'
+  }
+
+  return str.slice(0, 4) + '*'.repeat(str.length - 4)
+}
+
+export function redactSettings(settings: JSONObject, privateSettings: JSONArray): JSONObject {
+  let result = JSON.stringify(settings)
+
+  for (const privateSetting of privateSettings) {
+    if (typeof privateSetting === 'string') {
+      const value = settings[privateSetting]
+      if (typeof value === 'string' && value.length > 1) {
+        const regex = new RegExp(escapeRegExp(value), 'g')
+        result = result.replace(regex, redactString(value))
+      }
+    }
+  }
+
+  return JSON.parse(result)
 }

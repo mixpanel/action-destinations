@@ -5,7 +5,8 @@ import { Extensions, Action, Validate } from './action'
 import { ExecuteInput, StepResult } from './step'
 import Context, { Subscriptions } from '../context'
 import { time, duration } from '../time'
-import { JSONObject } from '../json-object'
+import { JSONArray, JSONObject } from '../json-object'
+import { redactSettings } from '../redact'
 
 export interface DestinationConfig {
   name: string
@@ -133,7 +134,8 @@ export class Destination {
     context: Context,
     subscription: Subscription,
     payload: JSONObject,
-    settings: JSONObject
+    destinationSettings: JSONObject,
+    privateSettings: JSONArray
   ): Promise<StepResult[]> {
     const isSubscribed = validate(subscription.subscribe, payload)
     if (!isSubscribed) {
@@ -148,12 +150,14 @@ export class Destination {
 
     const subscriptionStartedAt = time()
 
+    const settings = {
+      ...destinationSettings,
+      ...subscription.settings
+    }
+
     const input: ExecuteInput = {
       payload,
-      settings: {
-        ...settings,
-        ...subscription.settings
-      },
+      settings,
       mapping: subscription.mapping
     }
 
@@ -166,7 +170,11 @@ export class Destination {
       duration: subscriptionDuration,
       destination: this.config.name,
       action: actionSlug,
-      input,
+      input: {
+        payload,
+        mapping: subscription.mapping,
+        settings: redactSettings(settings, privateSettings)
+      },
       output: results
     })
 
@@ -177,11 +185,18 @@ export class Destination {
    * Note: Until we move subscriptions upstream (into int-consumer) we've opted
    * to have failures abort the set of subscriptions and get potentially retried by centrifuge
    */
-  public async onEvent(context: Context, event: JSONObject, settings: JSONObject = {}): Promise<StepResult[]> {
+  public async onEvent(
+    context: Context,
+    event: JSONObject,
+    settings: JSONObject = {},
+    privateSettings: JSONArray = []
+  ): Promise<StepResult[]> {
     const subscriptions = getSubscriptions(settings)
     const destinationSettings = getDestinationSettings(settings)
 
-    const promises = subscriptions.map(s => this.onSubscription(context, s, event, destinationSettings))
+    const promises = subscriptions.map(s =>
+      this.onSubscription(context, s, event, destinationSettings, privateSettings)
+    )
 
     const results = await Promise.all(promises)
 

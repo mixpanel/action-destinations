@@ -5,11 +5,15 @@ import { getDestinationByIdOrSlug } from '../destinations'
 import MIMEType from 'whatwg-mimetype'
 import { constructTrace, Span } from './tracing'
 import Context from '@/lib/context'
-import { JSONObject } from '@/lib/json-object'
+import { JSONArray, JSONObject } from '@/lib/json-object'
 import { StepResult } from '@/lib/destination-kit/step'
 import getEventTesterData, { EventTesterRequest, RequestToDestination, ResponseFromDestination } from './event-tester'
 
-function parseJsonHeader(headers: IncomingHttpHeaders, header: string, fallback = undefined): JSONObject | undefined {
+function parseJsonHeader(
+  headers: IncomingHttpHeaders,
+  header: string,
+  fallback = undefined
+): JSONObject | JSONArray | undefined {
   const raw = headers[header]
   if (!raw || Array.isArray(raw)) {
     return fallback
@@ -38,12 +42,13 @@ function parseContentType(req: Request): MIMEType {
 async function handleHttp(context: Context, req: Request): Promise<StepResult[]> {
   const idOrSlug = req.params.destinationId
   const event = req.body
-  const settings = parseJsonHeader(req.headers, 'centrifuge-settings')
+  const settings = parseJsonHeader(req.headers, 'centrifuge-settings') as JSONObject
+  const privateSettings = parseJsonHeader(req.headers, 'centrifuge-private-settings') as JSONArray
 
   // Try to map the id param to a slug, or treat it as the slug (easier local testing)
   const destination = getDestinationByIdOrSlug(idOrSlug)
 
-  const results = await destination.onEvent(context, event, settings)
+  const results = await destination.onEvent(context, event, settings, privateSettings)
 
   return results
 }
@@ -180,7 +185,8 @@ function constructCloudError(
 async function handleCloudEvent(
   context: Context,
   destinationId: string,
-  cloudEvent: CloudEvent
+  cloudEvent: CloudEvent,
+  privateSettings?: JSONArray
 ): Promise<CloudEventResponse> {
   const start = new Date()
 
@@ -190,7 +196,7 @@ async function handleCloudEvent(
   const destination = getDestinationByIdOrSlug(destinationId)
 
   try {
-    const results = await destination.onEvent(context, cloudEvent.data, cloudEvent.settings)
+    const results = await destination.onEvent(context, cloudEvent.data, cloudEvent.settings, privateSettings)
     const eventTesterData = getEventTesterData(destination.responses)
     return constructCloudSuccess(cloudEvent, results, eventTesterData, { start })
   } catch (err) {
@@ -218,6 +224,7 @@ async function destination(req: Request, res: Response): Promise<void> {
   const { context } = req
   const destinationId = req.params.destinationId
   const contentType = parseContentType(req)
+  const privateSettings = parseJsonHeader(req.headers, 'centrifuge-private-settings') as JSONArray
 
   if (isCloudEvent(contentType)) {
     if (isBatchedCloudEvent(contentType)) {
@@ -229,7 +236,7 @@ async function destination(req: Request, res: Response): Promise<void> {
     }
 
     if (isStructuredCloudEvent(contentType)) {
-      const result = await handleCloudEvent(context, destinationId, req.body)
+      const result = await handleCloudEvent(context, destinationId, req.body, privateSettings)
       res.set('Content-Type', 'application/cloudevent+json; charset=utf-8')
       res.status(result.status)
       res.send(result)
