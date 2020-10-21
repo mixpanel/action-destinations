@@ -17,8 +17,7 @@ const RESTRICTED_CIDR_BLOCKS = [
   '192.168.0.0/16',
   'fc00::/7',
   'fd00::/8',
-  'fe80::/10',
-  '::1/128'
+  'fe80::/10'
 ]
 
 const CIDR_SUBNETS = RESTRICTED_CIDR_BLOCKS.map(block => ip.cidrSubnet(block))
