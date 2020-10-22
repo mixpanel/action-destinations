@@ -78,7 +78,8 @@
   "lint-staged": {
     "*.{ts}": [
       "eslint --fix",
-      "prettier --write"
+      "prettier --write",
+      "yarn generate-types"
     ],
     "*.{yml,md,json}": [
       "prettier --write"
