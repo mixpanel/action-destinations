@@ -7,7 +7,6 @@
 - [Overview](#overview)
 - [Destination API](#destination-api)
   - [destination(config)](#destinationconfig)
-    - [.extendRequest(...callbacks)](#extendrequestcallbacks)
     - [.partnerAction(slug, callback)](#partneractionslug-callback)
 - [Action API](#action-api)
   - [Action](#action)
@@ -109,9 +108,11 @@ destination() instantiates a new Destination object with the given configuration
 
 The configuration object accepts the following fields:
 
-| Field  | Type     | Description                                                  |
-| ------ | -------- | ------------------------------------------------------------ |
-| `name` | `string` | The human-readable name of the destination. E.g. "Amplitude" |
+| Field           | Type       | Description                                                  |
+| --------------- | ---------- | ------------------------------------------------------------ |
+| `name`          | `string`   | The human-readable name of the destination. E.g. "Amplitude" |
+| `schema`        | `object`   | The JSON Schema repesenting destination settings             |
+| `extendRequest` | `function` | (Optional) function to extend the `got` request instance     |
 
 ```js
 const { destination } = require('./lib/destination-kit')
@@ -126,22 +127,25 @@ module.exports = destination({
 Destination is the entrypoint for a destination. It holds the destination config (name, base request
 options, etc.) and sends incoming events to actions registered with this destination.
 
-The object returned by destination() supports the following chainable methods:
+The object returned by destination() supports the following configuration and chainable methods:
 
-#### .extendRequest(...function(Context))
+#### extendRequest(function(Context))
 
-extendRequest() adds callback functions that can set default
+extendRequest() adds a callback function that can set default
 [`got`](https://github.com/sindresorhus/got) request options for all requests made by actions
 registered with this destination. It returns the base destination object.
 
 ```js
-destination({ name: 'Simple' }).extendRequest(({ settings }) => ({
-  password: settings.apiKey,
-  responseType: 'json'
-}))
+destination({
+  name: 'Simple',
+  extendRequest({ settings }) {
+    return {
+      password: settings.apiKey,
+      responseType: 'json'
+    }
+  }
+})
 ```
-
-extendRequest() calls should come before partnerAction() calls.
 
 #### .partnerAction(slug: string, callback: function(Action))
 
@@ -158,8 +162,6 @@ destination({ name: 'Amplitude' })
     action.mapField(...).request(...)
   })
 ```
-
-partnerAction() calls should come after extendRequest() calls.
 
 ## Action API
 

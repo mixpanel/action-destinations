@@ -24,6 +24,7 @@
     "@types/http-errors": "^1.8.0",
     "@types/ip": "^1.1.0",
     "@types/jest": "^26.0.14",
+    "@types/json-schema": "^7.0.6",
     "@types/lodash": "^4.14.161",
     "@types/node": "^12.12.11",
     "@types/whatwg-mimetype": "^2.1.0",

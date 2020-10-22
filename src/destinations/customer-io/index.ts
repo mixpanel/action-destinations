@@ -1,6 +1,6 @@
+import { JSONSchema7 } from 'json-schema'
 import { Destination } from '../../lib/destination-kit'
 
-import config from './destination.json'
 import settings from './settings.schema.json'
 import addPersonToSegment from './addPersonToSegment'
 import createUpdateDevice from './createUpdateDevice'
@@ -12,10 +12,11 @@ import triggerCampaign from './triggerCampaign'
 import { Settings } from './generated-types'
 
 export default function createDestination(): Destination<Settings> {
-  const destination = new Destination<Settings>(config)
-    .validateSettings(settings)
-
-    .extendRequest(({ settings }) => {
+  const destination = new Destination<Settings>({
+    name: 'Customer.io',
+    // TODO get this from the database
+    schema: settings as JSONSchema7,
+    extendRequest({ settings }) {
       const userPass = Buffer.from(`${settings.siteId}:${settings.apiKey}`)
 
       return {
@@ -25,26 +26,27 @@ export default function createDestination(): Destination<Settings> {
         },
         responseType: 'json'
       }
-    })
+    }
+  })
 
-    .apiKeyAuth({
-      testCredentials: (req, { settings }) => {
-        return req('https://beta-api.customer.io/v1/api/segments', {
-          prefixUrl: '',
-          headers: {
-            authorization: `Bearer ${settings.appApiKey}`
-          }
-        })
-      }
-    })
+  destination.apiKeyAuth({
+    testCredentials: (req, { settings }) => {
+      return req('https://beta-api.customer.io/v1/api/segments', {
+        prefixUrl: '',
+        headers: {
+          authorization: `Bearer ${settings.appApiKey}`
+        }
+      })
+    }
+  })
 
-    .partnerAction('addPersonToSegment', addPersonToSegment)
-    .partnerAction('createUpdateDevice', createUpdateDevice)
-    .partnerAction('createUpdatePerson', createUpdatePerson)
-    .partnerAction('removePersonFromSegment', removePersonFromSegment)
-    .partnerAction('trackAnonymousEvent', trackAnonymousEvent)
-    .partnerAction('trackEvent', trackEvent)
-    .partnerAction('triggerCampaign', triggerCampaign)
+  destination.partnerAction('addPersonToSegment', addPersonToSegment)
+  destination.partnerAction('createUpdateDevice', createUpdateDevice)
+  destination.partnerAction('createUpdatePerson', createUpdatePerson)
+  destination.partnerAction('removePersonFromSegment', removePersonFromSegment)
+  destination.partnerAction('trackAnonymousEvent', trackAnonymousEvent)
+  destination.partnerAction('trackEvent', trackEvent)
+  destination.partnerAction('triggerCampaign', triggerCampaign)
 
   return destination
 }

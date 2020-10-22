@@ -1,15 +1,21 @@
 import validate from '@segment/fab5-subscriptions'
 import { BadRequest } from 'http-errors'
 import got, { CancelableRequest, Got, Response } from 'got'
-import { Extensions, Action, Validate } from './action'
+import { JSONSchema7 } from 'json-schema'
+import { Action, Validate, Extension } from './action'
 import { ExecuteInput, StepResult } from './step'
 import Context, { Subscriptions } from '../context'
 import { time, duration } from '../time'
 import { JSONArray, JSONObject } from '../json-object'
 import { redactSettings } from '../redact'
 
-export interface DestinationConfig {
+export interface DestinationConfig<Settings = any> {
+  /** The name of the destination */
   name: string
+  /** The JSON Schema representing the destination settings. When present will be used to validate settings */
+  schema?: JSONSchema7
+  /** An optional function to extend requests sent from the destination (including all actions) */
+  extendRequest?: Extension<Settings, any>
 }
 
 interface Subscription {
@@ -50,30 +56,20 @@ function instrumentSubscription(context: Context, input: Subscriptions): void {
 }
 
 export class Destination<Settings = any> {
-  config: DestinationConfig
+  readonly name: string
+  readonly settingsSchema?: JSONSchema7
+  readonly extendRequest?: Extension<Settings, any>
   partnerActions: PartnerActions<Settings, any>
-  requestExtensions: Extensions<Settings, any>
-  settingsSchema?: object
   auth?: TestAuth<Settings>
   responses: Response[]
 
-  constructor(config: DestinationConfig) {
-    this.config = config
+  constructor(config: DestinationConfig<Settings>) {
+    this.name = config.name
+    this.settingsSchema = config.schema
+    this.extendRequest = config.extendRequest
     this.partnerActions = {}
-    this.requestExtensions = []
-    this.settingsSchema = undefined
     this.auth = undefined
     this.responses = []
-  }
-
-  extendRequest(...extensions: Extensions<Settings, {}>): Destination<Settings> {
-    this.requestExtensions.push(...extensions)
-    return this
-  }
-
-  validateSettings(schema: object): Destination<Settings> {
-    this.settingsSchema = schema
-    return this
   }
 
   apiKeyAuth(options: TestAuthOptions<Settings>): Destination<Settings> {
@@ -105,8 +101,8 @@ export class Destination<Settings = any> {
       }
     })
 
-    for (const extension of this.requestExtensions) {
-      request = request.extend(extension(context))
+    if (typeof this.extendRequest === 'function') {
+      request = request.extend(this.extendRequest(context))
     }
 
     try {
@@ -120,7 +116,11 @@ export class Destination<Settings = any> {
     slug: string,
     actionFn: (action: Action<Settings, any>) => Action<Settings, any>
   ): Destination<Settings> {
-    const action = new Action<Settings, {}>().extendRequest(...this.requestExtensions)
+    const action = new Action<Settings, {}>()
+
+    if (this.extendRequest) {
+      action.extendRequest(this.extendRequest)
+    }
 
     action.on('response', response => {
       this.responses.push(response)
@@ -170,7 +170,7 @@ export class Destination<Settings = any> {
 
     instrumentSubscription(context, {
       duration: subscriptionDuration,
-      destination: this.config.name,
+      destination: this.name,
       action: actionSlug,
       input: {
         ...input,

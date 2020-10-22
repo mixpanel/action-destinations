@@ -75,7 +75,8 @@ class MapPayload<Settings, Payload> extends Step<Settings, Payload> {
   }
 }
 
-export type Extensions<Settings, Payload> = ((ctx: ExecuteInput<Settings, Payload>) => ExtendOptions)[]
+export type Extension<Settings, Payload> = (ctx: ExecuteInput<Settings, Payload>) => ExtendOptions
+export type Extensions<Settings, Payload> = Extension<Settings, Payload>[]
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type RequestFn<Settings, Payload> = (req: Got, ctx: ExecuteInput<Settings, Payload>) => any
