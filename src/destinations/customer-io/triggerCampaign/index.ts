@@ -1,5 +1,7 @@
 import { Action } from '@/lib/destination-kit/action'
 import payloadSchema from './payload.schema.json'
+import { Settings } from '../generated-types'
+import { TriggerBroadcastCampaign } from './generated-types'
 
 interface Campaigns {
   campaigns: Campaign[]
@@ -10,7 +12,9 @@ interface Campaign {
   name: string
 }
 
-export default function(action: Action): Action {
+export default function(
+  action: Action<Settings, TriggerBroadcastCampaign>
+): Action<Settings, TriggerBroadcastCampaign> {
   return action
     .validatePayload(payloadSchema)
 

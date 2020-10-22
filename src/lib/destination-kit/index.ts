@@ -23,21 +23,21 @@ interface Subscription {
   mapping?: JSONObject
 }
 
-interface PartnerActions {
-  [key: string]: Action
+interface PartnerActions<Settings, Payload> {
+  [key: string]: Action<Settings, Payload>
 }
 
-interface TestAuth {
+interface TestAuth<Settings> {
   type: string
-  options: TestAuthOptions
+  options: TestAuthOptions<Settings>
 }
 
-interface TestAuthOptions {
-  testCredentials: (req: Got, settings: TestAuthSettings) => CancelableRequest<Response<string>>
+interface TestAuthOptions<Settings> {
+  testCredentials: (req: Got, settings: TestAuthSettings<Settings>) => CancelableRequest<Response<string>>
 }
 
-interface TestAuthSettings {
-  settings: JSONObject
+interface TestAuthSettings<Settings> {
+  settings: Settings
 }
 
 function instrumentSubscription(context: Context, input: Subscriptions): void {
@@ -50,13 +50,13 @@ function instrumentSubscription(context: Context, input: Subscriptions): void {
   })
 }
 
-export class Destination {
+export class Destination<Settings = any> {
   config: DestinationConfig
   defaultSubscriptions: Subscription[]
-  partnerActions: PartnerActions
-  requestExtensions: Extensions
+  partnerActions: PartnerActions<Settings, any>
+  requestExtensions: Extensions<Settings, any>
   settingsSchema?: object
-  auth?: TestAuth
+  auth?: TestAuth<Settings>
   responses: Response[]
 
   constructor(config: DestinationConfig) {
@@ -68,17 +68,17 @@ export class Destination {
     this.responses = []
   }
 
-  extendRequest(...extensions: Extensions): Destination {
+  extendRequest(...extensions: Extensions<Settings, {}>): Destination<Settings> {
     this.requestExtensions.push(...extensions)
     return this
   }
 
-  validateSettings(schema: object): Destination {
+  validateSettings(schema: object): Destination<Settings> {
     this.settingsSchema = schema
     return this
   }
 
-  apiKeyAuth(options: TestAuthOptions): Destination {
+  apiKeyAuth(options: TestAuthOptions<Settings>): Destination<Settings> {
     this.auth = {
       type: 'apiKey',
       options
@@ -87,8 +87,8 @@ export class Destination {
     return this
   }
 
-  async testCredentials(settings: JSONObject): Promise<void> {
-    const context: ExecuteInput = { settings, payload: {} }
+  async testCredentials(settings: Settings): Promise<void> {
+    const context: ExecuteInput<Settings, {}> = { settings, payload: {}, cacheIds: {} }
 
     if (this.settingsSchema) {
       const step = new Validate('', 'settings', this.settingsSchema)
@@ -118,14 +118,18 @@ export class Destination {
     }
   }
 
-  public partnerAction(slug: string, actionFn: (action: Action) => Action): Destination {
-    const action = new Action().extendRequest(...this.requestExtensions)
+  public partnerAction(
+    slug: string,
+    actionFn: (action: Action<Settings, any>) => Action<Settings, any>
+  ): Destination<Settings> {
+    const action = new Action<Settings, {}>().extendRequest(...this.requestExtensions)
 
     action.on('response', response => {
       this.responses.push(response)
     })
 
     this.partnerActions[slug] = actionFn(action)
+
     return this
   }
 
@@ -133,7 +137,7 @@ export class Destination {
     context: Context,
     subscription: Subscription,
     event: JSONObject,
-    settings: JSONObject,
+    settings: Settings,
     privateSettings: JSONArray
   ): Promise<StepResult[]> {
     const isSubscribed = validate(subscription.subscribe, event)
@@ -149,7 +153,7 @@ export class Destination {
 
     const subscriptionStartedAt = time()
 
-    const input: ExecuteInput = {
+    const input: ExecuteInput<Settings, {}> = {
       // Payload starts as the event itself, but will get transformed based on the given `mapping` + `event`
       // In other arbitrary actions (like autocomplete) payload may be non-event data
       //
@@ -157,7 +161,8 @@ export class Destination {
       // these are effectively actions that power UI **inputs** and nothing else.
       payload: event,
       mapping: subscription.mapping,
-      settings
+      settings,
+      cacheIds: {}
     }
 
     const results = await action.execute(input)
@@ -171,7 +176,7 @@ export class Destination {
       action: actionSlug,
       input: {
         ...input,
-        settings: redactSettings(settings, privateSettings)
+        settings: redactSettings((settings as unknown) as JSONObject, privateSettings)
       },
       output: results
     })
@@ -186,11 +191,11 @@ export class Destination {
   public async onEvent(
     context: Context,
     event: JSONObject,
-    settings: JSONObject = {},
+    settings: JSONObject,
     privateSettings: JSONArray = []
   ): Promise<StepResult[]> {
-    const subscriptions = getSubscriptions(settings)
-    const destinationSettings = getDestinationSettings(settings)
+    const subscriptions = this.getSubscriptions(settings)
+    const destinationSettings = this.getDestinationSettings(settings)
 
     const promises = subscriptions.map(s =>
       this.onSubscription(context, s, event, destinationSettings, privateSettings)
@@ -200,18 +205,15 @@ export class Destination {
 
     return results.flat()
   }
-}
 
-function getSubscriptions(settings: JSONObject): Subscription[] {
-  const { subscriptions } = settings
+  getSubscriptions(settings: JSONObject): Subscription[] {
+    const { subscriptions } = settings
+    const parsedSubscriptions = typeof subscriptions === 'string' ? JSON.parse(subscriptions) : subscriptions
+    return parsedSubscriptions as Subscription[]
+  }
 
-  const parsedSubscriptions = typeof subscriptions === 'string' ? JSON.parse(subscriptions) : subscriptions
-
-  return parsedSubscriptions as Subscription[]
-}
-
-function getDestinationSettings(settings: JSONObject): JSONObject {
-  const { subscriptions, ...otherSettings } = settings
-
-  return otherSettings
+  getDestinationSettings(settings: JSONObject): Settings {
+    const { subscriptions, ...otherSettings } = settings
+    return (otherSettings as unknown) as Settings
+  }
 }

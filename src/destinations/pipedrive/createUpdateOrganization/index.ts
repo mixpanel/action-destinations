@@ -1,8 +1,12 @@
 import { get } from 'lodash'
 import { Action } from '@/lib/destination-kit/action'
 import payloadSchema from './payload.schema.json'
+import { Settings } from '../generated-types'
+import { CreateOrUpdateOrganization } from './generated-types'
 
-export default function(action: Action): Action {
+export default function(
+  action: Action<Settings, CreateOrUpdateOrganization>
+): Action<Settings, CreateOrUpdateOrganization> {
   return action
     .validatePayload(payloadSchema)
 
@@ -15,7 +19,7 @@ export default function(action: Action): Action {
 
     .cachedRequest({
       ttl: 60,
-      key: ({ payload }) => payload.identifier as string,
+      key: ({ payload }) => payload.identifier,
       value: async (req, { payload }) => {
         const search = await req.get('organizations/search', {
           searchParams: { term: payload.identifier }
@@ -25,8 +29,9 @@ export default function(action: Action): Action {
       as: 'organizationId'
     })
 
-    .request(async (req, { payload, organizationId }) => {
+    .request(async (req, { payload, cacheIds }) => {
       const { identifier, ...organization } = payload
+      const organizationId = cacheIds.organizationId
 
       if (organizationId === undefined || organizationId === null) {
         return req.post('organizations', {

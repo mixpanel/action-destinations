@@ -1,5 +1,6 @@
 import { Got } from 'got'
 import { AutocompleteResponse } from '@/lib/autocomplete'
+import { Settings } from '../generated-types'
 
 interface ListResponse {
   segments: Segment[]
@@ -10,8 +11,7 @@ interface Segment {
   name: string
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default async function(req: Got, { settings }: any): Promise<AutocompleteResponse> {
+export default async function(req: Got, { settings }: { settings: Settings }): Promise<AutocompleteResponse> {
   const response = await req.get<ListResponse>('https://beta-api.customer.io/v1/api/segments', {
     prefixUrl: '',
     headers: {

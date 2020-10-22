@@ -6,9 +6,10 @@ import trackUser from './trackUser'
 import identifyUser from './identifyUser'
 import annotateChart from './annotateChart'
 import deleteUser from './deleteUser'
+import { Settings } from './generated-types'
 
-export default function createDestination(): Destination {
-  const destination = new Destination(config)
+export default function createDestination(): Destination<Settings> {
+  const destination = new Destination<Settings>(config)
     .validateSettings(settings)
     .partnerAction('trackUser', trackUser)
     .partnerAction('identifyUser', identifyUser)

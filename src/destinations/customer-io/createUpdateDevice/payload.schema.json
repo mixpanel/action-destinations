@@ -3,6 +3,7 @@
   "title": "Create or Update Device",
   "description": "Update a person's device in Customer.io or create it if it doesn't exist.",
   "type": "object",
+  "additionalProperties": false,
   "properties": {
     "person_id": {
       "title": "Person ID",

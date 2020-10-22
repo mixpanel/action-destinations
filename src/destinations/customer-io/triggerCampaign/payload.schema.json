@@ -3,6 +3,7 @@
   "title": "Trigger Broadcast Campaign",
   "description": "Trigger a Customer.io broadcast campaign.",
   "type": "object",
+  "additionalProperties": false,
   "properties": {
     "id": {
       "title": "Campaign ID",

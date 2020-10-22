@@ -3,6 +3,7 @@
   "title": "Identify User",
   "description": "Set the user ID for a particular device ID or update user properties without sending an event to Amplitude.",
   "type": "object",
+  "additionalProperties": false,
   "properties": {
     "user_id": {
       "title": "User ID",

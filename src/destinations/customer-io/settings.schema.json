@@ -21,5 +21,6 @@
       "type": "string"
     }
   },
+  "additionalProperties": false,
   "required": ["siteId", "apiKey", "appApiKey"]
 }

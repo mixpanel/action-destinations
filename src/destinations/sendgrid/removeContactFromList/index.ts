@@ -2,6 +2,8 @@ import { get } from 'lodash'
 import listIdAutocomplete from '../autocomplete/list_id'
 import { Action } from '@/lib/destination-kit/action'
 import payloadSchema from './payload.schema.json'
+import { Settings } from '../generated-types'
+import { RemoveRecipientFromList } from './generated-types'
 
 // SendGrid uses a custom "SGQL" query language for finding contacts. To protect us from basic
 // injection attacks (e.g. "email = 'x@x.com' or email like '%@%'"), we can just strip all quotes
@@ -10,7 +12,7 @@ const sgqlEscape = (s: string): string => {
   return s.replace(/['"]/g, '')
 }
 
-export default function(action: Action): Action {
+export default function(action: Action<Settings, RemoveRecipientFromList>): Action<Settings, RemoveRecipientFromList> {
   return action
     .validatePayload(payloadSchema)
 
@@ -30,7 +32,9 @@ export default function(action: Action): Action {
       as: 'contactId'
     })
 
-    .request(async (req, { payload, contactId }) => {
+    .request(async (req, { payload, cacheIds }) => {
+      const contactId = cacheIds.contactId
+
       if (contactId === null || contactId === undefined) {
         return null
       }

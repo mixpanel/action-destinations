@@ -3,6 +3,7 @@
   "title": "Create or Update Organization",
   "description": "Update an organization in Pipedrive or create it if it doesn't exist yet.",
   "type": "object",
+  "additionalProperties": false,
   "properties": {
     "identifier": {
       "title": "Organization ID",

@@ -3,6 +3,7 @@
   "title": "Remove Person from Segment",
   "description": "Remove a person from a segment in Customer.io.",
   "type": "object",
+  "additionalProperties": false,
   "properties": {
     "segment_id": {
       "title": "Segment ID",

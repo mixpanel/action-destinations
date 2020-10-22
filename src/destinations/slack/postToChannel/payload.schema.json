@@ -3,6 +3,7 @@
   "title": "Post Message",
   "description": "Post a message to a Slack channel.",
   "type": "object",
+  "additionalProperties": false,
   "properties": {
     "url": {
       "title": "Webhook URL",

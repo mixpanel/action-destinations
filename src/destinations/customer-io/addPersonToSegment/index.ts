@@ -1,8 +1,10 @@
 import segmentIdAutocomplete from '../autocomplete/segment_id'
 import { Action } from '@/lib/destination-kit/action'
 import payloadSchema from './payload.schema.json'
+import { Settings } from '../generated-types'
+import { AddPersonToSegment } from './generated-types'
 
-export default function(action: Action): Action {
+export default function(action: Action<Settings, AddPersonToSegment>): Action<Settings, AddPersonToSegment> {
   return action
     .validatePayload(payloadSchema)
 

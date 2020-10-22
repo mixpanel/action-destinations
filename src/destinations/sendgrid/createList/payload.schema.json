@@ -3,6 +3,7 @@
   "title": "Create Contact List",
   "description": "Create a marketing contact list.",
   "type": "object",
+  "additionalProperties": false,
   "properties": {
     "name": {
       "title": "Name",

@@ -3,6 +3,7 @@
   "title": "Create or Update Contact",
   "description": "Update an existing marketing contact or create them if they don't exist.",
   "type": "object",
+  "additionalProperties": false,
   "properties": {
     "list_id": {
       "title": "List ID",

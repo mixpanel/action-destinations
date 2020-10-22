@@ -9,9 +9,10 @@ import removePersonFromSegment from './removePersonFromSegment'
 import trackAnonymousEvent from './trackAnonymousEvent'
 import trackEvent from './trackEvent'
 import triggerCampaign from './triggerCampaign'
+import { Settings } from './generated-types'
 
-export default function createDestination(): Destination {
-  const destination = new Destination(config)
+export default function createDestination(): Destination<Settings> {
+  const destination = new Destination<Settings>(config)
     .validateSettings(settings)
 
     .extendRequest(({ settings }) => {

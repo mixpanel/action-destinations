@@ -5,15 +5,16 @@ import settings from './settings.schema.json'
 import createUpdateOrganization from './createUpdateOrganization'
 import createUpdatePerson from './createUpdatePerson'
 import deletePerson from './deletePerson'
+import { Settings } from './generated-types'
 
-export default function createDestination(): Destination {
-  const destination = new Destination(config)
+export default function createDestination(): Destination<Settings> {
+  const destination = new Destination<Settings>(config)
     .validateSettings(settings)
 
     .extendRequest(({ settings }) => ({
       prefixUrl: `https://${settings.domain}.pipedrive.com/api/v1/`,
       searchParams: {
-        api_token: settings.apiToken as string
+        api_token: settings.apiToken
       },
       responseType: 'json'
     }))

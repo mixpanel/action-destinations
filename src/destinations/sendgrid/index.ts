@@ -6,9 +6,10 @@ import createList from './createList'
 import createUpdateContact from './createUpdateContact'
 import deleteContact from './deleteContact'
 import removeContactFromList from './removeContactFromList'
+import { Settings } from './generated-types'
 
-export default function createDestination(): Destination {
-  const destination = new Destination(config)
+export default function createDestination(): Destination<Settings> {
+  const destination = new Destination<Settings>(config)
     .validateSettings(settings)
 
     .extendRequest(({ settings }) => {

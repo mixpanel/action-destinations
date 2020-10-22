@@ -3,6 +3,7 @@
   "title": "Track Anonymous Event",
   "description": "Track an event not tied to a known person.",
   "type": "object",
+  "additionalProperties": false,
   "properties": {
     "name": {
       "title": "Event Name",

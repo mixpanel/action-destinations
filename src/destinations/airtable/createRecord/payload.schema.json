@@ -3,6 +3,7 @@
   "title": "Create Record",
   "description": "Create a new record in Airtable base.",
   "type": "object",
+  "additionalProperties": false,
   "properties": {
     "url": {
       "title": "Base URL",

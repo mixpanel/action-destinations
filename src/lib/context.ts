@@ -29,7 +29,7 @@ export interface Subscriptions {
   duration: number
   destination: string
   action: string
-  input: ExecuteInput
+  input: ExecuteInput<{}, {}>
   output: StepResult[]
 }
 

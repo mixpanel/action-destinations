@@ -1,7 +1,14 @@
 import { Action } from '@/lib/destination-kit/action'
 import payloadSchema from './payload.schema.json'
+import { Settings } from '../generated-types'
+import { DeleteUser } from './generated-types'
 
-export default function(action: Action): Action {
+interface DeleteUserBody extends Omit<DeleteUser, 'user_id' | 'amplitude_id'> {
+  amplitude_ids?: string[]
+  user_ids?: string[]
+}
+
+export default function(action: Action<Settings, DeleteUser>): Action<Settings, DeleteUser> {
   return action
     .validatePayload(payloadSchema)
 
@@ -22,14 +29,18 @@ export default function(action: Action): Action {
     })
 
     .request((req, { payload, settings }) => {
-      const { amplitude_id: amplitudeId, user_id: userId, ...body } = payload
-
-      if (amplitudeId !== undefined) {
-        body.amplitude_ids = [amplitudeId]
+      const body: DeleteUserBody = {
+        ignore_invalid_id: payload.ignore_invalid_id,
+        delete_from_org: payload.delete_from_org,
+        requester: payload.requester
       }
 
-      if (userId !== undefined) {
-        body.user_ids = [userId]
+      if (payload.amplitude_id !== undefined) {
+        body.amplitude_ids = [payload.amplitude_id]
+      }
+
+      if (payload.user_id !== undefined) {
+        body.user_ids = [payload.user_id]
       }
 
       return req.post('https://amplitude.com/api/2/deletions/users', {

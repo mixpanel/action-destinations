@@ -3,6 +3,7 @@
   "title": "Track Event",
   "description": "Track an event for a known person.",
   "type": "object",
+  "additionalProperties": false,
   "properties": {
     "id": {
       "title": "Person ID",

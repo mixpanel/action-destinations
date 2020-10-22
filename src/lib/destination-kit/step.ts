@@ -6,23 +6,27 @@ export interface StepResult {
   error?: JSONObject | null
 }
 
-export interface ExecuteInput {
+export interface ExecuteInput<Settings, Payload> {
   /** The subscription mapping definition */
   readonly mapping?: JSONObject
   /** The global destination settings */
-  readonly settings: JSONObject
+  readonly settings: Settings
   /** The transformed input data, based on `mapping` + `event` */
-  payload: JSONObject
+  payload: Payload
+  /** The ids from cached requests */
+  cacheIds: { [key: string]: string }
+  /** The page used in autocomplete */
+  page?: string
 }
 
 /**
  * Step is the base class for all discrete execution steps. It handles executing the step, logging,
  * catching errors, and returning a result object.
  */
-export class Step extends EventEmitter {
-  executeStep?(ctx: ExecuteInput): Promise<string>
+export class Step<Settings, Payload> extends EventEmitter {
+  executeStep?(ctx: ExecuteInput<Settings, Payload>): Promise<string>
 
-  async execute(ctx: ExecuteInput): Promise<StepResult> {
+  async execute(ctx: ExecuteInput<Settings, Payload>): Promise<StepResult> {
     const result: StepResult = {
       output: null,
       error: null
@@ -45,18 +49,18 @@ export class Step extends EventEmitter {
 /**
  * Steps is a list of one or more Step instances that can be executed in-order.
  */
-export class Steps {
-  steps: Step[]
+export class Steps<Settings, Payload> {
+  steps: Step<Settings, Payload>[]
 
   constructor() {
     this.steps = []
   }
 
-  push(step: Step): void {
+  push(step: Step<Settings, Payload>): void {
     this.steps.push(step)
   }
 
-  async execute(ctx: ExecuteInput): Promise<StepResult[]> {
+  async execute(ctx: ExecuteInput<Settings, Payload>): Promise<StepResult[]> {
     if (this.steps.length === 0) {
       throw new Error('no steps defined')
     }

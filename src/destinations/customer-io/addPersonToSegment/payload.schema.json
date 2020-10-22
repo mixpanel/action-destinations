@@ -3,6 +3,7 @@
   "title": "Add Person to Segment",
   "description": "Add a person to a segment in Customer.io.",
   "type": "object",
+  "additionalProperties": false,
   "properties": {
     "segment_id": {
       "title": "Segment ID",

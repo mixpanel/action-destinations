@@ -3,6 +3,7 @@
   "title": "Annotate Chart",
   "description": "Annotate important dates (feature releases, marketing campaigns, etc.) on Amplitude charts.",
   "type": "object",
+  "additionalProperties": false,
   "properties": {
     "app_id": {
       "title": "App ID",

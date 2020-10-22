@@ -3,6 +3,7 @@
   "title": "Remove Recipient from List",
   "description": "Remove a recipient from a list.",
   "type": "object",
+  "additionalProperties": false,
   "properties": {
     "list_id": {
       "title": "List ID",

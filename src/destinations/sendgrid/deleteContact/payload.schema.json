@@ -3,6 +3,7 @@
   "title": "Delete Contact",
   "description": "Delete a contact from SendGrid.",
   "type": "object",
+  "additionalProperties": false,
   "properties": {
     "email": {
       "title": "Email Address",

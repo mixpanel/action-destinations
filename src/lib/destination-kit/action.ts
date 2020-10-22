@@ -10,8 +10,8 @@ import { JSONObject } from '../json-object'
 import { Step, Steps, StepResult, ExecuteInput } from './step'
 import { lookup, beforeRequest } from '../dns'
 
-class MapInput extends Step {
-  executeStep(ctx: ExecuteInput): Promise<string> {
+class MapInput<Settings, Payload> extends Step<Settings, Payload> {
+  executeStep(ctx: ExecuteInput<Settings, Payload>): Promise<string> {
     // Transforms the initial payload (event) + action settings (from `subscriptions[0].mapping`)
     // into input data that the action can use to talk to partner apis
     if (ctx.mapping) {
@@ -22,7 +22,7 @@ class MapInput extends Step {
   }
 }
 
-export class Validate extends Step {
+export class Validate<Settings, Payload> extends Step<Settings, Payload> {
   errorPrefix: string
   field: ExecuteInputField
   validate: Ajv.ValidateFunction
@@ -49,7 +49,7 @@ export class Validate extends Step {
     this.validate = ajv.compile(schema)
   }
 
-  executeStep(ctx: ExecuteInput): Promise<string> {
+  executeStep(ctx: ExecuteInput<Settings, Payload>): Promise<string> {
     if (!this.validate(ctx[this.field])) {
       throw new AggregateAjvError(this.validate.errors)
     }
@@ -58,7 +58,7 @@ export class Validate extends Step {
   }
 }
 
-class MapPayload extends Step {
+class MapPayload<Settings, Payload> extends Step<Settings, Payload> {
   mapping: JSONObject
   options: JSONObject
 
@@ -68,34 +68,34 @@ class MapPayload extends Step {
     this.options = options
   }
 
-  executeStep(ctx: ExecuteInput): Promise<string> {
+  executeStep(ctx: ExecuteInput<Settings, Payload>): Promise<string> {
     // TODO dont mutate payload (payload is already transformed via MapInput)
     ctx.payload = transform(this.mapping, ctx.payload, this.options)
     return Promise.resolve('MapPayload completed')
   }
 }
 
-export type Extensions = ((ctx: ExecuteInput) => ExtendOptions)[]
+export type Extensions<Settings, Payload> = ((ctx: ExecuteInput<Settings, Payload>) => ExtendOptions)[]
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type RequestFn = (req: Got, ctx: any) => any
+export type RequestFn<Settings, Payload> = (req: Got, ctx: ExecuteInput<Settings, Payload>) => any
 
 /**
  * Request handles delivering a payload to an external API. It uses the `got` library under the hood.
  *
  * The callback should be  able to return the raw request instead of needing to do `return response.data` etc.
  */
-class Request extends Step {
-  requestFn: RequestFn | undefined
-  extensions: Extensions
+class Request<Settings, Payload> extends Step<Settings, Payload> {
+  requestFn: RequestFn<Settings, Payload> | undefined
+  extensions: Extensions<Settings, Payload>
 
-  constructor(extensions: Extensions, requestFn?: RequestFn) {
+  constructor(extensions: Extensions<Settings, Payload>, requestFn?: RequestFn<Settings, Payload>) {
     super()
     this.extensions = extensions || []
     this.requestFn = requestFn
   }
 
-  async executeStep(ctx: ExecuteInput): Promise<string> {
+  async executeStep(ctx: ExecuteInput<Settings, Payload>): Promise<string> {
     if (!this.requestFn) {
       return ''
     }
@@ -119,7 +119,7 @@ class Request extends Step {
     return response.body as string
   }
 
-  baseRequest(ctx: ExecuteInput): Got {
+  baseRequest(ctx: ExecuteInput<Settings, Payload>): Got {
     let base = got.extend({
       // disable automatic retries
       retry: 0,
@@ -143,23 +143,23 @@ class Request extends Step {
   }
 }
 
-interface CachedRequestConfig {
-  key: (ctx: ExecuteInput) => string
-  value: RequestFn
+interface CachedRequestConfig<Settings, Payload> {
+  key: (ctx: ExecuteInput<Settings, Payload>) => string
+  value: RequestFn<Settings, Payload>
   as: string
   ttl: number
   negative?: boolean
 }
 
 // CachedRequest is like Request but cached. Next question.
-class CachedRequest extends Request {
+class CachedRequest<Settings, Payload> extends Request<Settings, Payload> {
   keyFn: Function
   valueFn: Function
   as: string
   negative: boolean
   cache: NodeCache
 
-  constructor(extensions: Extensions, config: CachedRequestConfig) {
+  constructor(extensions: Extensions<Settings, Payload>, config: CachedRequestConfig<Settings, Payload>) {
     super(extensions)
 
     this.keyFn = config.key
@@ -173,11 +173,12 @@ class CachedRequest extends Request {
     })
   }
 
-  async executeStep(ctx: ExecuteInput): Promise<string> {
+  async executeStep(ctx: ExecuteInput<Settings, Payload>): Promise<string> {
     const k = this.keyFn(ctx)
-    let v = this.cache.get(k)
+    let v = this.cache.get<string>(k)
 
     if (v !== undefined) {
+      ctx.cacheIds[this.as] = v
       return 'cache hit'
     }
 
@@ -187,7 +188,7 @@ class CachedRequest extends Request {
       v = await this.valueFn(request, ctx)
     } catch (e) {
       if (get(e, 'response.statusCode') === 404) {
-        v = null
+        v = undefined
       } else {
         throw e
       }
@@ -206,7 +207,7 @@ class CachedRequest extends Request {
 }
 
 // Do executes a JavaScript function synchronously.
-class Do extends Step {
+class Do<Settings, Payload> extends Step<Settings, Payload> {
   fn: Function
 
   constructor(fn: Function) {
@@ -214,7 +215,7 @@ class Do extends Step {
     this.fn = fn
   }
 
-  async executeStep(ctx: ExecuteInput): Promise<string> {
+  async executeStep(ctx: ExecuteInput<Settings, Payload>): Promise<string> {
     return await this.fn(ctx)
   }
 }
@@ -227,13 +228,13 @@ interface FanOutOptions {
 /**
  * FanOut allows us to make multiple external requests in parallel based on a given array of values.
  */
-class FanOut extends Step {
-  parent: Action
-  steps: Steps
+class FanOut<Settings, Payload> extends Step<Settings, Payload> {
+  parent: Action<Settings, Payload>
+  steps: Steps<Settings, Payload>
   opts: FanOutOptions
-  requestExtensions: Extensions
+  requestExtensions: Extensions<Settings, Payload>
 
-  constructor(parent: Action, opts: FanOutOptions) {
+  constructor(parent: Action<Settings, Payload>, opts: FanOutOptions) {
     super()
     this.parent = parent
     this.opts = opts
@@ -242,7 +243,7 @@ class FanOut extends Step {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async executeStep(ctx: ExecuteInput): Promise<any> {
+  async executeStep(ctx: ExecuteInput<Settings, Payload>): Promise<any> {
     const values = this._on(this.opts.on, ctx)
 
     // Run steps for all values in parallel.
@@ -255,7 +256,7 @@ class FanOut extends Step {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  _on(on: string, ctx: ExecuteInput): any {
+  _on(on: string, ctx: ExecuteInput<Settings, Payload>): any {
     if (Array.isArray(on)) {
       return on
     }
@@ -287,7 +288,7 @@ class FanOut extends Step {
   // Execute each step of the fan-out in sequence with the given context and
   // fan-out key/value pair.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async executeForValue(ctx: ExecuteInput, key: string, value: any): Promise<any> {
+  async executeForValue(ctx: ExecuteInput<Settings, Payload>, key: string, value: any): Promise<any> {
     // TODO handle ctx better, maybe propagate manually
     const ctxWithValue = {
       ...ctx,
@@ -299,30 +300,30 @@ class FanOut extends Step {
 
   // --
 
-  cachedRequest(config: CachedRequestConfig): FanOut {
+  cachedRequest(config: CachedRequestConfig<Settings, Payload>): FanOut<Settings, Payload> {
     const step = new CachedRequest([], config)
     this.steps.push(step)
     return this
   }
 
-  extendRequest(...fns: Extensions): FanOut {
+  extendRequest(...fns: Extensions<Settings, Payload>): FanOut<Settings, Payload> {
     this.requestExtensions.push(...fns)
     return this
   }
 
-  request(fn: RequestFn): FanOut {
+  request(fn: RequestFn<Settings, Payload>): FanOut<Settings, Payload> {
     const step = new Request([], fn)
     this.steps.push(step)
     return this
   }
 
-  do(fn: Function): FanOut {
+  do(fn: Function): FanOut<Settings, Payload> {
     const step = new Do(fn)
     this.steps.push(step)
     return this
   }
 
-  fanIn(): Action {
+  fanIn(): Action<Settings, Payload> {
     return this.parent
   }
 }
@@ -351,10 +352,11 @@ interface FieldMapping {
   }
 }
 
-interface ExecuteAutocompleteInput {
-  settings: JSONObject
-  payload: JSONObject
-  page: string
+interface ExecuteAutocompleteInput<Settings, Payload> {
+  settings: Settings
+  payload: Payload
+  cacheIds: { [key: string]: string }
+  page?: string
 }
 
 type ExecuteInputField = 'payload' | 'settings' | 'mapping'
@@ -363,23 +365,23 @@ type ExecuteInputField = 'payload' | 'settings' | 'mapping'
  * Action is the beginning step for all partner actions. Entrypoints always start with the
  * MapAndValidateInput step.
  */
-export class Action extends EventEmitter {
-  steps: Steps
-  requestExtensions: Extensions
-  private autocompleteCache: { [key: string]: RequestFn }
+export class Action<Settings, Payload> extends EventEmitter {
+  steps: Steps<Settings, Payload>
+  requestExtensions: Extensions<Settings, Payload>
+  private autocompleteCache: { [key: string]: RequestFn<Settings, Payload> }
 
   constructor() {
     super()
 
     this.steps = new Steps()
-    const step = new MapInput()
+    const step = new MapInput<Settings, Payload>()
     this.steps.push(step)
 
     this.requestExtensions = []
     this.autocompleteCache = {}
   }
 
-  async execute(ctx: ExecuteInput): Promise<StepResult[]> {
+  async execute(ctx: ExecuteInput<Settings, Payload>): Promise<StepResult[]> {
     const results = await this.steps.execute(ctx)
 
     const finalResult = results[results.length - 1]
@@ -390,18 +392,18 @@ export class Action extends EventEmitter {
     return results
   }
 
-  validatePayload(schema: object): Action {
+  validatePayload(schema: object): Action<Settings, Payload> {
     const step = new Validate('Payload is invalid:', 'payload', schema)
     this.steps.push(step)
     return this
   }
 
-  autocomplete(field: string, callback: RequestFn): Action {
+  autocomplete(field: string, callback: RequestFn<Settings, Payload>): Action<Settings, Payload> {
     this.autocompleteCache[field] = callback
     return this
   }
 
-  executeAutocomplete(field: string, ctx: ExecuteAutocompleteInput): any {
+  executeAutocomplete(field: string, ctx: ExecuteAutocompleteInput<Settings, Payload>): any {
     if (!this.autocompleteCache[field]) {
       return {
         data: [],
@@ -409,12 +411,12 @@ export class Action extends EventEmitter {
       }
     }
 
-    const step = new Request(this.requestExtensions, this.autocompleteCache[field])
+    const step = new Request<Settings, Payload>(this.requestExtensions, this.autocompleteCache[field])
 
     return step.executeStep(ctx)
   }
 
-  mapField(path: string, fieldMapping: FieldMapping): Action {
+  mapField(path: string, fieldMapping: FieldMapping): Action<Settings, Payload> {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     let pathParts: string[] = JSONPath.toPathArray(path)
@@ -442,26 +444,26 @@ export class Action extends EventEmitter {
     return this
   }
 
-  do(fn: Function): Action {
+  do(fn: Function): Action<Settings, Payload> {
     const step = new Do(fn)
     this.steps.push(step)
     return this
   }
 
-  fanOut(opts: FanOutOptions): FanOut {
-    const step = new FanOut(this, opts)
+  fanOut(opts: FanOutOptions): FanOut<Settings, Payload> {
+    const step = new FanOut<Settings, Payload>(this, opts)
     step.extendRequest(...this.requestExtensions)
     this.steps.push(step)
     return step
   }
 
-  extendRequest(...extensionFns: Extensions): Action {
+  extendRequest(...extensionFns: Extensions<Settings, Payload>): Action<Settings, Payload> {
     this.requestExtensions.push(...extensionFns)
     return this
   }
 
-  request(requestFn: RequestFn): Action {
-    const step = new Request(this.requestExtensions, requestFn)
+  request(requestFn: RequestFn<Settings, Payload>): Action<Settings, Payload> {
+    const step = new Request<Settings, Payload>(this.requestExtensions, requestFn)
 
     step.on('response', response => this.emit('response', response))
 
@@ -470,7 +472,7 @@ export class Action extends EventEmitter {
     return this
   }
 
-  cachedRequest(config: CachedRequestConfig): Action {
+  cachedRequest(config: CachedRequestConfig<Settings, Payload>): Action<Settings, Payload> {
     const step = new CachedRequest(this.requestExtensions, config)
     this.steps.push(step)
     return this
