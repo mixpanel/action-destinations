@@ -10,7 +10,6 @@ import { redactSettings } from '../redact'
 
 export interface DestinationConfig {
   name: string
-  defaultSubscriptions: Subscription[]
 }
 
 interface Subscription {
@@ -52,7 +51,6 @@ function instrumentSubscription(context: Context, input: Subscriptions): void {
 
 export class Destination<Settings = any> {
   config: DestinationConfig
-  defaultSubscriptions: Subscription[]
   partnerActions: PartnerActions<Settings, any>
   requestExtensions: Extensions<Settings, any>
   settingsSchema?: object

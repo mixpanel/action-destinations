@@ -109,10 +109,9 @@ destination() instantiates a new Destination object with the given configuration
 
 The configuration object accepts the following fields:
 
-| Field                  | Type     | Description                                                  |
-| ---------------------- | -------- | ------------------------------------------------------------ |
-| `name`                 | `string` | The human-readable name of the destination. E.g. "Amplitude" |
-| `defaultSubscriptions` | `object` | TODO (not sure if we want to keep this)                      |
+| Field  | Type     | Description                                                  |
+| ------ | -------- | ------------------------------------------------------------ |
+| `name` | `string` | The human-readable name of the destination. E.g. "Amplitude" |
 
 ```js
 const { destination } = require('./lib/destination-kit')

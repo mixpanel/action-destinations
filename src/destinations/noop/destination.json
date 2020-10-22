@@ -1,9 +1,3 @@
 {
-  "name": "No-op",
-  "defaultSubscriptions": [
-    {
-      "subscribe": "all",
-      "partnerAction": "noop"
-    }
-  ]
+  "name": "No-op"
 }
