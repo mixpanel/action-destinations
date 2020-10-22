@@ -18,7 +18,6 @@
     - [.mapField()](#mapfield)
     - [.request(fn)](#requestfn)
     - [.validatePayload()](#validatepayload)
-    - [.validateSettings()](#validatesettings)
 
 <!-- tocstop -->
 
@@ -275,9 +274,7 @@ fanIn() returns the parent Action object.
 ```js
 action
   .fanOut({ on: '$.payload.ids', as: 'userId' })
-  .request((req, { payload, userId }) =>
-    req.post(`http://example.com/${userId}/ping`)
-  )
+  .request((req, { payload, userId }) => req.post(`http://example.com/${userId}/ping`))
   .do(({ userId }) => console.log(`${userId} pinged`))
   .fanIn()
 ```
@@ -339,32 +336,6 @@ action
   .do(({ payload }) => {
     console.log(`User's ID is ${payload.userId}`)
   })
-```
-
-#### .validateSettings(schema: object)
-
-validateSettings() accepts a [JSON Schema](https://json-schema.org) configuration and validates the
-`settings` field of the Context object against it. It throws an error and halts execution of the
-Action if validation fails.
-
-```js
-action
-  .validateSettings({
-    type: 'object',
-    properties: {
-      apiKey: {
-        title: 'API Key',
-        type: 'string',
-        minLength: 32
-      }
-    },
-    required: [apiKey]
-  })
-  .extendRequest(({ settings }) => ({
-    headers: {
-      Authorization: `Bearer ${settings.apiKey}`
-    }
-  }))
 ```
 
 ### Context

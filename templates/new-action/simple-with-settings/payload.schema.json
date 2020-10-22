@@ -16,7 +16,13 @@
     "properties": {
       "description": "Properties of the user",
       "type": "object"
+    },
+    "url": {
+      "title": "URL",
+      "description": "URL to send payloads to.",
+      "type": "string",
+      "format": "uri"
     }
   },
-  "required": ["email", "event"]
+  "required": ["email", "event", "url"]
 }

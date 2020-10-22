@@ -223,7 +223,7 @@ function removeUndefined(obj) {
 }
 
 module.exports = {
-  map: (mapping, payload = {}, options = {}) => {
+  transform: (mapping, payload = {}, options = {}) => {
     const payloadType = realTypeOf(payload)
     if (payloadType !== 'object') throw new Error(`payload must be an object, got ${payloadType}`)
 
@@ -232,7 +232,8 @@ module.exports = {
     let resolved = resolve(mapping, payload)
 
     if (options.merge) {
-      resolved = merge(payload, resolved)
+      // Merge into an empty object to avoid mutating the `payload` argument
+      resolved = merge({}, payload, resolved)
     }
 
     resolved = removeUndefined(resolved)

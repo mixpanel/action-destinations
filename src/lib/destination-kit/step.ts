@@ -7,9 +7,12 @@ export interface StepResult {
 }
 
 export interface ExecuteInput {
-  settings: JSONObject
+  /** The subscription mapping definition */
+  readonly mapping?: JSONObject
+  /** The global destination settings */
+  readonly settings: JSONObject
+  /** The transformed input data, based on `mapping` + `event` */
   payload: JSONObject
-  mapping?: JSONObject
 }
 
 /**

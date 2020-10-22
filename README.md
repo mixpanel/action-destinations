@@ -4,7 +4,7 @@
 
 Fab 5 Engine is an early prototype implementation of five destinations following the Destinations
 2.0 vision. 2.0 destinations are comprised of one or more subscriptions ("if" statements) that
-trigger partner actions along with a mapping that maps the incoming event to a payload that matches
+trigger partner actions along with a mapping that transforms the incoming event to a payload that matches
 the action's schema.
 
 ![Destinations 2.0 flow][architecture]
@@ -122,11 +122,9 @@ Here's a full example:
     "mapping": {
       "text": {
         "@template": "Tracked! event={{event}}, {{properties.text}}"
-      }
-    },
-    "settings": {
+      },
       "url": "https://hooks.slack.com/services/0HL7TC62R/0T276CRHL/8WvI6gEiE9ZqD47kWqYbfIhZ",
-      "channels": ["test-fab-5"]
+      "channel": "test-fab-5"
     }
   },
   {
@@ -137,11 +135,9 @@ Here's a full example:
     "mapping": {
       "text": {
         "@template": "User identified! email={{email}}"
-      }
-    },
-    "settings": {
+      },
       "url": "https://hooks.slack.com/services/0HL7TC62R/0T276CRHL/8WvI6gEiE9ZqD47kWqYbfIhZ",
-      "channels": ["test-fab-5"]
+      "channel": "test-fab-5"
     }
   }
 ]

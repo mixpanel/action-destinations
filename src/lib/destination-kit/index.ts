@@ -20,7 +20,6 @@ interface Subscription {
     | {
         type: string
       }
-  settings?: JSONObject
   mapping?: JSONObject
 }
 
@@ -133,11 +132,11 @@ export class Destination {
   private async onSubscription(
     context: Context,
     subscription: Subscription,
-    payload: JSONObject,
-    destinationSettings: JSONObject,
+    event: JSONObject,
+    settings: JSONObject,
     privateSettings: JSONArray
   ): Promise<StepResult[]> {
-    const isSubscribed = validate(subscription.subscribe, payload)
+    const isSubscribed = validate(subscription.subscribe, event)
     if (!isSubscribed) {
       return [{ output: 'not subscribed' }]
     }
@@ -150,15 +149,15 @@ export class Destination {
 
     const subscriptionStartedAt = time()
 
-    const settings = {
-      ...destinationSettings,
-      ...subscription.settings
-    }
-
     const input: ExecuteInput = {
-      payload,
-      settings,
-      mapping: subscription.mapping
+      // Payload starts as the event itself, but will get transformed based on the given `mapping` + `event`
+      // In other arbitrary actions (like autocomplete) payload may be non-event data
+      //
+      // TODO: evaluate if actions like autocomplete should be defined the same, and have the same semantics as a normal partner action
+      // these are effectively actions that power UI **inputs** and nothing else.
+      payload: event,
+      mapping: subscription.mapping,
+      settings
     }
 
     const results = await action.execute(input)
@@ -171,8 +170,7 @@ export class Destination {
       destination: this.config.name,
       action: actionSlug,
       input: {
-        payload,
-        mapping: subscription.mapping,
+        ...input,
         settings: redactSettings(settings, privateSettings)
       },
       output: results

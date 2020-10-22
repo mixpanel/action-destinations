@@ -1,4 +1,4 @@
-import { map } from '../mapping-kit'
+import { transform } from '../mapping-kit'
 import Ajv from 'ajv'
 import { AggregateAjvError } from '@segment/ajv-human-errors'
 import { JSONPath } from 'jsonpath-plus'
@@ -12,12 +12,10 @@ import { lookup, beforeRequest } from '../dns'
 
 class MapInput extends Step {
   executeStep(ctx: ExecuteInput): Promise<string> {
-    if (ctx.settings) {
-      ctx.settings = map(ctx.settings, ctx.payload)
-    }
-
+    // Transforms the initial payload (event) + action settings (from `subscriptions[0].mapping`)
+    // into input data that the action can use to talk to partner apis
     if (ctx.mapping) {
-      ctx.payload = map(ctx.mapping, ctx.payload)
+      ctx.payload = transform(ctx.mapping, ctx.payload)
     }
 
     return Promise.resolve('MapInput completed')
@@ -71,7 +69,8 @@ class MapPayload extends Step {
   }
 
   executeStep(ctx: ExecuteInput): Promise<string> {
-    ctx.payload = map(this.mapping, ctx.payload, this.options)
+    // TODO dont mutate payload (payload is already transformed via MapInput)
+    ctx.payload = transform(this.mapping, ctx.payload, this.options)
     return Promise.resolve('MapPayload completed')
   }
 }
@@ -389,12 +388,6 @@ export class Action extends EventEmitter {
     }
 
     return results
-  }
-
-  validateSettings(schema: object): Action {
-    const step = new Validate('Settings are invalid:', 'settings', schema)
-    this.steps.push(step)
-    return this
   }
 
   validatePayload(schema: object): Action {

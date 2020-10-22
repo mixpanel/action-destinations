@@ -76,12 +76,12 @@ Output:
 
 ```js
 // Require using path
-const { map } = require('../mapping-kit')
+const { transform } = require('../mapping-kit')
 
 const mapping = { '@path': '$.foo.bar' }
 const input = { foo: { bar: 'Hello!' } }
 
-const output = map(mapping, input)
+const output = transform(mapping, input)
 // => "Hello!"
 ```
 
@@ -225,10 +225,10 @@ suite][schema.test.js] is a good source-of-truth for current implementation beha
 
 ## Options
 
-Options can be passed to the `map()` function as the third parameter:
+Options can be passed to the `transform()` function as the third parameter:
 
 ```js
-const output = map(mapping, input, options)
+const output = transform(mapping, input, options)
 ```
 
 Available options:

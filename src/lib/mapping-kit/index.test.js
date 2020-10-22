@@ -1,33 +1,33 @@
-const { map } = require('./index')
+const { transform } = require('./index')
 
 describe('validations', () => {
   test('valid', () => {
     expect(() => {
-      map(['cool'])
+      transform(['cool'])
     }).not.toThrow()
     expect(() => {
-      map(123)
+      transform(123)
     }).not.toThrow()
     expect(() => {
-      map({ foo: 'bar' })
+      transform({ foo: 'bar' })
     }).not.toThrow()
     expect(() => {
-      map('neat')
+      transform('neat')
     }).not.toThrow()
     expect(() => {
-      map({ '@path': '$.foo.bar' })
+      transform({ '@path': '$.foo.bar' })
     }).not.toThrow()
     expect(() => {
-      map({ a: 1, b: { '@path': '$.foo.bar' } })
+      transform({ a: 1, b: { '@path': '$.foo.bar' } })
     }).not.toThrow()
   })
 
   test('invalid', () => {
     expect(() => {
-      map({ a: 1, '@field': '$.foo.bar' })
+      transform({ a: 1, '@field': '$.foo.bar' })
     }).toThrow()
     expect(() => {
-      map({ oops: { '@merge': [{}, 123] } })
+      transform({ oops: { '@merge': [{}, 123] } })
     }).toThrow()
     // Further validaiton tests are in validate.test.js
   })
@@ -36,22 +36,22 @@ describe('validations', () => {
 describe('payload validations', () => {
   test('invalid type', () => {
     expect(() => {
-      map({ a: 1 }, 123)
+      transform({ a: 1 }, 123)
     }).toThrowError()
     expect(() => {
-      map({ a: 1 }, [])
+      transform({ a: 1 }, [])
     }).toThrowError()
   })
 })
 
 describe('no-op', () => {
   test('empty mapping', () => {
-    const output = map({}, { cool: false })
+    const output = transform({}, { cool: false })
     expect(output).toStrictEqual({})
   })
 
   test('pass-through mapping', () => {
-    const output = map({ cool: true }, {})
+    const output = transform({ cool: true }, {})
     expect(output).toStrictEqual({ cool: true })
   })
 })
@@ -59,7 +59,7 @@ describe('no-op', () => {
 describe('options', () => {
   describe('merge', () => {
     test('overwrite value', () => {
-      const output = map(
+      const output = transform(
         { a: { b: 0 } }, // mapping
         { a: { b: { c: 1 } } }, // payload
         { merge: true } // options
@@ -68,7 +68,7 @@ describe('options', () => {
     })
 
     test('leave other values intact', () => {
-      const output = map(
+      const output = transform(
         { a: { b: 0 }, d: 1 }, // mapping
         { a: { b: 2, c: 3 }, e: 4 }, // payload
         { merge: true } // options
@@ -83,18 +83,18 @@ describe('@base64', () => {
   const base64Str = Buffer.from(str).toString('base64')
 
   test('simple', () => {
-    const output = map({ '@base64': str }, {})
+    const output = transform({ '@base64': str }, {})
     expect(output).toStrictEqual(base64Str)
   })
 
   test('nested directive', () => {
-    const output = map({ '@base64': { '@path': '$.foo' } }, { foo: str })
+    const output = transform({ '@base64': { '@path': '$.foo' } }, { foo: str })
     expect(output).toStrictEqual(base64Str)
   })
 
   test('invalid type', () => {
     expect(() => {
-      map({ '@base64': { oops: true } }, {})
+      transform({ '@base64': { oops: true } }, {})
     }).toThrowError()
   })
 })
@@ -103,7 +103,7 @@ describe('@if', () => {
   const payload = { a: 1, b: true, c: false, d: null }
 
   test('exists', () => {
-    let output = map(
+    let output = transform(
       {
         '@if': {
           exists: { '@path': '$.a' },
@@ -115,7 +115,7 @@ describe('@if', () => {
     )
     expect(output).toStrictEqual(1)
 
-    output = map(
+    output = transform(
       {
         '@if': {
           exists: { '@path': '$.d' },
@@ -127,7 +127,7 @@ describe('@if', () => {
     )
     expect(output).toStrictEqual(2)
 
-    output = map(
+    output = transform(
       {
         '@if': {
           exists: { '@path': '$.x' },
@@ -141,7 +141,7 @@ describe('@if', () => {
   })
 
   test('true', () => {
-    let output = map(
+    let output = transform(
       {
         '@if': {
           true: { '@path': '$.b' },
@@ -153,7 +153,7 @@ describe('@if', () => {
     )
     expect(output).toStrictEqual(1)
 
-    output = map(
+    output = transform(
       {
         '@if': {
           true: { '@path': '$.c' },
@@ -169,13 +169,13 @@ describe('@if', () => {
 
 describe('@json', () => {
   test('simple', () => {
-    expect(map({ '@json': true }, {})).toStrictEqual('true')
-    expect(map({ '@json': {} }, {})).toStrictEqual('{}')
-    expect(map({ '@json': 'hello' }, {})).toStrictEqual('"hello"')
+    expect(transform({ '@json': true }, {})).toStrictEqual('true')
+    expect(transform({ '@json': {} }, {})).toStrictEqual('{}')
+    expect(transform({ '@json': 'hello' }, {})).toStrictEqual('"hello"')
   })
 
   test('nested', () => {
-    const output = map({ '@json': { '@path': '$.properties.cool' } }, { properties: { cool: 'yep' } })
+    const output = transform({ '@json': { '@path': '$.properties.cool' } }, { properties: { cool: 'yep' } })
     expect(output).toStrictEqual('"yep"')
   })
 })
@@ -185,47 +185,47 @@ describe('@lowercase', () => {
   const lowerStr = 'omg123!'
 
   test('simple', () => {
-    const output = map({ '@lowercase': str }, {})
+    const output = transform({ '@lowercase': str }, {})
     expect(output).toStrictEqual(lowerStr)
   })
 
   test('nested directive', () => {
-    const output = map({ '@lowercase': { '@path': '$.foo' } }, { foo: str })
+    const output = transform({ '@lowercase': { '@path': '$.foo' } }, { foo: str })
     expect(output).toStrictEqual(lowerStr)
   })
 
   test('invalid type', () => {
     expect(() => {
-      map({ '@lowercase': ['oh no'] }, {})
+      transform({ '@lowercase': ['oh no'] }, {})
     }).toThrowError()
   })
 })
 
 describe('@merge', () => {
   test('empty', () => {
-    const output = map({ '@merge': [] }, {})
+    const output = transform({ '@merge': [] }, {})
     expect(output).toStrictEqual({})
   })
 
   test('one object', () => {
-    const output = map({ '@merge': [{ cool: true }] }, {})
+    const output = transform({ '@merge': [{ cool: true }] }, {})
     expect(output).toStrictEqual({ cool: true })
   })
 
   test('simple overwrite', () => {
-    const output = map({ '@merge': [{ cool: true }, { cool: 'you bet' }] }, {})
+    const output = transform({ '@merge': [{ cool: true }, { cool: 'you bet' }] }, {})
     expect(output).toStrictEqual({ cool: 'you bet' })
   })
 
   test('nested directive', () => {
-    const output = map({ '@merge': [{ cool: true }, { '@path': '$.foo' }] }, { foo: { bar: 'baz' } })
+    const output = transform({ '@merge': [{ cool: true }, { '@path': '$.foo' }] }, { foo: { bar: 'baz' } })
     expect(output).toStrictEqual({ cool: true, bar: 'baz' })
   })
 })
 
 describe('@omit', () => {
   test('empty object', () => {
-    const output = map(
+    const output = transform(
       {
         '@omit': {
           object: {},
@@ -238,7 +238,7 @@ describe('@omit', () => {
   })
 
   test('empty fields', () => {
-    const output = map(
+    const output = transform(
       {
         '@omit': {
           object: { a: 1 },
@@ -251,7 +251,7 @@ describe('@omit', () => {
   })
 
   test('raw object and fields', () => {
-    const output = map(
+    const output = transform(
       {
         '@omit': {
           object: { a: 1, b: 2, c: 3 },
@@ -264,7 +264,7 @@ describe('@omit', () => {
   })
 
   test('object directive', () => {
-    const output = map(
+    const output = transform(
       {
         '@omit': {
           object: { '@path': '$.foo' },
@@ -277,7 +277,7 @@ describe('@omit', () => {
   })
 
   test('fields directive', () => {
-    const output = map(
+    const output = transform(
       {
         '@omit': {
           object: { a: 1, b: 2, c: 3 },
@@ -290,7 +290,7 @@ describe('@omit', () => {
   })
 
   test('fields nested directive', () => {
-    const output = map(
+    const output = transform(
       {
         '@omit': {
           object: { a: 1, b: 2, c: 3 },
@@ -304,7 +304,7 @@ describe('@omit', () => {
 
   test("doesn't modify original", () => {
     const original = { a: 1, b: 2, c: 3 }
-    const output = map(
+    const output = transform(
       {
         '@omit': {
           object: original,
@@ -320,45 +320,45 @@ describe('@omit', () => {
 
 describe('@path', () => {
   test('simple', () => {
-    const output = map({ neat: { '@path': '$.foo' } }, { foo: 'bar' })
+    const output = transform({ neat: { '@path': '$.foo' } }, { foo: 'bar' })
     expect(output).toStrictEqual({ neat: 'bar' })
   })
 
   test('nested path', () => {
-    const output = map({ neat: { '@path': '$.foo.bar' } }, { foo: { bar: 'baz' } })
+    const output = transform({ neat: { '@path': '$.foo.bar' } }, { foo: { bar: 'baz' } })
     expect(output).toStrictEqual({ neat: 'baz' })
   })
 
   test('nested directive', () => {
-    const output = map({ '@path': { '@path': '$.foo' } }, { foo: 'bar', bar: 'baz' })
+    const output = transform({ '@path': { '@path': '$.foo' } }, { foo: 'bar', bar: 'baz' })
     expect(output).toStrictEqual('baz')
   })
 
   test('JSONPath features', () => {
-    const output = map({ '@path': '$.foo..bar' }, { foo: [{ bar: 1 }, { bar: 2 }] })
+    const output = transform({ '@path': '$.foo..bar' }, { foo: [{ bar: 1 }, { bar: 2 }] })
     expect(output).toStrictEqual([1, 2])
   })
 
   test('invalid path', () => {
-    const output = map({ neat: { '@path': '$.oops' } }, { foo: 'bar' })
+    const output = transform({ neat: { '@path': '$.oops' } }, { foo: 'bar' })
     expect(output).toStrictEqual({})
   })
 
   test('invalid key type', () => {
     expect(() => {
-      map({ neat: { '@path': {} } }, { foo: 'bar' })
+      transform({ neat: { '@path': {} } }, { foo: 'bar' })
     }).toThrowError()
   })
 
   test('invalid nested value type', () => {
-    const output = map({ neat: { '@path': '$.foo.bar.baz' } }, { foo: 'bar' })
+    const output = transform({ neat: { '@path': '$.foo.bar.baz' } }, { foo: 'bar' })
     expect(output).toStrictEqual({})
   })
 })
 
 describe('@pick', () => {
   test('empty object', () => {
-    const output = map(
+    const output = transform(
       {
         '@pick': {
           object: {},
@@ -371,7 +371,7 @@ describe('@pick', () => {
   })
 
   test('empty fields', () => {
-    const output = map(
+    const output = transform(
       {
         '@pick': {
           object: { a: 1 },
@@ -384,7 +384,7 @@ describe('@pick', () => {
   })
 
   test('raw object and fields', () => {
-    const output = map(
+    const output = transform(
       {
         '@pick': {
           object: { a: 1, b: 2, c: 3 },
@@ -397,7 +397,7 @@ describe('@pick', () => {
   })
 
   test('object directive', () => {
-    const output = map(
+    const output = transform(
       {
         '@pick': {
           object: { '@path': '$.foo' },
@@ -410,7 +410,7 @@ describe('@pick', () => {
   })
 
   test('fields directive', () => {
-    const output = map(
+    const output = transform(
       {
         '@pick': {
           object: { a: 1, b: 2, c: 3 },
@@ -423,7 +423,7 @@ describe('@pick', () => {
   })
 
   test('fields nested directive', () => {
-    const output = map(
+    const output = transform(
       {
         '@pick': {
           object: { a: 1, b: 2, c: 3 },
@@ -437,7 +437,7 @@ describe('@pick', () => {
 
   test("doesn't modify original", () => {
     const original = { a: 1, b: 2, c: 3 }
-    const output = map(
+    const output = transform(
       {
         '@pick': {
           object: original,
@@ -453,35 +453,35 @@ describe('@pick', () => {
 
 describe('@root', () => {
   test('simple', () => {
-    const output = map({ '@root': true }, { cool: true })
+    const output = transform({ '@root': true }, { cool: true })
     expect(output).toStrictEqual({ cool: true })
   })
 })
 
 describe('@template', () => {
   test('basic', () => {
-    const output = map({ '@template': 'Hello, {{who}}!' }, { who: 'World' })
+    const output = transform({ '@template': 'Hello, {{who}}!' }, { who: 'World' })
     expect(output).toStrictEqual('Hello, World!')
   })
 
   test('nested fields', () => {
-    const output = map({ '@template': 'Hello, {{who.name}}!' }, { who: { name: 'World' } })
+    const output = transform({ '@template': 'Hello, {{who.name}}!' }, { who: { name: 'World' } })
     expect(output).toStrictEqual('Hello, World!')
   })
 
   test('no escaping', () => {
-    const output = map({ '@template': '<blink>{{a}} {{{a}}}</blink>' }, { a: '<b>Hi</b>' })
+    const output = transform({ '@template': '<blink>{{a}} {{{a}}}</blink>' }, { a: '<b>Hi</b>' })
     expect(output).toStrictEqual('<blink>&lt;b&gt;Hi&lt;&#x2F;b&gt; <b>Hi</b></blink>')
   })
 
   test('missing fields', () => {
-    const output = map({ '@template': '{{oops.yo}}' }, {})
+    const output = transform({ '@template': '{{oops.yo}}' }, {})
     expect(output).toStrictEqual('')
   })
 
   test('invalid template', () => {
     expect(() => {
-      map({ '@template': '{{' }, {})
+      transform({ '@template': '{{' }, {})
     }).toThrowError()
   })
 })
@@ -490,7 +490,7 @@ describe('@timestamp', () => {
   const ts = '2020-06-01'
 
   test('json format', () => {
-    const output = map(
+    const output = transform(
       {
         '@timestamp': {
           timestamp: ts,
@@ -503,7 +503,7 @@ describe('@timestamp', () => {
   })
 
   test('custom format', () => {
-    const output = map(
+    const output = transform(
       {
         '@timestamp': {
           timestamp: ts,
@@ -516,7 +516,7 @@ describe('@timestamp', () => {
   })
 
   test('nested directives', () => {
-    const output = map(
+    const output = transform(
       {
         '@timestamp': {
           timestamp: { '@path': '$.timestamp' },
@@ -530,7 +530,7 @@ describe('@timestamp', () => {
 
   test('bad timestamp type', () => {
     expect(() => {
-      map(
+      transform(
         {
           '@timestamp': {
             timestamp: { '@path': '$.timestamp' },
@@ -544,7 +544,7 @@ describe('@timestamp', () => {
 
   test('bad format type', () => {
     expect(() => {
-      map(
+      transform(
         {
           '@timestamp': {
             timestamp: { '@path': '$.timestamp' },
@@ -557,7 +557,7 @@ describe('@timestamp', () => {
   })
 
   test('bad input', () => {
-    const output = map(
+    const output = transform(
       {
         '@timestamp': {
           timestamp: 'oops',
@@ -572,30 +572,30 @@ describe('@timestamp', () => {
 
 describe('@uuid', () => {
   test('unique IDs', () => {
-    const outputA = map({ '@uuid': {} }, {})
+    const outputA = transform({ '@uuid': {} }, {})
     expect(outputA).toMatch(/^[a-f0-9-]{36}$/)
 
-    const outputB = map({ '@uuid': {} }, {})
+    const outputB = transform({ '@uuid': {} }, {})
     expect(outputA).not.toEqual(outputB)
   })
 })
 
 describe('remove undefined values in objects', () => {
   test('simple', () => {
-    expect(map({ x: undefined }, {})).toEqual({})
-    expect(map({ x: null }, {})).toEqual({ x: null })
-    expect(map({ x: 'hi' }, {})).toEqual({ x: 'hi' })
-    expect(map({ x: 1 }, {})).toEqual({ x: 1 })
-    expect(map({ x: {} }, {})).toEqual({ x: {} })
-    expect(map({ x: undefined, y: 1, z: 'hi' }, {})).toEqual({ y: 1, z: 'hi' })
+    expect(transform({ x: undefined }, {})).toEqual({})
+    expect(transform({ x: null }, {})).toEqual({ x: null })
+    expect(transform({ x: 'hi' }, {})).toEqual({ x: 'hi' })
+    expect(transform({ x: 1 }, {})).toEqual({ x: 1 })
+    expect(transform({ x: {} }, {})).toEqual({ x: {} })
+    expect(transform({ x: undefined, y: 1, z: 'hi' }, {})).toEqual({ y: 1, z: 'hi' })
   })
 
   test('nested', () => {
-    expect(map({ x: { y: undefined, z: 1 }, foo: 1 }, {})).toEqual({
+    expect(transform({ x: { y: undefined, z: 1 }, foo: 1 }, {})).toEqual({
       x: { z: 1 },
       foo: 1
     })
-    expect(map({ x: { y: { z: undefined } }, foo: 1 }, {})).toEqual({
+    expect(transform({ x: { y: { z: undefined } }, foo: 1 }, {})).toEqual({
       x: { y: {} },
       foo: 1
     })
