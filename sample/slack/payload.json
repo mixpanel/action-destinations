@@ -1,7 +1,0 @@
-{
-  "event": "Local Test",
-  "properties": {
-    "text": "Hello, world!"
-  },
-  "type": "track"
-}
