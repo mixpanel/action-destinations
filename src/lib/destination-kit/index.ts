@@ -16,6 +16,8 @@ export interface DestinationConfig<Settings = any> {
   schema?: JSONSchema7
   /** An optional function to extend requests sent from the destination (including all actions) */
   extendRequest?: Extension<Settings, any>
+  /** Optional authentication configuration */
+  authentication?: AuthenticationScheme<Settings>
 }
 
 interface Subscription {
@@ -32,18 +34,16 @@ interface PartnerActions<Settings, Payload> {
   [key: string]: Action<Settings, Payload>
 }
 
-interface TestAuth<Settings> {
-  type: string
-  options: TestAuthOptions<Settings>
-}
-
-interface TestAuthOptions<Settings> {
-  testCredentials: (req: Got, settings: TestAuthSettings<Settings>) => CancelableRequest<Response<string>>
-}
-
 interface TestAuthSettings<Settings> {
   settings: Settings
 }
+
+interface ApiKeyAuthentication<Settings> {
+  type: 'API Key',
+  testAuthentication: (req: Got, input: TestAuthSettings<Settings>) => CancelableRequest<Response<string>>
+}
+
+type AuthenticationScheme<Settings = any> = ApiKeyAuthentication<Settings>
 
 function instrumentSubscription(context: Context, input: Subscriptions): void {
   context.append('subscriptions', {
@@ -59,8 +59,11 @@ export class Destination<Settings = any> {
   readonly name: string
   readonly settingsSchema?: JSONSchema7
   readonly extendRequest?: Extension<Settings, any>
+
+  // TODO Authentication should be included in part of the destination configuration including creating a test request
+  readonly authentication?: AuthenticationScheme<Settings>
+
   partnerActions: PartnerActions<Settings, any>
-  auth?: TestAuth<Settings>
   responses: Response[]
 
   constructor(config: DestinationConfig<Settings>) {
@@ -68,20 +71,11 @@ export class Destination<Settings = any> {
     this.settingsSchema = config.schema
     this.extendRequest = config.extendRequest
     this.partnerActions = {}
-    this.auth = undefined
+    this.authentication = config.authentication
     this.responses = []
   }
 
-  apiKeyAuth(options: TestAuthOptions<Settings>): Destination<Settings> {
-    this.auth = {
-      type: 'apiKey',
-      options
-    }
-
-    return this
-  }
-
-  async testCredentials(settings: Settings): Promise<void> {
+  async testAuthentication(settings: Settings): Promise<void> {
     const context: ExecuteInput<Settings, {}> = { settings, payload: {}, cacheIds: {} }
 
     if (this.settingsSchema) {
@@ -89,7 +83,7 @@ export class Destination<Settings = any> {
       await step.executeStep(context)
     }
 
-    if (!this.auth) {
+    if (!this.authentication) {
       return
     }
 
@@ -106,7 +100,7 @@ export class Destination<Settings = any> {
     }
 
     try {
-      await this.auth.options.testCredentials(request, { settings })
+      await this.authentication.testAuthentication(request, { settings })
     } catch (error) {
       throw new Error('Credentials are invalid')
     }

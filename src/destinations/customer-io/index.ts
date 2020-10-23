@@ -14,6 +14,17 @@ import { Settings } from './generated-types'
 export default function createDestination(): Destination<Settings> {
   const destination = new Destination<Settings>({
     name: 'Customer.io',
+    authentication: {
+      type: 'API Key',
+      testAuthentication: (req, { settings }) => {
+        return req('https://beta-api.customer.io/v1/api/segments', {
+          prefixUrl: '',
+          headers: {
+            authorization: `Bearer ${settings.appApiKey}`
+          }
+        })
+      }
+    },
     // TODO get this from the database
     schema: settings as JSONSchema7,
     extendRequest({ settings }) {
@@ -26,17 +37,6 @@ export default function createDestination(): Destination<Settings> {
         },
         responseType: 'json'
       }
-    }
-  })
-
-  destination.apiKeyAuth({
-    testCredentials: (req, { settings }) => {
-      return req('https://beta-api.customer.io/v1/api/segments', {
-        prefixUrl: '',
-        headers: {
-          authorization: `Bearer ${settings.appApiKey}`
-        }
-      })
     }
   })
 

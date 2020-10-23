@@ -12,6 +12,11 @@ export default function createDestination(): Destination<Settings> {
   const destination = new Destination<Settings>({
     name: 'SendGrid',
     // TODO get this from the database
+    authentication: {
+      type: 'API Key',
+      testAuthentication: (req) => req('user/profile')
+    },
+    // TODO get this from the database
     schema: settings as JSONSchema7,
     extendRequest({ settings }) {
       return {
@@ -20,10 +25,6 @@ export default function createDestination(): Destination<Settings> {
         responseType: 'json'
       }
     }
-  })
-
-  destination.apiKeyAuth({
-    testCredentials: req => req('user/profile')
   })
 
   destination.partnerAction('createList', createList)

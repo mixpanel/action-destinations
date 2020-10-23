@@ -11,6 +11,11 @@ export default function createDestination(): Destination<Settings> {
   const destination = new Destination<Settings>({
     name: 'Pipedrive',
     // TODO get this from the database
+    authentication: {
+      type: 'API Key',
+      testAuthentication: (req) => req('users/me')
+    },
+    // TODO get this from the database
     schema: settings as JSONSchema7,
     extendRequest({ settings }) {
       return {
@@ -21,10 +26,6 @@ export default function createDestination(): Destination<Settings> {
         responseType: 'json'
       }
     }
-  })
-
-  destination.apiKeyAuth({
-    testCredentials: req => req('users/me')
   })
 
   destination.partnerAction('createUpdateOrganization', createUpdateOrganization)
