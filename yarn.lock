@@ -543,9 +543,9 @@
     node-statsd "^0.1.1"
 
 "@segment/fab5-subscriptions@^0.1.0":
-  version "0.1.3"
-  resolved "https://registry.yarnpkg.com/@segment/fab5-subscriptions/-/fab5-subscriptions-0.1.3.tgz#9d6a401997e8f5ad8a626304257e35d4cde2d7df"
-  integrity sha512-MMBR7HOAszaLAxR+Iz17s4K7CFHq0U3vhdKoZtS4TEdx+NewcWwHMogujmfs26BX8EmGV9SkvgtOw5tqMlpu3A==
+  version "0.1.4"
+  resolved "https://registry.yarnpkg.com/@segment/fab5-subscriptions/-/fab5-subscriptions-0.1.4.tgz#6c70d52e4fdd71871e6890801f08fff3d3ddb46d"
+  integrity sha512-lmBkzsgAt/EIhjLllqo3XzvHehc6hxZnh/7DWJOu/5p6fFAAz9vLFRjxgY2muDIKZVGeeqsizr2/SI7xvew8Ow==
   dependencies:
     lodash "^4.17.15"
 
