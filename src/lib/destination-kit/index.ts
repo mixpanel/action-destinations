@@ -39,7 +39,7 @@ interface TestAuthSettings<Settings> {
 }
 
 interface ApiKeyAuthentication<Settings> {
-  type: 'API Key',
+  type: 'API Key'
   testAuthentication: (req: Got, input: TestAuthSettings<Settings>) => CancelableRequest<Response<string>>
 }
 
@@ -199,8 +199,20 @@ export class Destination<Settings = any> {
   }
 
   getSubscriptions(settings: JSONObject): Subscription[] {
-    const { subscriptions } = settings
-    const parsedSubscriptions = typeof subscriptions === 'string' ? JSON.parse(subscriptions) : subscriptions
+    const { subscription, subscriptions } = settings
+    let parsedSubscriptions
+
+    // TODO remove all `else`s once https://github.com/segmentio/refinery/pull/635 lands
+    if (subscription) {
+      parsedSubscriptions = [subscription]
+    } else if (typeof subscriptions === 'string') {
+      parsedSubscriptions = JSON.parse(subscriptions)
+    } else if (Array.isArray(subscriptions)) {
+      parsedSubscriptions = subscriptions
+    } else {
+      parsedSubscriptions = []
+    }
+
     return parsedSubscriptions as Subscription[]
   }
 
