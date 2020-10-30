@@ -8,10 +8,12 @@ export default function(action: Action<Settings, TrackEvent>): Action<Settings, 
     .validatePayload(payloadSchema)
 
     .request(async (req, { payload }) => {
-      const { id, ...body } = payload
-
-      return req.post(`customers/${id}/events`, {
-        json: body
+      return req.post(`customers/${payload.id}/events`, {
+        json: {
+          name: payload.name,
+          type: payload.type,
+          data: payload.data
+        }
       })
     })
 }

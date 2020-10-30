@@ -40,10 +40,12 @@ export default function(
     })
 
     .request(async (req, { payload }) => {
-      const { id, ...body } = payload
-
-      return req.post(`https://api.customer.io/v1/api/campaigns/${id}/triggers`, {
-        json: body
+      return req.post(`https://api.customer.io/v1/api/campaigns/${payload.id}/triggers`, {
+        json: {
+          ids: payload.ids,
+          data: payload.data,
+          recipients: payload.recipients
+        }
       })
     })
 }

@@ -15,12 +15,11 @@ export default function(action: Action<Settings, CreateOrUpdatePerson>): Action<
     })
 
     .request(async (req, { payload }) => {
-      const { id, custom_attributes: customAttrs, ...body } = payload
-
-      return req.put(`customers/${id}`, {
+      return req.put(`customers/${payload.id}`, {
         json: {
-          ...customAttrs,
-          ...body
+          ...payload.custom_attributes,
+          email: payload.email,
+          created_at: payload.created_at
         }
       })
     })

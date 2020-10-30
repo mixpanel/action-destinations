@@ -15,13 +15,12 @@ export default function(action: Action<Settings, CreateOrUpdateDevice>): Action<
     })
 
     .request(async (req, { payload }) => {
-      const { person_id: customerId, device_id: deviceId, ...body } = payload
-
-      return req.put(`customers/${customerId}/devices`, {
+      return req.put(`customers/${payload.person_id}/devices`, {
         json: {
           device: {
-            id: deviceId,
-            ...body
+            id: payload.device_id,
+            platform: payload.platform,
+            last_used: payload.last_used
           }
         }
       })

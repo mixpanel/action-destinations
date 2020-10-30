@@ -11,11 +11,9 @@ export default function(action: Action<Settings, RemovePersonFromSegment>): Acti
     .autocomplete('segment_id', segmentIdAutocomplete)
 
     .request(async (req, { payload }) => {
-      const { segment_id: segmentId, person_id: customerId } = payload
-
-      return req.post(`segments/${segmentId}/remove_customers`, {
+      return req.post(`segments/${payload.segment_id}/remove_customers`, {
         json: {
-          ids: [customerId]
+          ids: [payload.person_id]
         }
       })
     })

@@ -68,15 +68,26 @@ export default function(action: Action<Settings, CreateOrUpdatePerson>): Action<
     })
 
     .request(async (req, { payload, cacheIds }) => {
-      const { identifier, ...person } = payload
       const personId = cacheIds.personId
 
-      if (personId === undefined || personId === null) {
-        return req.post('persons', { json: person })
-      } else {
-        // Don't need add_time if we're only upading the person
-        const { add_time: x, ...cleanPerson } = person
-        return req.put(`persons/${personId}`, { json: cleanPerson })
+      const person = {
+        name: payload.name,
+        org_id: payload.org_id,
+        email: payload.email,
+        phone: payload.phone
       }
+
+      if (personId === undefined || personId === null) {
+        return req.post('persons', {
+          json: {
+            ...person,
+            add_time: payload.add_time
+          }
+        })
+      }
+
+      return req.put(`persons/${personId}`, {
+        json: person
+      })
     })
 }

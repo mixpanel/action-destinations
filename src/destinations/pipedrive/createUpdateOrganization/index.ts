@@ -30,20 +30,24 @@ export default function(
     })
 
     .request(async (req, { payload, cacheIds }) => {
-      const { identifier, ...organization } = payload
       const organizationId = cacheIds.organizationId
+
+      const organization = {
+        name: payload.name,
+        owner_id: payload.owner_id
+      }
 
       if (organizationId === undefined || organizationId === null) {
         return req.post('organizations', {
-          json: organization
-        })
-      } else {
-        // Don't need add_time when we're only updating the org
-        const { add_time: x, ...cleanOrganization } = organization
-
-        return req.put(`organizations/${organizationId}`, {
-          json: cleanOrganization
+          json: {
+            ...organization,
+            add_time: payload.add_time
+          }
         })
       }
+
+      return req.put(`organizations/${organizationId}`, {
+        json: organization
+      })
     })
 }

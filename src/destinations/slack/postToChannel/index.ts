@@ -4,10 +4,13 @@ import { PostMessage } from './generated-types'
 
 export default function(action: Action<{}, PostMessage>): Action<{}, PostMessage> {
   return action.validatePayload(payloadSchema).request((req, { payload }) => {
-    const { url, ...fields } = payload
-
-    return req.post(url, {
-      json: fields,
+    return req.post(payload.url, {
+      json: {
+        channel: payload.channel,
+        text: payload.text,
+        username: payload.username,
+        icon_url: payload.icon_url
+      },
       responseType: 'text'
     })
   })
