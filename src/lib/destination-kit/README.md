@@ -154,13 +154,10 @@ destination({
 of the Action (see ["Action API"](#action-api) below). It returns the base destination object.
 
 ```js
-destination({ name: 'Amplitude' })
-  .partnerAction('trackUser', (action) => {
-    action.request(...)
-  })
-  .partnerAction('annotateChart', (action) => {
-    action.mapField(...).request(...)
-  })
+const destination = new Destination({ name: 'Amplitude' })
+destination.partnerAction('trackUser', (action) => {
+  action.request(...)
+})
 ```
 
 ## Action API

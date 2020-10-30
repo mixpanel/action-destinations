@@ -4,7 +4,6 @@ import { Destination } from '../../lib/destination-kit'
 import settings from './settings.schema.json'
 import trackUser from './trackUser'
 import identifyUser from './identifyUser'
-import annotateChart from './annotateChart'
 import deleteUser from './deleteUser'
 import { Settings } from './generated-types'
 
@@ -17,7 +16,6 @@ export default function createDestination(): Destination<Settings> {
 
   destination.partnerAction('trackUser', trackUser)
   destination.partnerAction('identifyUser', identifyUser)
-  destination.partnerAction('annotateChart', annotateChart)
   destination.partnerAction('deleteUser', deleteUser)
 
   return destination
