@@ -14,7 +14,10 @@
     "data": {
       "title": "Data",
       "description": "Custom Liquid merge data to include with the trigger.",
-      "type": "object"
+      "type": "object",
+      "defaultMapping": {
+        "@path": "$.properties"
+      }
     },
     "recipients": {
       "title": "Recipients",

@@ -8,7 +8,10 @@
     "email": {
       "title": "Email Address",
       "description": "Email address of the contact to delete.",
-      "type": "string"
+      "type": "string",
+      "defaultMapping": {
+        "@template": "{{properties.email}}"
+      }
     }
   },
   "required": ["email"]

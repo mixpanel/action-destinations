@@ -11,7 +11,10 @@
     },
     "user_id": {
       "title": "User ID",
-      "type": "string"
+      "type": "string",
+      "defaultMapping": {
+        "@template": "{{userId}}"
+      }
     },
     "requester": {
       "title": "Requester",

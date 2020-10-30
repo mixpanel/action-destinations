@@ -14,7 +14,10 @@
     "person_id": {
       "title": "Person ID",
       "description": "ID of the person to add.",
-      "type": "string"
+      "type": "string",
+      "defaultMapping": {
+        "@template": "{{userId}}"
+      }
     }
   },
   "required": ["segment_id", "person_id"]

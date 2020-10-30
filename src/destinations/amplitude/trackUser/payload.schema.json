@@ -6,34 +6,52 @@
     "user_id": {
       "title": "User ID",
       "type": "string",
-      "description": "A readable ID specified by you. Must have a minimum length of 5 characters. Required unless device ID is present."
+      "description": "A readable ID specified by you. Must have a minimum length of 5 characters. Required unless device ID is present.",
+      "defaultMapping": {
+        "@template": "{{userId}}"
+      }
     },
     "device_id": {
       "title": "Device ID",
       "type": "string",
-      "description": "A device-specific identifier, such as the Identifier for Vendor on iOS. Required unless user ID is present. If a device ID is not sent with the event, it will be set to a hashed version of the user ID."
+      "description": "A device-specific identifier, such as the Identifier for Vendor on iOS. Required unless user ID is present. If a device ID is not sent with the event, it will be set to a hashed version of the user ID.",
+      "defaultMapping": {
+        "@template": "{{context.device.id}}"
+      }
     },
     "event_type": {
       "title": "Event Type",
       "type": "string",
       "description": "A unique identifier for your event.",
-      "examples": ["watch_tutorial"]
+      "examples": ["watch_tutorial"],
+      "defaultMapping": {
+        "@template": "{{name}}"
+      }
     },
     "time": {
       "title": "Timestamp",
       "type": "string",
       "format": "date-time",
-      "description": "The timestamp of the event in milliseconds since epoch. If time is not sent with the event, it will be set to the request upload time."
+      "description": "The timestamp of the event in milliseconds since epoch. If time is not sent with the event, it will be set to the request upload time.",
+      "defaultMapping": {
+        "@template": "{{timestamp}}"
+      }
     },
     "event_properties": {
       "title": "Event Properties",
       "type": "object",
-      "description": "An object of key-value pairs that represent additional data to be sent along with the event. You can store property values in an array. Date values are transformed into string values. Object depth may not exceed 40 layers."
+      "description": "An object of key-value pairs that represent additional data to be sent along with the event. You can store property values in an array. Date values are transformed into string values. Object depth may not exceed 40 layers.",
+      "defaultMapping": {
+        "@path": "$.properties"
+      }
     },
     "user_properties": {
       "title": "User Properties",
       "type": "object",
-      "description": "An object of key-value pairs that represent additional data tied to the user. You can store property values in an array. Date values are transformed into string values. Object depth may not exceed 40 layers."
+      "description": "An object of key-value pairs that represent additional data tied to the user. You can store property values in an array. Date values are transformed into string values. Object depth may not exceed 40 layers.",
+      "defaultMapping": {
+        "@path": "$.traits"
+      }
     },
     "groups": {
       "title": "Groups",
@@ -43,57 +61,90 @@
     "app_version": {
       "title": "App Version",
       "type": "string",
-      "description": "The current version of your application."
+      "description": "The current version of your application.",
+      "defaultMapping": {
+        "@template": "{{context.app.version}}"
+      }
     },
     "platform": {
       "title": "Platform",
       "type": "string",
-      "description": "Platform of the device."
+      "description": "Platform of the device.",
+      "defaultMapping": {
+        "@template": "{{context.device.type}}"
+      }
     },
     "os_name": {
       "title": "OS Name",
       "type": "string",
-      "description": "The name of the mobile operating system or browser that the user is using."
+      "description": "The name of the mobile operating system or browser that the user is using.",
+      "defaultMapping": {
+        "@template": "{{context.os.name}}"
+      }
     },
     "os_version": {
       "title": "OS Version",
       "type": "string",
-      "description": "The version of the mobile operating system or browser the user is using."
+      "description": "The version of the mobile operating system or browser the user is using.",
+      "defaultMapping": {
+        "@template": "{{context.os.version}}"
+      }
     },
     "device_brand": {
       "title": "Device Brand",
       "type": "string",
-      "description": "The device brand that the user is using."
+      "description": "The device brand that the user is using.",
+      "defaultMapping": {
+        "@template": "{{context.device.manufacturer}}"
+      }
     },
     "device_manufacturer": {
       "title": "Device Manufacturer",
       "type": "string",
-      "description": "The device manufacturer that the user is using."
+      "description": "The device manufacturer that the user is using.",
+      "defaultMapping": {
+        "@template": "{{context.device.manufacturer}}"
+      }
     },
     "device_model": {
       "title": "Device Model",
       "type": "string",
-      "description": "The device model that the user is using."
+      "description": "The device model that the user is using.",
+      "defaultMapping": {
+        "@template": "{{context.device.model}}"
+      }
     },
     "carrier": {
       "title": "Carrier",
       "type": "string",
-      "description": "The carrier that the user is using."
+      "description": "The carrier that the user is using.",
+      "defaultMapping": {
+        "@template": "{{context.network.carrier}}"
+      }
     },
     "country": {
       "title": "Country",
       "type": "string",
-      "description": "The current country of the user."
+      "description": "The current country of the user.",
+      "defaultMapping": {
+        "@template": "{{context.location.country}}"
+      }
     },
     "region": {
       "title": "Region",
       "type": "string",
-      "description": "The current region of the user."
+      "description": "The current region of the user.",
+      "defaultMapping": {
+        "@template": "{{context.location.city}}"
+      }
     },
     "city": {
       "title": "City",
       "type": "string",
-      "description": "The current city of the user."
+      "description": "The current city of the user.",
+      "defaultMapping": {
+        "@template": "{{context.location.city}}"
+      }
     },
     "dma": {
       "title": "Designated Market Area",
@@ -103,7 +154,10 @@
     "language": {
       "title": "Language",
       "type": "string",
-      "description": "The language set by the user."
+      "description": "The language set by the user.",
+      "defaultMapping": {
+        "@template": "{{context.locale}}"
+      }
     },
     "price": {
       "title": "Price",
@@ -133,32 +187,50 @@
     "location_lat": {
       "title": "Latitude",
       "type": "number",
-      "description": "The current Latitude of the user."
+      "description": "The current Latitude of the user.",
+      "defaultMapping": {
+        "@template": "{{context.location.latitude}}"
+      }
     },
     "location_lng": {
       "title": "Longtitude",
       "type": "number",
-      "description": "The current Longitude of the user."
+      "description": "The current Longitude of the user.",
+      "defaultMapping": {
+        "@template": "{{context.location.longitude}}"
+      }
     },
     "ip": {
       "title": "IP Address",
       "type": "string",
-      "description": "The IP address of the user. Use \"$remote\" to use the IP address on the upload request. Amplitude will use the IP address to reverse lookup a user's location (city, country, region, and DMA). Amplitude has the ability to drop the location and IP address from events once it reaches our servers. You can submit a request to Amplitude's platform specialist team here to configure this for you."
+      "description": "The IP address of the user. Use \"$remote\" to use the IP address on the upload request. Amplitude will use the IP address to reverse lookup a user's location (city, country, region, and DMA). Amplitude has the ability to drop the location and IP address from events once it reaches our servers. You can submit a request to Amplitude's platform specialist team here to configure this for you.",
+      "defaultMapping": {
+        "@template": "{{context.ip}}"
+      }
     },
     "idfa": {
       "title": "Identifier For Advertiser (IDFA)",
       "type": "string",
-      "description": "Identifier for Advertiser. _(iOS)_"
+      "description": "Identifier for Advertiser. _(iOS)_",
+      "defaultMapping": {
+        "@template": "{{context.device.advertisingId}}"
+      }
     },
     "idfv": {
       "title": "Identifier For Vendor (IDFV)",
       "type": "string",
-      "description": "Identifier for Vendor. _(iOS)_"
+      "description": "Identifier for Vendor. _(iOS)_",
+      "defaultMapping": {
+        "@template": "{{context.device.id}}"
+      }
     },
     "adid": {
       "title": "Google Play Services Advertising ID",
       "type": "string",
-      "description": "Google Play Services advertising ID. _(Android)_"
+      "description": "Google Play Services advertising ID. _(Android)_",
+      "defaultMapping": {
+        "@template": "{{context.device.advertisingId}}"
+      }
     },
     "android_id": {
       "title": "Android ID",

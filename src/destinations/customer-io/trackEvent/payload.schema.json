@@ -8,21 +8,33 @@
     "id": {
       "title": "Person ID",
       "description": "ID of the person who triggered this event.",
-      "type": "string"
+      "type": "string",
+      "defaultMapping": {
+        "@template": "{{userId}}"
+      }
     },
     "name": {
       "title": "Event Name",
-      "type": "string"
+      "type": "string",
+      "defaultMapping": {
+        "@template": "{{event}}"
+      }
     },
     "type": {
       "title": "Event Type",
       "description": "Override event type. Ex. \"page\".",
-      "type": "string"
+      "type": "string",
+      "defaultMapping": {
+        "@template": "{{type}}"
+      }
     },
     "data": {
       "title": "Data",
       "description": "Custom data to include with the event.",
-      "type": "object"
+      "type": "object",
+      "defaultMapping": {
+        "@path": "$.properties"
+      }
     }
   },
   "required": ["id", "name"]

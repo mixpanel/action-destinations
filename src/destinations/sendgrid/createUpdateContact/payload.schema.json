@@ -15,7 +15,10 @@
       "title": "Email Address",
       "type": "string",
       "description": "The primary email for the contact.",
-      "maxLength": 254
+      "maxLength": 254,
+      "defaultMapping": {
+        "@template": "{{properties.email}}"
+      }
     },
     "alternate_emails": {
       "title": "Additional Amail Addresses",
@@ -42,13 +45,19 @@
       "title": "City",
       "type": "string",
       "description": "The city of the contact.",
-      "maxLength": 60
+      "maxLength": 60,
+      "defaultMapping": {
+        "@template": "{{context.location.city}}"
+      }
     },
     "country": {
       "title": "Country",
       "type": "string",
       "description": "The country of the contacts address. Accepts full name or abbreviation.",
-      "maxLength": 50
+      "maxLength": 50,
+      "defaultMapping": {
+        "@template": "{{context.location.country}}"
+      }
     },
     "first_name": {
       "title": "First Name",

@@ -8,22 +8,34 @@
     "id": {
       "title": "Person ID",
       "description": "ID used to uniquely identify person in Customer.io.",
-      "type": "string"
+      "type": "string",
+      "defaultMapping": {
+        "@template": "{{userId}}"
+      }
     },
     "email": {
       "title": "Email Address",
       "description": "Person's email address.",
-      "type": "string"
+      "type": "string",
+      "defaultMapping": {
+        "@template": "{{traits.userId}}"
+      }
     },
     "created_at": {
       "title": "Created At",
       "description": "Timestamp for when the person was created. Default is current date and time.",
-      "type": "string"
+      "type": "string",
+      "defaultMapping": {
+        "@template": "{{timestamp}}"
+      }
     },
     "custom_attributes": {
       "title": "Custom Attributes",
       "description": "Optional custom attributes for this person. When updating a person, attributes are added and not removed.",
-      "type": "object"
+      "type": "object",
+      "defaultMapping": {
+        "@path": "$.traits"
+      }
     }
   },
   "required": ["id", "email"]
