@@ -7,7 +7,6 @@
 - [Overview](#overview)
 - [Destination API](#destination-api)
   - [destination(config)](#destinationconfig)
-    - [.partnerAction(slug, callback)](#partneractionslug-callback)
 - [Action API](#action-api)
   - [Action](#action)
     - [.cachedRequest()](#cachedrequest)
@@ -147,19 +146,6 @@ destination({
 })
 ```
 
-#### .partnerAction(slug: string, callback: function(Action))
-
-.partnerAction() registers an action with this destination. It accepts an action slug (e.g.
-"trackUser") and a callback that is passed an Action object that can be used to define the behavior
-of the Action (see ["Action API"](#action-api) below). It returns the base destination object.
-
-```js
-const destination = new Destination({ name: 'Amplitude' })
-destination.partnerAction('trackUser', (action) => {
-  action.request(...)
-})
-```
-
 ## Action API
 
 Use the action API to define the behavior of a discrete action for a destination. An action is
@@ -168,7 +154,7 @@ composed of a sequence of steps that are created by calling chainable methods on
 ### Action
 
 The Action object is instantiated by the Destination API (see above) and passed to the callback
-function in the .partnerAction() call. Generally you won't instantiate this directly but instead use
+function in the `actions` array of the destination. Generally you won't instantiate this directly but instead use
 the following chainable methods on the Action object. Each method appends a step to the execution
 flow for the Action.
 

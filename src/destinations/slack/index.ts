@@ -3,10 +3,11 @@ import postToChannel from './postToChannel'
 
 export default function createDestination(): Destination<{}> {
   const destination = new Destination<{}>({
-    name: 'Slack'
+    name: 'Slack',
+    actions: {
+      postToChannel
+    }
   })
-
-  destination.partnerAction('postToChannel', postToChannel)
 
   return destination
 }

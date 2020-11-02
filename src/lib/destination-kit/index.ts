@@ -9,7 +9,11 @@ import { time, duration } from '../time'
 import { JSONArray, JSONObject } from '../json-object'
 import { redactSettings } from '../redact'
 
-export interface DestinationConfig<Settings = any> {
+interface PartnerActions<Settings, Payload> {
+  [key: string]: Action<Settings, Payload>
+}
+
+export interface DestinationConfig<Settings = unknown> {
   /** The name of the destination */
   name: string
   /** The JSON Schema representing the destination settings. When present will be used to validate settings */
@@ -18,6 +22,10 @@ export interface DestinationConfig<Settings = any> {
   extendRequest?: Extension<Settings, any>
   /** Optional authentication configuration */
   authentication?: AuthenticationScheme<Settings>
+  /** Actions */
+  actions: {
+    [key: string]: (action: Action<Settings, any>) => Action<Settings, any>
+  }
 }
 
 interface Subscription {
@@ -30,16 +38,30 @@ interface Subscription {
   mapping?: JSONObject
 }
 
-interface PartnerActions<Settings, Payload> {
-  [key: string]: Action<Settings, Payload>
-}
-
 interface TestAuthSettings<Settings> {
   settings: Settings
 }
 
-interface ApiKeyAuthentication<Settings> {
-  type: 'API Key'
+interface AuthenticationField {
+  /** The name of the field */
+  key: string
+  /** The display name of the field */
+  label: string
+  /** The datatype of the value */
+  type: 'string'
+  /** Whether or not the field is required for authentication */
+  required: boolean
+  /** Help text describing the field and how it is used (or why it is required). */
+  description?: string
+}
+
+interface Authentication {
+  fields?: AuthenticationField[]
+}
+
+interface ApiKeyAuthentication<Settings> extends Authentication {
+  /** Typically used for "API Key" authentication. */
+  type: 'custom'
   testAuthentication: (req: Got, input: TestAuthSettings<Settings>) => CancelableRequest<Response<string>>
 }
 
@@ -60,7 +82,7 @@ export class Destination<Settings = any> {
   readonly settingsSchema?: JSONSchema7
   readonly extendRequest?: Extension<Settings, any>
 
-  // TODO Authentication should be included in part of the destination configuration including creating a test request
+  // TODO Authentication should be required including creating a test request?
   readonly authentication?: AuthenticationScheme<Settings>
 
   partnerActions: PartnerActions<Settings, any>
@@ -73,6 +95,10 @@ export class Destination<Settings = any> {
     this.partnerActions = {}
     this.authentication = config.authentication
     this.responses = []
+
+    for (const action of Object.keys(config.actions)) {
+      this.partnerAction(action, config.actions[action])
+    }
   }
 
   async testAuthentication(settings: Settings): Promise<void> {
@@ -106,7 +132,7 @@ export class Destination<Settings = any> {
     }
   }
 
-  public partnerAction(
+  private partnerAction(
     slug: string,
     actionFn: (action: Action<Settings, any>) => Action<Settings, any>
   ): Destination<Settings> {

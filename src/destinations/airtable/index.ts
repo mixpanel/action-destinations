@@ -19,10 +19,12 @@ export default function createDestination(): Destination<Settings> {
         },
         responseType: 'json'
       }
+    },
+
+    actions: {
+      createRecord
     }
   })
-
-  destination.partnerAction('createRecord', createRecord)
 
   return destination
 }

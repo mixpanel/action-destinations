@@ -15,7 +15,7 @@ export default function createDestination(): Destination<Settings> {
   const destination = new Destination<Settings>({
     name: 'Customer.io',
     authentication: {
-      type: 'API Key',
+      type: 'custom',
       testAuthentication: (req, { settings }) => {
         return req('https://beta-api.customer.io/v1/api/segments', {
           prefixUrl: '',
@@ -37,16 +37,18 @@ export default function createDestination(): Destination<Settings> {
         },
         responseType: 'json'
       }
+    },
+
+    actions: {
+      addPersonToSegment,
+      createUpdateDevice,
+      createUpdatePerson,
+      removePersonFromSegment,
+      trackAnonymousEvent,
+      trackEvent,
+      triggerCampaign
     }
   })
-
-  destination.partnerAction('addPersonToSegment', addPersonToSegment)
-  destination.partnerAction('createUpdateDevice', createUpdateDevice)
-  destination.partnerAction('createUpdatePerson', createUpdatePerson)
-  destination.partnerAction('removePersonFromSegment', removePersonFromSegment)
-  destination.partnerAction('trackAnonymousEvent', trackAnonymousEvent)
-  destination.partnerAction('trackEvent', trackEvent)
-  destination.partnerAction('triggerCampaign', triggerCampaign)
 
   return destination
 }

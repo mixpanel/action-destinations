@@ -13,8 +13,8 @@ export default function createDestination(): Destination<Settings> {
     name: 'SendGrid',
     // TODO get this from the database
     authentication: {
-      type: 'API Key',
-      testAuthentication: (req) => req('user/profile')
+      type: 'custom',
+      testAuthentication: req => req('user/profile')
     },
     // TODO get this from the database
     schema: settings as JSONSchema7,
@@ -24,13 +24,15 @@ export default function createDestination(): Destination<Settings> {
         headers: { Authorization: `Bearer ${settings.apiKey}` },
         responseType: 'json'
       }
+    },
+
+    actions: {
+      createList,
+      createUpdateContact,
+      deleteContact,
+      removeContactFromList
     }
   })
-
-  destination.partnerAction('createList', createList)
-  destination.partnerAction('createUpdateContact', createUpdateContact)
-  destination.partnerAction('deleteContact', deleteContact)
-  destination.partnerAction('removeContactFromList', removeContactFromList)
 
   return destination
 }
