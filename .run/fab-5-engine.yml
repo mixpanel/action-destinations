@@ -34,8 +34,8 @@ count:
     autoscale_policy: cpu_mem_tracking
 
 autodeploy:
-  production:
-    branch: master
+  # production:
+  #   branch: master
   stage:
     branch: staging
 
