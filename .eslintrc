@@ -1,6 +1,6 @@
 {
   "root": true,
-  "ignorePatterns": ["/node_modules/", "/dist/"],
+  "ignorePatterns": ["/node_modules/", "/dist/", "/templates/"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": 2019,
@@ -19,6 +19,13 @@
   "plugins": ["@typescript-eslint"],
   "rules": {
     "@typescript-eslint/ban-types": "off",
+    "@typescript-eslint/ban-ts-comment": ["error", {
+      "ts-expect-error": "allow-with-description",
+      "ts-ignore": "allow-with-description",
+      "ts-nocheck": true,
+      "ts-check": false
+    }],
+    "@typescript-eslint/no-empty-interface": "off",
     "@typescript-eslint/no-floating-promises": "error",
     "@typescript-eslint/no-unsafe-assignment": "off",
     "@typescript-eslint/no-unsafe-call": "warn",
