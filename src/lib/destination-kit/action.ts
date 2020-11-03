@@ -86,7 +86,6 @@ class MapPayload<Settings, Payload> extends Step<Settings, Payload> {
   }
 
   executeStep(ctx: ExecuteInput<Settings, Payload>): Promise<string> {
-    // TODO dont mutate payload (payload is already transformed via MapInput)
     ctx.payload = transform(this.mapping, ctx.payload, this.options)
     return Promise.resolve('MapPayload completed')
   }
@@ -323,30 +322,6 @@ class FanOut<Settings, Payload> extends Step<Settings, Payload> {
   }
 }
 
-interface Mapping {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: any
-}
-
-interface FieldMapping {
-  '@if'?: {
-    true: {
-      '@path': string
-    }
-    then: string
-    else: string
-  }
-  '@timestamp'?: {
-    timestamp: {
-      '@path': string
-    }
-    format: string
-  }
-  '@lowercase'?: {
-    '@path': string
-  }
-}
-
 interface ExecuteAutocompleteInput<Settings, Payload> {
   settings: Settings
   payload: Payload
@@ -355,6 +330,11 @@ interface ExecuteAutocompleteInput<Settings, Payload> {
 }
 
 type ExecuteInputField = 'payload' | 'settings' | 'mapping'
+
+// Type that makes a specific set of keys optional in a record
+type PartialRecord<K extends keyof any, T> = {
+  [P in K]?: T
+}
 
 /**
  * Action is the beginning step for all partner actions. Entrypoints always start with the
@@ -411,31 +391,22 @@ export class Action<Settings, Payload> extends EventEmitter {
     return step.executeStep(ctx)
   }
 
-  mapField(path: string, fieldMapping: FieldMapping): Action<Settings, Payload> {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    let pathParts: string[] = JSONPath.toPathArray(path)
-    if (pathParts[0] === '$') {
-      pathParts = pathParts.slice(1)
-    }
+  mapFields(mapping: PartialRecord<keyof Payload, JSONObject>): Action<Settings, Payload> {
+    const mappingIfExists: Record<string, JSONObject> = {}
 
-    let mapping: Mapping = {
-      '@if': {
-        exists: { '@path': path },
-        then: fieldMapping
+    // Wrap each mapping with an if statement to only apply it when the property exists
+    for (const key of Object.keys(mapping)) {
+      const originalMapping = mapping[key as keyof Payload] as JSONObject
+      mappingIfExists[key] = {
+        '@if': {
+          exists: { '@path': `$.${key}` },
+          then: originalMapping
+        }
       }
     }
 
-    for (const field of pathParts.reverse()) {
-      mapping = { [field]: mapping }
-    }
-
-    const step = new MapPayload(mapping, {
-      merge: true
-    })
-
+    const step = new MapPayload(mappingIfExists, { merge: true })
     this.steps.push(step)
-
     return this
   }
 

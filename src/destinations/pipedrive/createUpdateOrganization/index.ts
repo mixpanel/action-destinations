@@ -10,10 +10,12 @@ export default function(
   return action
     .validatePayload(payloadSchema)
 
-    .mapField('$.add_time', {
-      '@timestamp': {
-        timestamp: { '@path': '$.add_time' },
-        format: 'YYYY-MM-DD HH:MM:SS'
+    .mapFields({
+      add_time: {
+        '@timestamp': {
+          timestamp: { '@path': '$.add_time' },
+          format: 'YYYY-MM-DD HH:MM:SS'
+        }
       }
     })
 

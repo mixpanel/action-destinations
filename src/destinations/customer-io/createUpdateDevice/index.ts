@@ -7,10 +7,12 @@ export default function(action: Action<Settings, CreateOrUpdateDevice>): Action<
   return action
     .validatePayload(payloadSchema)
 
-    .mapField('$.last_used', {
-      '@timestamp': {
-        timestamp: { '@path': '$.last_used' },
-        format: 'X'
+    .mapFields({
+      last_used: {
+        '@timestamp': {
+          timestamp: { '@path': '$.last_used' },
+          format: 'X'
+        }
       }
     })
 

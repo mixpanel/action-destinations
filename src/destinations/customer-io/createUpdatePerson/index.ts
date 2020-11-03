@@ -7,10 +7,12 @@ export default function(action: Action<Settings, CreateOrUpdatePerson>): Action<
   return action
     .validatePayload(payloadSchema)
 
-    .mapField('created_at', {
-      '@timestamp': {
-        timestamp: { '@path': '$.created_at' },
-        format: 'X'
+    .mapFields({
+      created_at: {
+        '@timestamp': {
+          timestamp: { '@path': '$.created_at' },
+          format: 'X'
+        }
       }
     })
 

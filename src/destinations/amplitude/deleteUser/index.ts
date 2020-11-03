@@ -12,19 +12,21 @@ export default function(action: Action<Settings, DeleteUser>): Action<Settings, 
   return action
     .validatePayload(payloadSchema)
 
-    .mapField('$.ignore_invalid_id', {
-      '@if': {
-        true: { '@path': '$.ignore_invalid_id' },
-        then: 'True',
-        else: 'False'
-      }
-    })
+    .mapFields({
+      ignore_invalid_id: {
+        '@if': {
+          true: { '@path': '$.ignore_invalid_id' },
+          then: 'True',
+          else: 'False'
+        }
+      },
 
-    .mapField('$.delete_from_org', {
-      '@if': {
-        true: { '@path': '$.delete_from_org' },
-        then: 'True',
-        else: 'False'
+      delete_from_org: {
+        '@if': {
+          true: { '@path': '$.delete_from_org' },
+          then: 'True',
+          else: 'False'
+        }
       }
     })
 

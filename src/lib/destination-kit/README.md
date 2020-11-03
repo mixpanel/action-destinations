@@ -12,7 +12,7 @@
     - [.cachedRequest()](#cachedrequest)
     - [.extendRequest(......)](#extendrequest)
     - [.fanOut()](#fanout)
-    - [.mapField()](#mapfield)
+    - [.mapFields()](#mapfields)
     - [.request(fn)](#requestfn)
     - [.validatePayload()](#validatepayload)
 
@@ -31,10 +31,12 @@ module.exports = action =>
     .validatePayload(require('./payload.schema.json'))
 
     // Customer.io wants Unix timestamps
-    .mapField('created_at', {
-      '@timestamp': {
-        timestamp: { '@path': '$.created_at' },
-        format: 'X'
+    .mapFields({
+      created_at: {
+        '@timestamp': {
+          timestamp: { '@path': '$.created_at' },
+          format: 'X'
+        }
       }
     })
 
@@ -242,18 +244,20 @@ action
   .fanIn()
 ```
 
-#### .mapField(path: string, mapping: object)
+#### .mapFields(mapping: object)
 
-mapField() maps a single field in the payload value of the Context object using
+mapFields() maps a single field in the payload value of the Context object using
 [`mapping-kit`](https://github.com/segmentio/fab-5-engine/tree/master/lib/mapping-kit). It accepts
 a [JSONPath expression](https://goessner.net/articles/JsonPath/) path to the field to be mapped and
 a `mapping-kit` mapping configuration. You can overwrite an existing field or add a new field.
 
 ```js
-action.mapField('$.time', {
-  '@timestamp': {
-    timestamp: { '@path': '$.time' },
-    format: 'x'
+action.mapFields({
+  time: {
+    '@timestamp': {
+      timestamp: { '@path': '$.time' },
+      format: 'x'
+    }
   }
 })
 ```

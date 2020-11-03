@@ -48,10 +48,12 @@ export default function(action: Action<Settings, CreateOrUpdatePerson>): Action<
       }
     })
 
-    .mapField('$.add_time', {
-      '@timestamp': {
-        timestamp: { '@path': '$.add_time' },
-        format: 'YYYY-MM-DD HH:MM:SS'
+    .mapFields({
+      add_time: {
+        '@timestamp': {
+          timestamp: { '@path': '$.add_time' },
+          format: 'YYYY-MM-DD HH:MM:SS'
+        }
       }
     })
 

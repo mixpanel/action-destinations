@@ -7,17 +7,18 @@ export default function(action: Action<Settings, TrackUser>): Action<Settings, T
   return action
     .validatePayload(payloadSchema)
 
-    .mapField('$.time', {
-      '@timestamp': {
-        timestamp: { '@path': '$.time' },
-        format: 'x'
-      }
-    })
-
-    .mapField('$.session_id', {
-      '@timestamp': {
-        timestamp: { '@path': '$.session_id' },
-        format: 'x'
+    .mapFields({
+      time: {
+        '@timestamp': {
+          timestamp: { '@path': '$.time' },
+          format: 'x'
+        }
+      },
+      session_id: {
+        '@timestamp': {
+          timestamp: { '@path': '$.session_id' },
+          format: 'x'
+        }
       }
     })
 
