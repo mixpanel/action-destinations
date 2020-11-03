@@ -26,7 +26,7 @@ export type IconURL = string
  */
 export interface PostMessage {
   url: WebhookURL
-  channel: Channel
+  channel?: Channel
   text: Message
   username?: User
   icon_url?: IconURL
