@@ -1,10 +1,12 @@
-import { Action } from '@/lib/destination-kit/action'
-import payloadSchema from './payload.schema.json'
+import { ActionDefinition } from '@/lib/destination-kit/action'
+import { Settings } from '../generated-types'
 import { PostMessage } from './generated-types'
+import schema from './payload.schema.json'
 
-export default function(action: Action<{}, PostMessage>): Action<{}, PostMessage> {
-  return action.validatePayload(payloadSchema).request((req, { payload }) => {
-    return req.post(payload.url, {
+const action: ActionDefinition<Settings, PostMessage> = {
+  schema,
+  perform: (request, { payload }) => {
+    return request.post(payload.url, {
       json: {
         channel: payload.channel,
         text: payload.text,
@@ -13,5 +15,7 @@ export default function(action: Action<{}, PostMessage>): Action<{}, PostMessage
       },
       responseType: 'text'
     })
-  })
+  }
 }
+
+export default action

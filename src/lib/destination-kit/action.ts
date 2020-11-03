@@ -10,6 +10,23 @@ import { JSONObject } from '../json-object'
 import { Step, Steps, StepResult, ExecuteInput } from './step'
 import { lookup, beforeRequest } from '../dns'
 
+export type RequestFn<Settings, Payload> = (request: Got, data: ExecuteInput<Settings, Payload>) => any
+
+export interface ActionDefinition<Settings, Payload = any> {
+  /** The unique identifier for the action, e.g. `postToChannel` */
+  // key: string
+  /** The display title of the action */
+  // this is in `schema` right now
+  // title: string
+  /** The display description of the action */
+  // this is in `schema` right now
+  // description: string
+  /** The jsonschema representation of fields used to perform the action */
+  schema: object
+  /** The operation to perform when this action is triggered */
+  perform: RequestFn<Settings, Payload>
+}
+
 class MapInput<Settings, Payload> extends Step<Settings, Payload> {
   executeStep(ctx: ExecuteInput<Settings, Payload>): Promise<string> {
     // Transforms the initial payload (event) + action settings (from `subscriptions[0].mapping`)
@@ -77,9 +94,6 @@ class MapPayload<Settings, Payload> extends Step<Settings, Payload> {
 
 export type Extension<Settings, Payload> = (ctx: ExecuteInput<Settings, Payload>) => ExtendOptions
 export type Extensions<Settings, Payload> = Extension<Settings, Payload>[]
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type RequestFn<Settings, Payload> = (req: Got, ctx: ExecuteInput<Settings, Payload>) => any
 
 /**
  * Request handles delivering a payload to an external API. It uses the `got` library under the hood.
@@ -207,20 +221,6 @@ class CachedRequest<Settings, Payload> extends Request<Settings, Payload> {
   }
 }
 
-// Do executes a JavaScript function synchronously.
-class Do<Settings, Payload> extends Step<Settings, Payload> {
-  fn: Function
-
-  constructor(fn: Function) {
-    super()
-    this.fn = fn
-  }
-
-  async executeStep(ctx: ExecuteInput<Settings, Payload>): Promise<string> {
-    return await this.fn(ctx)
-  }
-}
-
 interface FanOutOptions {
   on: string
   as: string
@@ -314,12 +314,6 @@ class FanOut<Settings, Payload> extends Step<Settings, Payload> {
 
   request(fn: RequestFn<Settings, Payload>): FanOut<Settings, Payload> {
     const step = new Request([], fn)
-    this.steps.push(step)
-    return this
-  }
-
-  do(fn: Function): FanOut<Settings, Payload> {
-    const step = new Do(fn)
     this.steps.push(step)
     return this
   }
@@ -442,12 +436,6 @@ export class Action<Settings, Payload> extends EventEmitter {
 
     this.steps.push(step)
 
-    return this
-  }
-
-  do(fn: Function): Action<Settings, Payload> {
-    const step = new Do(fn)
-    this.steps.push(step)
     return this
   }
 

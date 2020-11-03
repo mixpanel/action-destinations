@@ -2,7 +2,7 @@ import validate from '@segment/fab5-subscriptions'
 import { BadRequest } from 'http-errors'
 import got, { CancelableRequest, Got, Response } from 'got'
 import { JSONSchema7 } from 'json-schema'
-import { Action, Validate, Extension } from './action'
+import { Action, ActionDefinition, Validate, Extension } from './action'
 import { ExecuteInput, StepResult } from './step'
 import Context, { Subscriptions } from '../context'
 import { time, duration } from '../time'
@@ -12,6 +12,8 @@ import { redactSettings } from '../redact'
 interface PartnerActions<Settings, Payload> {
   [key: string]: Action<Settings, Payload>
 }
+
+type ActionFn<Settings> = (action: Action<Settings, any>) => Action<Settings, any>
 
 export interface DestinationConfig<Settings = unknown> {
   /** The name of the destination */
@@ -24,7 +26,7 @@ export interface DestinationConfig<Settings = unknown> {
   authentication?: AuthenticationScheme<Settings>
   /** Actions */
   actions: {
-    [key: string]: (action: Action<Settings, any>) => Action<Settings, any>
+    [key: string]: ActionDefinition<Settings> | ActionFn<Settings>
   }
 }
 
@@ -132,9 +134,10 @@ export class Destination<Settings = any> {
     }
   }
 
+  // TODO refactor this whole thing
   private partnerAction(
     slug: string,
-    actionFn: (action: Action<Settings, any>) => Action<Settings, any>
+    actionFn: ActionDefinition<Settings> | ActionFn<Settings>
   ): Destination<Settings> {
     const action = new Action<Settings, {}>()
 
@@ -146,7 +149,19 @@ export class Destination<Settings = any> {
       this.responses.push(response)
     })
 
-    this.partnerActions[slug] = actionFn(action)
+    if (typeof actionFn === 'function') {
+      this.partnerActions[slug] = actionFn(action)
+    } else {
+      this.partnerActions[slug] = action
+
+      if (actionFn.schema) {
+        action.validatePayload(actionFn.schema)
+      }
+
+      if (actionFn.perform) {
+        action.request(actionFn.perform)
+      }
+    }
 
     return this
   }

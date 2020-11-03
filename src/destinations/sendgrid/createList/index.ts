@@ -1,10 +1,15 @@
-import { Action } from '@/lib/destination-kit/action'
-import payloadSchema from './payload.schema.json'
+import { ActionDefinition } from '@/lib/destination-kit/action'
 import { Settings } from '../generated-types'
 import { CreateContactList } from './generated-types'
+import schema from './payload.schema.json'
 
-export default function(action: Action<Settings, CreateContactList>): Action<Settings, CreateContactList> {
-  return action
-    .validatePayload(payloadSchema)
-    .request(async (req, { payload }) => req.post('marketing/lists', { json: payload }))
+const action: ActionDefinition<Settings, CreateContactList> = {
+  schema,
+  perform: (request, { payload }) => {
+    return request.post('marketing/lists', {
+      json: payload
+    })
+  }
 }
+
+export default action

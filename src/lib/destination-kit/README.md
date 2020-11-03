@@ -10,7 +10,6 @@
 - [Action API](#action-api)
   - [Action](#action)
     - [.cachedRequest()](#cachedrequest)
-    - [.do()](#do)
     - [.extendRequest(......)](#extendrequest)
     - [.fanOut()](#fanout)
     - [.mapField()](#mapfield)
@@ -88,9 +87,6 @@ something the UI can consume, like JSON.
   .request(req, ({user}) => (
     req.put(`https://example.com/${user.id}`)
   )
-  .do(({user}) => {
-    console.log(`${user.id} updated`)
-  })
 .fanIn()
 ```
 
@@ -189,28 +185,14 @@ The config object accepts the following fields (all fields are required unless o
 | `negative` | `boolean`                 | (Optional) Set this to `true` to cache negative values (null, undefined).                                                                                                                                |
 
 ```js
-action
-  .cachedRequest({
-    ttl: 60, // 1 minute
-    key: ({ payload }) => payload.userId,
-    value: (req, { payload }) => {
-      const resp = req.get(`http://example.com/users/${payload.userId}`)
-      return resp.data
-    },
-    as: 'userEmail'
-  })
-  .do(({ payload, userEmail }) => {
-    console.log(`User: ${payload.userId} -> ${userEmail}`)
-  })
-```
-
-#### .do(function(Context))
-
-do() runs the given function at runtime. The return value of this callback function is ignored.
-
-```js
-action.do(({ payload }) => {
-  console.log(`Processing user ${payload.userId}`)
+action.cachedRequest({
+  ttl: 60, // 1 minute
+  key: ({ payload }) => payload.userId,
+  value: (req, { payload }) => {
+    const resp = req.get(`http://example.com/users/${payload.userId}`)
+    return resp.data
+  },
+  as: 'userEmail'
 })
 ```
 
@@ -251,15 +233,12 @@ fanOut() supports only a subset of the steps available on the parent Action obje
 
 - request()
 
-- do()
-
 fanIn() returns the parent Action object.
 
 ```js
 action
   .fanOut({ on: '$.payload.ids', as: 'userId' })
   .request((req, { payload, userId }) => req.post(`http://example.com/${userId}/ping`))
-  .do(({ userId }) => console.log(`${userId} pinged`))
   .fanIn()
 ```
 
@@ -271,16 +250,11 @@ a [JSONPath expression](https://goessner.net/articles/JsonPath/) path to the fie
 a `mapping-kit` mapping configuration. You can overwrite an existing field or add a new field.
 
 ```js
-action.do(({ payload }) => {
-  payload.time = '2020-07-21T22:24:06.277Z'
-})
-mapField('$.time', {
+action.mapField('$.time', {
   '@timestamp': {
     timestamp: { '@path': '$.time' },
     format: 'x'
   }
-}).do(({ payload }) => {
-  console.log(`Unix timestamp: ${payload.time}`)
 })
 ```
 
@@ -309,17 +283,13 @@ validatePayload() accepts a [JSON Schema](https://json-schema.org) configuration
 Action if validation fails.
 
 ```js
-action
-  .validatePayload({
-    type: 'object',
-    properties: {
-      userId: { type: 'string' }
-    },
-    required: ['userId']
-  })
-  .do(({ payload }) => {
-    console.log(`User's ID is ${payload.userId}`)
-  })
+action.validatePayload({
+  type: 'object',
+  properties: {
+    userId: { type: 'string' }
+  },
+  required: ['userId']
+})
 ```
 
 ### Context

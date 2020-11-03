@@ -1,15 +1,15 @@
-import { Action } from '@/lib/destination-kit/action'
-import payloadSchema from './payload.schema.json'
+import { ActionDefinition } from '@/lib/destination-kit/action'
 import { Settings } from '../generated-types'
 import { TrackAnonymousEvent } from './generated-types'
+import schema from './payload.schema.json'
 
-export default function(action: Action<Settings, TrackAnonymousEvent>): Action<Settings, TrackAnonymousEvent> {
-  return action
-    .validatePayload(payloadSchema)
-
-    .request(async (req, { payload }) => {
-      return req.post('events', {
-        json: payload
-      })
+const action: ActionDefinition<Settings, TrackAnonymousEvent> = {
+  schema,
+  perform: (request, { payload }) => {
+    return request.post('events', {
+      json: payload
     })
+  }
 }
+
+export default action
