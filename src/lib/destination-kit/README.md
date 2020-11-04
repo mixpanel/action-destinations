@@ -11,7 +11,6 @@
   - [Action](#action)
     - [.cachedRequest()](#cachedrequest)
     - [.extendRequest(......)](#extendrequest)
-    - [.fanOut()](#fanout)
     - [.mapFields()](#mapfields)
     - [.request(fn)](#requestfn)
     - [.validatePayload()](#validatepayload)
@@ -50,8 +49,9 @@ module.exports = action =>
 
 The goals of Destination Kit are to minimize the amount of work it takes to build a destination (to
 make them easy to build) and to standardize the most common patterns of destinations (to make them
-easy to build correctly). Additionally, by using a fluent interface and dependency injection rather
-than bare imperative JavaScript, we can use the same destination code to generate multiple things:
+easy to build correctly). Through this standard definition and dependency injection, we can use the same destination code to generate multiple things:
+
+- JSON Schema validation
 
 - Lambda functions to handle transformation and delivery of events.
 
@@ -59,40 +59,6 @@ than bare imperative JavaScript, we can use the same destination code to generat
   action, and how the destination behaves.
 
 - Centrifuge GX job configuration to move logic and work out of Lambda piecemeal.
-
-A fluent interface also makes it significantly easier to translate destination actions into UI. For
-example, the following code would require you to parse the full JavaScript AST to translate it into
-a UI that a user could make sense of:
-
-```js
-let responses = []
-
-for (let user of users) {
-  try {
-    const response = req.put(`https://example.com/${user.id}`)
-    console.log(`${user.id} updated`)
-    responses.push(response)
-  } catch (error) {
-    responses.push(error)
-  }
-}
-
-return responses
-```
-
-Whereas a fluent interface maps more easily to UI components without requiring JavaScript AST
-traversal. Instead, you simply swap out the default `action()` implementation for one that generates
-something the UI can consume, like JSON.
-
-```js
-.fanOut({on: 'users', as: 'user'})
-  .request(req, ({user}) => (
-    req.put(`https://example.com/${user.id}`)
-  )
-.fanIn()
-```
-
-<img width="640" alt="image" src="https://user-images.githubusercontent.com/111501/88086596-720aad00-cb3c-11ea-8353-a8d0bb477c51.png">
 
 ## Destination API
 
@@ -172,9 +138,7 @@ Some notes on the cache implementation:
 - The backing cache is not shared among cachedRequest() calls. Every cachedRequest() block has its
   own cache.
 
-- The cache holds a maximum of 1,000 keys currently. This could be expanded in the future if needs
-  dictate, but currently we run Fab 5 / Destinations 2.0 in Lambda where we have very little memory
-  left after the Node runtime.
+- The cache holds a maximum of 1,000 keys currently. This could be expanded in the future if needs dictate.
 
 The config object accepts the following fields (all fields are required unless otherwise noted):
 
@@ -212,36 +176,6 @@ action
     responseType: 'json'
   }))
   .request(req => req.get('https://example.com'))
-```
-
-#### .fanOut(config: object)
-
-fanOut() splits the execution flow into parallel flows based on an array of values and returns
-a FanOut object on which steps can be appended. This is most useful for running requests in
-parallel. Parallel execution continues until fanIn() is called on the FanOut object.
-
-The config object requires the following fields:
-
-| Field | Type     | Description                                                                                                                                                                                                         |
-| ----- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `on`  | `string` | A [JSONPath expression](https://goessner.net/articles/JsonPath/) that is applied to the Context object and should resolve to an array of values. A parallel flow of execution will be run for each of these values. |
-| `as`  | `string` | The field name that each value will be available as on the Context object to callbacks in each parallel flow of execution.                                                                                          |
-
-fanOut() supports only a subset of the steps available on the parent Action object:
-
-- cachedRequest()
-
-- extendRequest()
-
-- request()
-
-fanIn() returns the parent Action object.
-
-```js
-action
-  .fanOut({ on: '$.payload.ids', as: 'userId' })
-  .request((req, { payload, userId }) => req.post(`http://example.com/${userId}/ping`))
-  .fanIn()
 ```
 
 #### .mapFields(mapping: object)

@@ -1,7 +1,6 @@
 import { transform } from '../mapping-kit'
 import Ajv from 'ajv'
 import { AggregateAjvError } from '@segment/ajv-human-errors'
-import { JSONPath } from 'jsonpath-plus'
 import got, { ExtendOptions, Got, Response } from 'got'
 import NodeCache from 'node-cache'
 import { EventEmitter } from 'events'
@@ -220,108 +219,6 @@ class CachedRequest<Settings, Payload> extends Request<Settings, Payload> {
   }
 }
 
-interface FanOutOptions {
-  on: string
-  as: string
-}
-
-/**
- * FanOut allows us to make multiple external requests in parallel based on a given array of values.
- */
-class FanOut<Settings, Payload> extends Step<Settings, Payload> {
-  parent: Action<Settings, Payload>
-  steps: Steps<Settings, Payload>
-  opts: FanOutOptions
-  requestExtensions: Extensions<Settings, Payload>
-
-  constructor(parent: Action<Settings, Payload>, opts: FanOutOptions) {
-    super()
-    this.parent = parent
-    this.opts = opts
-    this.steps = new Steps()
-    this.requestExtensions = []
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async executeStep(ctx: ExecuteInput<Settings, Payload>): Promise<any> {
-    const values = this._on(this.opts.on, ctx)
-
-    // Run steps for all values in parallel.
-    return await Promise.all(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      values.map((val: any) => {
-        return this.executeForValue.bind(this)(ctx, this.opts.as, val)
-      })
-    )
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  _on(on: string, ctx: ExecuteInput<Settings, Payload>): any {
-    if (Array.isArray(on)) {
-      return on
-    }
-
-    let values = null
-
-    const found = JSONPath({
-      path: on,
-      json: ctx
-    })
-
-    if (found.length > 1) {
-      values = found
-    } else {
-      values = found[0] // 'on' path points directly to an array
-    }
-
-    if (!Array.isArray(values)) {
-      throw new Error(`fanOut: ${on} is not an array, it is a ${typeof values}`)
-    }
-
-    if (!values) {
-      return 'nothing to fan out on' // TODO better return format?
-    }
-
-    return values
-  }
-
-  // Execute each step of the fan-out in sequence with the given context and
-  // fan-out key/value pair.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async executeForValue(ctx: ExecuteInput<Settings, Payload>, key: string, value: any): Promise<any> {
-    // TODO handle ctx better, maybe propagate manually
-    const ctxWithValue = {
-      ...ctx,
-      [key]: value
-    }
-
-    return await this.steps.execute(ctxWithValue)
-  }
-
-  // --
-
-  cachedRequest(config: CachedRequestConfig<Settings, Payload>): FanOut<Settings, Payload> {
-    const step = new CachedRequest([], config)
-    this.steps.push(step)
-    return this
-  }
-
-  extendRequest(...fns: Extensions<Settings, Payload>): FanOut<Settings, Payload> {
-    this.requestExtensions.push(...fns)
-    return this
-  }
-
-  request(fn: RequestFn<Settings, Payload>): FanOut<Settings, Payload> {
-    const step = new Request([], fn)
-    this.steps.push(step)
-    return this
-  }
-
-  fanIn(): Action<Settings, Payload> {
-    return this.parent
-  }
-}
-
 interface ExecuteAutocompleteInput<Settings, Payload> {
   settings: Settings
   payload: Payload
@@ -408,13 +305,6 @@ export class Action<Settings, Payload> extends EventEmitter {
     const step = new MapPayload(mappingIfExists, { merge: true })
     this.steps.push(step)
     return this
-  }
-
-  fanOut(opts: FanOutOptions): FanOut<Settings, Payload> {
-    const step = new FanOut<Settings, Payload>(this, opts)
-    step.extendRequest(...this.requestExtensions)
-    this.steps.push(step)
-    return step
   }
 
   extendRequest(...extensionFns: Extensions<Settings, Payload>): Action<Settings, Payload> {
