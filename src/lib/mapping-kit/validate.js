@@ -1,12 +1,10 @@
-const flatMap = require('array.prototype.flatmap')
-
 module.exports = validate
 
 class AggregateError extends Error {
   constructor(...errors) {
     super()
     this.name = 'AggregateError'
-    this._errors = flatMap(errors, e => {
+    this._errors = errors.flatMap(e => {
       if (e instanceof AggregateError) {
         return [...e]
       } else {
