@@ -49,6 +49,8 @@ const questions: PromptObject<keyof ActionData>[] = [
   }
 ]
 
+let spinner: ora.Ora
+
 function renderTemplate(content: string, data: ActionData) {
   return Mustache.render(content, data)
 }
@@ -59,10 +61,10 @@ async function createAction(action: ActionData): Promise<void> {
 
   const actionPath = path.join(__dirname, '../src/destinations', action.destination, action.slug)
 
-  const spinner = ora(`Creating ${chalk.bgMagenta.white(action.name)} action...`).start()
+  spinner = ora().start(`Creating ${chalk.bgMagenta.white(action.name)} action...`)
 
   if (fs.existsSync(actionPath)) {
-    spinner.stop()
+    spinner.fail()
     console.log(chalk.red(`An action "${action.slug}" already exists. Skipping.`))
     return
   }
@@ -82,11 +84,14 @@ async function createAction(action: ActionData): Promise<void> {
     fs.writeFileSync(writePath, contents, 'utf8')
   })
 
+  spinner.succeed(`Scaffolding action`)
+
   try {
-    spinner.text = chalk`Generating types for {bgMagenta.white ${action.slug}} action`
+    spinner.start(chalk`Generating types for {bgMagenta.white ${action.slug}} action`)
     await execa('yarn', ['generate-types'])
-  } finally {
-    spinner.stop()
+    spinner.succeed()
+  } catch (err) {
+    spinner.fail()
   }
 
   console.log(``)
@@ -116,4 +121,10 @@ async function run() {
   }
 }
 
-run().catch(error => console.error(chalk.red(error.message)))
+run().catch(error => {
+  if (spinner) {
+    spinner.fail()
+  }
+  console.error(chalk.red(error.message))
+  process.exitCode = 1
+})

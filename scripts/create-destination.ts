@@ -35,16 +35,18 @@ function renderTemplate(content: string, data: DestinationData) {
   return Mustache.render(content, data)
 }
 
+let spinner: ora.Ora
+
 async function createDirectory(destination: DestinationData): Promise<void> {
   const templatePath = path.join(__dirname, '../templates/destination')
   const filesToCreate = fs.readdirSync(templatePath)
 
   const destinationPath = path.join(__dirname, '../src/destinations', destination.slug)
 
-  const spinner = ora(`Creating ${chalk.bgMagenta.white(destination.slug)}...`).start()
+  spinner = ora().start(`Creating ${chalk.bgMagenta.white(destination.slug)}`)
 
   if (fs.existsSync(destinationPath)) {
-    spinner.stop()
+    spinner.fail()
     console.log(chalk.red(`A destination with the slug "${destination.slug}" already exists. Skipping.`))
     return
   }
@@ -64,11 +66,14 @@ async function createDirectory(destination: DestinationData): Promise<void> {
     fs.writeFileSync(writePath, contents, 'utf8')
   })
 
+  spinner.succeed(`Scaffolding directory`)
+
   try {
-    spinner.text = chalk`Generating types for {bgMagenta.white ${destination.slug}} destination`
+    spinner.start(chalk`Generating types for {bgMagenta.white ${destination.slug}} destination`)
     await execa('yarn', ['generate-types'])
-  } finally {
-    spinner.stop()
+    spinner.succeed()
+  } catch (err) {
+    spinner.fail()
   }
 
   console.log(``)
@@ -93,4 +98,10 @@ async function run() {
   }
 }
 
-run().catch(error => console.error(chalk.red(error.message)))
+run().catch(error => {
+  if (spinner) {
+    spinner.fail()
+  }
+  console.error(chalk.red(error.message))
+  process.exitCode = 1
+})
