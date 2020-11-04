@@ -5,7 +5,6 @@ import got, { ExtendOptions, Got, Response } from 'got'
 import NodeCache from 'node-cache'
 import { EventEmitter } from 'events'
 import get from 'lodash/get'
-import { JSONObject } from '../json-object'
 import { Step, Steps, StepResult, ExecuteInput } from './step'
 import { lookup, beforeRequest } from '../dns'
 
@@ -71,22 +70,6 @@ export class Validate<Settings, Payload> extends Step<Settings, Payload> {
     }
 
     return Promise.resolve('Validate completed')
-  }
-}
-
-class MapPayload<Settings, Payload> extends Step<Settings, Payload> {
-  mapping: JSONObject
-  options: JSONObject
-
-  constructor(mapping: JSONObject, options: JSONObject = {}) {
-    super()
-    this.mapping = mapping
-    this.options = options
-  }
-
-  executeStep(ctx: ExecuteInput<Settings, Payload>): Promise<string> {
-    ctx.payload = transform(this.mapping, ctx.payload, this.options)
-    return Promise.resolve('MapPayload completed')
   }
 }
 
@@ -228,11 +211,6 @@ interface ExecuteAutocompleteInput<Settings, Payload> {
 
 type ExecuteInputField = 'payload' | 'settings' | 'mapping'
 
-// Type that makes a specific set of keys optional in a record
-type PartialRecord<K extends keyof any, T> = {
-  [P in K]?: T
-}
-
 /**
  * Action is the beginning step for all partner actions. Entrypoints always start with the
  * MapAndValidateInput step.
@@ -286,25 +264,6 @@ export class Action<Settings, Payload> extends EventEmitter {
     const step = new Request<Settings, Payload>(this.requestExtensions, this.autocompleteCache[field])
 
     return step.executeStep(ctx)
-  }
-
-  mapFields(mapping: PartialRecord<keyof Payload, JSONObject>): Action<Settings, Payload> {
-    const mappingIfExists: Record<string, JSONObject> = {}
-
-    // Wrap each mapping with an if statement to only apply it when the property exists
-    for (const key of Object.keys(mapping)) {
-      const originalMapping = mapping[key as keyof Payload] as JSONObject
-      mappingIfExists[key] = {
-        '@if': {
-          exists: { '@path': `$.${key}` },
-          then: originalMapping
-        }
-      }
-    }
-
-    const step = new MapPayload(mappingIfExists, { merge: true })
-    this.steps.push(step)
-    return this
   }
 
   extendRequest(...extensionFns: Extensions<Settings, Payload>): Action<Settings, Payload> {

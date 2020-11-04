@@ -1,4 +1,5 @@
 import { get } from 'lodash'
+import dayjs from '@/lib/dayjs'
 import { Action } from '@/lib/destination-kit/action'
 import payloadSchema from './payload.schema.json'
 import { Settings } from '../generated-types'
@@ -9,15 +10,6 @@ export default function(
 ): Action<Settings, CreateOrUpdateOrganization> {
   return action
     .validatePayload(payloadSchema)
-
-    .mapFields({
-      add_time: {
-        '@timestamp': {
-          timestamp: { '@path': '$.add_time' },
-          format: 'YYYY-MM-DD HH:MM:SS'
-        }
-      }
-    })
 
     .cachedRequest({
       ttl: 60,
@@ -43,7 +35,7 @@ export default function(
         return req.post('organizations', {
           json: {
             ...organization,
-            add_time: payload.add_time
+            add_time: payload.add_time ? dayjs.utc(payload.add_time).format('YYYY-MM-DD HH:MM:SS') : undefined
           }
         })
       }

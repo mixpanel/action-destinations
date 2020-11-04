@@ -1,54 +1,45 @@
-import { Action } from '@/lib/destination-kit/action'
-import payloadSchema from './payload.schema.json'
+import { ActionDefinition } from '@/lib/destination-kit/action'
 import { Settings } from '../generated-types'
 import { DeleteUser } from './generated-types'
+import schema from './payload.schema.json'
 
-interface DeleteUserBody extends Omit<DeleteUser, 'user_id' | 'amplitude_id'> {
+interface DeleteUserBody {
   amplitude_ids?: string[]
+  delete_from_org?: 'True' | 'False'
+  ignore_invalid_id?: 'True' | 'False'
+  requester?: string
   user_ids?: string[]
 }
 
-export default function(action: Action<Settings, DeleteUser>): Action<Settings, DeleteUser> {
-  return action
-    .validatePayload(payloadSchema)
+const definition: ActionDefinition<Settings, DeleteUser> = {
+  schema,
+  perform: (req, { payload, settings }) => {
+    const body: DeleteUserBody = {
+      requester: payload.requester
+    }
 
-    .mapFields({
-      ignore_invalid_id: {
-        '@if': {
-          true: { '@path': '$.ignore_invalid_id' },
-          then: 'True',
-          else: 'False'
-        }
-      },
+    if (typeof payload.ignore_invalid_id === 'boolean') {
+      body.ignore_invalid_id = payload.ignore_invalid_id ? 'True' : 'False'
+    }
 
-      delete_from_org: {
-        '@if': {
-          true: { '@path': '$.delete_from_org' },
-          then: 'True',
-          else: 'False'
-        }
-      }
+    if (typeof payload.delete_from_org === 'boolean') {
+      body.delete_from_org = payload.delete_from_org ? 'True' : 'False'
+    }
+
+    if (payload.amplitude_id !== undefined) {
+      body.amplitude_ids = [payload.amplitude_id]
+    }
+
+    if (payload.user_id !== undefined) {
+      body.user_ids = [payload.user_id]
+    }
+
+    return req.post('https://amplitude.com/api/2/deletions/users', {
+      username: settings.apiKey,
+      password: settings.secretKey,
+      json: body
     })
-
-    .request((req, { payload, settings }) => {
-      const body: DeleteUserBody = {
-        ignore_invalid_id: payload.ignore_invalid_id,
-        delete_from_org: payload.delete_from_org,
-        requester: payload.requester
-      }
-
-      if (payload.amplitude_id !== undefined) {
-        body.amplitude_ids = [payload.amplitude_id]
-      }
-
-      if (payload.user_id !== undefined) {
-        body.user_ids = [payload.user_id]
-      }
-
-      return req.post('https://amplitude.com/api/2/deletions/users', {
-        username: settings.apiKey,
-        password: settings.secretKey,
-        json: body
-      })
-    })
+  }
 }
+
+export default definition

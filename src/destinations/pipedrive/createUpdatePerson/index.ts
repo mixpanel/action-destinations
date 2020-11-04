@@ -1,4 +1,5 @@
 import { get } from 'lodash'
+import dayjs from '@/lib/dayjs'
 import { Action } from '@/lib/destination-kit/action'
 import payloadSchema from './payload.schema.json'
 import { Settings } from '../generated-types'
@@ -16,6 +17,14 @@ interface Organizations {
 interface Organization {
   id: string
   name: string
+}
+
+interface Person {
+  name: string
+  org_id?: number
+  email?: string[]
+  phone?: string
+  add_time?: string
 }
 
 export default function(action: Action<Settings, CreateOrUpdatePerson>): Action<Settings, CreateOrUpdatePerson> {
@@ -48,15 +57,6 @@ export default function(action: Action<Settings, CreateOrUpdatePerson>): Action<
       }
     })
 
-    .mapFields({
-      add_time: {
-        '@timestamp': {
-          timestamp: { '@path': '$.add_time' },
-          format: 'YYYY-MM-DD HH:MM:SS'
-        }
-      }
-    })
-
     .cachedRequest({
       ttl: 60,
       key: ({ payload }) => payload.identifier,
@@ -72,7 +72,7 @@ export default function(action: Action<Settings, CreateOrUpdatePerson>): Action<
     .request(async (req, { payload, cacheIds }) => {
       const personId = cacheIds.personId
 
-      const person = {
+      const person: Person = {
         name: payload.name,
         org_id: payload.org_id,
         email: payload.email,
@@ -80,16 +80,13 @@ export default function(action: Action<Settings, CreateOrUpdatePerson>): Action<
       }
 
       if (personId === undefined || personId === null) {
-        return req.post('persons', {
-          json: {
-            ...person,
-            add_time: payload.add_time
-          }
-        })
+        if (payload.add_time) {
+          person.add_time = dayjs.utc(person.add_time).format('YYYY-MM-DD HH:MM:SS')
+        }
+
+        return req.post('persons', { json: person })
       }
 
-      return req.put(`persons/${personId}`, {
-        json: person
-      })
+      return req.put(`persons/${personId}`, { json: person })
     })
 }

@@ -11,7 +11,6 @@
   - [Action](#action)
     - [.cachedRequest()](#cachedrequest)
     - [.extendRequest(......)](#extendrequest)
-    - [.mapFields()](#mapfields)
     - [.request(fn)](#requestfn)
     - [.validatePayload()](#validatepayload)
 
@@ -25,26 +24,16 @@ company", "track user", "trigger campaign").
 
 ```js
 // Create or update a customer record in Customer.io
-module.exports = action =>
-  action
-    .validatePayload(require('./payload.schema.json'))
+module.exports = {
+  schema: require('./payload.schema.json'),
+  perform: (req, { payload }) => {
+    const { id, custom_attributes: customAttrs, created_at, ...body } = payload
 
-    // Customer.io wants Unix timestamps
-    .mapFields({
-      created_at: {
-        '@timestamp': {
-          timestamp: { '@path': '$.created_at' },
-          format: 'X'
-        }
-      }
+    return req.put(`customers/${id}`, {
+      json: { ...customAttrs, ...body }
     })
-
-    .request(async (req, { payload }) => {
-      const { id, custom_attributes: customAttrs, ...body } = payload
-      return req.put(`customers/${id}`, {
-        json: { ...customAttrs, ...body }
-      })
-    })
+  }
+}
 ```
 
 The goals of Destination Kit are to minimize the amount of work it takes to build a destination (to
@@ -176,24 +165,6 @@ action
     responseType: 'json'
   }))
   .request(req => req.get('https://example.com'))
-```
-
-#### .mapFields(mapping: object)
-
-mapFields() maps a single field in the payload value of the Context object using
-[`mapping-kit`](https://github.com/segmentio/fab-5-engine/tree/master/lib/mapping-kit). It accepts
-a [JSONPath expression](https://goessner.net/articles/JsonPath/) path to the field to be mapped and
-a `mapping-kit` mapping configuration. You can overwrite an existing field or add a new field.
-
-```js
-action.mapFields({
-  time: {
-    '@timestamp': {
-      timestamp: { '@path': '$.time' },
-      format: 'x'
-    }
-  }
-})
 ```
 
 #### .request(function(Got, Context))

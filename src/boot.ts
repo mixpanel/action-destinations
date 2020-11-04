@@ -1,3 +1,4 @@
+import './aliases'
 import http from 'http'
 import { once } from 'lodash'
 import blockedStats from '@segment/blocked-stats'

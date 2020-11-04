@@ -1,11 +1,8 @@
 const Mustache = require('mustache')
-const dayjs = require('dayjs')
-const utc = require('dayjs/plugin/utc')
 const merge = require('lodash/merge')
 const { JSONPath } = require('jsonpath-plus')
+const dayjs = require('../dayjs').default
 const validate = require('./validate')
-
-dayjs.extend(utc)
 
 const directives = {}
 
