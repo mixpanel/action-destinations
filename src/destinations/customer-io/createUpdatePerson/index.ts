@@ -1,11 +1,12 @@
 import dayjs from '@/lib/dayjs'
-import { Action } from '@/lib/destination-kit/action'
-import payloadSchema from './payload.schema.json'
+import { ActionDefinition } from '@/lib/destination-kit/action'
 import { Settings } from '../generated-types'
 import { CreateOrUpdatePerson } from './generated-types'
+import schema from './payload.schema.json'
 
-export default function(action: Action<Settings, CreateOrUpdatePerson>): Action<Settings, CreateOrUpdatePerson> {
-  return action.validatePayload(payloadSchema).request(async (req, { payload }) => {
+const definition: ActionDefinition<Settings, CreateOrUpdatePerson> = {
+  schema,
+  perform: (req, { payload }) => {
     return req.put(`customers/${payload.id}`, {
       json: {
         ...payload.custom_attributes,
@@ -13,5 +14,7 @@ export default function(action: Action<Settings, CreateOrUpdatePerson>): Action<
         created_at: payload.created_at ? dayjs.utc(payload.created_at).format('X') : undefined
       }
     })
-  })
+  }
 }
+
+export default definition

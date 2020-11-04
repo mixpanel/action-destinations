@@ -1,11 +1,12 @@
 import dayjs from '@/lib/dayjs'
-import { Action } from '@/lib/destination-kit/action'
-import payloadSchema from './payload.schema.json'
+import { ActionDefinition } from '@/lib/destination-kit/action'
 import { Settings } from '../generated-types'
 import { CreateOrUpdateDevice } from './generated-types'
+import schema from './payload.schema.json'
 
-export default function(action: Action<Settings, CreateOrUpdateDevice>): Action<Settings, CreateOrUpdateDevice> {
-  return action.validatePayload(payloadSchema).request(async (req, { payload }) => {
+const definition: ActionDefinition<Settings, CreateOrUpdateDevice> = {
+  schema,
+  perform: (req, { payload }) => {
     return req.put(`customers/${payload.person_id}/devices`, {
       json: {
         device: {
@@ -15,5 +16,7 @@ export default function(action: Action<Settings, CreateOrUpdateDevice>): Action<
         }
       }
     })
-  })
+  }
 }
+
+export default definition
