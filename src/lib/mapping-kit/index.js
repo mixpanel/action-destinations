@@ -1,9 +1,11 @@
 const Mustache = require('mustache')
-const moment = require('moment')
-moment.suppressDeprecationWarnings = true
+const dayjs = require('dayjs')
+const utc = require('dayjs/plugin/utc')
 const merge = require('lodash/merge')
 const { JSONPath } = require('jsonpath-plus')
 const validate = require('./validate')
+
+dayjs.extend(utc)
 
 const directives = {}
 
@@ -153,10 +155,10 @@ registerDirective('@timestamp', (opts, payload) => {
   if (inputFormat !== undefined && inputFormatType !== 'string')
     throw new Error(`@timestamp: inputFormat must be a string, got ${inputFormat}`)
 
-  const momentTs = moment.utc(ts, inputFormat)
+  const dayjsTs = dayjs.utc(ts, inputFormat)
 
-  if (format === 'json') return momentTs.toJSON()
-  else return momentTs.format(format)
+  if (format === 'json') return dayjsTs.toJSON()
+  else return dayjsTs.format(format)
 })
 
 const uuid = require('uuid')

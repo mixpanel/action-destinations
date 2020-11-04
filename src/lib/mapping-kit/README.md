@@ -763,7 +763,7 @@ Mappings:
 ### @timestamp
 
 The @timestamp directive parses a string or number timestamp and resolves to a string timestamp
-using the given format. The @timestamp directive uses [moment.js](https://momentjs.com) to parse and
+using the given format. The @timestamp directive uses [day.js](https://day.js.org/) to parse and
 format timestamps.
 
 ```json
@@ -793,7 +793,7 @@ Mappings:
 The @timestamp directive is fairly liberal in what it accepts by default. In order, it checks for
 the ISO 8601 format, RFC 2822 format, and then it falls back to `new Date(...)`. In Node.js, `new Date(...)` also accepts a UNIX timestamp (seconds since epoch) as a number or string. If you want to
 use a custom format, supply a `inputFormat` value using the [format specified by
-moment.js](https://momentjs.com/docs/#/parsing/string-format/):
+day.js](https://day.js.org/docs/en/parse/string-format):
 
 ```json
 Mappings:
