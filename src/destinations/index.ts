@@ -24,7 +24,7 @@ const idToSlug: Record<string, string> = {
   '5f7dd8e302173ff732db5cc4': 'slack'
 }
 
-function getDestinationBySlug(slug: string): Destination {
+export function getDestinationBySlug(slug: string): Destination {
   const destination = destinations[slug]
 
   if (!destination) {
