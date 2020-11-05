@@ -48,6 +48,19 @@ export interface ActionDefinition<Settings, Payload = any> {
     [K in keyof Payload]?: RequestFn<Settings, Payload>
   }
 
+  /**
+   * Register fields that should be executed, cached and provided
+   * to the action's `perform` function
+   */
+  cachedFields?: {
+    [field: string]: {
+      key: (ctx: ExecuteInput<Settings, Payload>) => string
+      ttl: number
+      value: RequestFn<Settings, Payload>
+      negative?: boolean
+    }
+  }
+
   /** The operation to perform when this action is triggered */
   perform: RequestFn<Settings, Payload>
 }
@@ -276,6 +289,13 @@ export class Action<Settings, Payload> extends EventEmitter {
 
     Object.entries(definition.autocompleteFields ?? {}).forEach(([field, callback]) => {
       this.autocomplete(field, callback as RequestFn<Settings, Payload>)
+    })
+
+    Object.entries(definition.cachedFields ?? {}).forEach(([field, cacheConfig]) => {
+      this.cachedRequest({
+        ...cacheConfig,
+        as: field
+      })
     })
 
     if (definition.perform) {
