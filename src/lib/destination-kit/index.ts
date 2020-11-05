@@ -137,7 +137,7 @@ export class Destination<Settings = any> {
   // TODO refactor this whole thing
   private partnerAction(
     slug: string,
-    actionFn: ActionDefinition<Settings> | ActionFn<Settings>
+    definition: ActionDefinition<Settings> | ActionFn<Settings>
   ): Destination<Settings> {
     const action = new Action<Settings, {}>()
 
@@ -149,18 +149,10 @@ export class Destination<Settings = any> {
       this.responses.push(response)
     })
 
-    if (typeof actionFn === 'function') {
-      this.partnerActions[slug] = actionFn(action)
+    if (typeof definition === 'function') {
+      this.partnerActions[slug] = definition(action)
     } else {
-      this.partnerActions[slug] = action
-
-      if (actionFn.schema) {
-        action.validatePayload(actionFn.schema)
-      }
-
-      if (actionFn.perform) {
-        action.request(actionFn.perform)
-      }
+      this.partnerActions[slug] = action.loadDefinition(definition)
     }
 
     return this

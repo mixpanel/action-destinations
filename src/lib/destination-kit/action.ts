@@ -13,14 +13,41 @@ export type RequestFn<Settings, Payload> = (request: Got, data: ExecuteInput<Set
 export interface ActionDefinition<Settings, Payload = any> {
   /** The unique identifier for the action, e.g. `postToChannel` */
   // key: string
+
   /** The display title of the action */
   // this is in `schema` right now
   // title: string
+
   /** The display description of the action */
   // this is in `schema` right now
   // description: string
-  /** The jsonschema representation of fields used to perform the action */
-  schema: object
+
+  /**
+   * The jsonschema representation of fields used to perform the action
+   *
+   * We may eventually auto-generate the jsonschema from a definition object
+   * instead of requiring devs to build and modify jsonschema directly.
+   *
+   * Plus, jsonschema cannot fully represent our action or field definitions
+   * without many custom keywords.
+   */
+  schema: {
+    title: string
+    description: string
+    type: string
+    additionalProperties: boolean
+    properties: Record<keyof Payload, Record<string, unknown>>
+    required?: string[]
+  }
+
+  /**
+   * Temporary way to "register" autocomplete fields.
+   * This is likely going to change as we productionalize the data model and definition object
+   */
+  autocompleteFields?: {
+    [K in keyof Payload]?: RequestFn<Settings, Payload>
+  }
+
   /** The operation to perform when this action is triggered */
   perform: RequestFn<Settings, Payload>
 }
@@ -240,6 +267,18 @@ export class Action<Settings, Payload> extends EventEmitter {
     }
 
     return results
+  }
+
+  loadDefinition(definition: ActionDefinition<Settings, Payload>): Action<Settings, Payload> {
+    if (definition.schema) {
+      this.validatePayload(definition.schema)
+    }
+
+    if (definition.perform) {
+      this.request(definition.perform)
+    }
+
+    return this
   }
 
   validatePayload(schema: object): Action<Settings, Payload> {

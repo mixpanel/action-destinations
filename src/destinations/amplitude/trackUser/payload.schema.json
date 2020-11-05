@@ -1,6 +1,7 @@
 {
   "$schema": "http://json-schema.org/schema#",
   "title": "Track User",
+  "description": "Sends user events to Amplitude.",
   "type": "object",
   "properties": {
     "user_id": {
