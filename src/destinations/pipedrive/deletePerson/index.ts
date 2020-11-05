@@ -1,14 +1,14 @@
 import { get } from 'lodash'
-import { Action } from '@/lib/destination-kit/action'
-import payloadSchema from './payload.schema.json'
+import { ActionDefinition } from '@/lib/destination-kit/action'
 import { Settings } from '../generated-types'
 import { DeletePerson } from './generated-types'
+import schema from './payload.schema.json'
 
-export default function(action: Action<Settings, DeletePerson>): Action<Settings, DeletePerson> {
-  return action
-    .validatePayload(payloadSchema)
+const definition: ActionDefinition<Settings, DeletePerson> = {
+  schema,
 
-    .cachedRequest({
+  cachedFields: {
+    personId: {
       ttl: 60,
       key: ({ payload }) => payload.identifier,
       value: async (req, { payload }) => {
@@ -19,16 +19,18 @@ export default function(action: Action<Settings, DeletePerson>): Action<Settings
         })
 
         return get(search.body, 'data.items[0].item.id')
-      },
-      as: 'personId'
-    })
-
-    .request(async (req, { cacheIds }) => {
-      const personId = cacheIds.personId
-
-      if (personId === undefined || personId === null) {
-        return null
       }
-      return req.delete(`persons/${personId}`)
-    })
+    }
+  },
+
+  perform: (req, { cacheIds }) => {
+    const personId = cacheIds.personId
+
+    if (personId === undefined || personId === null) {
+      return null
+    }
+    return req.delete(`persons/${personId}`)
+  }
 }
+
+export default definition

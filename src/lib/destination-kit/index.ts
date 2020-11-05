@@ -13,8 +13,6 @@ interface PartnerActions<Settings, Payload> {
   [key: string]: Action<Settings, Payload>
 }
 
-type ActionFn<Settings> = (action: Action<Settings, any>) => Action<Settings, any>
-
 export interface DestinationConfig<Settings = unknown> {
   /** The name of the destination */
   name: string
@@ -26,7 +24,7 @@ export interface DestinationConfig<Settings = unknown> {
   authentication?: AuthenticationScheme<Settings>
   /** Actions */
   actions: {
-    [key: string]: ActionDefinition<Settings> | ActionFn<Settings>
+    [key: string]: ActionDefinition<Settings>
   }
 }
 
@@ -135,10 +133,7 @@ export class Destination<Settings = any> {
   }
 
   // TODO refactor this whole thing
-  private partnerAction(
-    slug: string,
-    definition: ActionDefinition<Settings> | ActionFn<Settings>
-  ): Destination<Settings> {
+  private partnerAction(slug: string, definition: ActionDefinition<Settings>): Destination<Settings> {
     const action = new Action<Settings, {}>()
 
     if (this.extendRequest) {
@@ -149,11 +144,7 @@ export class Destination<Settings = any> {
       this.responses.push(response)
     })
 
-    if (typeof definition === 'function') {
-      this.partnerActions[slug] = definition(action)
-    } else {
-      this.partnerActions[slug] = action.loadDefinition(definition)
-    }
+    this.partnerActions[slug] = action.loadDefinition(definition)
 
     return this
   }

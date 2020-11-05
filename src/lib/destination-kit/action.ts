@@ -305,17 +305,6 @@ export class Action<Settings, Payload> extends EventEmitter {
     return this
   }
 
-  validatePayload(schema: object): Action<Settings, Payload> {
-    const step = new Validate('Payload is invalid:', 'payload', schema)
-    this.steps.push(step)
-    return this
-  }
-
-  autocomplete(field: string, callback: RequestFn<Settings, Payload>): Action<Settings, Payload> {
-    this.autocompleteCache[field] = callback
-    return this
-  }
-
   executeAutocomplete(field: string, ctx: ExecuteAutocompleteInput<Settings, Payload>): any {
     if (!this.autocompleteCache[field]) {
       return {
@@ -334,7 +323,18 @@ export class Action<Settings, Payload> extends EventEmitter {
     return this
   }
 
-  request(requestFn: RequestFn<Settings, Payload>): Action<Settings, Payload> {
+  private validatePayload(schema: object): Action<Settings, Payload> {
+    const step = new Validate('Payload is invalid:', 'payload', schema)
+    this.steps.push(step)
+    return this
+  }
+
+  private autocomplete(field: string, callback: RequestFn<Settings, Payload>): Action<Settings, Payload> {
+    this.autocompleteCache[field] = callback
+    return this
+  }
+
+  private request(requestFn: RequestFn<Settings, Payload>): Action<Settings, Payload> {
     const step = new Request<Settings, Payload>(this.requestExtensions, requestFn)
 
     step.on('response', response => this.emit('response', response))
@@ -344,7 +344,7 @@ export class Action<Settings, Payload> extends EventEmitter {
     return this
   }
 
-  cachedRequest(config: CachedRequestConfig<Settings, Payload>): Action<Settings, Payload> {
+  private cachedRequest(config: CachedRequestConfig<Settings, Payload>): Action<Settings, Payload> {
     const step = new CachedRequest(this.requestExtensions, config)
     this.steps.push(step)
     return this

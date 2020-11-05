@@ -1,9 +1,9 @@
 import { get } from 'lodash'
 import dayjs from '@/lib/dayjs'
-import { Action } from '@/lib/destination-kit/action'
-import payloadSchema from './payload.schema.json'
+import { ActionDefinition } from '@/lib/destination-kit/action'
 import { Settings } from '../generated-types'
 import { CreateOrUpdatePerson } from './generated-types'
+import schema from './payload.schema.json'
 
 interface Organizations {
   data: Organization[]
@@ -27,11 +27,11 @@ interface Person {
   add_time?: string
 }
 
-export default function(action: Action<Settings, CreateOrUpdatePerson>): Action<Settings, CreateOrUpdatePerson> {
-  return action
-    .validatePayload(payloadSchema)
+const definition: ActionDefinition<Settings, CreateOrUpdatePerson> = {
+  schema,
 
-    .autocomplete('org_id', async (req, { page }) => {
+  autocompleteFields: {
+    org_id: async (req, { page }) => {
       const response = await req.get<Organizations>('organizations', {
         searchParams: {
           start: typeof page === 'string' ? Number(page) : undefined
@@ -55,9 +55,11 @@ export default function(action: Action<Settings, CreateOrUpdatePerson>): Action<
           pagination: { nextPage }
         }
       }
-    })
+    }
+  },
 
-    .cachedRequest({
+  cachedFields: {
+    personId: {
       ttl: 60,
       key: ({ payload }) => payload.identifier,
       value: async (req, { payload }) => {
@@ -65,28 +67,30 @@ export default function(action: Action<Settings, CreateOrUpdatePerson>): Action<
           searchParams: { term: payload.identifier }
         })
         return get(search.body, 'data.items[0].item.id')
-      },
-      as: 'personId'
-    })
+      }
+    }
+  },
 
-    .request(async (req, { payload, cacheIds }) => {
-      const personId = cacheIds.personId
+  perform: (req, { payload, cacheIds }) => {
+    const personId = cacheIds.personId
 
-      const person: Person = {
-        name: payload.name,
-        org_id: payload.org_id,
-        email: payload.email,
-        phone: payload.phone
+    const person: Person = {
+      name: payload.name,
+      org_id: payload.org_id,
+      email: payload.email,
+      phone: payload.phone
+    }
+
+    if (personId === undefined || personId === null) {
+      if (payload.add_time) {
+        person.add_time = dayjs.utc(person.add_time).format('YYYY-MM-DD HH:MM:SS')
       }
 
-      if (personId === undefined || personId === null) {
-        if (payload.add_time) {
-          person.add_time = dayjs.utc(person.add_time).format('YYYY-MM-DD HH:MM:SS')
-        }
+      return req.post('persons', { json: person })
+    }
 
-        return req.post('persons', { json: person })
-      }
-
-      return req.put(`persons/${personId}`, { json: person })
-    })
+    return req.put(`persons/${personId}`, { json: person })
+  }
 }
+
+export default definition

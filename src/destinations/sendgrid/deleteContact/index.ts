@@ -1,8 +1,8 @@
 import { get } from 'lodash'
-import { Action } from '@/lib/destination-kit/action'
-import payloadSchema from './payload.schema.json'
+import { ActionDefinition } from '@/lib/destination-kit/action'
 import { Settings } from '../generated-types'
 import { DeleteContact } from './generated-types'
+import schema from './payload.schema.json'
 
 // SendGrid uses a custom "SGQL" query language for finding contacts. To protect us from basic
 // injection attacks (e.g. "email = 'x@x.com' or email like '%@%'"), we can just strip all quotes
@@ -10,11 +10,12 @@ import { DeleteContact } from './generated-types'
 const sgqlEscape = (s: string): string => {
   return s.replace(/['"]/g, '')
 }
-export default function(action: Action<Settings, DeleteContact>): Action<Settings, DeleteContact> {
-  return action
-    .validatePayload(payloadSchema)
 
-    .cachedRequest({
+const definition: ActionDefinition<Settings, DeleteContact> = {
+  schema,
+
+  cachedFields: {
+    contactId: {
       ttl: 60,
       key: ({ payload }) => payload.email,
       value: async (req, { payload }) => {
@@ -24,17 +25,19 @@ export default function(action: Action<Settings, DeleteContact>): Action<Setting
           }
         })
         return get(search.body, 'result[0].id')
-      },
-      as: 'contactId'
-    })
-
-    .request(async (req, { cacheIds }) => {
-      const contactId = cacheIds.contactId
-
-      if (contactId === null || contactId === undefined) {
-        return null
       }
+    }
+  },
 
-      return req.delete(`marketing/contacts?ids=${contactId}`)
-    })
+  perform: (req, { cacheIds }) => {
+    const contactId = cacheIds.contactId
+
+    if (contactId === null || contactId === undefined) {
+      return null
+    }
+
+    return req.delete(`marketing/contacts?ids=${contactId}`)
+  }
 }
+
+export default definition
