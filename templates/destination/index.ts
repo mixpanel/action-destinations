@@ -1,5 +1,5 @@
 import { JSONSchema7 } from 'json-schema'
-import { DestinationDefinition } from '@/lib/destination-kit'
+import { DestinationDefinition } from '../../lib/destination-kit'
 import { Settings } from './generated-types'
 import settings from './settings.schema.json'
 
