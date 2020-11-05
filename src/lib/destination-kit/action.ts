@@ -274,6 +274,10 @@ export class Action<Settings, Payload> extends EventEmitter {
       this.validatePayload(definition.schema)
     }
 
+    Object.entries(definition.autocompleteFields ?? {}).forEach(([field, callback]) => {
+      this.autocomplete(field, callback as RequestFn<Settings, Payload>)
+    })
+
     if (definition.perform) {
       this.request(definition.perform)
     }
