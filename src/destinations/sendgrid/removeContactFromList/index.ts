@@ -34,8 +34,8 @@ const definition: ActionDefinition<Settings, RemoveRecipientFromList> = {
     }
   },
 
-  perform: (req, { payload, cacheIds }) => {
-    const contactId = cacheIds.contactId
+  perform: (req, { payload, cachedFields }) => {
+    const contactId = cachedFields.contactId
 
     if (contactId === null || contactId === undefined) {
       return null

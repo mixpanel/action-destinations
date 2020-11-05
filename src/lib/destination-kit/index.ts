@@ -13,7 +13,7 @@ interface PartnerActions<Settings, Payload> {
   [key: string]: Action<Settings, Payload>
 }
 
-export interface DestinationConfig<Settings = unknown> {
+export interface DestinationDefinition<Settings = unknown> {
   /** The name of the destination */
   name: string
   /** The JSON Schema representing the destination settings. When present will be used to validate settings */
@@ -88,21 +88,21 @@ export class Destination<Settings = any> {
   partnerActions: PartnerActions<Settings, any>
   responses: Response[]
 
-  constructor(config: DestinationConfig<Settings>) {
-    this.name = config.name
-    this.settingsSchema = config.schema
-    this.extendRequest = config.extendRequest
+  constructor(destination: DestinationDefinition<Settings>) {
+    this.name = destination.name
+    this.settingsSchema = destination.schema
+    this.extendRequest = destination.extendRequest
     this.partnerActions = {}
-    this.authentication = config.authentication
+    this.authentication = destination.authentication
     this.responses = []
 
-    for (const action of Object.keys(config.actions)) {
-      this.partnerAction(action, config.actions[action])
+    for (const action of Object.keys(destination.actions)) {
+      this.partnerAction(action, destination.actions[action])
     }
   }
 
   async testAuthentication(settings: Settings): Promise<void> {
-    const context: ExecuteInput<Settings, {}> = { settings, payload: {}, cacheIds: {} }
+    const context: ExecuteInput<Settings, {}> = { settings, payload: {}, cachedFields: {} }
 
     if (this.settingsSchema) {
       const step = new Validate('', 'settings', this.settingsSchema)
@@ -178,7 +178,7 @@ export class Destination<Settings = any> {
       payload: event,
       mapping: subscription.mapping,
       settings,
-      cacheIds: {}
+      cachedFields: {}
     }
 
     const results = await action.execute(input)
@@ -222,7 +222,7 @@ export class Destination<Settings = any> {
     return results.flat()
   }
 
-  getSubscriptions(settings: JSONObject): Subscription[] {
+  private getSubscriptions(settings: JSONObject): Subscription[] {
     const { subscription, subscriptions } = settings
     let parsedSubscriptions
 
@@ -240,7 +240,7 @@ export class Destination<Settings = any> {
     return parsedSubscriptions as Subscription[]
   }
 
-  getDestinationSettings(settings: JSONObject): Settings {
+  private getDestinationSettings(settings: JSONObject): Settings {
     const { subscriptions, ...otherSettings } = settings
     return (otherSettings as unknown) as Settings
   }

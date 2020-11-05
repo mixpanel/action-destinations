@@ -1,24 +1,19 @@
 import { JSONSchema7 } from 'json-schema'
-import { Destination } from '../../lib/destination-kit'
-
+import { DestinationDefinition } from '../../lib/destination-kit'
 import settings from './settings.schema.json'
 import trackUser from './trackUser'
 import identifyUser from './identifyUser'
 import deleteUser from './deleteUser'
 import { Settings } from './generated-types'
 
-export default function createDestination(): Destination<Settings> {
-  const destination = new Destination<Settings>({
-    name: 'Amplitude',
-    // TODO get this from the database
-    schema: settings as JSONSchema7,
-
-    actions: {
-      trackUser,
-      identifyUser,
-      deleteUser
-    }
-  })
-
-  return destination
+const destination: DestinationDefinition<Settings> = {
+  name: 'Amplitude',
+  schema: settings as JSONSchema7,
+  actions: {
+    trackUser,
+    identifyUser,
+    deleteUser
+  }
 }
+
+export default destination

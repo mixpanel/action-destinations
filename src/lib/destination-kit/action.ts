@@ -54,7 +54,7 @@ export interface ActionDefinition<Settings, Payload = any> {
    */
   cachedFields?: {
     [field: string]: {
-      key: (ctx: ExecuteInput<Settings, Payload>) => string
+      key: (data: ExecuteInput<Settings, Payload>) => string
       ttl: number
       value: RequestFn<Settings, Payload>
       negative?: boolean
@@ -66,11 +66,11 @@ export interface ActionDefinition<Settings, Payload = any> {
 }
 
 class MapInput<Settings, Payload> extends Step<Settings, Payload> {
-  executeStep(ctx: ExecuteInput<Settings, Payload>): Promise<string> {
+  executeStep(data: ExecuteInput<Settings, Payload>): Promise<string> {
     // Transforms the initial payload (event) + action settings (from `subscriptions[0].mapping`)
     // into input data that the action can use to talk to partner apis
-    if (ctx.mapping) {
-      ctx.payload = transform(ctx.mapping, ctx.payload)
+    if (data.mapping) {
+      data.payload = transform(data.mapping, data.payload)
     }
 
     return Promise.resolve('MapInput completed')
@@ -104,8 +104,8 @@ export class Validate<Settings, Payload> extends Step<Settings, Payload> {
     this.validate = ajv.compile(schema)
   }
 
-  executeStep(ctx: ExecuteInput<Settings, Payload>): Promise<string> {
-    if (!this.validate(ctx[this.field])) {
+  executeStep(data: ExecuteInput<Settings, Payload>): Promise<string> {
+    if (!this.validate(data[this.field])) {
       throw new AggregateAjvError(this.validate.errors)
     }
 
@@ -113,7 +113,7 @@ export class Validate<Settings, Payload> extends Step<Settings, Payload> {
   }
 }
 
-export type Extension<Settings, Payload> = (ctx: ExecuteInput<Settings, Payload>) => ExtendOptions
+export type Extension<Settings, Payload> = (data: ExecuteInput<Settings, Payload>) => ExtendOptions
 export type Extensions<Settings, Payload> = Extension<Settings, Payload>[]
 
 /**
@@ -131,13 +131,13 @@ class Request<Settings, Payload> extends Step<Settings, Payload> {
     this.requestFn = requestFn
   }
 
-  async executeStep(ctx: ExecuteInput<Settings, Payload>): Promise<string> {
+  async executeStep(data: ExecuteInput<Settings, Payload>): Promise<string> {
     if (!this.requestFn) {
       return ''
     }
 
-    const baseRequest = this.baseRequest(ctx)
-    const request = this.requestFn(baseRequest, ctx)
+    const baseRequest = this.baseRequest(data)
+    const request = this.requestFn(baseRequest, data)
 
     let response: Response
     try {
@@ -155,7 +155,7 @@ class Request<Settings, Payload> extends Step<Settings, Payload> {
     return response.body as string
   }
 
-  baseRequest(ctx: ExecuteInput<Settings, Payload>): Got {
+  baseRequest(data: ExecuteInput<Settings, Payload>): Got {
     let base = got.extend({
       // disable automatic retries
       retry: 0,
@@ -172,7 +172,7 @@ class Request<Settings, Payload> extends Step<Settings, Payload> {
     })
 
     for (const extension of this.extensions) {
-      base = base.extend(extension(ctx))
+      base = base.extend(extension(data))
     }
 
     return base
@@ -180,7 +180,7 @@ class Request<Settings, Payload> extends Step<Settings, Payload> {
 }
 
 interface CachedRequestConfig<Settings, Payload> {
-  key: (ctx: ExecuteInput<Settings, Payload>) => string
+  key: (data: ExecuteInput<Settings, Payload>) => string
   value: RequestFn<Settings, Payload>
   as: string
   ttl: number
@@ -209,19 +209,19 @@ class CachedRequest<Settings, Payload> extends Request<Settings, Payload> {
     })
   }
 
-  async executeStep(ctx: ExecuteInput<Settings, Payload>): Promise<string> {
-    const k = this.keyFn(ctx)
+  async executeStep(data: ExecuteInput<Settings, Payload>): Promise<string> {
+    const k = this.keyFn(data)
     let v = this.cache.get<string>(k)
 
     if (v !== undefined) {
-      ctx.cacheIds[this.as] = v
+      data.cachedFields[this.as] = v
       return 'cache hit'
     }
 
-    const request = this.baseRequest(ctx)
+    const request = this.baseRequest(data)
 
     try {
-      v = await this.valueFn(request, ctx)
+      v = await this.valueFn(request, data)
     } catch (e) {
       if (get(e, 'response.statusCode') === 404) {
         v = undefined
@@ -245,7 +245,7 @@ class CachedRequest<Settings, Payload> extends Request<Settings, Payload> {
 interface ExecuteAutocompleteInput<Settings, Payload> {
   settings: Settings
   payload: Payload
-  cacheIds: { [key: string]: string }
+  cachedFields: { [key: string]: string }
   page?: string
 }
 
@@ -271,8 +271,8 @@ export class Action<Settings, Payload> extends EventEmitter {
     this.autocompleteCache = {}
   }
 
-  async execute(ctx: ExecuteInput<Settings, Payload>): Promise<StepResult[]> {
-    const results = await this.steps.execute(ctx)
+  async execute(data: ExecuteInput<Settings, Payload>): Promise<StepResult[]> {
+    const results = await this.steps.execute(data)
 
     const finalResult = results[results.length - 1]
     if (finalResult.error) {
@@ -305,7 +305,7 @@ export class Action<Settings, Payload> extends EventEmitter {
     return this
   }
 
-  executeAutocomplete(field: string, ctx: ExecuteAutocompleteInput<Settings, Payload>): any {
+  executeAutocomplete(field: string, data: ExecuteAutocompleteInput<Settings, Payload>): any {
     if (!this.autocompleteCache[field]) {
       return {
         data: [],
@@ -315,7 +315,7 @@ export class Action<Settings, Payload> extends EventEmitter {
 
     const step = new Request<Settings, Payload>(this.requestExtensions, this.autocompleteCache[field])
 
-    return step.executeStep(ctx)
+    return step.executeStep(data)
   }
 
   extendRequest(...extensionFns: Extensions<Settings, Payload>): Action<Settings, Payload> {

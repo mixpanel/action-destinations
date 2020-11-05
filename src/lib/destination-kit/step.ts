@@ -14,7 +14,7 @@ export interface ExecuteInput<Settings, Payload> {
   /** The transformed input data, based on `mapping` + `event` */
   payload: Payload
   /** The ids from cached requests */
-  cacheIds: { [key: string]: string }
+  cachedFields: { [key: string]: string }
   /** The page used in autocomplete */
   page?: string
 }
@@ -24,9 +24,9 @@ export interface ExecuteInput<Settings, Payload> {
  * catching errors, and returning a result object.
  */
 export class Step<Settings, Payload> extends EventEmitter {
-  executeStep?(ctx: ExecuteInput<Settings, Payload>): Promise<string>
+  executeStep?(data: ExecuteInput<Settings, Payload>): Promise<string>
 
-  async execute(ctx: ExecuteInput<Settings, Payload>): Promise<StepResult> {
+  async execute(data: ExecuteInput<Settings, Payload>): Promise<StepResult> {
     const result: StepResult = {
       output: null,
       error: null
@@ -37,7 +37,7 @@ export class Step<Settings, Payload> extends EventEmitter {
     }
 
     try {
-      result.output = await this.executeStep(ctx)
+      result.output = await this.executeStep(data)
     } catch (e) {
       result.error = e
     }
@@ -60,7 +60,7 @@ export class Steps<Settings, Payload> {
     this.steps.push(step)
   }
 
-  async execute(ctx: ExecuteInput<Settings, Payload>): Promise<StepResult[]> {
+  async execute(data: ExecuteInput<Settings, Payload>): Promise<StepResult[]> {
     if (this.steps.length === 0) {
       throw new Error('no steps defined')
     }
@@ -68,7 +68,7 @@ export class Steps<Settings, Payload> {
     const results: StepResult[] = []
 
     for (const step of this.steps) {
-      const result = await step.execute(ctx)
+      const result = await step.execute(data)
 
       results.push(result)
 

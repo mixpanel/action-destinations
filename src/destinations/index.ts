@@ -1,10 +1,19 @@
-import { Destination } from '@/lib/destination-kit'
-import createAirtable from './airtable'
-import createAmplitude from './amplitude'
-import createCustomerio from './customer-io'
-import createPipedrive from './pipedrive'
-import createSendgrid from './sendgrid'
-import createSlack from './slack'
+import { Destination, DestinationDefinition } from '@/lib/destination-kit'
+import airtable from './airtable'
+import amplitude from './amplitude'
+import customerio from './customerio'
+import pipedrive from './pipedrive'
+import sendgrid from './sendgrid'
+import slack from './slack'
+
+const destinations: Record<string, DestinationDefinition<any>> = {
+  airtable,
+  amplitude,
+  customerio,
+  pipedrive,
+  sendgrid,
+  slack
+}
 
 const idToSlug: Record<string, string> = {
   '5f7dd5e61ad74fefa2b1fc46': 'airtable',
@@ -15,23 +24,14 @@ const idToSlug: Record<string, string> = {
   '5f7dd8e302173ff732db5cc4': 'slack'
 }
 
-export function getDestinationBySlug(slug: string): Destination {
-  switch (slug) {
-    case 'airtable':
-      return createAirtable()
-    case 'amplitude':
-      return createAmplitude()
-    case 'customerio':
-      return createCustomerio()
-    case 'pipedrive':
-      return createPipedrive()
-    case 'sendgrid':
-      return createSendgrid()
-    case 'slack':
-      return createSlack()
-    default:
-      throw new Error('Destination not found')
+function getDestinationBySlug(slug: string): Destination {
+  const destination = destinations[slug]
+
+  if (!destination) {
+    throw new Error('Destination not found')
   }
+
+  return new Destination(destination)
 }
 
 export function getDestinationByIdOrSlug(idOrSlug: string): Destination {

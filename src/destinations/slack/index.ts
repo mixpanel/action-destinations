@@ -1,14 +1,12 @@
-import { Destination } from '../../lib/destination-kit'
+import { DestinationDefinition } from '../../lib/destination-kit'
 import { Settings } from './generated-types'
 import postToChannel from './postToChannel'
 
-export default function createDestination(): Destination<{}> {
-  const destination = new Destination<Settings>({
-    name: 'Slack',
-    actions: {
-      postToChannel
-    }
-  })
-
-  return destination
+const destination: DestinationDefinition<Settings> = {
+  name: 'Slack',
+  actions: {
+    postToChannel
+  }
 }
+
+export default destination

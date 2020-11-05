@@ -21,8 +21,8 @@ const definition: ActionDefinition<Settings, CreateOrUpdateOrganization> = {
     }
   },
 
-  perform: (req, { payload, cacheIds }) => {
-    const organizationId = cacheIds.organizationId
+  perform: (req, { payload, cachedFields }) => {
+    const organizationId = cachedFields.organizationId
 
     const organization = {
       name: payload.name,

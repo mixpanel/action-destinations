@@ -29,8 +29,8 @@ const definition: ActionDefinition<Settings, DeleteContact> = {
     }
   },
 
-  perform: (req, { cacheIds }) => {
-    const contactId = cacheIds.contactId
+  perform: (req, { cachedFields }) => {
+    const contactId = cachedFields.contactId
 
     if (contactId === null || contactId === undefined) {
       return null

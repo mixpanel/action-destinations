@@ -23,8 +23,8 @@ const definition: ActionDefinition<Settings, DeletePerson> = {
     }
   },
 
-  perform: (req, { cacheIds }) => {
-    const personId = cacheIds.personId
+  perform: (req, { cachedFields }) => {
+    const personId = cachedFields.personId
 
     if (personId === undefined || personId === null) {
       return null

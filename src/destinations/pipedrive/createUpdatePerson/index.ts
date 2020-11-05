@@ -71,8 +71,8 @@ const definition: ActionDefinition<Settings, CreateOrUpdatePerson> = {
     }
   },
 
-  perform: (req, { payload, cacheIds }) => {
-    const personId = cacheIds.personId
+  perform: (req, { payload, cachedFields }) => {
+    const personId = cachedFields.personId
 
     const person: Person = {
       name: payload.name,
