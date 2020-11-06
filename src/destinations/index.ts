@@ -1,5 +1,5 @@
 // We need to import this here too for `fab-5-ops` to work
-import './aliases'
+import '../aliases'
 import { Destination, DestinationDefinition } from '../lib/destination-kit'
 import airtable from './airtable'
 import amplitude from './amplitude'
