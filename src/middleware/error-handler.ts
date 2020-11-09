@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/node'
 import { ErrorRequestHandler } from 'express'
 import { NODE_ENV } from '../config'
 import logger from '../lib/logger'
@@ -27,6 +28,8 @@ const errorHandler: ErrorRequestHandler = (error, req, res, _next): void => {
   // Only return the error message in development
   if (NODE_ENV === 'development' || NODE_ENV === 'test') {
     payload.message = error.message || error
+  } else {
+    Sentry.captureException(error)
   }
 
   res.status(status).json(payload)

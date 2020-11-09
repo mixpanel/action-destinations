@@ -1,11 +1,24 @@
 import './aliases'
 import http from 'http'
 import { once } from 'lodash'
+import * as Sentry from '@sentry/node'
+import * as SentryIntegrations from '@sentry/integrations'
 import blockedStats from '@segment/blocked-stats'
 import app from './app'
 import logger from './lib/logger'
 import stats from './lib/stats'
-import { PORT } from './config'
+import { PORT, NODE_ENV, SENTRY_DSN } from './config'
+
+Sentry.init({
+  dsn: SENTRY_DSN,
+  environment: NODE_ENV,
+  integrations: [
+    new SentryIntegrations.Dedupe(),
+    new SentryIntegrations.ExtraErrorData({
+      depth: 4
+    })
+  ]
+})
 
 // Track blocked event loop metrics
 blockedStats(logger, stats)
@@ -35,6 +48,11 @@ const gracefulShutdown = once(exitCode => {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function handleUncaught(error: any, crashType: string): void {
   error.crashType = crashType
+  Sentry.withScope(scope => {
+    scope.setTag('crashType', crashType)
+    Sentry.captureException(error)
+  })
+
   stats.increment('crash', 1, [`type:${crashType}`])
   logger.crit('😱  Server crashed', error)
 

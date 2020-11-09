@@ -1,8 +1,9 @@
 import { RequestHandler, Request, Response } from 'express'
+import { once, get } from 'lodash'
+import * as Sentry from '@sentry/node'
 import Context from '../lib/context'
 import logger from '../lib/logger'
 import stats from '../lib/stats'
-import { once, get } from 'lodash'
 
 interface RecordErrorParams {
   error: unknown
@@ -22,6 +23,7 @@ function recordError({ error, req }: RecordErrorParams): void {
     http_req_query: req.query,
     http_req_ip: req.ip
   })
+  Sentry.captureException(error)
 }
 
 interface CreateAfterResponseCallbackParams {
