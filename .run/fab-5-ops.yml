@@ -1,0 +1,54 @@
+name: fab-5-ops
+
+labels:
+  team: destinations
+  owner: epd-destinations@segment.com
+  Autoscale::Target::CPU: 80
+  Autoscale::Target::Mem: 70
+
+container:
+  image: fab-5-engine
+  repository: 528451384384.dkr.ecr.us-west-2.amazonaws.com
+  cmd: ['./scripts/run-ops.sh']
+
+expose:
+  - name: http
+    port: 3000
+    proto: http
+    health_check_path: /health
+
+resources:
+  cpu_shares: 512
+  mem_mb: 512
+
+count:
+  production:
+    min: 1
+    max: 3
+    autoscale_policy: cpu_mem_tracking
+  stage:
+    min: 1
+    max: 3
+    autoscale_policy: cpu_mem_tracking
+
+autodeploy:
+  production:
+    branch: master
+  stage:
+    branch: staging
+
+config:
+  production:
+    NODE_ENV: production
+    UV_THREADPOOL_SIZE: 128
+    DATADOG_AGENT_ADDR: '172.17.42.1:8125'
+    SENTRY_DSN: https://e1f53320787f46a28883db55c7e73c71@o19879.ingest.sentry.io/5510102
+
+  stage: &stage_config
+    NODE_ENV: stage
+    UV_THREADPOOL_SIZE: 128
+    DATADOG_AGENT_ADDR: '172.17.42.1:8125'
+    SENTRY_DSN: https://e1f53320787f46a28883db55c7e73c71@o19879.ingest.sentry.io/5510102
+
+  dev:
+    <<: *stage_config

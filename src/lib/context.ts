@@ -3,6 +3,14 @@ import { ExecuteInput, StepResult } from './destination-kit/step'
 import logger, { LEVEL } from './logger'
 import stats from './stats'
 
+interface NodeError extends Error {
+  code: string
+}
+
+function isNodeError(error: any): error is NodeError {
+  return typeof error === 'object' && Boolean(error.code) && error instanceof Error
+}
+
 interface Fields {
   // Standard HTTP
   http_req_method?: string
@@ -21,8 +29,19 @@ interface Fields {
   req_destination?: string
   error?: unknown
 
+  // Client requests to other services
+  service_client_requests: ServiceClientRequest[]
+
   // Subscriptions executed during the request
   subscriptions: Subscriptions[]
+}
+
+export interface ServiceClientRequest {
+  service: string
+  endpoint: string
+  duration: number
+  retries: number
+  error?: unknown
 }
 
 export interface Subscriptions {
@@ -34,7 +53,7 @@ export interface Subscriptions {
 }
 
 type SetFields = Exclude<keyof Fields, AppendFields>
-type AppendFields = 'subscriptions'
+type AppendFields = 'subscriptions' | 'service_client_requests'
 
 /** The request context, which gathers info about what happened during the request for debugging purposes */
 export default class Context {
@@ -53,6 +72,7 @@ export default class Context {
     req_source: undefined,
     req_destination: undefined,
     error: undefined,
+    service_client_requests: [],
     subscriptions: []
   }
 
@@ -114,9 +134,40 @@ export default class Context {
     }
   }
 
+  private sendRpcCallMetrics(): void {
+    for (const rpcCall of this.fields.service_client_requests) {
+      const error = rpcCall.error
+
+      const tags = [
+        `service:${rpcCall.service}`,
+        `endpoint:${rpcCall.endpoint.replace(/:/g, '_')}` // Replace the colon from routes params
+      ]
+
+      stats.increment('rpc_call', 1, tags)
+      stats.histogram('rpc_call_duration', rpcCall.duration, tags)
+
+      if (error) {
+        stats.increment('rpc_call_error', 1, tags)
+      }
+
+      if (rpcCall.retries > 0) {
+        stats.increment('rpc_call_retry', rpcCall.retries, tags)
+
+        if (error) {
+          stats.increment('rpc_call_failed_after_retry', 1, tags)
+        }
+      }
+
+      if (isNodeError(error) && (error.code === 'ETIMEDOUT' || error.code === 'ESOCKETTIMEDOUT')) {
+        stats.increment('rpc_call_timeout', 1, tags)
+      }
+    }
+  }
+
   /** Sends all the metrics for the request */
   sendMetrics(): void {
     this.sendRequestMetrics()
+    this.sendRpcCallMetrics()
   }
 }
 

@@ -14,7 +14,8 @@ steps:
       - yarn test
       - mv node_modules node_modules_dev
       - yarn install --frozen-lockfile --production
-      - node -e "require('./dist/src/boot'); process.exit(0)"
+      - node -e "require('./dist/src/app'); process.exit(0)"
+      - node -e "require('./dist/src/ops/server'); process.exit(0)"
       - make -f .buildkite/Makefile.ci ci-docker-build
       - mv node_modules node_modules_prod
       - mv node_modules_dev node_modules
@@ -41,3 +42,4 @@ steps:
       - ssh://git@github.com/segmentio/treb-publish-buildkite-plugin#v0.5.0:
           configs:
             - .run/fab-5-engine.yml
+            - .run/fab-5-ops.yml

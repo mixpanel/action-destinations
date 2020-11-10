@@ -7,12 +7,12 @@ import stats from '../lib/stats'
 /** Catch all error handler */
 const errorHandler: ErrorRequestHandler = (error, req, res, _next): void => {
   const status = error.statusCode || error.status || 500
-  const payload = { message: 'Internal server error', status }
+  const payload = { error: 'Internal server error', status }
 
   // Return user errors and don't log them
   // E.g: validation errors, JSON parsing errors, payload too large errors
   if (error.expose && status >= 400 && status <= 499) {
-    payload.message = error.message
+    payload.error = error.message
   } else {
     // Decorate the error with useful info to aid debugging
     error.referer = req.headers.referer
@@ -27,7 +27,7 @@ const errorHandler: ErrorRequestHandler = (error, req, res, _next): void => {
 
   // Only return the error message in development
   if (NODE_ENV === 'development' || NODE_ENV === 'test') {
-    payload.message = error.message || error
+    payload.error = error.message || error
   } else {
     Sentry.captureException(error)
   }

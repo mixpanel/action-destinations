@@ -8,12 +8,14 @@
   "engineStrict": true,
   "author": "Tyson Mote <tyson@segment.com>",
   "license": "UNLICENSED",
-  "main": "src/boot.js",
+  "main": "src/app.js",
   "scripts": {
     "lint": "eslint '**/*.ts'",
-    "start": "yarn build && node dist/src/boot.js",
+    "start": "yarn build && node dist/src/app.js",
     "dev-typescript": "tsc --watch --preserveWatchOutput",
-    "dev-server": "NODE_ENV=development nodemon --inspect=47082 --watch dist dist/src/boot.js",
+    "dev-server": "NODE_ENV=development nodemon --inspect=47082 --watch dist dist/src/app.js",
+    "dev-ops-server": "NODE_ENV=developement nodemon --inspect=47082 --watch dist dist/src/ops/server.js",
+    "dev-ops": "yarn build && concurrently 'yarn dev-typescript' 'yarn dev-ops-server'",
     "dev": "yarn build && concurrently 'yarn dev-typescript' 'yarn dev-server'",
     "build": "yarn generate-types && tsc",
     "test": "jest",
@@ -63,6 +65,7 @@
   "dependencies": {
     "@segment/ajv-human-errors": "^1.1.0",
     "@segment/blocked-stats": "^2.2.0",
+    "@segment/control-plane-service-client": "ssh://git@github.com:segmentio/control-plane-service-js-client#master",
     "@segment/express-stats": "^1.3.1",
     "@segment/fab5-subscriptions": "^0.1.0",
     "@sentry/integrations": "^5.27.3",
@@ -79,6 +82,7 @@
     "module-alias": "^2.2.2",
     "mustache": "^4.0.1",
     "node-cache": "^5.1.2",
+    "ow": "^0.19.0",
     "uuid": "^8.3.0",
     "whatwg-mimetype": "^2.3.0"
   },

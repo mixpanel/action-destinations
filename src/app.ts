@@ -1,7 +1,10 @@
+import './aliases'
 import express from 'express'
 import routes from './routes'
 import core from './middleware/core'
 import errorHandler from './middleware/error-handler'
+import { startServer } from './boot'
+import { PORT } from './config'
 
 const app = express()
 
@@ -21,4 +24,4 @@ app.use(routes)
 
 app.use(errorHandler)
 
-export default app
+export default startServer(app, Number(PORT || 3000))

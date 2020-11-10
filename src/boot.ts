@@ -1,13 +1,11 @@
-import './aliases'
 import http from 'http'
 import { once } from 'lodash'
 import * as Sentry from '@sentry/node'
 import * as SentryIntegrations from '@sentry/integrations'
 import blockedStats from '@segment/blocked-stats'
-import app from './app'
 import logger from './lib/logger'
 import stats from './lib/stats'
-import { PORT, NODE_ENV, SENTRY_DSN } from './config'
+import { NODE_ENV, SENTRY_DSN } from './config'
 
 Sentry.init({
   dsn: SENTRY_DSN,
@@ -23,19 +21,26 @@ Sentry.init({
 // Track blocked event loop metrics
 blockedStats(logger, stats)
 
-const server = http.createServer(app).listen(PORT, () => {
-  logger.info(`Listening at http://localhost:${PORT}`)
-})
+let server: http.Server
+
+export function startServer(app: http.RequestListener, port: number) {
+  server = http.createServer(app).listen(port, () => {
+    logger.info(`Listening at http://localhost:${port}`)
+  })
+  return server
+}
 
 const gracefulShutdown = once((exitCode) => {
   logger.info('Server stopping...')
 
   // Stop receiving new requests, allowing inflight requests to finish
-  server.close(() => {
-    logger.info('Server stopped')
-    // Leave time for logging / error capture
-    setTimeout(() => process.exit(exitCode), 300)
-  })
+  if (server) {
+    server.close(() => {
+      logger.info('Server stopped')
+      // Leave time for logging / error capture
+      setTimeout(() => process.exit(exitCode), 300)
+    })
+  }
 
   // Forcibly shutdown after 8 seconds (Docker forcibly kills after 10 seconds)
   setTimeout(() => {
