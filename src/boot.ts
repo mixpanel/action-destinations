@@ -27,7 +27,7 @@ const server = http.createServer(app).listen(PORT, () => {
   logger.info(`Listening at http://localhost:${PORT}`)
 })
 
-const gracefulShutdown = once(exitCode => {
+const gracefulShutdown = once((exitCode) => {
   logger.info('Server stopping...')
 
   // Stop receiving new requests, allowing inflight requests to finish
@@ -48,7 +48,7 @@ const gracefulShutdown = once(exitCode => {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function handleUncaught(error: any, crashType: string): void {
   error.crashType = crashType
-  Sentry.withScope(scope => {
+  Sentry.withScope((scope) => {
     scope.setTag('crashType', crashType)
     Sentry.captureException(error)
   })
@@ -60,10 +60,10 @@ function handleUncaught(error: any, crashType: string): void {
   gracefulShutdown(1)
 }
 
-process.on('uncaughtException', error => {
+process.on('uncaughtException', (error) => {
   handleUncaught(error, 'uncaughtException')
 })
-process.on('unhandledRejection', error => {
+process.on('unhandledRejection', (error) => {
   handleUncaught(error, 'unhandledRejection')
 })
 

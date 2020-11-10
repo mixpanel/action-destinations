@@ -38,7 +38,7 @@ function summarizeRequest(response: Response<unknown>): RequestToDestination {
   const request = response.request
 
   // This is needed because `request.options.body` does not contain the actual body sent in the request
-  const symbol = Object.getOwnPropertySymbols(request).find(s => String(s) === 'Symbol(body)')
+  const symbol = Object.getOwnPropertySymbols(request).find((s) => String(s) === 'Symbol(body)')
 
   return {
     url: request.requestUrl,

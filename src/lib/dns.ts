@@ -20,14 +20,14 @@ const RESTRICTED_CIDR_BLOCKS = [
   'fe80::/10'
 ]
 
-const CIDR_SUBNETS = RESTRICTED_CIDR_BLOCKS.map(block => ip.cidrSubnet(block))
+const CIDR_SUBNETS = RESTRICTED_CIDR_BLOCKS.map((block) => ip.cidrSubnet(block))
 
 /**
  * Identifies whether an address is contained in a restricted cidr block
  * @param address - the address to validate against restricted cidr blocks
  */
 function isRestrictedIp(address: string): boolean {
-  return CIDR_SUBNETS.some(subnet => subnet.contains(address))
+  return CIDR_SUBNETS.some((subnet) => subnet.contains(address))
 }
 
 /**
@@ -41,18 +41,22 @@ export function lookup(hostname: string, ...args: any[]): void {
     options = {}
   }
 
-  return dns.lookup(hostname, options, (err: NodeJS.ErrnoException | null, address: string | string[], family?: number) => {
-    if (!err) {
-      const addresses = Array.isArray(address) ? address : [address]
-      const isRestricted = addresses.some(isRestrictedIp)
+  return dns.lookup(
+    hostname,
+    options,
+    (err: NodeJS.ErrnoException | null, address: string | string[], family?: number) => {
+      if (!err) {
+        const addresses = Array.isArray(address) ? address : [address]
+        const isRestricted = addresses.some(isRestrictedIp)
 
-      if (isRestricted) {
-        err = new Error(`"${hostname}" is a restricted hostname.`)
+        if (isRestricted) {
+          err = new Error(`"${hostname}" is a restricted hostname.`)
+        }
       }
-    }
 
-    callback(err, address, family)
-  })
+      callback(err, address, family)
+    }
+  )
 }
 
 /**

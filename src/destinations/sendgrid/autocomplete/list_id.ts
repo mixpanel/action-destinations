@@ -14,14 +14,14 @@ interface ListItem {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default async function(req: Got, { page }: any): Promise<AutocompleteResponse> {
+export default async function (req: Got, { page }: any): Promise<AutocompleteResponse> {
   const response = await req<ListResponse>('marketing/lists', {
     searchParams: {
       page_token: page
     }
   })
 
-  const items = response.body.result.map(list => ({
+  const items = response.body.result.map((list) => ({
     label: list.name,
     value: list.id
   }))

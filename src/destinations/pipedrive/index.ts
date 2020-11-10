@@ -10,7 +10,7 @@ const destination: DestinationDefinition<Settings> = {
   name: 'Pipedrive',
   authentication: {
     type: 'custom',
-    testAuthentication: req => req('users/me')
+    testAuthentication: (req) => req('users/me')
   },
   schema: settings as JSONSchema7,
   extendRequest({ settings }) {

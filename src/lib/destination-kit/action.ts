@@ -337,7 +337,7 @@ export class Action<Settings, Payload> extends EventEmitter {
   private request(requestFn: RequestFn<Settings, Payload>): Action<Settings, Payload> {
     const step = new Request<Settings, Payload>(this.requestExtensions, requestFn)
 
-    step.on('response', response => this.emit('response', response))
+    step.on('response', (response) => this.emit('response', response))
 
     this.steps.push(step)
 

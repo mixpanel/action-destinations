@@ -88,7 +88,7 @@ registerDirective('@merge', (arr, payload) => {
   const arrType = realTypeOf(arr)
   if (arrType !== 'array') throw new Error(`@merge: expected array, got ${arrType}`)
 
-  const objects = arr.map(v => resolve(v, payload))
+  const objects = arr.map((v) => resolve(v, payload))
   return Object.assign({}, ...objects)
 })
 
@@ -108,7 +108,7 @@ registerDirective('@omit', (opts, payload) => {
   const [obj, fields] = resolveObjectAndFields('@omit', opts, payload)
 
   const clonedObj = JSON.parse(JSON.stringify(obj))
-  fields.forEach(f => delete clonedObj[f])
+  fields.forEach((f) => delete clonedObj[f])
 
   return clonedObj
 })
@@ -123,7 +123,7 @@ registerDirective('@pick', (opts, payload) => {
   const [obj, fields] = resolveObjectAndFields('@omit', opts, payload)
 
   const clean = {}
-  fields.forEach(f => {
+  fields.forEach((f) => {
     if (Object.prototype.hasOwnProperty.call(obj, f)) {
       clean[f] = obj[f]
     }
@@ -167,14 +167,14 @@ function isDirective(obj) {
   if (realTypeOf(obj) !== 'object') return false
   const keys = Object.keys(obj)
 
-  const directiveKey = keys.find(key => key.startsWith('@'))
+  const directiveKey = keys.find((key) => key.startsWith('@'))
 
   if (!directiveKey) {
     return false
   }
 
   // Check that there aren't any other keys besides @directive or _metadata
-  const otherKeys = keys.filter(key => !key.startsWith('@') && key !== '_metadata')
+  const otherKeys = keys.filter((key) => !key.startsWith('@') && key !== '_metadata')
   return otherKeys.length === 0
 }
 

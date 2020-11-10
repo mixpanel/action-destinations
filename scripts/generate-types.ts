@@ -1,4 +1,5 @@
 import { compileFromFile } from 'json-schema-to-typescript'
+import { Options as PrettierOptions } from 'prettier'
 import pkg from '../package.json'
 import path from 'path'
 import fs from 'fs'
@@ -31,7 +32,7 @@ async function generateSettings(destinationPath: string): Promise<void> {
   }
 
   const generated = await compileFromFile(settingsPath, {
-    style: pkg.prettier,
+    style: pkg.prettier as PrettierOptions,
     bannerComment: COMMENT
   })
 
@@ -53,7 +54,7 @@ async function generatePayloads(destinationPath: string): Promise<void> {
     }
 
     const generated = await compileFromFile(payloadPath, {
-      style: pkg.prettier,
+      style: pkg.prettier as PrettierOptions,
       bannerComment: COMMENT
     })
 
@@ -67,7 +68,7 @@ run()
   .then(() => {
     process.exit(0)
   })
-  .catch(err => {
+  .catch((err) => {
     console.error(err)
     process.exit(1)
   })

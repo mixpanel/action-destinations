@@ -140,7 +140,7 @@ export class Destination<Settings = any> {
       action.extendRequest(this.extendRequest)
     }
 
-    action.on('response', response => {
+    action.on('response', (response) => {
       this.responses.push(response)
     })
 
@@ -213,7 +213,7 @@ export class Destination<Settings = any> {
     const subscriptions = this.getSubscriptions(settings)
     const destinationSettings = this.getDestinationSettings(settings)
 
-    const promises = subscriptions.map(s =>
+    const promises = subscriptions.map((s) =>
       this.onSubscription(context, s, event, destinationSettings, privateSettings)
     )
 

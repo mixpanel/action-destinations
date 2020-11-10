@@ -126,8 +126,8 @@ function constructCloudSuccess(
     data: {
       results: getSuccessData(result),
       debugRequests: eventTesterRequests,
-      requestsToDestination: eventTesterRequests.map(r => r.request),
-      responseFromDestination: eventTesterRequests.map(r => r.response)
+      requestsToDestination: eventTesterRequests.map((r) => r.request),
+      responseFromDestination: eventTesterRequests.map((r) => r.response)
     },
     trace: constructTrace({
       name: 'invoke',
@@ -168,8 +168,8 @@ function constructCloudError(
       name: error?.name,
       message,
       debugRequests: eventTesterRequests,
-      requestsToDestination: eventTesterRequests.map(r => r.request),
-      responseFromDestination: eventTesterRequests.map(r => r.response)
+      requestsToDestination: eventTesterRequests.map((r) => r.request),
+      responseFromDestination: eventTesterRequests.map((r) => r.response)
     },
     // TODO support all error types
     errortype: 'MESSAGE_REJECTED',
@@ -210,7 +210,7 @@ async function handleCloudEventBatch(
   destinationId: string,
   batch: CloudEvent[]
 ): Promise<CloudEventResponse[]> {
-  const promises = batch.map(event => handleCloudEvent(context, destinationId, event))
+  const promises = batch.map((event) => handleCloudEvent(context, destinationId, event))
   const results = await Promise.all(promises)
   return results
 }

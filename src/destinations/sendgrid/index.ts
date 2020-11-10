@@ -11,7 +11,7 @@ const destination: DestinationDefinition<Settings> = {
   name: 'SendGrid',
   authentication: {
     type: 'custom',
-    testAuthentication: req => req('user/profile')
+    testAuthentication: (req) => req('user/profile')
   },
   schema: settings as JSONSchema7,
   extendRequest({ settings }) {

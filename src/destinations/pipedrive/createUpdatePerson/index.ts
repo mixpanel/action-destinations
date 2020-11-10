@@ -38,7 +38,7 @@ const definition: ActionDefinition<Settings, CreateOrUpdatePerson> = {
         }
       })
 
-      const items = response.body.data.map(organization => ({
+      const items = response.body.data.map((organization) => ({
         label: organization.name,
         value: organization.id
       }))

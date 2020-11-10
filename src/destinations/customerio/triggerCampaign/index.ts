@@ -26,7 +26,7 @@ async function idAutocomplete(
     }
   })
 
-  const items = response.body.campaigns.map(campaign => ({
+  const items = response.body.campaigns.map((campaign) => ({
     label: campaign.name,
     value: campaign.id
   }))

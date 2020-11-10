@@ -11,7 +11,7 @@ interface Segment {
   name: string
 }
 
-export default async function(req: Got, { settings }: { settings: Settings }): Promise<AutocompleteResponse> {
+export default async function (req: Got, { settings }: { settings: Settings }): Promise<AutocompleteResponse> {
   const response = await req.get<ListResponse>('https://beta-api.customer.io/v1/api/segments', {
     prefixUrl: '',
     headers: {
@@ -19,7 +19,7 @@ export default async function(req: Got, { settings }: { settings: Settings }): P
     }
   })
 
-  const items = response.body.segments.map(segment => ({
+  const items = response.body.segments.map((segment) => ({
     label: segment.name,
     value: segment.id
   }))

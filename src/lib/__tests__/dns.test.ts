@@ -22,7 +22,7 @@ const client = got.extend({
 
 describe('dns#lookup', () => {
   test('bubbles the original error', async () => {
-  // @ts-ignore
+    // @ts-ignore
     mockedDns.lookup.mockImplementationOnce((_hostname, _options, callback) => {
       callback(new Error('Nope!'))
     })

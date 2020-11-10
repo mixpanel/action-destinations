@@ -4,7 +4,7 @@ class AggregateError extends Error {
   constructor(...errors) {
     super()
     this.name = 'AggregateError'
-    this._errors = errors.flatMap(e => {
+    this._errors = errors.flatMap((e) => {
       if (e instanceof AggregateError) {
         return [...e]
       } else {
@@ -34,7 +34,7 @@ class AggregateError extends Error {
   }
 
   _refreshMessage() {
-    this.message = this._errors.map(e => e.message).join(' ')
+    this.message = this._errors.map((e) => e.message).join(' ')
   }
 }
 
@@ -70,14 +70,14 @@ function validateDirective(obj, stack = []) {
   }
 
   const keys = Object.keys(obj)
-  const directiveKeys = keys.filter(key => key.startsWith('@'))
+  const directiveKeys = keys.filter((key) => key.startsWith('@'))
 
   if (directiveKeys.length > 1) {
     throw new ValidationError(`should only have one @-prefixed key but it has ${directiveKeys.length} keys`, stack)
   }
 
   // Check that there aren't other keys besides @directive or _metadata
-  const otherKeys = keys.filter(key => !key.startsWith('@') && key !== '_metadata')
+  const otherKeys = keys.filter((key) => !key.startsWith('@') && key !== '_metadata')
 
   if (otherKeys.length > 0) {
     throw new ValidationError(`should only have one @-prefixed key but it has ${keys.length} keys`, stack)
@@ -171,7 +171,7 @@ function validateObject(obj, stack = []) {
 
   const keys = Object.keys(obj)
 
-  const directiveKey = keys.find(k => k.charAt(0) === '@')
+  const directiveKey = keys.find((k) => k.charAt(0) === '@')
   if (directiveKey) {
     throw new ValidationError(
       `shouldn't have directive (@-prefixed) keys but it has ${JSON.stringify(directiveKey)}`,
@@ -181,7 +181,7 @@ function validateObject(obj, stack = []) {
 
   const err = new AggregateError()
 
-  keys.forEach(k => {
+  keys.forEach((k) => {
     try {
       validate(obj[k], [...stack, k])
     } catch (e) {
@@ -233,7 +233,7 @@ function directive(names, fn) {
   if (!Array.isArray(names)) {
     names = [names]
   }
-  names.forEach(name => {
+  names.forEach((name) => {
     directives[name] = (v, stack = []) => {
       try {
         fn(v, [...stack, name])
@@ -313,7 +313,7 @@ directive('@path', (v, stack) => {
   validateDirectiveOrString(v, stack)
 })
 
-directive('@root', v => {
+directive('@root', (v) => {
   // no-op
 })
 
@@ -333,7 +333,7 @@ directive('@timestamp', (v, stack) => {
   )
 })
 
-directive('@uuid', v => {
+directive('@uuid', (v) => {
   // no-op
 })
 
@@ -345,7 +345,7 @@ function realTypeOf(v) {
   if (rawType === 'object') {
     if (Array.isArray(v)) return 'array'
     else if (v === null) return 'null'
-    else if (Object.keys(v).some(k => k.match(/^@/))) return 'directive'
+    else if (Object.keys(v).some((k) => k.match(/^@/))) return 'directive'
     else return 'object'
   }
 
