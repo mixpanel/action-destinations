@@ -1,4 +1,4 @@
-import validate from '@segment/fab5-subscriptions'
+import { validate, parseFql, Subscription as SubscriptionAst } from '@segment/fab5-subscriptions'
 import { BadRequest } from 'http-errors'
 import got, { CancelableRequest, Got, Response } from 'got'
 import { JSONSchema7 } from 'json-schema'
@@ -30,11 +30,7 @@ export interface DestinationDefinition<Settings = unknown> {
 
 interface Subscription {
   partnerAction: string
-  subscribe:
-    | string
-    | {
-        type: string
-      }
+  subscribe: string | SubscriptionAst
   mapping?: JSONObject
 }
 
@@ -156,7 +152,10 @@ export class Destination<Settings = any> {
     settings: Settings,
     privateSettings: JSONArray
   ): Promise<StepResult[]> {
-    const isSubscribed = validate(subscription.subscribe, event)
+    const subscriptionAst: SubscriptionAst =
+      typeof subscription.subscribe === 'string' ? parseFql(subscription.subscribe) : subscription.subscribe
+
+    const isSubscribed = validate(subscriptionAst, event)
     if (!isSubscribed) {
       return [{ output: 'not subscribed' }]
     }

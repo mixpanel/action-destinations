@@ -596,12 +596,21 @@
     "@types/node-statsd" "^0.1.2"
     node-statsd "^0.1.1"
 
-"@segment/fab5-subscriptions@^0.1.0":
-  version "0.1.4"
-  resolved "https://registry.yarnpkg.com/@segment/fab5-subscriptions/-/fab5-subscriptions-0.1.4.tgz#6c70d52e4fdd71871e6890801f08fff3d3ddb46d"
-  integrity sha512-lmBkzsgAt/EIhjLllqo3XzvHehc6hxZnh/7DWJOu/5p6fFAAz9vLFRjxgY2muDIKZVGeeqsizr2/SI7xvew8Ow==
+"@segment/fab5-subscriptions@^1.0.0":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@segment/fab5-subscriptions/-/fab5-subscriptions-1.0.1.tgz#766095c5cddf66f6e0a6113a0b792da234d16cd1"
+  integrity sha512-cnejkupLOyj4a2YFxQn76HV9RvCEtkAUcCIUQ/Q4e80jt1q1vOoLWWqE1+luWlzFOH63aPK3kGk2wfFyDIxV7Q==
   dependencies:
-    lodash "^4.17.15"
+    "@segment/fql" "^1.9.1"
+    lodash "^4.17.20"
+
+"@segment/fql@^1.9.1":
+  version "1.9.1"
+  resolved "https://registry.yarnpkg.com/@segment/fql/-/fql-1.9.1.tgz#13bad562f37a63e3096284b90f92cc47cb14e35e"
+  integrity sha512-ynUIayzBbCrbEASY51iymFwC2xbBEH1Q0VQYztKcYrOwlJmPI77I7ZkCm2+tBD0quuSWXeQfBYvMHmLF9puL+g==
+  dependencies:
+    "@types/lodash" "^4.14.121"
+    lodash "^4.17.11"
 
 "@segment/remote-service-client@^2.0.0":
   version "2.3.0"
@@ -877,7 +886,7 @@
   dependencies:
     "@types/node" "*"
 
-"@types/lodash@^4.14.165":
+"@types/lodash@^4.14.121", "@types/lodash@^4.14.165":
   version "4.14.165"
   resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.165.tgz#74d55d947452e2de0742bad65270433b63a8c30f"
   integrity sha512-tjSSOTHhI5mCHTy/OOXYIhi2Wt1qcbHmuXD1Ha7q70CgI/I71afO4XtLb/cVexki1oVYchpul/TOuu3Arcdxrg==
@@ -4313,7 +4322,7 @@ lodash.sortby@^4.7.0:
   resolved "https://registry.yarnpkg.com/lodash.sortby/-/lodash.sortby-4.7.0.tgz#edd14c824e2cc9c1e0b0a1b42bb5210516a42438"
   integrity sha1-7dFMgk4sycHgsKG0K7UhBRakJDg=
 
-lodash@^4.17.14, lodash@^4.17.15, lodash@^4.17.19, lodash@^4.17.20:
+lodash@^4.17.11, lodash@^4.17.14, lodash@^4.17.15, lodash@^4.17.19, lodash@^4.17.20:
   version "4.17.20"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.20.tgz#b44a9b6297bcb698f1c51a3545a2b3b368d59c52"
   integrity sha512-PlhdFcillOINfeV7Ni6oF1TAEayyZBoZ8bcshTHqOYJYlrqzRK5hagpagky5o4HfCzzd1TRkXPMFq6cKk9rGmA==
