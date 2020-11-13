@@ -17,6 +17,7 @@ expose:
     port: 3000
     proto: http
     health_check_path: /health
+    health_check_status: 204
 
 resources:
   cpu_shares: 512
