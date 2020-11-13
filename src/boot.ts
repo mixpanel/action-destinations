@@ -1,3 +1,4 @@
+import { Express } from 'express'
 import http from 'http'
 import { once } from 'lodash'
 import * as Sentry from '@sentry/node'
@@ -23,10 +24,17 @@ blockedStats(logger, stats)
 
 let server: http.Server
 
-export function startServer(app: http.RequestListener, port: number) {
-  server = http.createServer(app).listen(port, () => {
+export function startServer(app: Express, port: number) {
+  server = http.createServer(app)
+
+  server.on('error', (err: Error) => {
+    logger.error(`Server error: ${err.message}`, err)
+  })
+
+  server.listen(port, () => {
     logger.info(`Listening at http://localhost:${port}`)
   })
+
   return server
 }
 

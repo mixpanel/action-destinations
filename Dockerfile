@@ -28,4 +28,4 @@ WORKDIR /fab-5-engine
 EXPOSE 3000
 ENV PORT 3000
 
-ENTRYPOINT ["scripts/run.sh"]
+CMD ["scripts/run.sh"]
