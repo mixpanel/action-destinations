@@ -3,6 +3,7 @@ name: fab-5-ops
 labels:
   team: destinations
   owner: epd-destinations@segment.com
+  github_repo: https://github.com/segmentio/fab-5-engine
   Autoscale::Target::CPU: 80
   Autoscale::Target::Mem: 70
 
