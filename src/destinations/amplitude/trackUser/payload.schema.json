@@ -3,6 +3,7 @@
   "title": "Track User",
   "description": "Sends user events to Amplitude.",
   "type": "object",
+  "defaultSubscription": "type = \"track\"",
   "properties": {
     "user_id": {
       "title": "User ID",

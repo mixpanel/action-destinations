@@ -4,6 +4,7 @@
   "description": "Track an event not tied to a known person.",
   "type": "object",
   "additionalProperties": false,
+  "defaultSubscription": "type = \"track\"",
   "properties": {
     "name": {
       "title": "Event Name",

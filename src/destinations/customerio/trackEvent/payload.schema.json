@@ -4,6 +4,7 @@
   "description": "Track an event for a known person.",
   "type": "object",
   "additionalProperties": false,
+  "defaultSubscription": "type = \"track\"",
   "properties": {
     "id": {
       "title": "Person ID",

@@ -4,6 +4,7 @@
   "description": "Update a person in Pipedrive or create them if they don't exist yet.",
   "type": "object",
   "additionalProperties": false,
+  "defaultSubscription": "type = \"identify\"",
   "properties": {
     "identifier": {
       "title": "Person ID",

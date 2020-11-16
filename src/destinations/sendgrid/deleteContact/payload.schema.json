@@ -4,6 +4,7 @@
   "description": "Delete a contact from SendGrid.",
   "type": "object",
   "additionalProperties": false,
+  "defaultSubscription": "type = \"delete\"",
   "properties": {
     "email": {
       "title": "Email Address",

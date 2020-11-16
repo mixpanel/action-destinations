@@ -4,6 +4,7 @@
   "description": "Update an existing marketing contact or create them if they don't exist.",
   "type": "object",
   "additionalProperties": false,
+  "defaultSubscription": "type = \"identify\"",
   "properties": {
     "list_id": {
       "title": "List ID",

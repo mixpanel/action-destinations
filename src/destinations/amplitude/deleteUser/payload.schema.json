@@ -4,6 +4,7 @@
   "description": "Delete a user from Amplitude.",
   "type": "object",
   "additionalProperties": false,
+  "defaultSubscription": "type = \"delete\"",
   "properties": {
     "amplitude_id": {
       "title": "Amplitude ID",

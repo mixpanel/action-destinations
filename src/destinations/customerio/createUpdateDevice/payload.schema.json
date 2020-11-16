@@ -4,6 +4,7 @@
   "description": "Update a person's device in Customer.io or create it if it doesn't exist.",
   "type": "object",
   "additionalProperties": false,
+  "defaultSubscription": "event = \"Application Installed\"",
   "properties": {
     "person_id": {
       "title": "Person ID",

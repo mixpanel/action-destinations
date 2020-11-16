@@ -4,6 +4,7 @@
   "description": "Delete a person in Pipedrive.",
   "type": "object",
   "additionalProperties": false,
+  "defaultSubscription": "type = \"delete\"",
   "properties": {
     "identifier": {
       "title": "Person ID",
