@@ -1,10 +1,51 @@
 import { ActionDefinition } from '@/lib/destination-kit/action'
 import { Settings } from '../generated-types'
 import { TrackEvent } from './generated-types'
-import schema from './payload.schema.json'
 
 const action: ActionDefinition<Settings, TrackEvent> = {
-  schema,
+  schema: {
+    $schema: 'http://json-schema.org/schema#',
+    title: 'Track Event',
+    description: 'Track an event for a known person.',
+    type: 'object',
+    additionalProperties: false,
+    defaultSubscription: 'type = "track"',
+    properties: {
+      id: {
+        title: 'Person ID',
+        description: 'ID of the person who triggered this event.',
+        type: 'string',
+        defaultMapping: {
+          '@template': '{{userId}}'
+        }
+      },
+      name: {
+        title: 'Event Name',
+        type: 'string',
+        defaultMapping: {
+          '@template': '{{event}}'
+        }
+      },
+      type: {
+        title: 'Event Type',
+        description: 'Override event type. Ex. "page".',
+        type: 'string',
+        defaultMapping: {
+          '@template': '{{type}}'
+        }
+      },
+      data: {
+        title: 'Data',
+        description: 'Custom data to include with the event.',
+        type: 'object',
+        defaultMapping: {
+          '@path': '$.properties'
+        }
+      }
+    },
+    required: ['id', 'name']
+  },
+
   perform: (request, { payload }) => {
     return request.post(`customers/${payload.id}/events`, {
       json: {

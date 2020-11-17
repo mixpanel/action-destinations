@@ -19,7 +19,7 @@
     "dev": "yarn build && concurrently 'yarn dev-typescript' 'yarn dev-server'",
     "build": "yarn generate-types && tsc",
     "test": "jest",
-    "generate-types": "ts-node scripts/generate-types",
+    "generate-types": "ts-node --files scripts/generate-types",
     "create:action": "ts-node scripts/create-action",
     "create:destination": "ts-node scripts/create-destination",
     "generate-action": "ts-node scripts/generate-action"

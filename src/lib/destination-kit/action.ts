@@ -32,11 +32,13 @@ export interface ActionDefinition<Settings, Payload = any> {
    * without many custom keywords.
    */
   schema: {
+    $schema: string
     title: string
     description: string
     type: string
     additionalProperties: boolean
     properties: Record<keyof Payload, Record<string, unknown>>
+    defaultSubscription?: string
     required?: string[]
   }
 

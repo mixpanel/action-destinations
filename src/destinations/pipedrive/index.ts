@@ -1,6 +1,4 @@
-import { JSONSchema7 } from 'json-schema'
 import { DestinationDefinition } from '../../lib/destination-kit'
-import settings from './settings.schema.json'
 import createUpdateOrganization from './createUpdateOrganization'
 import createUpdatePerson from './createUpdatePerson'
 import deletePerson from './deletePerson'
@@ -12,7 +10,27 @@ const destination: DestinationDefinition<Settings> = {
     type: 'custom',
     testAuthentication: (req) => req('users/me')
   },
-  schema: settings as JSONSchema7,
+  schema: {
+    $schema: 'http://json-schema.org/schema#',
+    type: 'object',
+    properties: {
+      domain: {
+        title: 'Domain',
+        description: 'Pipedrive domain. This is found in Pipedrive in Settings > Company settings > Company domain.',
+        type: 'string',
+        minLength: 1
+      },
+      apiToken: {
+        title: 'API Token',
+        description:
+          'Pipedrive API token. This is found in Pipedrive in Settings > Personal preferences > API > Your personal API token.',
+        type: 'string',
+        minLength: 20
+      }
+    },
+    additionalProperties: false,
+    required: ['domain', 'apiToken']
+  },
   extendRequest({ settings }) {
     return {
       prefixUrl: `https://${settings.domain}.pipedrive.com/api/v1/`,

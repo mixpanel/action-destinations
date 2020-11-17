@@ -1,66 +1,42 @@
-import { compileFromFile } from 'json-schema-to-typescript'
+import '../src/aliases'
+import { compile } from 'json-schema-to-typescript'
 import { Options as PrettierOptions } from 'prettier'
 import pkg from '../package.json'
 import path from 'path'
 import fs from 'fs'
+import { destinations } from '@/destinations'
+import { JSONSchema4 } from 'json-schema'
 
 const COMMENT = '// Generated file. DO NOT MODIFY IT BY HAND.'
 const root = path.join(__dirname, '..')
 const destinationsPath = path.join(root, 'src/destinations')
 
 async function run() {
-  const destinations = fs.readdirSync(destinationsPath)
-
-  for (const destination of destinations) {
-    const destinationPath = path.join(destinationsPath, destination)
-    const stats = fs.lstatSync(destinationPath)
-
-    const isDirectory = stats.isDirectory()
-    if (isDirectory) {
-      await generateSettings(destinationPath)
-      await generatePayloads(destinationPath)
-    }
-  }
-}
-
-async function generateSettings(destinationPath: string): Promise<void> {
-  const settingsPath = path.join(destinationPath, 'settings.schema.json')
-
-  const settingsExists = fs.existsSync(settingsPath)
-  if (!settingsExists) {
-    return
-  }
-
-  const generated = await compileFromFile(settingsPath, {
-    style: pkg.prettier as PrettierOptions,
-    bannerComment: COMMENT
-  })
-
-  const writePath = path.join(destinationPath, 'generated-types.ts')
-
-  fs.writeFileSync(writePath, generated)
-}
-
-async function generatePayloads(destinationPath: string): Promise<void> {
-  const actions = fs.readdirSync(destinationPath)
-
-  for (const action of actions) {
-    const actionPath = path.join(destinationPath, action)
-    const payloadPath = path.join(actionPath, 'payload.schema.json')
-
-    const payloadExists = fs.existsSync(payloadPath)
-    if (!payloadExists) {
+  for (const destination in destinations) {
+    const destinationDefinition = destinations[destination]
+    if (!destinationDefinition.schema) {
       continue
     }
 
-    const generated = await compileFromFile(payloadPath, {
+    const generated = await compile(destinationDefinition.schema as JSONSchema4, 'Settings', {
       style: pkg.prettier as PrettierOptions,
       bannerComment: COMMENT
     })
 
-    const writePath = path.join(actionPath, 'generated-types.ts')
-
+    const writePath = path.join(destinationsPath, destination, 'generated-types.ts')
     fs.writeFileSync(writePath, generated)
+
+    for (const action in destinationDefinition.actions) {
+      const actionDefinition = destinationDefinition.actions[action]
+
+      const generated = await compile(actionDefinition.schema as JSONSchema4, '', {
+        style: pkg.prettier as PrettierOptions,
+        bannerComment: COMMENT
+      })
+
+      const writePath = path.join(destinationsPath, destination, action, 'generated-types.ts')
+      fs.writeFileSync(writePath, generated)
+    }
   }
 }
 

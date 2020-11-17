@@ -1,10 +1,48 @@
 import { ActionDefinition } from '@/lib/destination-kit/action'
 import { Settings } from '../generated-types'
 import { PostMessage } from './generated-types'
-import schema from './payload.schema.json'
 
 const action: ActionDefinition<Settings, PostMessage> = {
-  schema,
+  schema: {
+    $schema: 'http://json-schema.org/schema#',
+    title: 'Post Message',
+    description: 'Post a message to a Slack channel.',
+    type: 'object',
+    additionalProperties: false,
+    properties: {
+      url: {
+        title: 'Webhook URL',
+        description: 'Slack webhook URL.',
+        type: 'string',
+        format: 'uri'
+      },
+      channel: {
+        title: 'Channel',
+        description: 'Slack channel to post message to.',
+        type: 'string'
+      },
+      text: {
+        title: 'Message',
+        description:
+          "The text message to post to Slack. You can use [Slack's formatting syntax.](https://api.slack.com/reference/surfaces/formatting)",
+        type: 'string'
+      },
+      username: {
+        title: 'User',
+        description: 'User name to post messages as.',
+        type: 'string',
+        default: 'Segment'
+      },
+      icon_url: {
+        title: 'Icon URL',
+        description: 'URL for user icon image.',
+        type: 'string',
+        default: 'https://logo.clearbit.com/segment.com'
+      }
+    },
+    required: ['url', 'text']
+  },
+
   perform: (request, { payload }) => {
     return request.post(payload.url, {
       json: {

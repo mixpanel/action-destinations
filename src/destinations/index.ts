@@ -5,7 +5,7 @@ import pipedrive from './pipedrive'
 import sendgrid from './sendgrid'
 import slack from './slack'
 
-const destinations: Record<string, DestinationDefinition<any>> = {
+export const destinations: Record<string, DestinationDefinition<any>> = {
   amplitude,
   customerio,
   pipedrive,

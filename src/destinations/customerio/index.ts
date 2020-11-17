@@ -1,6 +1,4 @@
-import { JSONSchema7 } from 'json-schema'
 import { DestinationDefinition } from '../../lib/destination-kit'
-import settings from './settings.schema.json'
 import addPersonToSegment from './addPersonToSegment'
 import createUpdateDevice from './createUpdateDevice'
 import createUpdatePerson from './createUpdatePerson'
@@ -23,7 +21,35 @@ const destination: DestinationDefinition<Settings> = {
       })
     }
   },
-  schema: settings as JSONSchema7,
+  schema: {
+    $schema: 'http://json-schema.org/schema#',
+    type: 'object',
+    properties: {
+      apiKey: {
+        description:
+          'Customer.io API key. This can be found on your [API Credentials page](https://fly.customer.io/settings/api_credentials).',
+        minLength: 20,
+        title: 'API Key',
+        type: 'string'
+      },
+      appApiKey: {
+        description:
+          'Customer.io App API Key. This can be found on your [API Credentials page](https://fly.customer.io/settings/api_credentials?keyType=app).',
+        minLength: 20,
+        title: 'App API Key',
+        type: 'string'
+      },
+      siteId: {
+        description:
+          'Customer.io site ID. This can be found on your [API Credentials page](https://fly.customer.io/settings/api_credentials).',
+        minLength: 20,
+        title: 'Site ID',
+        type: 'string'
+      }
+    },
+    additionalProperties: false,
+    required: ['siteId', 'apiKey', 'appApiKey']
+  },
   extendRequest({ settings }) {
     const userPass = Buffer.from(`${settings.siteId}:${settings.apiKey}`)
 

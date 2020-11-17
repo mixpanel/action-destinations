@@ -2,10 +2,28 @@ import { get } from 'lodash'
 import { ActionDefinition } from '@/lib/destination-kit/action'
 import { Settings } from '../generated-types'
 import { DeletePerson } from './generated-types'
-import schema from './payload.schema.json'
 
 const definition: ActionDefinition<Settings, DeletePerson> = {
-  schema,
+  schema: {
+    $schema: 'http://json-schema.org/schema#',
+    title: 'Delete Person',
+    description: 'Delete a person in Pipedrive.',
+    type: 'object',
+    additionalProperties: false,
+    defaultSubscription: 'type = "delete"',
+    properties: {
+      identifier: {
+        title: 'Person ID',
+        description:
+          'Identifier used to find person to delete in Pipedrive. Can be an email, name, phone number, or custom field value. Custom person fields may be included by using the long hash keys of the custom fields. These look like "33595c732cd7a027c458ea115a48a7f8a254fa86".',
+        type: 'string',
+        defaultMapping: {
+          '@template': '{{userId}}'
+        }
+      }
+    },
+    required: ['identifier']
+  },
 
   cachedFields: {
     personId: {

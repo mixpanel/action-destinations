@@ -3,7 +3,6 @@ import listIdAutocomplete from '../autocomplete/list_id'
 import { ActionDefinition } from '@/lib/destination-kit/action'
 import { Settings } from '../generated-types'
 import { RemoveRecipientFromList } from './generated-types'
-import schema from './payload.schema.json'
 
 // SendGrid uses a custom "SGQL" query language for finding contacts. To protect us from basic
 // injection attacks (e.g. "email = 'x@x.com' or email like '%@%'"), we can just strip all quotes
@@ -13,7 +12,30 @@ const sgqlEscape = (s: string): string => {
 }
 
 const definition: ActionDefinition<Settings, RemoveRecipientFromList> = {
-  schema,
+  schema: {
+    $schema: 'http://json-schema.org/schema#',
+    title: 'Remove Recipient from List',
+    description: 'Remove a recipient from a list.',
+    type: 'object',
+    additionalProperties: false,
+    properties: {
+      list_id: {
+        title: 'List ID',
+        description: 'The ID of the SendGrid list to remove the user from.',
+        type: 'string',
+        autocomplete: true
+      },
+      email: {
+        title: 'Email Address',
+        description: 'Email address of the user to be removed from the list.',
+        type: 'string',
+        defaultMapping: {
+          '@template': '{{properties.email}}'
+        }
+      }
+    },
+    required: ['list_id', 'email']
+  },
 
   autocompleteFields: {
     list_id: listIdAutocomplete

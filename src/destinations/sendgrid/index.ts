@@ -1,6 +1,4 @@
-import { JSONSchema7 } from 'json-schema'
 import { DestinationDefinition } from '../../lib/destination-kit'
-import settings from './settings.schema.json'
 import createList from './createList'
 import createUpdateContact from './createUpdateContact'
 import deleteContact from './deleteContact'
@@ -13,7 +11,21 @@ const destination: DestinationDefinition<Settings> = {
     type: 'custom',
     testAuthentication: (req) => req('user/profile')
   },
-  schema: settings as JSONSchema7,
+  schema: {
+    $schema: 'http://json-schema.org/schema#',
+    type: 'object',
+    properties: {
+      apiKey: {
+        title: 'API Key',
+        description:
+          'SendGrid API key, created under the ["API Keys" tab](https://app.sendgrid.com/settings/api_keys) of the Settings page.',
+        type: 'string',
+        minLength: 32
+      }
+    },
+    additionalProperties: false,
+    required: ['apiKey']
+  },
   extendRequest({ settings }) {
     return {
       prefixUrl: 'https://api.sendgrid.com/v3/',
