@@ -22,10 +22,7 @@ export type PhoneNumber = string
  */
 export type CreatedAt = string
 
-/**
- * Update a person in Pipedrive or create them if they don't exist yet.
- */
-export interface CreateOrUpdatePerson {
+export interface Payload {
   identifier: PersonID
   name: PersonName
   org_id?: OrganizationID

@@ -1,13 +1,13 @@
 import { ActionDefinition } from '@/lib/destination-kit/action'
 import listIdAutocomplete from '../autocomplete/list_id'
 import { Settings } from '../generated-types'
-import { CreateOrUpdateContact } from './generated-types'
+import { Payload } from './generated-types'
 
-const definition: ActionDefinition<Settings, CreateOrUpdateContact> = {
+const action: ActionDefinition<Settings, Payload> = {
+  title: 'Create or Update Contact',
+  description: "Update an existing marketing contact or create them if they don't exist.",
   schema: {
     $schema: 'http://json-schema.org/schema#',
-    title: 'Create or Update Contact',
-    description: "Update an existing marketing contact or create them if they don't exist.",
     type: 'object',
     additionalProperties: false,
     defaultSubscription: 'type = "identify"',
@@ -126,4 +126,4 @@ const definition: ActionDefinition<Settings, CreateOrUpdateContact> = {
   }
 }
 
-export default definition
+export default action

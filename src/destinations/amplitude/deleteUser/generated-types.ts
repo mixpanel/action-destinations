@@ -12,10 +12,7 @@ export type IgnoreInvalidID = boolean
  */
 export type DeleteFromOrganization = boolean
 
-/**
- * Delete a user from Amplitude.
- */
-export interface DeleteUser {
+export interface Payload {
   amplitude_id?: AmplitudeID
   user_id?: UserID
   requester?: Requester

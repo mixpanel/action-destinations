@@ -15,12 +15,10 @@ export interface ActionDefinition<Settings, Payload = any> {
   // key: string
 
   /** The display title of the action */
-  // this is in `schema` right now
-  // title: string
+  title: string
 
   /** The display description of the action */
-  // this is in `schema` right now
-  // description: string
+  description: string
 
   /**
    * The jsonschema representation of fields used to perform the action
@@ -33,8 +31,6 @@ export interface ActionDefinition<Settings, Payload = any> {
    */
   schema: {
     $schema: string
-    title: string
-    description: string
     type: string
     additionalProperties: boolean
     properties: Record<keyof Payload, Record<string, unknown>>

@@ -1,13 +1,13 @@
 import { ActionDefinition } from '@/lib/destination-kit/action'
 import { Settings } from '../generated-types'
-import { IdentifyUser } from './generated-types'
+import { Payload } from './generated-types'
 
-const action: ActionDefinition<Settings, IdentifyUser> = {
+const action: ActionDefinition<Settings, Payload> = {
+  title: 'Identify User',
+  description:
+    'Set the user ID for a particular device ID or update user properties without sending an event to Amplitude.',
   schema: {
     $schema: 'http://json-schema.org/schema#',
-    title: 'Identify User',
-    description:
-      'Set the user ID for a particular device ID or update user properties without sending an event to Amplitude.',
     type: 'object',
     additionalProperties: false,
     defaultSubscription: 'type = "identify"',

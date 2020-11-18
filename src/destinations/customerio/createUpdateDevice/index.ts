@@ -1,13 +1,13 @@
 import dayjs from '@/lib/dayjs'
 import { ActionDefinition } from '@/lib/destination-kit/action'
 import { Settings } from '../generated-types'
-import { CreateOrUpdateDevice } from './generated-types'
+import { Payload } from './generated-types'
 
-const definition: ActionDefinition<Settings, CreateOrUpdateDevice> = {
+const action: ActionDefinition<Settings, Payload> = {
+  title: 'Create or Update Device',
+  description: "Update a person's device in Customer.io or create it if it doesn't exist.",
   schema: {
     $schema: 'http://json-schema.org/schema#',
-    title: 'Create or Update Device',
-    description: "Update a person's device in Customer.io or create it if it doesn't exist.",
     type: 'object',
     additionalProperties: false,
     defaultSubscription: 'event = "Application Installed"',
@@ -62,4 +62,4 @@ const definition: ActionDefinition<Settings, CreateOrUpdateDevice> = {
   }
 }
 
-export default definition
+export default action

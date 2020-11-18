@@ -129,10 +129,7 @@ export type SessionID = string
  */
 export type EventID1 = string
 
-/**
- * Sends user events to Amplitude.
- */
-export interface TrackUser {
+export interface Payload {
   user_id?: UserID
   device_id?: DeviceID
   event_type: EventType

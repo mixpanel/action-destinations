@@ -3,7 +3,7 @@ import { AutocompleteResponse } from '@/lib/autocomplete'
 import { ActionDefinition } from '@/lib/destination-kit/action'
 import { ExecuteInput } from '@/lib/destination-kit/step'
 import { Settings } from '../generated-types'
-import { TriggerBroadcastCampaign } from './generated-types'
+import { Payload } from './generated-types'
 
 interface Campaigns {
   campaigns: Campaign[]
@@ -14,10 +14,7 @@ interface Campaign {
   name: string
 }
 
-async function idAutocomplete(
-  req: Got,
-  { settings }: ExecuteInput<Settings, TriggerBroadcastCampaign>
-): Promise<AutocompleteResponse> {
+async function idAutocomplete(req: Got, { settings }: ExecuteInput<Settings, Payload>): Promise<AutocompleteResponse> {
   const response = await req.get<Campaigns>('https://beta-api.customer.io/v1/api/campaigns', {
     prefixUrl: '',
     headers: {
@@ -38,11 +35,11 @@ async function idAutocomplete(
   }
 }
 
-const definition: ActionDefinition<Settings, TriggerBroadcastCampaign> = {
+const action: ActionDefinition<Settings, Payload> = {
+  title: 'Trigger Broadcast Campaign',
+  description: 'Trigger a Customer.io broadcast campaign.',
   schema: {
     $schema: 'http://json-schema.org/schema#',
-    title: 'Trigger Broadcast Campaign',
-    description: 'Trigger a Customer.io broadcast campaign.',
     type: 'object',
     additionalProperties: false,
     properties: {
@@ -90,4 +87,4 @@ const definition: ActionDefinition<Settings, TriggerBroadcastCampaign> = {
   }
 }
 
-export default definition
+export default action

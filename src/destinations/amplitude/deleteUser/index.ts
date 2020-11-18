@@ -1,6 +1,6 @@
 import { ActionDefinition } from '@/lib/destination-kit/action'
 import { Settings } from '../generated-types'
-import { DeleteUser } from './generated-types'
+import { Payload } from './generated-types'
 
 interface DeleteUserBody {
   amplitude_ids?: string[]
@@ -10,11 +10,11 @@ interface DeleteUserBody {
   user_ids?: string[]
 }
 
-const definition: ActionDefinition<Settings, DeleteUser> = {
+const action: ActionDefinition<Settings, Payload> = {
+  title: 'Delete User',
+  description: 'Delete a user from Amplitude.',
   schema: {
     $schema: 'http://json-schema.org/schema#',
-    title: 'Delete User',
-    description: 'Delete a user from Amplitude.',
     type: 'object',
     additionalProperties: false,
     defaultSubscription: 'type = "delete"',
@@ -75,4 +75,4 @@ const definition: ActionDefinition<Settings, DeleteUser> = {
   }
 }
 
-export default definition
+export default action

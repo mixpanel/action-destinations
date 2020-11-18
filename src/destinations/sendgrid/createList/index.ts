@@ -1,12 +1,12 @@
 import { ActionDefinition } from '@/lib/destination-kit/action'
 import { Settings } from '../generated-types'
-import { CreateContactList } from './generated-types'
+import { Payload } from './generated-types'
 
-const action: ActionDefinition<Settings, CreateContactList> = {
+const action: ActionDefinition<Settings, Payload> = {
+  title: 'Create Contact List',
+  description: 'Create a marketing contact list.',
   schema: {
     $schema: 'http://json-schema.org/schema#',
-    title: 'Create Contact List',
-    description: 'Create a marketing contact list.',
     type: 'object',
     additionalProperties: false,
     properties: {

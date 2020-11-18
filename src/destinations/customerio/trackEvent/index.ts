@@ -1,12 +1,12 @@
 import { ActionDefinition } from '@/lib/destination-kit/action'
 import { Settings } from '../generated-types'
-import { TrackEvent } from './generated-types'
+import { Payload } from './generated-types'
 
-const action: ActionDefinition<Settings, TrackEvent> = {
+const action: ActionDefinition<Settings, Payload> = {
+  title: 'Track Event',
+  description: 'Track an event for a known person.',
   schema: {
     $schema: 'http://json-schema.org/schema#',
-    title: 'Track Event',
-    description: 'Track an event for a known person.',
     type: 'object',
     additionalProperties: false,
     defaultSubscription: 'type = "track"',

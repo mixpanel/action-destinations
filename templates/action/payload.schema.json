@@ -1,9 +1,7 @@
 {
   "$schema": "http://json-schema.org/schema#",
-  "title": "{{name}}",
-  "description": "{{description}}",
   "type": "object",
-  "additionalProperties": false,
   "properties": {},
-  "required": []
+  "required": [],
+  "additionalProperties": false
 }

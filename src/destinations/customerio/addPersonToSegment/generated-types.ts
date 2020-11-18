@@ -9,10 +9,7 @@ export type SegmentID = number
  */
 export type PersonID = string
 
-/**
- * Add a person to a segment in Customer.io.
- */
-export interface AddPersonToSegment {
+export interface Payload {
   segment_id: SegmentID
   person_id: PersonID
 }

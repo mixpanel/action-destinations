@@ -9,10 +9,7 @@ export type ListID = string
  */
 export type EmailAddress = string
 
-/**
- * Remove a recipient from a list.
- */
-export interface RemoveRecipientFromList {
+export interface Payload {
   list_id: ListID
   email: EmailAddress
 }

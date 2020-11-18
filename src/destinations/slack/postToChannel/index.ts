@@ -1,12 +1,12 @@
 import { ActionDefinition } from '@/lib/destination-kit/action'
 import { Settings } from '../generated-types'
-import { PostMessage } from './generated-types'
+import { Payload } from './generated-types'
 
-const action: ActionDefinition<Settings, PostMessage> = {
+const action: ActionDefinition<Settings, Payload> = {
+  title: 'Post Message',
+  description: 'Post a message to a Slack channel.',
   schema: {
     $schema: 'http://json-schema.org/schema#',
-    title: 'Post Message',
-    description: 'Post a message to a Slack channel.',
     type: 'object',
     additionalProperties: false,
     properties: {

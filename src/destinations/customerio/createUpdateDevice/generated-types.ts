@@ -17,10 +17,7 @@ export type Platform = 'ios' | 'android'
  */
 export type LastUsed = string
 
-/**
- * Update a person's device in Customer.io or create it if it doesn't exist.
- */
-export interface CreateOrUpdateDevice {
+export interface Payload {
   person_id: PersonID
   device_id: DeviceID
   platform: Platform

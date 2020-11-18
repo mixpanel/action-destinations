@@ -2,10 +2,7 @@
 
 export type EventName = string
 
-/**
- * Track an event not tied to a known person.
- */
-export interface TrackAnonymousEvent {
+export interface Payload {
   name: EventName
   data?: Data
 }

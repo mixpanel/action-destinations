@@ -21,10 +21,7 @@ export type User = string
  */
 export type IconURL = string
 
-/**
- * Post a message to a Slack channel.
- */
-export interface PostMessage {
+export interface Payload {
   url: WebhookURL
   channel?: Channel
   text: Message

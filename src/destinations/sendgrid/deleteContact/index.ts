@@ -1,7 +1,7 @@
 import { get } from 'lodash'
 import { ActionDefinition } from '@/lib/destination-kit/action'
 import { Settings } from '../generated-types'
-import { DeleteContact } from './generated-types'
+import { Payload } from './generated-types'
 
 // SendGrid uses a custom "SGQL" query language for finding contacts. To protect us from basic
 // injection attacks (e.g. "email = 'x@x.com' or email like '%@%'"), we can just strip all quotes
@@ -10,11 +10,11 @@ const sgqlEscape = (s: string): string => {
   return s.replace(/['"]/g, '')
 }
 
-const definition: ActionDefinition<Settings, DeleteContact> = {
+const action: ActionDefinition<Settings, Payload> = {
+  title: 'Delete Contact',
+  description: 'Delete a contact from SendGrid.',
   schema: {
     $schema: 'http://json-schema.org/schema#',
-    title: 'Delete Contact',
-    description: 'Delete a contact from SendGrid.',
     type: 'object',
     additionalProperties: false,
     defaultSubscription: 'type = "delete"',
@@ -57,4 +57,4 @@ const definition: ActionDefinition<Settings, DeleteContact> = {
   }
 }
 
-export default definition
+export default action

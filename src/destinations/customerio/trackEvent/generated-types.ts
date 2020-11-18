@@ -10,10 +10,7 @@ export type EventName = string
  */
 export type EventType = string
 
-/**
- * Track an event for a known person.
- */
-export interface TrackEvent {
+export interface Payload {
   id: PersonID
   name: EventName
   type?: EventType

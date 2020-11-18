@@ -13,10 +13,7 @@ export type EmailAddress = string
  */
 export type CreatedAt = string
 
-/**
- * Update a person in Customer.io or create them if they don't exist.
- */
-export interface CreateOrUpdatePerson {
+export interface Payload {
   id: PersonID
   email: EmailAddress
   created_at?: CreatedAt

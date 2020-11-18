@@ -1,13 +1,13 @@
 import dayjs from '@/lib/dayjs'
 import { ActionDefinition } from '@/lib/destination-kit/action'
 import { Settings } from '../generated-types'
-import { TrackUser } from './generated-types'
+import { Payload } from './generated-types'
 
-const definition: ActionDefinition<Settings, TrackUser> = {
+const action: ActionDefinition<Settings, Payload> = {
+  title: 'Track User',
+  description: 'Sends user events to Amplitude.',
   schema: {
     $schema: 'http://json-schema.org/schema#',
-    title: 'Track User',
-    description: 'Sends user events to Amplitude.',
     type: 'object',
     defaultSubscription: 'type = "track"',
     properties: {
@@ -299,4 +299,4 @@ const definition: ActionDefinition<Settings, TrackUser> = {
   }
 }
 
-export default definition
+export default action

@@ -1,12 +1,12 @@
 import { ActionDefinition } from '@/lib/destination-kit/action'
 import { Settings } from '../generated-types'
-import { TrackAnonymousEvent } from './generated-types'
+import { Payload } from './generated-types'
 
-const action: ActionDefinition<Settings, TrackAnonymousEvent> = {
+const action: ActionDefinition<Settings, Payload> = {
+  title: 'Track Anonymous Event',
+  description: 'Track an event not tied to a known person.',
   schema: {
     $schema: 'http://json-schema.org/schema#',
-    title: 'Track Anonymous Event',
-    description: 'Track an event not tied to a known person.',
     type: 'object',
     additionalProperties: false,
     defaultSubscription: 'type = "track"',

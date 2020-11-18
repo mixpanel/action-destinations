@@ -1,13 +1,13 @@
 import { get } from 'lodash'
 import { ActionDefinition } from '@/lib/destination-kit/action'
 import { Settings } from '../generated-types'
-import { DeletePerson } from './generated-types'
+import { Payload } from './generated-types'
 
-const definition: ActionDefinition<Settings, DeletePerson> = {
+const action: ActionDefinition<Settings, Payload> = {
+  title: 'Delete Person',
+  description: 'Delete a person in Pipedrive.',
   schema: {
     $schema: 'http://json-schema.org/schema#',
-    title: 'Delete Person',
-    description: 'Delete a person in Pipedrive.',
     type: 'object',
     additionalProperties: false,
     defaultSubscription: 'type = "delete"',
@@ -51,4 +51,4 @@ const definition: ActionDefinition<Settings, DeletePerson> = {
   }
 }
 
-export default definition
+export default action

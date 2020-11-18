@@ -29,7 +29,7 @@ async function run() {
     for (const action in destinationDefinition.actions) {
       const actionDefinition = destinationDefinition.actions[action]
 
-      const generated = await compile(actionDefinition.schema as JSONSchema4, '', {
+      const generated = await compile(actionDefinition.schema as JSONSchema4, 'Payload', {
         style: pkg.prettier as PrettierOptions,
         bannerComment: COMMENT
       })

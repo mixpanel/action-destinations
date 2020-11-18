@@ -69,10 +69,7 @@ export type IsPaying = boolean
  */
 export type InitialVersion = string
 
-/**
- * Set the user ID for a particular device ID or update user properties without sending an event to Amplitude.
- */
-export interface IdentifyUser {
+export interface Payload {
   user_id?: UserID
   device_id?: DeviceID
   user_properties?: UserProperties

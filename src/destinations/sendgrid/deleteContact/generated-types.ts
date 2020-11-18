@@ -5,9 +5,6 @@
  */
 export type EmailAddress = string
 
-/**
- * Delete a contact from SendGrid.
- */
-export interface DeleteContact {
+export interface Payload {
   email: EmailAddress
 }

@@ -9,10 +9,7 @@ export type SegmentID = number
  */
 export type PersonID = string
 
-/**
- * Remove a person from a segment in Customer.io.
- */
-export interface RemovePersonFromSegment {
+export interface Payload {
   segment_id: SegmentID
   person_id: PersonID
 }

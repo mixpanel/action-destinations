@@ -2,12 +2,13 @@
  * CLI to generate action definition to insert into metadata setting description.
  */
 
+import '../src/aliases'
 import * as path from 'path'
 import * as fs from 'fs'
 import chalk from 'chalk'
 import prompts from 'prompts'
 import clipboardy from 'clipboardy'
-import loadJsonFile from 'load-json-file'
+import { ActionDefinition } from '@/lib/destination-kit/action'
 
 const destinationsPath = path.join(__dirname, '..', 'src', 'destinations')
 
@@ -53,15 +54,18 @@ const run = async () => {
     return
   }
 
-  const schema = await loadJsonFile(
-    path.join(__dirname, '..', 'src', 'destinations', destination, action, 'payload.schema.json')
-  )
+  const actionPath = path.join(destinationsPath, destination, action)
+  const actionDefinition: ActionDefinition<unknown> = (await import(actionPath)).default
 
   const definition = JSON.stringify(
     {
       slug: action,
       settings: [],
-      schema
+      schema: {
+        title: actionDefinition.title,
+        description: actionDefinition.description,
+        ...actionDefinition.schema
+      }
     },
     null,
     '  '

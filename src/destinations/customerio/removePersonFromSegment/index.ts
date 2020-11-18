@@ -1,13 +1,13 @@
 import segmentIdAutocomplete from '../autocomplete/segment_id'
 import { ActionDefinition } from '@/lib/destination-kit/action'
 import { Settings } from '../generated-types'
-import { RemovePersonFromSegment } from './generated-types'
+import { Payload } from './generated-types'
 
-const definition: ActionDefinition<Settings, RemovePersonFromSegment> = {
+const action: ActionDefinition<Settings, Payload> = {
+  title: 'Remove Person from Segment',
+  description: 'Remove a person from a segment in Customer.io.',
   schema: {
     $schema: 'http://json-schema.org/schema#',
-    title: 'Remove Person from Segment',
-    description: 'Remove a person from a segment in Customer.io.',
     type: 'object',
     additionalProperties: false,
     properties: {
@@ -42,4 +42,4 @@ const definition: ActionDefinition<Settings, RemovePersonFromSegment> = {
   }
 }
 
-export default definition
+export default action

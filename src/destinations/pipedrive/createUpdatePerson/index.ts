@@ -2,7 +2,7 @@ import { get } from 'lodash'
 import dayjs from '@/lib/dayjs'
 import { ActionDefinition } from '@/lib/destination-kit/action'
 import { Settings } from '../generated-types'
-import { CreateOrUpdatePerson } from './generated-types'
+import { Payload } from './generated-types'
 
 interface Organizations {
   data: Organization[]
@@ -26,11 +26,11 @@ interface Person {
   add_time?: string
 }
 
-const definition: ActionDefinition<Settings, CreateOrUpdatePerson> = {
+const action: ActionDefinition<Settings, Payload> = {
+  title: 'Create or Update Person',
+  description: "Update a person in Pipedrive or create them if they don't exist yet.",
   schema: {
     $schema: 'http://json-schema.org/schema#',
-    title: 'Create or Update Person',
-    description: "Update a person in Pipedrive or create them if they don't exist yet.",
     type: 'object',
     additionalProperties: false,
     defaultSubscription: 'type = "identify"',
@@ -140,4 +140,4 @@ const definition: ActionDefinition<Settings, CreateOrUpdatePerson> = {
   }
 }
 
-export default definition
+export default action

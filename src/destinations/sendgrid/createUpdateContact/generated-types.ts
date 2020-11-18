@@ -51,10 +51,7 @@ export type PostalCode = string
  */
 export type Region = string
 
-/**
- * Update an existing marketing contact or create them if they don't exist.
- */
-export interface CreateOrUpdateContact {
+export interface Payload {
   list_id: ListID
   email: EmailAddress
   alternate_emails?: AdditionalAmailAddresses

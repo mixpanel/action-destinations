@@ -2,13 +2,13 @@ import { get } from 'lodash'
 import dayjs from '@/lib/dayjs'
 import { ActionDefinition } from '@/lib/destination-kit/action'
 import { Settings } from '../generated-types'
-import { CreateOrUpdateOrganization } from './generated-types'
+import { Payload } from './generated-types'
 
-const definition: ActionDefinition<Settings, CreateOrUpdateOrganization> = {
+const action: ActionDefinition<Settings, Payload> = {
+  title: 'Create or Update Organization',
+  description: "Update an organization in Pipedrive or create it if it doesn't exist yet.",
   schema: {
     $schema: 'http://json-schema.org/schema#',
-    title: 'Create or Update Organization',
-    description: "Update an organization in Pipedrive or create it if it doesn't exist yet.",
     type: 'object',
     additionalProperties: false,
     defaultSubscription: 'type = "group"',
@@ -75,4 +75,4 @@ const definition: ActionDefinition<Settings, CreateOrUpdateOrganization> = {
   }
 }
 
-export default definition
+export default action

@@ -5,9 +5,6 @@
  */
 export type Name = string
 
-/**
- * Create a marketing contact list.
- */
-export interface CreateContactList {
+export interface Payload {
   name: Name
 }

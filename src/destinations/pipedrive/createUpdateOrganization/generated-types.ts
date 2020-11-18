@@ -14,10 +14,7 @@ export type OwnerID = number
  */
 export type CreatedAt = string
 
-/**
- * Update an organization in Pipedrive or create it if it doesn't exist yet.
- */
-export interface CreateOrUpdateOrganization {
+export interface Payload {
   identifier: OrganizationID
   name: OrganizationName
   owner_id?: OwnerID

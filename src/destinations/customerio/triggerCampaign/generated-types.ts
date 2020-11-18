@@ -9,10 +9,7 @@ export type CampaignID = number
  */
 export type ProfileIDs = unknown[]
 
-/**
- * Trigger a Customer.io broadcast campaign.
- */
-export interface TriggerBroadcastCampaign {
+export interface Payload {
   id: CampaignID
   data?: Data
   recipients?: Recipients

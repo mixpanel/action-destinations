@@ -1,13 +1,13 @@
 import segmentIdAutocomplete from '../autocomplete/segment_id'
 import { ActionDefinition } from '@/lib/destination-kit/action'
 import { Settings } from '../generated-types'
-import { AddPersonToSegment } from './generated-types'
+import { Payload } from './generated-types'
 
-const definition: ActionDefinition<Settings, AddPersonToSegment> = {
+const action: ActionDefinition<Settings, Payload> = {
+  title: 'Add Person to Segment',
+  description: 'Add a person to a segment in Customer.io.',
   schema: {
     $schema: 'http://json-schema.org/schema#',
-    title: 'Add Person to Segment',
-    description: 'Add a person to a segment in Customer.io.',
     type: 'object',
     additionalProperties: false,
     properties: {
@@ -44,4 +44,4 @@ const definition: ActionDefinition<Settings, AddPersonToSegment> = {
   }
 }
 
-export default definition
+export default action

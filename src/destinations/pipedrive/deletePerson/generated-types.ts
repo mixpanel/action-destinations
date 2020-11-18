@@ -5,9 +5,6 @@
  */
 export type PersonID = string
 
-/**
- * Delete a person in Pipedrive.
- */
-export interface DeletePerson {
+export interface Payload {
   identifier: PersonID
 }
