@@ -1,13 +1,18 @@
 import { ActionDefinition } from '@/lib/destination-kit/action'
 import { Settings } from '../generated-types'
-import schema from './payload.schema.json'
-import { {{typeName}} } from './generated-types'
+import { Payload } from './generated-types'
 
-const action: ActionDefinition<Settings, {{typeName}}> = {
+const action: ActionDefinition<Settings, Payload> = {
   title: '{{name}}',
   description: '{{description}}',
-  schema,
-  perform: (request, { payload }) => {
+  schema: {
+    "$schema": "http://json-schema.org/schema#",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {},
+    "required": []
+  },
+  perform: (_request, _data) => {
     // Make your partner api request here!
   }
 }

@@ -26,7 +26,7 @@ const questions: PromptObject<keyof DestinationData>[] = [
     type: 'text',
     name: 'slug',
     // @ts-ignore the types are missing the Function signature
-    initial: prev => slugify(prev).toLowerCase(),
+    initial: (prev) => slugify(prev).toLowerCase(),
     message: 'Destination slug:'
   }
 ]
@@ -53,7 +53,7 @@ async function createDirectory(destination: DestinationData): Promise<void> {
 
   fs.mkdirSync(destinationPath)
 
-  filesToCreate.forEach(file => {
+  filesToCreate.forEach((file) => {
     const filePath = path.join(templatePath, file)
 
     spinner.text = chalk`Creating {bold src/destinations/${file}}`
@@ -84,6 +84,8 @@ async function createDirectory(destination: DestinationData): Promise<void> {
 
 async function run() {
   const destination = await prompts(questions)
+  console.log(``)
+
   await createDirectory(destination)
 
   const response = await prompts({
@@ -98,7 +100,7 @@ async function run() {
   }
 }
 
-run().catch(error => {
+run().catch((error) => {
   if (spinner) {
     spinner.fail()
   }

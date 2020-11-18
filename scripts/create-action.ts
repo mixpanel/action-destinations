@@ -20,7 +20,7 @@ interface ActionData {
 }
 
 const destinationsDir = path.join(__dirname, '../src/destinations')
-const destinations = fs.readdirSync(destinationsDir).filter(file => {
+const destinations = fs.readdirSync(destinationsDir).filter((file) => {
   const stats = fs.statSync(path.join(destinationsDir, file))
   return stats.isDirectory()
 })
@@ -30,7 +30,7 @@ const questions: PromptObject<keyof ActionData>[] = [
     type: 'select',
     name: 'destination',
     message: 'Which destination?',
-    choices: destinations.map(destination => {
+    choices: destinations.map((destination) => {
       return {
         title: destination,
         value: destination
@@ -71,7 +71,7 @@ async function createAction(action: ActionData): Promise<void> {
 
   fs.mkdirSync(actionPath)
 
-  filesToCreate.forEach(file => {
+  filesToCreate.forEach((file) => {
     const filePath = path.join(templatePath, file)
 
     spinner.text = chalk`Creating {bold src/destinations/${action.destination}/${action.slug}/${file}}`
@@ -103,6 +103,8 @@ async function createAction(action: ActionData): Promise<void> {
 async function run() {
   const action = await prompts(questions)
 
+  console.log(``)
+
   action.name = startCase(action.name)
   action.slug = camelCase(action.name)
   action.typeName = action.name.replace(/ /g, '')
@@ -121,7 +123,7 @@ async function run() {
   }
 }
 
-run().catch(error => {
+run().catch((error) => {
   if (spinner) {
     spinner.fail()
   }

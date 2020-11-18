@@ -3,20 +3,19 @@
  */
 
 import '../src/aliases'
-import * as path from 'path'
-import * as fs from 'fs'
 import chalk from 'chalk'
+import fs from 'fs'
+import path from 'path'
 import prompts from 'prompts'
 import clipboardy from 'clipboardy'
-import { ActionDefinition } from '@/lib/destination-kit/action'
+import { DestinationDefinition } from '@/lib/destination-kit'
 
 const destinationsPath = path.join(__dirname, '..', 'src', 'destinations')
+const destinations = fs.readdirSync(destinationsPath).filter((file) => {
+  return fs.statSync(path.join(destinationsPath, file)).isDirectory()
+})
 
 const run = async () => {
-  const destinations = fs.readdirSync(destinationsPath).filter((file) => {
-    return fs.statSync(path.join(destinationsPath, file)).isDirectory()
-  })
-
   const { destination } = await prompts({
     type: 'select',
     name: 'destination',
@@ -31,20 +30,15 @@ const run = async () => {
     return
   }
 
-  const actions = fs
-    .readdirSync(path.join(destinationsPath, destination))
-    .filter((file) => {
-      return fs.statSync(path.join(destinationsPath, destination, file)).isDirectory()
-    })
-    .filter((file) => {
-      return fs.existsSync(path.join(destinationsPath, destination, file, 'payload.schema.json'))
-    })
+  const destinationPath = path.join(destinationsPath, destination)
+  const destinationDefinition: DestinationDefinition = (await import(destinationPath)).default
+  const actions = destinationDefinition.actions
 
   const { action } = await prompts({
     type: 'select',
     name: 'action',
     message: 'Action:',
-    choices: actions.map((action) => ({
+    choices: Object.keys(actions).map((action) => ({
       title: action,
       value: action
     }))
@@ -54,8 +48,7 @@ const run = async () => {
     return
   }
 
-  const actionPath = path.join(destinationsPath, destination, action)
-  const actionDefinition: ActionDefinition<unknown> = (await import(actionPath)).default
+  const actionDefinition = actions[action]
 
   const definition = JSON.stringify(
     {
