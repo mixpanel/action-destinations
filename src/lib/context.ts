@@ -4,6 +4,8 @@ import { ExecuteInput, StepResult } from './destination-kit/step'
 import logger, { LEVEL } from './logger'
 import stats from './stats'
 
+const USER_AGENT_REGEX = /^Segment \((.*?)\)$/
+
 interface NodeError extends Error {
   code: string
 }
@@ -116,12 +118,15 @@ export default class Context {
     // Replace the colon from routes params
     const endpoint = `${this.fields.http_req_method} ${this.fields.http_req_path}`.replace(/:/g, '_')
     const rawUserAgent = this.fields.http_req_headers?.['user-agent'] ?? 'unknown'
+    // Parse out the service name from the user-agent header
+    // This regex should always match because we force clients to send a user-agent header in this format
+    const userAgent = USER_AGENT_REGEX.exec(rawUserAgent)?.[1] ?? rawUserAgent
 
     const tags = [
       `status_code:${statusCode}`,
       `status_group:${statusGroup}`,
       `endpoint:${endpoint}`,
-      `user_agent:${rawUserAgent}`
+      `user_agent:${userAgent}`
     ]
 
     stats.increment('request', 1, tags)

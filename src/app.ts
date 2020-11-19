@@ -6,7 +6,7 @@ import errorHandler from './middleware/error-handler'
 import { startServer } from './boot'
 import { PORT } from './config'
 
-const app = express()
+export const app = express()
 
 app.disable('x-powered-by')
 

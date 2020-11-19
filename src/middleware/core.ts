@@ -46,7 +46,7 @@ function createAfterResponseCallback(params: CreateAfterResponseCallbackParams):
       // When using compression middleware, _contentLength does not get set so we need to check the headers
       const responseSize: number | undefined = parseFloat(res.getHeader('Content-Length') || get(res, '_contentLength'))
       // Don't log metrics for the health check endpoint unless it's an error
-      const shouldLogMetrics = Boolean(error) || routePath !== '/healthcheck'
+      const shouldLogMetrics = Boolean(error) || routePath !== '/health'
 
       ctx.set('http_res_status', res.statusCode)
       ctx.set('http_res_headers', res.getHeaders())
