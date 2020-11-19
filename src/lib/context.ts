@@ -1,3 +1,4 @@
+import { Subscription as SubscriptionAst } from '@segment/fab5-subscriptions'
 import { IncomingHttpHeaders, OutgoingHttpHeaders } from 'http'
 import { ExecuteInput, StepResult } from './destination-kit/step'
 import logger, { LEVEL } from './logger'
@@ -48,6 +49,7 @@ export interface Subscriptions {
   duration: number
   destination: string
   action: string
+  subscribe: string | SubscriptionAst
   input: ExecuteInput<{}, {}>
   output: StepResult[]
 }

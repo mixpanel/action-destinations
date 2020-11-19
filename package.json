@@ -116,8 +116,11 @@
       "<rootDir>/dist/"
     ],
     "moduleNameMapper": {
-      "@/(.+)": "<rootdir>/../../$1"
+      "@/(.+)": "<rootDir>/../../$1"
     },
+    "setupFilesAfterEnv": [
+      "<rootDir>/test/setup-after-env.ts"
+    ],
     "forceExit": true
   }
 }

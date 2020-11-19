@@ -189,6 +189,7 @@ export class Destination<Settings = any> {
       duration: subscriptionDuration,
       destination: this.name,
       action: actionSlug,
+      subscribe: subscription.subscribe,
       input: {
         ...input,
         settings: redactSettings((settings as unknown) as JSONObject, privateSettings)
@@ -240,7 +241,7 @@ export class Destination<Settings = any> {
   }
 
   private getDestinationSettings(settings: JSONObject): Settings {
-    const { subscriptions, ...otherSettings } = settings
+    const { subcription, subscriptions, ...otherSettings } = settings
     return (otherSettings as unknown) as Settings
   }
 }
