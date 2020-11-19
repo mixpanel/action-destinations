@@ -10,7 +10,7 @@ import { JSONArray, JSONObject } from '../json-object'
 import { redactSettings } from '../redact'
 import { SegmentEvent } from '@/lib/segment-event'
 
-interface PartnerActions<Settings, Payload> {
+interface PartnerActions<Settings, Payload extends object> {
   [key: string]: Action<Settings, Payload>
 }
 

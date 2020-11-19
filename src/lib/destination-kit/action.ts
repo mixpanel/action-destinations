@@ -1,12 +1,12 @@
-import { transform } from '../mapping-kit'
-import Ajv from 'ajv'
 import { AggregateAjvError } from '@segment/ajv-human-errors'
-import got, { ExtendOptions, Got, Response } from 'got'
-import NodeCache from 'node-cache'
+import Ajv from 'ajv'
 import { EventEmitter } from 'events'
+import got, { ExtendOptions, Got, Response } from 'got'
 import get from 'lodash/get'
-import { Step, Steps, StepResult, ExecuteInput } from './step'
-import { lookup, beforeRequest } from '../dns'
+import NodeCache from 'node-cache'
+import { beforeRequest, lookup } from '../dns'
+import { transform } from '../mapping-kit'
+import { ExecuteInput, Step, StepResult, Steps } from './step'
 
 export type RequestFn<Settings, Payload> = (request: Got, data: ExecuteInput<Settings, Payload>) => any
 
@@ -63,12 +63,14 @@ export interface ActionDefinition<Settings, Payload = any> {
   perform: RequestFn<Settings, Payload>
 }
 
-class MapInput<Settings, Payload> extends Step<Settings, Payload> {
+class MapInput<Settings, Payload extends object> extends Step<Settings, Payload> {
   executeStep(data: ExecuteInput<Settings, Payload>): Promise<string> {
     // Transforms the initial payload (event) + action settings (from `subscriptions[0].mapping`)
     // into input data that the action can use to talk to partner apis
     if (data.mapping) {
-      data.payload = transform(data.mapping, data.payload)
+      // Technically we can't know whether or not `transform` returns the exact shape of Payload here, hence the casting
+      // It will be validated in subsequent steps
+      data.payload = transform(data.mapping, data.payload as any) as Payload
     }
 
     return Promise.resolve('MapInput completed')
@@ -253,7 +255,7 @@ type ExecuteInputField = 'payload' | 'settings' | 'mapping'
  * Action is the beginning step for all partner actions. Entrypoints always start with the
  * MapAndValidateInput step.
  */
-export class Action<Settings, Payload> extends EventEmitter {
+export class Action<Settings, Payload extends object> extends EventEmitter {
   steps: Steps<Settings, Payload>
   requestExtensions: Extensions<Settings, Payload>
   private autocompleteCache: { [key: string]: RequestFn<Settings, Payload> }

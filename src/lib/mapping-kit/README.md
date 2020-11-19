@@ -74,9 +74,8 @@ Output:
 
 ## Usage
 
-```js
-// Require using path
-const { transform } = require('../mapping-kit')
+```ts
+import { transform } from '../mapping-kit'
 
 const mapping = { '@path': '$.foo.bar' }
 const input = { foo: { bar: 'Hello!' } }

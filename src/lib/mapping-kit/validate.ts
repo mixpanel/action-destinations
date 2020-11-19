@@ -1,71 +1,44 @@
-module.exports = validate
+import AggregateError from 'aggregate-error'
+import { CustomError } from 'ts-custom-error'
+import { isDirective } from './is-directive'
+import { isObject, realTypeOf, Dictionary } from './real-type-of'
 
-class AggregateError extends Error {
-  constructor(...errors) {
-    super()
-    this.name = 'AggregateError'
-    this._errors = errors.flatMap((e) => {
-      if (e instanceof AggregateError) {
-        return [...e]
-      } else {
-        return e
-      }
-    })
-    this._refreshMessage()
+class ValidationError extends CustomError {
+  constructor(message: string, stack: string[] = []) {
+    super(`/${stack.join('/')} ${message}.`)
   }
+}
 
-  push(e) {
+function flatAggregate(errors: Error[]): Error[] {
+  return errors.flatMap((e) => {
     if (e instanceof AggregateError) {
-      for (const err of e) this._errors.push(err)
+      return [...e]
     } else {
-      this._errors.push(e)
+      return e
     }
-    this._refreshMessage()
-  }
-
-  get length() {
-    return this._errors.length
-  }
-
-  *[Symbol.iterator]() {
-    for (const err of this._errors) {
-      yield err
-    }
-  }
-
-  _refreshMessage() {
-    this.message = this._errors.map((e) => e.message).join(' ')
-  }
+  })
 }
 
-class ValidationError extends Error {
-  constructor(msg, stack = []) {
-    super(`/${stack.join('/')} ${msg}.`)
-    this.name = 'ValidationError'
+function realTypeOrDirective(value: unknown) {
+  const type = realTypeOf(value)
+  if (type === 'object' && Object.keys(value as object).some((k) => k.startsWith('@'))) {
+    return 'directive'
   }
+  return type
 }
 
-// -- validators
+type DirectiveValidator = (v: unknown, stack?: string[]) => void
 
-function validate(mapping, stack = []) {
-  switch (realTypeOf(mapping)) {
-    case 'directive':
-      return validateDirective(mapping, stack)
-    case 'object':
-      return validateObject(mapping, stack)
-    case 'array':
-      return validateArray(mapping, stack)
-    default:
-      // All other types are valid "raw" mappings
-      return null
-  }
+interface DirectiveValidators {
+  [directive: string]: DirectiveValidator | undefined
 }
 
-function validateDirective(obj, stack = []) {
-  const type = realTypeOf(obj)
+const directives: DirectiveValidators = {}
 
+function validateDirective(obj: unknown, stack: string[] = []): void {
   // "allow" non-directive objects so that we can throw a more descriptive error below
-  if (type !== 'directive' && type !== 'object') {
+  if (!isDirective(obj) && !isObject(obj)) {
+    const type = realTypeOf(obj)
     throw new ValidationError(`should be a directive object but it is ${indefiniteArticle(type)} ${type}`, stack)
   }
 
@@ -93,9 +66,8 @@ function validateDirective(obj, stack = []) {
   fn(obj[directiveKey], stack)
 }
 
-function validateDirectiveOrRaw(v, stack = []) {
-  const type = realTypeOf(v)
-
+function validateDirectiveOrRaw(v: unknown, stack: string[] = []) {
+  const type = realTypeOrDirective(v)
   switch (type) {
     case 'directive':
       return validateDirective(v, stack)
@@ -114,9 +86,8 @@ function validateDirectiveOrRaw(v, stack = []) {
   }
 }
 
-function validateDirectiveOrString(v, stack = []) {
-  const type = realTypeOf(v)
-
+function validateDirectiveOrString(v: unknown, stack: string[] = []) {
+  const type = realTypeOrDirective(v)
   switch (type) {
     case 'directive':
       return validateDirective(v, stack)
@@ -130,9 +101,8 @@ function validateDirectiveOrString(v, stack = []) {
   }
 }
 
-function validateDirectiveOrObject(v, stack = []) {
-  const type = realTypeOf(v)
-
+function validateDirectiveOrObject(v: unknown, stack: string[] = []) {
+  const type = realTypeOrDirective(v)
   switch (type) {
     case 'directive':
       return validateDirective(v, stack)
@@ -146,8 +116,8 @@ function validateDirectiveOrObject(v, stack = []) {
   }
 }
 
-function validateDirectiveOrArray(v, stack = []) {
-  const type = realTypeOf(v)
+function validateDirectiveOrArray(v: unknown, stack: string[] = []) {
+  const type = realTypeOrDirective(v)
 
   switch (type) {
     case 'directive':
@@ -162,13 +132,13 @@ function validateDirectiveOrArray(v, stack = []) {
   }
 }
 
-function validateObject(obj, stack = []) {
-  const type = realTypeOf(obj)
-
+function validateObject(value: unknown, stack: string[] = []) {
+  const type = realTypeOrDirective(value)
   if (type !== 'object') {
     throw new ValidationError(`should be an object but it is ${indefiniteArticle(type)} ${type}`, stack)
   }
 
+  const obj = value as Dictionary
   const keys = Object.keys(obj)
 
   const directiveKey = keys.find((k) => k.charAt(0) === '@')
@@ -179,23 +149,32 @@ function validateObject(obj, stack = []) {
     )
   }
 
-  const err = new AggregateError()
-
+  const errors: Error[] = []
   keys.forEach((k) => {
     try {
       validate(obj[k], [...stack, k])
     } catch (e) {
-      err.push(e)
+      errors.push(e)
     }
   })
 
-  if (err.length) throw err
+  if (errors.length) {
+    throw new AggregateError(flatAggregate(errors))
+  }
 }
 
-function validateObjectWithFields(obj, fields, stack) {
-  validateObject(obj, stack)
+interface ValidateFields {
+  [key: string]: {
+    required?: DirectiveValidator
+    optional?: DirectiveValidator
+  }
+}
 
-  var err = new AggregateError()
+function validateObjectWithFields(input: unknown, fields: ValidateFields, stack: string[] = []) {
+  validateObject(input, stack)
+
+  const errors: Error[] = []
+  const obj = input as Dictionary
 
   Object.entries(fields).forEach(([prop, { required, optional }]) => {
     try {
@@ -209,15 +188,17 @@ function validateObjectWithFields(obj, fields, stack) {
           optional(obj[prop], [...stack, prop])
         }
       }
-    } catch (e) {
-      err.push(e)
+    } catch (error) {
+      errors.push(error)
     }
   })
 
-  if (err.length) throw err
+  if (errors.length) {
+    throw new AggregateError(flatAggregate(errors))
+  }
 }
 
-function validateArray(arr, stack = []) {
+function validateArray(arr: unknown, stack: string[] = []): void {
   const type = realTypeOf(arr)
 
   if (type !== 'array') {
@@ -225,21 +206,20 @@ function validateArray(arr, stack = []) {
   }
 }
 
-// -- directives
-
-const directives = {}
-
-function directive(names, fn) {
+function directive(names: string[] | string, fn: DirectiveValidator): void {
   if (!Array.isArray(names)) {
     names = [names]
   }
   names.forEach((name) => {
-    directives[name] = (v, stack = []) => {
+    directives[name] = (v: unknown, stack: string[] = []) => {
       try {
         fn(v, [...stack, name])
       } catch (e) {
-        if (e instanceof ValidationError || e instanceof AggregateError) throw e
-        else throw new ValidationError(e.message, stack)
+        if (e instanceof ValidationError || e instanceof AggregateError) {
+          throw e
+        }
+
+        throw new ValidationError(e.message, stack)
       }
     }
   })
@@ -270,21 +250,25 @@ directive('@lowercase', (v, stack) => {
   validateDirectiveOrString(v, stack)
 })
 
-directive('@merge', (v, stack) => {
+directive('@merge', (v, stack = []) => {
   validateArray(v, stack)
 
-  const err = new AggregateError()
-  v.forEach((obj, i) => {
+  const arr = v as unknown[]
+  const errors: Error[] = []
+
+  arr.forEach((obj, i) => {
     try {
       validateDirectiveOrObject(obj, [...stack, `${i}`])
-    } catch (e) {
-      err.push(e)
+    } catch (error) {
+      errors.push(error)
     }
   })
-  if (err.length) throw err
+  if (errors.length) {
+    throw new AggregateError(errors)
+  }
 })
 
-directive(['@omit', '@pick'], (v, stack) => {
+directive(['@omit', '@pick'], (v, stack = []) => {
   validateObjectWithFields(
     v,
     {
@@ -294,18 +278,21 @@ directive(['@omit', '@pick'], (v, stack) => {
     stack
   )
 
-  if (realTypeOf(v.fields) === 'array') {
-    const err = new AggregateError()
+  const obj = v as Dictionary
+  if (Array.isArray(obj.fields)) {
+    const errors: Error[] = []
 
-    v.fields.forEach((field, i) => {
+    obj.fields.forEach((field, i) => {
       try {
         validateDirectiveOrString(field, [...stack, i.toString()])
-      } catch (e) {
-        err.push(e)
+      } catch (error) {
+        errors.push(error)
       }
     })
 
-    if (err.length) throw err
+    if (errors.length) {
+      throw new AggregateError(errors)
+    }
   }
 })
 
@@ -313,7 +300,7 @@ directive('@path', (v, stack) => {
   validateDirectiveOrString(v, stack)
 })
 
-directive('@root', (v) => {
+directive('@root', () => {
   // no-op
 })
 
@@ -333,26 +320,11 @@ directive('@timestamp', (v, stack) => {
   )
 })
 
-directive('@uuid', (v) => {
+directive('@uuid', () => {
   // no-op
 })
 
-// -- util
-
-function realTypeOf(v) {
-  const rawType = typeof v
-
-  if (rawType === 'object') {
-    if (Array.isArray(v)) return 'array'
-    else if (v === null) return 'null'
-    else if (Object.keys(v).some((k) => k.match(/^@/))) return 'directive'
-    else return 'object'
-  }
-
-  return rawType
-}
-
-function indefiniteArticle(s) {
+function indefiniteArticle(s: string): string {
   switch (s.charAt(0)) {
     case 'a':
     case 'e':
@@ -362,5 +334,19 @@ function indefiniteArticle(s) {
       return 'an'
     default:
       return 'a'
+  }
+}
+
+export default function validate(mapping: unknown, stack: string[] = []) {
+  switch (realTypeOrDirective(mapping)) {
+    case 'directive':
+      return validateDirective(mapping, stack)
+    case 'object':
+      return validateObject(mapping, stack)
+    case 'array':
+      return validateArray(mapping, stack)
+    default:
+      // All other types are valid "raw" mappings
+      return null
   }
 }

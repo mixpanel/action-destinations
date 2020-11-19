@@ -1,17 +1,20 @@
-const { transform } = require('./index')
+import { transform } from '../index'
 
 describe('validations', () => {
   test('valid', () => {
     expect(() => {
+      // @ts-expect-error unsupported, but doesn't throw
       transform(['cool'])
     }).not.toThrow()
     expect(() => {
+      // @ts-expect-error unsupported, but doesn't throw
       transform(123)
     }).not.toThrow()
     expect(() => {
       transform({ foo: 'bar' })
     }).not.toThrow()
     expect(() => {
+      // @ts-expect-error unsupported, but doesn't throw
       transform('neat')
     }).not.toThrow()
     expect(() => {
@@ -29,16 +32,18 @@ describe('validations', () => {
     expect(() => {
       transform({ oops: { '@merge': [{}, 123] } })
     }).toThrow()
-    // Further validaiton tests are in validate.test.js
+    // Further validation tests are in validate.test.js
   })
 })
 
 describe('payload validations', () => {
   test('invalid type', () => {
     expect(() => {
+      // @ts-expect-error
       transform({ a: 1 }, 123)
     }).toThrowError()
     expect(() => {
+      // @ts-expect-error
       transform({ a: 1 }, [])
     }).toThrowError()
   })
@@ -53,28 +58,6 @@ describe('no-op', () => {
   test('pass-through mapping', () => {
     const output = transform({ cool: true }, {})
     expect(output).toStrictEqual({ cool: true })
-  })
-})
-
-describe('options', () => {
-  describe('merge', () => {
-    test('overwrite value', () => {
-      const output = transform(
-        { a: { b: 0 } }, // mapping
-        { a: { b: { c: 1 } } }, // payload
-        { merge: true } // options
-      )
-      expect(output).toStrictEqual({ a: { b: 0 } })
-    })
-
-    test('leave other values intact', () => {
-      const output = transform(
-        { a: { b: 0 }, d: 1 }, // mapping
-        { a: { b: 2, c: 3 }, e: 4 }, // payload
-        { merge: true } // options
-      )
-      expect(output).toStrictEqual({ a: { b: 0, c: 3 }, d: 1, e: 4 })
-    })
   })
 })
 
