@@ -8,6 +8,7 @@ import Context from '@/lib/context'
 import { JSONArray, JSONObject } from '@/lib/json-object'
 import { StepResult } from '@/lib/destination-kit/step'
 import getEventTesterData, { EventTesterRequest, RequestToDestination, ResponseFromDestination } from './event-tester'
+import { SegmentEvent } from '@/lib/segment-event'
 
 function parseJsonHeader(
   headers: IncomingHttpHeaders,
@@ -41,7 +42,7 @@ function parseContentType(req: Request): MIMEType {
 
 async function handleHttp(context: Context, req: Request): Promise<StepResult[]> {
   const idOrSlug = req.params.destinationId
-  const event = req.body
+  const event = req.body as SegmentEvent
   const settings = parseJsonHeader(req.headers, 'centrifuge-settings') as JSONObject
   const privateSettings = parseJsonHeader(req.headers, 'centrifuge-private-settings') as JSONArray
 
@@ -71,7 +72,7 @@ interface CloudEvent {
   destination: string
   specversion: string
   type: string
-  data: JSONObject
+  data: SegmentEvent
   settings: JSONObject
 }
 
@@ -196,7 +197,8 @@ async function handleCloudEvent(
   const destination = getDestinationByIdOrSlug(destinationId)
 
   try {
-    const results = await destination.onEvent(context, cloudEvent.data, cloudEvent.settings, privateSettings)
+    const event = cloudEvent.data
+    const results = await destination.onEvent(context, event, cloudEvent.settings, privateSettings)
     const eventTesterData = getEventTesterData(destination.responses)
     return constructCloudSuccess(cloudEvent, results, eventTesterData, { start })
   } catch (err) {

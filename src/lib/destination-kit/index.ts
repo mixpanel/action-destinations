@@ -8,6 +8,7 @@ import Context, { Subscriptions } from '../context'
 import { time, duration } from '../time'
 import { JSONArray, JSONObject } from '../json-object'
 import { redactSettings } from '../redact'
+import { SegmentEvent } from '@/lib/segment-event'
 
 interface PartnerActions<Settings, Payload> {
   [key: string]: Action<Settings, Payload>
@@ -149,7 +150,7 @@ export class Destination<Settings = any> {
   private async onSubscription(
     context: Context,
     subscription: Subscription,
-    event: JSONObject,
+    event: SegmentEvent,
     settings: Settings,
     privateSettings: JSONArray
   ): Promise<StepResult[]> {
@@ -207,7 +208,7 @@ export class Destination<Settings = any> {
    */
   public async onEvent(
     context: Context,
-    event: JSONObject,
+    event: SegmentEvent,
     settings: JSONObject,
     privateSettings: JSONArray = []
   ): Promise<StepResult[]> {
