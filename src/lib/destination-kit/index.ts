@@ -68,6 +68,7 @@ function instrumentSubscription(context: Context, input: Subscriptions): void {
     duration: input.duration,
     destination: input.destination,
     action: input.action,
+    subscribe: input.subscribe,
     input: input.input,
     output: input.output
   })
