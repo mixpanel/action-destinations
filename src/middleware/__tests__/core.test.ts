@@ -39,7 +39,7 @@ beforeAll(async () => {
 beforeEach(() => {
   // Reset the router after every test. This allows the test routes to be located in the tests
   router.stack = []
-  jest.restoreAllMocks()
+  jest.resetAllMocks()
 })
 
 afterAll((cb): void => {

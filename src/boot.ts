@@ -4,9 +4,9 @@ import { once } from 'lodash'
 import * as Sentry from '@sentry/node'
 import * as SentryIntegrations from '@sentry/integrations'
 import blockedStats from '@segment/blocked-stats'
-import logger from './lib/logger'
-import stats from './lib/stats'
-import { NODE_ENV, SENTRY_DSN } from './config'
+import logger from '@/lib/logger'
+import stats from '@/lib/stats'
+import { NODE_ENV, SENTRY_DSN } from '@/config'
 
 Sentry.init({
   dsn: SENTRY_DSN,

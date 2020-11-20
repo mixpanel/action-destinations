@@ -1,16 +1,25 @@
-import http from 'http'
 import listen from 'test-listen'
 import got from 'got'
-import { app } from '../app'
+import server from '../app'
 
 const client = got.extend({
   retry: 0, // Disable retries so that 500 errors don't make the tests super slow
   throwHttpErrors: false
 })
 
-const server = http.createServer(app)
 let url: string
 beforeAll(async () => {
+  if (server.listening) {
+    await new Promise((resolve, reject) => {
+      server.close((err) => {
+        if (err) {
+          reject(err)
+        } else {
+          resolve()
+        }
+      })
+    })
+  }
   url = await listen(server)
 })
 

@@ -1,5 +1,7 @@
 import nock from 'nock'
 
+jest.mock('@/lib/stats')
+
 beforeEach(() => {
   // Removes mocks between unit tests so they run in isolation
   nock.cleanAll()

@@ -1,9 +1,9 @@
 import { RequestHandler, Request, Response } from 'express'
 import { once, get } from 'lodash'
 import * as Sentry from '@sentry/node'
-import Context from '../lib/context'
-import logger from '../lib/logger'
-import stats from '../lib/stats'
+import Context from '@/lib/context'
+import logger from '@/lib/logger'
+import stats from '@/lib/stats'
 
 interface RecordErrorParams {
   error: unknown

@@ -1,8 +1,8 @@
 import * as Sentry from '@sentry/node'
 import { ErrorRequestHandler } from 'express'
 import { NODE_ENV } from '../config'
-import logger from '../lib/logger'
-import stats from '../lib/stats'
+import logger from '@/lib/logger'
+import stats from '@/lib/stats'
 
 /** Catch all error handler */
 const errorHandler: ErrorRequestHandler = (error, req, res, _next): void => {
