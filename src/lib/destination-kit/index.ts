@@ -77,14 +77,11 @@ function instrumentSubscription(context: Context, input: Subscriptions): void {
 
 export class Destination<Settings = any> {
   readonly name: string
-  readonly settingsSchema?: JSONSchema7
-  readonly extendRequest?: Extension<Settings, any>
-
-  // TODO Authentication should be required including creating a test request?
   readonly authentication?: AuthenticationScheme<Settings>
-
-  partnerActions: PartnerActions<Settings, any>
-  responses: Response[]
+  readonly extendRequest?: Extension<Settings, any>
+  readonly partnerActions: PartnerActions<Settings, any>
+  readonly responses: Response[]
+  readonly settingsSchema?: JSONSchema7
 
   constructor(destination: DestinationDefinition<Settings>) {
     this.name = destination.name
@@ -147,6 +144,15 @@ export class Destination<Settings = any> {
     return this
   }
 
+  protected executeAction(actionSlug: string, input: ExecuteInput<Settings, {}>): Promise<StepResult[]> {
+    const action = this.partnerActions[actionSlug]
+    if (!action) {
+      throw new BadRequest(`"${actionSlug}" is not a valid action`)
+    }
+
+    return action.execute(input)
+  }
+
   private async onSubscription(
     context: Context,
     subscription: Subscription,
@@ -163,11 +169,6 @@ export class Destination<Settings = any> {
     }
 
     const actionSlug = subscription.partnerAction
-    const action = this.partnerActions[actionSlug]
-    if (!action) {
-      throw new BadRequest(`"${actionSlug}" is not a valid action`)
-    }
-
     const subscriptionStartedAt = time()
 
     const input: ExecuteInput<Settings, {}> = {
@@ -182,7 +183,7 @@ export class Destination<Settings = any> {
       cachedFields: {}
     }
 
-    const results = await action.execute(input)
+    const results = await this.executeAction(actionSlug, input)
 
     const subscriptionEndedAt = time()
     const subscriptionDuration = duration(subscriptionStartedAt, subscriptionEndedAt)

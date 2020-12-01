@@ -36,7 +36,7 @@ async function run() {
     for (const action of actions) {
       const actionPath = path.join(destinationPath, action)
       const stats = fs.statSync(actionPath)
-      if (!stats.isDirectory() || action === 'autocomplete') {
+      if (!stats.isDirectory() || action === 'autocomplete' || action === '__tests__') {
         continue
       }
 
