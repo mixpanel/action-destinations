@@ -13,7 +13,7 @@ export type DeviceID = string
  */
 export type EventType = string
 /**
- * The timestamp of the event in milliseconds since epoch. If time is not sent with the event, it will be set to the request upload time.
+ * The timestamp of the event. If time is not sent with the event, it will be set to the request upload time.
  */
 export type Timestamp = string
 /**

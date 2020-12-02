@@ -26,7 +26,11 @@ const action: ActionDefinition<Settings, Payload> = {
         description:
           'A device-specific identifier, such as the Identifier for Vendor on iOS. Required unless user ID is present. If a device ID is not sent with the event, it will be set to a hashed version of the user ID.',
         defaultMapping: {
-          '@template': '{{context.device.id}}'
+          '@if': {
+            exists: { '@path': '$.context.device.id' },
+            then: { '@path': '$.context.device.id' },
+            else: { '@path': '$.anonymousId' }
+          }
         }
       },
       event_type: {
@@ -43,7 +47,7 @@ const action: ActionDefinition<Settings, Payload> = {
         type: 'string',
         format: 'date-time',
         description:
-          'The timestamp of the event in milliseconds since epoch. If time is not sent with the event, it will be set to the request upload time.',
+          'The timestamp of the event. If time is not sent with the event, it will be set to the request upload time.',
         defaultMapping: {
           '@template': '{{timestamp}}'
         }
@@ -109,7 +113,7 @@ const action: ActionDefinition<Settings, Payload> = {
         type: 'string',
         description: 'The device brand that the user is using.',
         defaultMapping: {
-          '@template': '{{context.device.manufacturer}}'
+          '@template': '{{context.device.brand}}'
         }
       },
       device_manufacturer: {
@@ -149,7 +153,7 @@ const action: ActionDefinition<Settings, Payload> = {
         type: 'string',
         description: 'The current region of the user.',
         defaultMapping: {
-          '@template': '{{context.location.city}}'
+          '@template': '{{context.location.region}}'
         }
       },
       city: {
@@ -232,7 +236,11 @@ const action: ActionDefinition<Settings, Payload> = {
         type: 'string',
         description: 'Identifier for Advertiser. _(iOS)_',
         defaultMapping: {
-          '@template': '{{context.device.advertisingId}}'
+          '@if': {
+            exists: { '@path': '$.context.device.advertisingId' },
+            then: { '@path': '$.context.device.advertisingId' },
+            else: { '@path': '$.context.device.idfa' }
+          }
         }
       },
       idfv: {
@@ -248,7 +256,11 @@ const action: ActionDefinition<Settings, Payload> = {
         type: 'string',
         description: 'Google Play Services advertising ID. _(Android)_',
         defaultMapping: {
-          '@template': '{{context.device.advertisingId}}'
+          '@if': {
+            exists: { '@path': '$.context.device.advertisingId' },
+            then: { '@path': '$.context.device.advertisingId' },
+            else: { '@path': '$.context.device.idfa' }
+          }
         }
       },
       android_id: {
