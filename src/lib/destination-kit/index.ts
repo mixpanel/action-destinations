@@ -6,11 +6,11 @@ import { Action, ActionDefinition, Validate, Extension } from './action'
 import { ExecuteInput, StepResult } from './step'
 import Context, { Subscriptions } from '../context'
 import { time, duration } from '../time'
-import { JSONArray, JSONObject } from '../json-object'
+import { JSONArray, JSONLikeObject, JSONObject } from '../json-object'
 import { redactSettings } from '../redact'
 import { SegmentEvent } from '@/lib/segment-event'
 
-interface PartnerActions<Settings, Payload extends object> {
+interface PartnerActions<Settings, Payload extends JSONLikeObject> {
   [key: string]: Action<Settings, Payload>
 }
 
@@ -100,7 +100,7 @@ export class Destination<Settings = any> {
     const context: ExecuteInput<Settings, {}> = { settings, payload: {}, cachedFields: {} }
 
     if (this.settingsSchema) {
-      const step = new Validate('', 'settings', this.settingsSchema)
+      const step = new Validate('settings', this.settingsSchema)
       await step.executeStep(context)
     }
 
@@ -127,19 +127,14 @@ export class Destination<Settings = any> {
     }
   }
 
-  // TODO refactor this whole thing
   private partnerAction(slug: string, definition: ActionDefinition<Settings>): Destination<Settings> {
-    const action = new Action<Settings, {}>()
-
-    if (this.extendRequest) {
-      action.extendRequest(this.extendRequest)
-    }
+    const action = new Action<Settings, {}>(definition, this.extendRequest)
 
     action.on('response', (response) => {
       this.responses.push(response)
     })
 
-    this.partnerActions[slug] = action.loadDefinition(definition)
+    this.partnerActions[slug] = action
 
     return this
   }

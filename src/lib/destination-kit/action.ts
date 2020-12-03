@@ -1,10 +1,11 @@
 import { AggregateAjvError } from '@segment/ajv-human-errors'
 import Ajv from 'ajv'
 import { EventEmitter } from 'events'
-import got, { ExtendOptions, Got, Response } from 'got'
+import { ExtendOptions, Got, Response } from 'got'
 import get from 'lodash/get'
 import NodeCache from 'node-cache'
-import { beforeRequest, lookup } from '../dns'
+import createRequestClient from '../create-request-client'
+import { JSONLikeObject } from '../json-object'
 import { transform } from '../mapping-kit'
 import { ExecuteInput, Step, StepResult, Steps } from './step'
 
@@ -63,7 +64,7 @@ export interface ActionDefinition<Settings, Payload = any> {
   perform: RequestFn<Settings, Payload>
 }
 
-class MapInput<Settings, Payload extends object> extends Step<Settings, Payload> {
+class MapInput<Settings, Payload extends JSONLikeObject> extends Step<Settings, Payload> {
   executeStep(data: ExecuteInput<Settings, Payload>): Promise<string> {
     // Transforms the initial payload (event) + action settings (from `subscriptions[0].mapping`)
     // into input data that the action can use to talk to partner apis
@@ -78,14 +79,12 @@ class MapInput<Settings, Payload extends object> extends Step<Settings, Payload>
 }
 
 export class Validate<Settings, Payload> extends Step<Settings, Payload> {
-  errorPrefix: string
   field: ExecuteInputField
   validate: Ajv.ValidateFunction
 
-  constructor(errorPrefix: string, field: ExecuteInputField, schema: object) {
+  constructor(field: ExecuteInputField, schema: object) {
     super()
 
-    this.errorPrefix = errorPrefix
     this.field = field
 
     const ajv = new Ajv({
@@ -123,6 +122,7 @@ export type Extensions<Settings, Payload> = Extension<Settings, Payload>[]
  */
 class Request<Settings, Payload> extends Step<Settings, Payload> {
   requestFn: RequestFn<Settings, Payload> | undefined
+  // TODO change this to single extension? we never pass more than 1
   extensions: Extensions<Settings, Payload>
 
   constructor(extensions: Extensions<Settings, Payload>, requestFn?: RequestFn<Settings, Payload>) {
@@ -136,12 +136,11 @@ class Request<Settings, Payload> extends Step<Settings, Payload> {
       return ''
     }
 
-    const baseRequest = this.baseRequest(data)
-    const request = this.requestFn(baseRequest, data)
+    const request = this.createRequestClient(data)
 
-    let response: Response
+    let response: Response | JSONLikeObject | null
     try {
-      response = await request
+      response = await this.requestFn(request, data)
       this.emit('response', response)
     } catch (e) {
       this.emit('response', e.response)
@@ -155,27 +154,9 @@ class Request<Settings, Payload> extends Step<Settings, Payload> {
     return response.body as string
   }
 
-  baseRequest(data: ExecuteInput<Settings, Payload>): Got {
-    let base = got.extend({
-      // disable automatic retries
-      retry: 0,
-      // default is no timeout
-      timeout: 3000,
-      headers: {
-        // override got's default of 'got (https://github.com/sindresorhus/got)'
-        'user-agent': undefined
-      },
-      lookup,
-      hooks: {
-        beforeRequest: [beforeRequest]
-      }
-    })
-
-    for (const extension of this.extensions) {
-      base = base.extend(extension(data))
-    }
-
-    return base
+  protected createRequestClient(data: ExecuteInput<Settings, Payload>): Got {
+    const options = this.extensions.map((extension) => extension(data))
+    return createRequestClient(...options)
   }
 }
 
@@ -218,7 +199,7 @@ class CachedRequest<Settings, Payload> extends Request<Settings, Payload> {
       return 'cache hit'
     }
 
-    const request = this.baseRequest(data)
+    const request = this.createRequestClient(data)
 
     try {
       v = await this.valueFn(request, data)
@@ -255,20 +236,29 @@ type ExecuteInputField = 'payload' | 'settings' | 'mapping'
  * Action is the beginning step for all partner actions. Entrypoints always start with the
  * MapAndValidateInput step.
  */
-export class Action<Settings, Payload extends object> extends EventEmitter {
+export class Action<Settings, Payload extends JSONLikeObject> extends EventEmitter {
   steps: Steps<Settings, Payload>
-  requestExtensions: Extensions<Settings, Payload>
+  private requestExtensions: Extensions<Settings, Payload>
   private autocompleteCache: { [key: string]: RequestFn<Settings, Payload> }
 
-  constructor() {
+  constructor(definition: ActionDefinition<Settings, Payload>, extendRequest?: Extension<Settings, Payload>) {
     super()
 
     this.steps = new Steps()
     const step = new MapInput<Settings, Payload>()
     this.steps.push(step)
 
-    this.requestExtensions = []
     this.autocompleteCache = {}
+    this.requestExtensions = []
+
+    if (extendRequest) {
+      // This must come before we load the definition because
+      // it instantiates "steps" with whatever request extensions
+      // are defined at that moment in time
+      this.requestExtensions.push(extendRequest)
+    }
+
+    this.loadDefinition(definition)
   }
 
   async execute(data: ExecuteInput<Settings, Payload>): Promise<StepResult[]> {
@@ -318,35 +308,23 @@ export class Action<Settings, Payload extends object> extends EventEmitter {
     return step.executeStep(data)
   }
 
-  extendRequest(...extensionFns: Extensions<Settings, Payload>): Action<Settings, Payload> {
-    this.requestExtensions.push(...extensionFns)
-    return this
-  }
-
-  private validatePayload(schema: object): Action<Settings, Payload> {
-    const step = new Validate('Payload is invalid:', 'payload', schema)
+  private validatePayload(schema: object): void {
+    const step = new Validate('payload', schema)
     this.steps.push(step)
-    return this
   }
 
-  private autocomplete(field: string, callback: RequestFn<Settings, Payload>): Action<Settings, Payload> {
+  private autocomplete(field: string, callback: RequestFn<Settings, Payload>): void {
     this.autocompleteCache[field] = callback
-    return this
   }
 
-  private request(requestFn: RequestFn<Settings, Payload>): Action<Settings, Payload> {
+  private request(requestFn: RequestFn<Settings, Payload>): void {
     const step = new Request<Settings, Payload>(this.requestExtensions, requestFn)
-
     step.on('response', (response) => this.emit('response', response))
-
     this.steps.push(step)
-
-    return this
   }
 
-  private cachedRequest(config: CachedRequestConfig<Settings, Payload>): Action<Settings, Payload> {
+  private cachedRequest(config: CachedRequestConfig<Settings, Payload>): void {
     const step = new CachedRequest(this.requestExtensions, config)
     this.steps.push(step)
-    return this
   }
 }
