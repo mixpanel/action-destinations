@@ -58,13 +58,11 @@ describe('SendGrid', () => {
 
   describe('createList', () => {
     it('should validate action fields', async () => {
-      const input = {
-        mapping: {},
-        settings
-      }
-
       try {
-        await testDestination.testAction('createList', input)
+        await testDestination.testAction('createList', {
+          settings,
+          skipDefaultMappings: true
+        })
       } catch (err) {
         expect(err.message).toContain("missing the required field 'name'.")
       }
@@ -90,13 +88,11 @@ describe('SendGrid', () => {
 
   describe('createUpdateContact', () => {
     it('should validate action fields', async () => {
-      const input = {
-        mapping: {},
-        settings
-      }
-
       try {
-        await testDestination.testAction('createUpdateContact', input)
+        await testDestination.testAction('createUpdateContact', {
+          settings,
+          skipDefaultMappings: true
+        })
       } catch (err) {
         expect(err.message).toContain("missing the required field 'email'.")
         expect(err.message).toContain("missing the required field 'list_id'.")
@@ -106,13 +102,11 @@ describe('SendGrid', () => {
 
   describe('deleteContact', () => {
     it('should validate action fields', async () => {
-      const input = {
-        mapping: {},
-        settings
-      }
-
       try {
-        await testDestination.testAction('deleteContact', input)
+        await testDestination.testAction('deleteContact', {
+          settings,
+          skipDefaultMappings: true
+        })
       } catch (err) {
         expect(err.message).toContain("missing the required field 'email'.")
       }
@@ -121,13 +115,11 @@ describe('SendGrid', () => {
 
   describe('removeContactFromList', () => {
     it('should validate action fields', async () => {
-      const input = {
-        mapping: {},
-        settings
-      }
-
       try {
-        await testDestination.testAction('removeContactFromList', input)
+        await testDestination.testAction('removeContactFromList', {
+          settings,
+          skipDefaultMappings: true
+        })
       } catch (err) {
         expect(err.message).toContain("missing the required field 'email'.")
         expect(err.message).toContain("missing the required field 'list_id'.")

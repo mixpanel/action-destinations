@@ -9,8 +9,10 @@ import { JSONLikeObject } from '../json-object'
 import { transform } from '../mapping-kit'
 import { ExecuteInput, Step, StepResult, Steps } from './step'
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type RequestFn<Settings, Payload> = (request: Got, data: ExecuteInput<Settings, Payload>) => any
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface ActionDefinition<Settings, Payload = any> {
   /** The unique identifier for the action, e.g. `postToChannel` */
   // key: string
@@ -71,6 +73,7 @@ class MapInput<Settings, Payload extends JSONLikeObject> extends Step<Settings, 
     if (data.mapping) {
       // Technically we can't know whether or not `transform` returns the exact shape of Payload here, hence the casting
       // It will be validated in subsequent steps
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       data.payload = transform(data.mapping, data.payload as any) as Payload
     }
 
@@ -88,8 +91,6 @@ export class Validate<Settings, Payload> extends Step<Settings, Payload> {
     this.field = field
 
     const ajv = new Ajv({
-      // Fill in any missing values with the default values.
-      useDefaults: true,
       // Coerce types to be a bit more liberal.
       coerceTypes: true,
       // Return all validation errors, not just the first.
@@ -105,6 +106,7 @@ export class Validate<Settings, Payload> extends Step<Settings, Payload> {
 
   executeStep(data: ExecuteInput<Settings, Payload>): Promise<string> {
     if (!this.validate(data[this.field])) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       throw new AggregateAjvError(this.validate.errors)
     }
 
@@ -112,8 +114,8 @@ export class Validate<Settings, Payload> extends Step<Settings, Payload> {
   }
 }
 
-export type Extension<Settings, Payload> = (data: ExecuteInput<Settings, Payload>) => ExtendOptions
-export type Extensions<Settings, Payload> = Extension<Settings, Payload>[]
+export type Extension<Settings, Payload = unknown> = (data: ExecuteInput<Settings, Payload>) => ExtendOptions
+export type Extensions<Settings, Payload = unknown> = Extension<Settings, Payload>[]
 
 /**
  * Request handles delivering a payload to an external API. It uses the `got` library under the hood.
@@ -230,14 +232,14 @@ interface ExecuteAutocompleteInput<Settings, Payload> {
   page?: string
 }
 
-type ExecuteInputField = 'payload' | 'settings' | 'mapping'
+type ExecuteInputField = 'payload' | 'settings'
 
 /**
  * Action is the beginning step for all partner actions. Entrypoints always start with the
  * MapAndValidateInput step.
  */
 export class Action<Settings, Payload extends JSONLikeObject> extends EventEmitter {
-  steps: Steps<Settings, Payload>
+  readonly steps: Steps<Settings, Payload>
   private requestExtensions: Extensions<Settings, Payload>
   private autocompleteCache: { [key: string]: RequestFn<Settings, Payload> }
 
@@ -272,7 +274,21 @@ export class Action<Settings, Payload extends JSONLikeObject> extends EventEmitt
     return results
   }
 
-  loadDefinition(definition: ActionDefinition<Settings, Payload>): Action<Settings, Payload> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  executeAutocomplete(field: string, data: ExecuteAutocompleteInput<Settings, Payload>): any {
+    if (!this.autocompleteCache[field]) {
+      return {
+        data: [],
+        pagination: {}
+      }
+    }
+
+    const step = new Request<Settings, Payload>(this.requestExtensions, this.autocompleteCache[field])
+
+    return step.executeStep(data)
+  }
+
+  private loadDefinition(definition: ActionDefinition<Settings, Payload>): void {
     if (definition.schema) {
       this.validatePayload(definition.schema)
     }
@@ -291,21 +307,6 @@ export class Action<Settings, Payload extends JSONLikeObject> extends EventEmitt
     if (definition.perform) {
       this.request(definition.perform)
     }
-
-    return this
-  }
-
-  executeAutocomplete(field: string, data: ExecuteAutocompleteInput<Settings, Payload>): any {
-    if (!this.autocompleteCache[field]) {
-      return {
-        data: [],
-        pagination: {}
-      }
-    }
-
-    const step = new Request<Settings, Payload>(this.requestExtensions, this.autocompleteCache[field])
-
-    return step.executeStep(data)
   }
 
   private validatePayload(schema: object): void {

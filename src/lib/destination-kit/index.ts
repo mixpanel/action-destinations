@@ -20,6 +20,7 @@ export interface DestinationDefinition<Settings = unknown> {
   /** The JSON Schema representing the destination settings. When present will be used to validate settings */
   schema?: JSONSchema7
   /** An optional function to extend requests sent from the destination (including all actions) */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   extendRequest?: Extension<Settings, any>
   /** Optional authentication configuration */
   authentication?: AuthenticationScheme<Settings>
@@ -62,6 +63,7 @@ interface ApiKeyAuthentication<Settings> extends Authentication {
   testAuthentication: (req: Got, input: TestAuthSettings<Settings>) => CancelableRequest<Response<string>>
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AuthenticationScheme<Settings = any> = ApiKeyAuthentication<Settings>
 
 function instrumentSubscription(context: Context, input: Subscriptions): void {
@@ -75,15 +77,24 @@ function instrumentSubscription(context: Context, input: Subscriptions): void {
   })
 }
 
-export class Destination<Settings = any> {
+interface EventInput<Settings> {
+  readonly event: SegmentEvent
+  readonly mapping: JSONObject
+  readonly settings: Settings
+}
+
+export class Destination<Settings = JSONObject> {
+  readonly definition: DestinationDefinition<Settings>
   readonly name: string
   readonly authentication?: AuthenticationScheme<Settings>
-  readonly extendRequest?: Extension<Settings, any>
+  readonly extendRequest?: Extension<Settings>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   readonly partnerActions: PartnerActions<Settings, any>
   readonly responses: Response[]
   readonly settingsSchema?: JSONSchema7
 
   constructor(destination: DestinationDefinition<Settings>) {
+    this.definition = destination
     this.name = destination.name
     this.settingsSchema = destination.schema
     this.extendRequest = destination.extendRequest
@@ -139,13 +150,21 @@ export class Destination<Settings = any> {
     return this
   }
 
-  protected executeAction(actionSlug: string, input: ExecuteInput<Settings, {}>): Promise<StepResult[]> {
+  protected executeAction(
+    actionSlug: string,
+    { event, mapping, settings }: EventInput<Settings>
+  ): Promise<StepResult[]> {
     const action = this.partnerActions[actionSlug]
     if (!action) {
       throw new BadRequest(`"${actionSlug}" is not a valid action`)
     }
 
-    return action.execute(input)
+    return action.execute({
+      cachedFields: {},
+      mapping,
+      payload: event,
+      settings
+    })
   }
 
   private async onSubscription(
@@ -166,16 +185,10 @@ export class Destination<Settings = any> {
     const actionSlug = subscription.partnerAction
     const subscriptionStartedAt = time()
 
-    const input: ExecuteInput<Settings, {}> = {
-      // Payload starts as the event itself, but will get transformed based on the given `mapping` + `event`
-      // In other arbitrary actions (like autocomplete) payload may be non-event data
-      //
-      // TODO: evaluate if actions like autocomplete should be defined the same, and have the same semantics as a normal partner action
-      // these are effectively actions that power UI **inputs** and nothing else.
-      payload: event,
-      mapping: subscription.mapping,
-      settings,
-      cachedFields: {}
+    const input = {
+      event,
+      mapping: subscription.mapping || {},
+      settings
     }
 
     const results = await this.executeAction(actionSlug, input)
@@ -189,7 +202,7 @@ export class Destination<Settings = any> {
       action: actionSlug,
       subscribe: subscription.subscribe,
       input: {
-        ...input,
+        mapping: input.mapping,
         settings: redactSettings((settings as unknown) as JSONObject, privateSettings)
       },
       output: results

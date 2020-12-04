@@ -110,6 +110,7 @@ app.post(
         const fields: Record<string, string> = {}
 
         for (const fieldError of error) {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-call
           const name = fieldError.path.replace('$.', '')
           fields[name] = fieldError.message
         }
@@ -156,20 +157,23 @@ app.post(
     const actionDefinition = destinationDefinition.partnerActions[action]
 
     try {
-      const result = await actionDefinition.execute({
+      const results = await actionDefinition.execute({
         settings,
         payload: event,
         mapping,
         cachedFields: {}
       })
 
+      const response = results[results.length - 1]?.output ?? ''
+
       res.status(200).json({
         ok: true,
-        response: JSON.stringify(result.pop()!.output || '', null, '\t')
+        response: JSON.stringify(response, null, '\t')
       })
     } catch (error) {
       res.status(200).json({
         ok: false,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         response: error.name === 'HTTPError' ? error.response.rawBody.toString() : error.message
       })
     }

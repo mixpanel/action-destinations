@@ -1,10 +1,33 @@
+import { defaults, mapValues } from 'lodash'
 import { Destination, DestinationDefinition } from '@/lib/destination-kit'
 import { JSONObject } from '@/lib/json-object'
 import { SegmentEvent } from '@/lib/segment-event'
+import { createSegmentEvent } from './create-segment-event'
 
 interface InputData<Settings> {
+  /**
+   * The Segment event. You can use `createSegmentEvent` if you want
+   * to construct an event from partial data.
+   */
+  event?: Partial<SegmentEvent>
+  /**
+   * The raw input - this is what customers define. It may include
+   * literal values as well as mapping-kit directives.
+   */
   mapping?: JSONObject
-  settings: Settings
+  /**
+   * The settings for a destination instance. Includes things like
+   * `apiKey` or `subdomain`. Any fields that are used across all actions
+   * in a destination.
+   */
+  settings?: Settings
+  /**
+   * Whether or not to *skip* default mappings (only happens during testing).
+   * Set to `true` if you want to explicitly provide the raw input.
+   * Set to `false` or omit if you want to test that defaultMappings
+   * work for any missing properties.
+   */
+  skipDefaultMappings?: boolean
 }
 
 class TestDestination<T> extends Destination<T> {
@@ -13,16 +36,28 @@ class TestDestination<T> extends Destination<T> {
   }
 
   /** Testing method that runs an action e2e while allowing slightly more flexible inputs */
-  async testAction(action: string, data: InputData<T>, event?: SegmentEvent) {
-    return super.executeAction(action, {
-      payload: event || {},
-      mapping: data.mapping,
-      settings: data.settings,
-      cachedFields: {}
+  async testAction(
+    action: string,
+    { event, mapping, settings, skipDefaultMappings }: InputData<T>
+  ): Promise<Destination['responses']> {
+    mapping = mapping ?? {}
+
+    if (!skipDefaultMappings) {
+      const schema = this.definition.actions[action].schema
+      const defaultMappings = mapValues(schema.properties, (prop) => prop.defaultMapping)
+      mapping = defaults(mapping, defaultMappings)
+    }
+
+    await super.executeAction(action, {
+      event: createSegmentEvent(event),
+      mapping,
+      settings: settings ?? ({} as T)
     })
+
+    return this.responses
   }
 }
 
-export function createTestDestination<T>(destination: DestinationDefinition<T>) {
+export function createTestDestination<T>(destination: DestinationDefinition<T>): TestDestination<T> {
   return new TestDestination(destination)
 }

@@ -40,7 +40,8 @@ const questions: PromptObject<keyof ActionData>[] = [
   {
     type: 'text',
     name: 'name',
-    message: 'Action name:'
+    message: 'Action name:',
+    format: (val) => startCase(val)
   },
   {
     type: 'text',
@@ -101,11 +102,10 @@ async function createAction(action: ActionData): Promise<void> {
 }
 
 async function run() {
-  const action = await prompts(questions)
+  const action: ActionData = await prompts(questions)
 
   console.log(``)
 
-  action.name = startCase(action.name)
   action.slug = camelCase(action.name)
   action.typeName = action.name.replace(/ /g, '')
 

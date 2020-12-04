@@ -5,6 +5,7 @@ import pipedrive from './pipedrive'
 import sendgrid from './sendgrid'
 import slack from './slack'
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const destinations: Record<string, DestinationDefinition<any>> = {
   amplitude,
   customerio,

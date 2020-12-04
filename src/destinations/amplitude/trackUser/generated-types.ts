@@ -77,7 +77,7 @@ export type Price = number
  */
 export type Quantity = number
 /**
- * Revenue = price quantity. If you send all 3 fields of price, quantity, and revenue, then (price quantity) will be used as the revenue value. You can use negative values to indicate refunds.
+ * Revenue = price * quantity. If you send all 3 fields of price, quantity, and revenue, then (price * quantity) will be used as the revenue value. You can use negative values to indicate refunds.
  */
 export type Revenue = number
 /**

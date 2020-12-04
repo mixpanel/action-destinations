@@ -1,6 +1,7 @@
 import { Subscription as SubscriptionAst } from '@segment/fab5-subscriptions'
 import { IncomingHttpHeaders, OutgoingHttpHeaders } from 'http'
-import { ExecuteInput, StepResult } from './destination-kit/step'
+import { StepResult } from './destination-kit/step'
+import { JSONLikeObject } from './json-object'
 import logger, { LEVEL } from './logger'
 import stats from './stats'
 
@@ -10,8 +11,8 @@ interface NodeError extends Error {
   code: string
 }
 
-function isNodeError(error: any): error is NodeError {
-  return typeof error === 'object' && Boolean(error.code) && error instanceof Error
+function isNodeError(error: unknown): error is NodeError {
+  return typeof error === 'object' && error instanceof Error && 'code' in error
 }
 
 interface Fields {
@@ -52,7 +53,7 @@ export interface Subscriptions {
   destination: string
   action: string
   subscribe: string | SubscriptionAst
-  input: ExecuteInput<{}, {}>
+  input: JSONLikeObject
   output: StepResult[]
 }
 

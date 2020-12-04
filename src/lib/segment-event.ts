@@ -24,6 +24,7 @@ export type Options = {
   context?: AnalyticsContext
   traits?: object
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any
 }
 
@@ -98,6 +99,7 @@ interface AnalyticsContext {
     id: string
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any
 }
 
@@ -135,10 +137,12 @@ export interface SegmentEvent {
    */
   writeKey?: string
 
+  receivedAt?: Date | string
+
   /**
    *  {@link https://github.com/segmentio/analytics.js-integrations/blob/2d5c637c022d2661c23449aed237d0d546bf062d/integrations/segmentio/lib/index.js#L151}
    */
-  sentAt?: Date
+  sentAt?: Date | string
 
   /**
    * {@link https://github.com/segmentio/analytics.js-integrations/blob/2d5c637c022d2661c23449aed237d0d546bf062d/integrations/segmentio/lib/index.js#L311-L320}

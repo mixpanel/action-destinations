@@ -18,7 +18,7 @@ const action: ActionDefinition<Settings, Payload> = {
         description:
           'A UUID (unique user ID) specified by you. **Note:** If you send a request with a user ID that is not in the Amplitude system yet, then the user tied to that ID will not be marked new until their first event. Required unless device ID is present.',
         defaultMapping: {
-          '@template': '{{userId}}'
+          '@path': '$.userId'
         }
       },
       device_id: {
@@ -27,7 +27,7 @@ const action: ActionDefinition<Settings, Payload> = {
         description:
           'A device specific identifier, such as the Identifier for Vendor (IDFV) on iOS. Required unless user ID is present.',
         defaultMapping: {
-          '@template': '{{context.device.id}}'
+          '@path': '$.context.device.id'
         }
       },
       user_properties: {
@@ -50,7 +50,7 @@ const action: ActionDefinition<Settings, Payload> = {
         type: 'string',
         description: 'Version of the app the user is on.',
         defaultMapping: {
-          '@template': '{{context.app.version}}'
+          '@path': '$.context.app.version'
         }
       },
       platform: {
@@ -58,7 +58,7 @@ const action: ActionDefinition<Settings, Payload> = {
         type: 'string',
         description: 'What platform is sending the data.',
         defaultMapping: {
-          '@template': '{{context.device.type}}'
+          '@path': '$.context.device.type'
         }
       },
       os_name: {
@@ -66,7 +66,7 @@ const action: ActionDefinition<Settings, Payload> = {
         type: 'string',
         description: 'Mobile operating system or browser the user is on.',
         defaultMapping: {
-          '@template': '{{context.os.name}}'
+          '@path': '$.context.os.name'
         }
       },
       os_version: {
@@ -74,7 +74,7 @@ const action: ActionDefinition<Settings, Payload> = {
         type: 'string',
         description: 'Version of the mobile operating system or browser the user is on.',
         defaultMapping: {
-          '@template': '{{context.os.version}}'
+          '@path': '$.context.os.version'
         }
       },
       device_brand: {
@@ -82,7 +82,7 @@ const action: ActionDefinition<Settings, Payload> = {
         type: 'string',
         description: 'Device brand the user is on.',
         defaultMapping: {
-          '@template': '{{context.device.manufacturer}}'
+          '@path': '$.context.device.manufacturer'
         }
       },
       device_manufacturer: {
@@ -90,7 +90,7 @@ const action: ActionDefinition<Settings, Payload> = {
         type: 'string',
         description: 'Device manufacturer the user is on.',
         defaultMapping: {
-          '@template': '{{context.device.manufacturer}}'
+          '@path': '$.context.device.manufacturer'
         }
       },
       device_model: {
@@ -98,7 +98,7 @@ const action: ActionDefinition<Settings, Payload> = {
         type: 'string',
         description: 'Device model the user is on.',
         defaultMapping: {
-          '@template': '{{context.device.model}}'
+          '@path': '$.context.device.model'
         }
       },
       carrier: {
@@ -106,7 +106,7 @@ const action: ActionDefinition<Settings, Payload> = {
         type: 'string',
         description: 'Carrier the user has.',
         defaultMapping: {
-          '@template': '{{context.network.carrier}}'
+          '@path': '$.context.network.carrier'
         }
       },
       country: {
@@ -114,7 +114,7 @@ const action: ActionDefinition<Settings, Payload> = {
         type: 'string',
         description: 'Country the user is in.',
         defaultMapping: {
-          '@template': '{{context.location.country}}'
+          '@path': '$.context.location.country'
         }
       },
       region: {
@@ -122,7 +122,7 @@ const action: ActionDefinition<Settings, Payload> = {
         type: 'string',
         description: 'Geographical region the user is in.',
         defaultMapping: {
-          '@template': '{{context.location.city}}'
+          '@path': '$.context.location.city'
         }
       },
       city: {
@@ -130,7 +130,7 @@ const action: ActionDefinition<Settings, Payload> = {
         type: 'string',
         description: 'What city the user is in.',
         defaultMapping: {
-          '@template': '{{context.location.city}}'
+          '@path': '$.context.location.city'
         }
       },
       dma: {
@@ -143,7 +143,7 @@ const action: ActionDefinition<Settings, Payload> = {
         type: 'string',
         description: 'Language the user has set.',
         defaultMapping: {
-          '@template': '{{context.locale}}'
+          '@path': '$.context.locale'
         }
       },
       paying: {

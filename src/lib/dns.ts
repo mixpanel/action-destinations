@@ -34,6 +34,7 @@ function isRestrictedIp(address: string): boolean {
  * Validates a hostname during a dns lookup, throws if restricted
  * Modeled after `dns.lookup` method signature
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function lookup(hostname: string, ...args: any[]): void {
   let [options, callback] = args
   if (typeof options === 'function') {
@@ -54,6 +55,7 @@ export function lookup(hostname: string, ...args: any[]): void {
         }
       }
 
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
       callback(err, address, family)
     }
   )
