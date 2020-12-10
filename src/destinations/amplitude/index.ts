@@ -1,7 +1,6 @@
 import { DestinationDefinition } from '../../lib/destination-kit'
 import trackUser from './trackUser'
 import identifyUser from './identifyUser'
-import deleteUser from './deleteUser'
 import { Settings } from './generated-types'
 
 const destination: DestinationDefinition<Settings> = {
@@ -27,8 +26,7 @@ const destination: DestinationDefinition<Settings> = {
   },
   actions: {
     trackUser,
-    identifyUser,
-    deleteUser
+    identifyUser
   }
 }
 

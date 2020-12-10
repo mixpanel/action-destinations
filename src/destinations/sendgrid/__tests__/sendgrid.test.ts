@@ -100,19 +100,6 @@ describe('SendGrid', () => {
     })
   })
 
-  describe('deleteContact', () => {
-    it('should validate action fields', async () => {
-      try {
-        await testDestination.testAction('deleteContact', {
-          settings,
-          skipDefaultMappings: true
-        })
-      } catch (err) {
-        expect(err.message).toContain("missing the required field 'email'.")
-      }
-    })
-  })
-
   describe('removeContactFromList', () => {
     it('should validate action fields', async () => {
       try {

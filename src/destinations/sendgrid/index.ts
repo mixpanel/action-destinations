@@ -1,7 +1,6 @@
 import { DestinationDefinition } from '../../lib/destination-kit'
 import createList from './createList'
 import createUpdateContact from './createUpdateContact'
-import deleteContact from './deleteContact'
 import removeContactFromList from './removeContactFromList'
 import { Settings } from './generated-types'
 
@@ -37,7 +36,6 @@ const destination: DestinationDefinition<Settings> = {
   actions: {
     createList,
     createUpdateContact,
-    deleteContact,
     removeContactFromList
   }
 }

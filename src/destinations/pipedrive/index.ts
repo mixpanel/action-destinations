@@ -1,7 +1,6 @@
 import { DestinationDefinition } from '../../lib/destination-kit'
 import createUpdateOrganization from './createUpdateOrganization'
 import createUpdatePerson from './createUpdatePerson'
-import deletePerson from './deletePerson'
 import { Settings } from './generated-types'
 
 const destination: DestinationDefinition<Settings> = {
@@ -43,8 +42,7 @@ const destination: DestinationDefinition<Settings> = {
 
   actions: {
     createUpdateOrganization,
-    createUpdatePerson,
-    deletePerson
+    createUpdatePerson
   }
 }
 
