@@ -1,13 +1,14 @@
 import { AggregateAjvError } from '@segment/ajv-human-errors'
 import Ajv from 'ajv'
 import { EventEmitter } from 'events'
-import { ExtendOptions, Got, Response } from 'got'
+import { Got, Response } from 'got'
 import get from 'lodash/get'
 import NodeCache from 'node-cache'
 import createRequestClient from '../create-request-client'
 import { JSONLikeObject } from '../json-object'
 import { transform } from '../mapping-kit'
 import { ExecuteInput, Step, StepResult, Steps } from './step'
+import type { RequestExtension, RequestExtensions } from './types'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type RequestFn<Settings, Payload> = (request: Got, data: ExecuteInput<Settings, Payload>) => any
@@ -114,9 +115,6 @@ export class Validate<Settings, Payload> extends Step<Settings, Payload> {
   }
 }
 
-export type Extension<Settings, Payload = unknown> = (data: ExecuteInput<Settings, Payload>) => ExtendOptions
-export type Extensions<Settings, Payload = unknown> = Extension<Settings, Payload>[]
-
 /**
  * Request handles delivering a payload to an external API. It uses the `got` library under the hood.
  *
@@ -125,9 +123,9 @@ export type Extensions<Settings, Payload = unknown> = Extension<Settings, Payloa
 class Request<Settings, Payload> extends Step<Settings, Payload> {
   requestFn: RequestFn<Settings, Payload> | undefined
   // TODO change this to single extension? we never pass more than 1
-  extensions: Extensions<Settings, Payload>
+  extensions: RequestExtensions<Settings, Payload>
 
-  constructor(extensions: Extensions<Settings, Payload>, requestFn?: RequestFn<Settings, Payload>) {
+  constructor(extensions: RequestExtensions<Settings, Payload>, requestFn?: RequestFn<Settings, Payload>) {
     super()
     this.extensions = extensions || []
     this.requestFn = requestFn
@@ -178,7 +176,7 @@ class CachedRequest<Settings, Payload> extends Request<Settings, Payload> {
   negative: boolean
   cache: NodeCache
 
-  constructor(extensions: Extensions<Settings, Payload>, config: CachedRequestConfig<Settings, Payload>) {
+  constructor(extensions: RequestExtensions<Settings, Payload>, config: CachedRequestConfig<Settings, Payload>) {
     super(extensions)
 
     this.keyFn = config.key
@@ -240,10 +238,10 @@ type ExecuteInputField = 'payload' | 'settings'
  */
 export class Action<Settings, Payload extends JSONLikeObject> extends EventEmitter {
   readonly steps: Steps<Settings, Payload>
-  private requestExtensions: Extensions<Settings, Payload>
+  private requestExtensions: RequestExtensions<Settings, Payload>
   private autocompleteCache: { [key: string]: RequestFn<Settings, Payload> }
 
-  constructor(definition: ActionDefinition<Settings, Payload>, extendRequest?: Extension<Settings, Payload>) {
+  constructor(definition: ActionDefinition<Settings, Payload>, extendRequest?: RequestExtension<Settings, Payload>) {
     super()
 
     this.steps = new Steps()

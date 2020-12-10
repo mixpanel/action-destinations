@@ -65,9 +65,9 @@ app.post(
 
     const destinationDefinition = getDestinationBySlug(destinationSlug)
 
-    ow(action, ow.string.oneOf(Object.keys(destinationDefinition.partnerActions)))
+    ow(action, ow.string.oneOf(Object.keys(destinationDefinition.actions)))
 
-    const actionDefinition = destinationDefinition.partnerActions[action]
+    const actionDefinition = destinationDefinition.actions[action]
 
     try {
       const result = await actionDefinition.executeAutocomplete(field, {
@@ -152,9 +152,9 @@ app.post(
 
     const destinationDefinition = getDestinationBySlug(destinationSlug)
 
-    ow(action, ow.string.oneOf(Object.keys(destinationDefinition.partnerActions)))
+    ow(action, ow.string.oneOf(Object.keys(destinationDefinition.actions)))
 
-    const actionDefinition = destinationDefinition.partnerActions[action]
+    const actionDefinition = destinationDefinition.actions[action]
 
     try {
       const results = await actionDefinition.execute({

@@ -2,13 +2,14 @@ import { validate, parseFql, Subscription as SubscriptionAst } from '@segment/fa
 import { BadRequest } from 'http-errors'
 import got, { CancelableRequest, Got, Response } from 'got'
 import { JSONSchema7 } from 'json-schema'
-import { Action, ActionDefinition, Validate, Extension } from './action'
+import { Action, ActionDefinition, Validate } from './action'
 import { ExecuteInput, StepResult } from './step'
 import Context, { Subscriptions } from '../context'
 import { time, duration } from '../time'
 import { JSONArray, JSONLikeObject, JSONObject } from '../json-object'
 import { redactSettings } from '../redact'
 import { SegmentEvent } from '@/lib/segment-event'
+import type { RequestExtension } from './types'
 
 interface PartnerActions<Settings, Payload extends JSONLikeObject> {
   [key: string]: Action<Settings, Payload>
@@ -21,7 +22,7 @@ export interface DestinationDefinition<Settings = unknown> {
   schema?: JSONSchema7
   /** An optional function to extend requests sent from the destination (including all actions) */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  extendRequest?: Extension<Settings, any>
+  extendRequest?: RequestExtension<Settings>
   /** Optional authentication configuration */
   authentication?: AuthenticationScheme<Settings>
   /** Actions */
@@ -87,9 +88,9 @@ export class Destination<Settings = JSONObject> {
   readonly definition: DestinationDefinition<Settings>
   readonly name: string
   readonly authentication?: AuthenticationScheme<Settings>
-  readonly extendRequest?: Extension<Settings>
+  readonly extendRequest?: RequestExtension<Settings>
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  readonly partnerActions: PartnerActions<Settings, any>
+  readonly actions: PartnerActions<Settings, any>
   readonly responses: Response[]
   readonly settingsSchema?: JSONSchema7
 
@@ -98,7 +99,7 @@ export class Destination<Settings = JSONObject> {
     this.name = destination.name
     this.settingsSchema = destination.schema
     this.extendRequest = destination.extendRequest
-    this.partnerActions = {}
+    this.actions = {}
     this.authentication = destination.authentication
     this.responses = []
 
@@ -145,7 +146,7 @@ export class Destination<Settings = JSONObject> {
       this.responses.push(response)
     })
 
-    this.partnerActions[slug] = action
+    this.actions[slug] = action
 
     return this
   }
@@ -154,7 +155,7 @@ export class Destination<Settings = JSONObject> {
     actionSlug: string,
     { event, mapping, settings }: EventInput<Settings>
   ): Promise<StepResult[]> {
-    const action = this.partnerActions[actionSlug]
+    const action = this.actions[actionSlug]
     if (!action) {
       throw new BadRequest(`"${actionSlug}" is not a valid action`)
     }
