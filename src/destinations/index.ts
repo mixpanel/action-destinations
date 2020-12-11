@@ -14,7 +14,7 @@ export const destinations: Record<string, DestinationDefinition<any>> = {
   slack
 }
 
-const idToSlug: Record<string, string> = {
+export const idToSlug: Record<string, string> = {
   '5f7dd6d21ad74f3842b1fc47': 'amplitude',
   '5f7dd78fe27ce7ff2b8bfa37': 'customerio',
   '5f7dd8191ad74f868ab1fc48': 'pipedrive',

@@ -22,7 +22,8 @@
     "generate-action": "ts-node --files scripts/generate-action",
     "generate-types": "ts-node --files scripts/generate-types",
     "create:action": "ts-node scripts/create-action",
-    "create:destination": "ts-node scripts/create-destination"
+    "create:destination": "ts-node scripts/create-destination",
+    "sync-json-schemas": "ts-node --files scripts/sync-json-schemas"
   },
   "devDependencies": {
     "@types/express": "^4.17.8",

@@ -143,6 +143,19 @@ Here's a full example:
 ]
 ```
 
+## Syncing json schemas
+
+Everytime the json schema changes for destinations or actions, run the following commands:
+
+```sh
+$ robo sshuttle
+$ yarn run sync-json-schemas
+#  If the above commands worked without any issues, continue
+$ robo prod.ssh
+$ goto fab-5-engine && yarn install
+$ yarn run sync-json-schemas
+```
+
 ## Misc.
 
 Code in this repo is formatted using `eslint`. You can format everything by running `yarn lint`.

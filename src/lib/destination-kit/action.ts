@@ -13,6 +13,15 @@ import type { RequestExtension, RequestExtensions } from './types'
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type RequestFn<Settings, Payload> = (request: Got, data: ExecuteInput<Settings, Payload>) => any
 
+export interface ActionSchema<Payload> {
+  $schema: string
+  type: string
+  additionalProperties: boolean
+  properties: Record<keyof Payload, Record<string, unknown>>
+  defaultSubscription?: string
+  required?: string[]
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface ActionDefinition<Settings, Payload = any> {
   /** The unique identifier for the action, e.g. `postToChannel` */
@@ -33,14 +42,7 @@ export interface ActionDefinition<Settings, Payload = any> {
    * Plus, jsonschema cannot fully represent our action or field definitions
    * without many custom keywords.
    */
-  schema: {
-    $schema: string
-    type: string
-    additionalProperties: boolean
-    properties: Record<keyof Payload, Record<string, unknown>>
-    defaultSubscription?: string
-    required?: string[]
-  }
+  schema: ActionSchema<Payload>
 
   /**
    * Temporary way to "register" autocomplete fields.
