@@ -27,7 +27,11 @@ const action: ActionDefinition<Settings, Payload> = {
         description:
           'A device specific identifier, such as the Identifier for Vendor (IDFV) on iOS. Required unless user ID is present.',
         defaultMapping: {
-          '@path': '$.context.device.id'
+          '@if': {
+            exists: { '@path': '$.context.device.id' },
+            then: { '@path': '$.context.device.id' },
+            else: { '@path': '$.anonymousId' }
+          }
         }
       },
       user_properties: {
@@ -82,7 +86,7 @@ const action: ActionDefinition<Settings, Payload> = {
         type: 'string',
         description: 'Device brand the user is on.',
         defaultMapping: {
-          '@path': '$.context.device.manufacturer'
+          '@path': '$.context.device.brand'
         }
       },
       device_manufacturer: {
@@ -122,7 +126,7 @@ const action: ActionDefinition<Settings, Payload> = {
         type: 'string',
         description: 'Geographical region the user is in.',
         defaultMapping: {
-          '@path': '$.context.location.city'
+          '@path': '$.context.location.region'
         }
       },
       city: {
@@ -155,6 +159,12 @@ const action: ActionDefinition<Settings, Payload> = {
         title: 'Initial Version',
         type: 'string',
         description: 'Version of the app the user was first on.'
+      },
+      insert_id: {
+        title: 'Insert ID',
+        type: 'string',
+        description:
+          'Amplitude will deduplicate subsequent events sent with this ID we have already seen before within the past 7 days. Amplitude recommends generating a UUID or using some combination of device ID, user ID, event type, event ID, and time.'
       }
     }
   },

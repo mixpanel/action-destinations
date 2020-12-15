@@ -20,7 +20,7 @@
     "build": "yarn generate-types && tsc",
     "test": "jest",
     "generate-action": "ts-node --files scripts/generate-action",
-    "generate-types": "ts-node --files scripts/generate-types",
+    "generate-types": "ts-node --transpile-only --files scripts/generate-types",
     "create:action": "ts-node scripts/create-action",
     "create:destination": "ts-node scripts/create-destination",
     "sync-json-schemas": "ts-node --files scripts/sync-json-schemas"

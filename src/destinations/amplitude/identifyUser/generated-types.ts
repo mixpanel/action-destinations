@@ -68,6 +68,10 @@ export type IsPaying = boolean
  * Version of the app the user was first on.
  */
 export type InitialVersion = string
+/**
+ * Amplitude will deduplicate subsequent events sent with this ID we have already seen before within the past 7 days. Amplitude recommends generating a UUID or using some combination of device ID, user ID, event type, event ID, and time.
+ */
+export type InsertID = string
 
 export interface Payload {
   user_id?: UserID
@@ -89,6 +93,7 @@ export interface Payload {
   language?: Language
   paying?: IsPaying
   start_version?: InitialVersion
+  insert_id?: InsertID
 }
 /**
  * Additional data tied to the user in Amplitude. Each distinct value will show up as a user segment on the Amplitude dashboard. Object depth may not exceed 40 layers. **Note:** You can store property values in an array and date values are transformed into string values.

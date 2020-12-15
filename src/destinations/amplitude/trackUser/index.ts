@@ -282,7 +282,7 @@ const action: ActionDefinition<Settings, Payload> = {
           'The start time of the session, necessary if you want to associate events with a particular system.'
       },
       insert_id: {
-        title: 'Event ID',
+        title: 'Insert ID',
         type: 'string',
         description:
           'Amplitude will deduplicate subsequent events sent with this ID we have already seen before within the past 7 days. Amplitude recommends generating a UUID or using some combination of device ID, user ID, event type, event ID, and time.'

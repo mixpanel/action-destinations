@@ -127,7 +127,7 @@ export type SessionID = string
 /**
  * Amplitude will deduplicate subsequent events sent with this ID we have already seen before within the past 7 days. Amplitude recommends generating a UUID or using some combination of device ID, user ID, event type, event ID, and time.
  */
-export type EventID1 = string
+export type InsertID = string
 
 export interface Payload {
   user_id?: UserID
@@ -164,7 +164,7 @@ export interface Payload {
   android_id?: AndroidID
   event_id?: EventID
   session_id?: SessionID
-  insert_id?: EventID1
+  insert_id?: InsertID
 }
 /**
  * An object of key-value pairs that represent additional data to be sent along with the event. You can store property values in an array. Date values are transformed into string values. Object depth may not exceed 40 layers.
