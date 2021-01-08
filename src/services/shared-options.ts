@@ -4,7 +4,7 @@ import Context from '@/lib/context'
 export const sharedOptions = {
   userAgent: 'Segment (fab-5)',
   onCall: ({ context, serviceName, method, endpoint: path, duration, retryCount, error }: OnCallData): void => {
-    const ctx: Context = context
+    const ctx: Context | undefined = context
 
     // JSONRPC
     let endpoint = method
@@ -13,7 +13,7 @@ export const sharedOptions = {
       endpoint = `${method} ${path}`
     }
 
-    ctx.append('service_client_requests', {
+    ctx?.append?.('service_client_requests', {
       service: serviceName,
       endpoint,
       duration,

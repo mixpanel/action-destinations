@@ -1,6 +1,7 @@
 import { DestinationDefinition } from '../../lib/destination-kit'
-import trackUser from './trackUser'
 import identifyUser from './identifyUser'
+import trackUser from './trackUser'
+import orderCompleted from './orderCompleted'
 import { Settings } from './generated-types'
 
 const destination: DestinationDefinition<Settings> = {
@@ -26,7 +27,8 @@ const destination: DestinationDefinition<Settings> = {
   },
   actions: {
     trackUser,
-    identifyUser
+    identifyUser,
+    orderCompleted
   }
 }
 

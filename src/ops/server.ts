@@ -9,6 +9,7 @@ import { PORT } from '@/config'
 import asyncHandler from '@/lib/async-handler'
 import { getDestinationBySlug } from '@/destinations'
 import { controlPlaneService } from '@/services/control-plane-service'
+import Context from '@/lib/context'
 
 const app = express()
 
@@ -26,13 +27,18 @@ app.use(core)
 
 app.use(express.json())
 
-async function fetchDestinationSettings(authorization: string, destinationId: string): Promise<object> {
+async function fetchDestinationSettings(
+  context: Context,
+  authorization: string,
+  destinationId: string
+): Promise<object> {
   const { error, data } = await controlPlaneService.getDestinationById(
     { authorization },
     {
       destinationId,
       showEncryptedSettings: true
-    }
+    },
+    { context }
   )
 
   if (error) {
@@ -58,7 +64,7 @@ app.post(
     let settings = req.body.settings
 
     if (destinationId) {
-      settings = await fetchDestinationSettings(req.headers.authorization as string, destinationId)
+      settings = await fetchDestinationSettings(req.context, req.headers.authorization as string, destinationId)
     }
 
     ow(settings, ow.optional.object)
@@ -145,7 +151,7 @@ app.post(
     let settings = req.body.settings
 
     if (destinationId) {
-      settings = await fetchDestinationSettings(req.headers.authorization as string, destinationId)
+      settings = await fetchDestinationSettings(req.context, req.headers.authorization as string, destinationId)
     }
 
     ow(settings, ow.optional.object)

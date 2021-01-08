@@ -1,3 +1,4 @@
+import { Response } from 'got'
 import { defaults, mapValues } from 'lodash'
 import { Destination, DestinationDefinition } from '@/lib/destination-kit'
 import { JSONObject } from '@/lib/json-object'
@@ -31,6 +32,8 @@ interface InputData<Settings> {
 }
 
 class TestDestination<T> extends Destination<T> {
+  responses: Response[]
+
   constructor(destination: DestinationDefinition<T>) {
     super(destination)
   }
@@ -54,7 +57,10 @@ class TestDestination<T> extends Destination<T> {
       settings: settings ?? ({} as T)
     })
 
-    return this.responses
+    const responses = this.responses
+    this.responses = []
+
+    return responses
   }
 }
 

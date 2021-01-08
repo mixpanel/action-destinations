@@ -72,9 +72,7 @@ config:
     DEFAULT_SECURITY_GROUP:
       provider: 'tfe-production'
       key: 'security_groups'
-    INTEGRATIONS_CLUSTER_SECURITY_GROUP:
-      provider: 'tfe-integrations-production'
-      key: 'security_groups'
+    INTEGRATIONS_CLUSTER_SECURITY_GROUP: 'sg-0eb1bce2a5e3c0c3d'
 
   stage: &stage_config
     NODE_ENV: stage
@@ -85,9 +83,7 @@ config:
     DEFAULT_SECURITY_GROUP:
       provider: 'tfe-stage'
       key: 'security_groups'
-    INTEGRATIONS_CLUSTER_SECURITY_GROUP:
-      provider: 'tfe-integrations-stage'
-      key: 'security_groups'
+    INTEGRATIONS_CLUSTER_SECURITY_GROUP: 'sg-09d2280967931c89f'
 
   dev:
     <<: *stage_config
