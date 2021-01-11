@@ -42,7 +42,6 @@ const action: ActionDefinition<Settings, Payload> = {
   schema: {
     $schema: 'http://json-schema.org/schema#',
     type: 'object',
-    defaultSubscription: 'type = "track" and event = "Order Completed"',
     properties: {
       ...eventSchema,
       trackRevenuePerProduct: {
