@@ -6,6 +6,17 @@ import { Settings } from './generated-types'
 
 const destination: DestinationDefinition<Settings> = {
   name: 'Amplitude',
+  authentication: {
+    type: 'custom',
+    testAuthentication: (req, { settings }) => {
+      // Note: Amplitude has some apis that use basic auth (like this one)
+      // and others that use custom auth in the request body
+      return req('https://amplitude.com/api/2/usersearch?user=testUser@example.com', {
+        username: settings.apiKey,
+        password: settings.secretKey
+      })
+    }
+  },
   schema: {
     $schema: 'http://json-schema.org/schema#',
     type: 'object',

@@ -116,7 +116,7 @@ export class Destination<Settings = JSONObject> {
       await step.executeStep(context)
     }
 
-    if (!this.authentication) {
+    if (!this.authentication?.testAuthentication) {
       return
     }
 
