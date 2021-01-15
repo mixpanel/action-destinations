@@ -2,10 +2,7 @@
 
 [![Build status](https://badge.buildkite.com/ec5e2cfa66d153ebaf3477af80de2a23f17b647e11e148c63c.svg?branch=master)](https://buildkite.com/segment/fab-5-engine)
 
-Fab 5 Engine is an early prototype implementation of five destinations following the Destinations
-2.0 vision. 2.0 destinations are comprised of one or more subscriptions ("if" statements) that
-trigger partner actions along with a mapping that transforms the incoming event to a payload that matches
-the action's schema.
+Fab 5 Engine is a prototype of five destinations following the Destinations 2.0 vision. 2.0 destinations are comprised of one or more subscriptions ("if" statements) that trigger partner actions along with a mapping that transforms the incoming event to a payload that matches the action's schema.
 
 ![Destinations 2.0 flow][architecture]
 
@@ -56,8 +53,7 @@ curl --request POST \
 			"version": 2
 		},
 		"settings": {
-			"subscriptions":  [
-			{
+			"subscription": {
 				"mapping": {
 					"channel": "test-fab-5",
 					"url": "https://hooks.slack.com/services/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",
@@ -66,18 +62,8 @@ curl --request POST \
 					}
 				},
 				"partnerAction": "postToChannel",
-				"subscribe": {
-					"operator": "and",
-					"children": [
-						{
-							"operator": "=",
-							"type": "event-type",
-							"value": "track"
-						}
-					]
-				}
+				"subscribe": "type = \"track\""
 			}
-		]
 		}
 	}
 ]'
@@ -85,18 +71,12 @@ curl --request POST \
 
 ## Configuring
 
-Fab 5 destinations are configured using a single Destination Function setting (`subscriptions`) that
-should contain a JSON blob of all subscriptions for the destination. The format should look like
-this:
+Fab 5 destinations are configured using a single Destination setting (`subscriptions`) that should contain a JSON blob of all subscriptions for the destination. The format should look like this:
 
 ```js
 [
   {
-    // "type" subscriptions are the only ones supported currently
-    "subscribe": {
-      "type": "<eventType>"
-    },
-
+    "subscribe": "<fql query>",
     "partnerAction": "<actionSlug>",
 
     // See ./lib/mapping-kit/README.md for documentation. The schema for each partner action is
@@ -115,9 +95,7 @@ Here's a full example:
 ```json
 [
   {
-    "subscribe": {
-      "type": "track"
-    },
+    "subscribe": "type = 'track'",
     "partnerAction": "postToChannel",
     "mapping": {
       "text": {
@@ -128,9 +106,7 @@ Here's a full example:
     }
   },
   {
-    "subscribe": {
-      "type": "identify"
-    },
+    "subscribe": "type = 'identify'",
     "partnerAction": "postToChannel",
     "mapping": {
       "text": {
@@ -156,6 +132,8 @@ $ goto fab-5-engine && yarn install
 $ yarn run sync-json-schemas
 ```
 
-## Misc.
+## NPM Package
 
-Code in this repo is formatted using `eslint`. You can format everything by running `yarn lint`.
+This repository also is used to publish a subset of the functionality as an npm package that can be used in the `integrations` monoservice. It contains only the destination definitions and the destination-kit / mapping-kit code to run them.
+
+Publishing is done via `yarn np` and the package output is compiled using the `tsconfig.package.json`

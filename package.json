@@ -1,14 +1,18 @@
 {
-  "name": "fab-5-engine",
-  "version": "1.0.0",
-  "description": "",
+  "name": "@segment/destination-actions",
+  "version": "1.0.0-0",
+  "description": "Destination Actions engine and definitions.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/segmentio/fab-5-engine"
+  },
   "engines": {
-    "node": ">=12.18"
+    "node": ">=10"
   },
   "engineStrict": true,
-  "author": "Tyson Mote <tyson@segment.com>",
   "license": "UNLICENSED",
-  "main": "src/app.js",
+  "main": "package/src/destinations/index.js",
+  "types": "package/src/destinations/index.d.ts",
   "scripts": {
     "lint": "eslint '**/*.ts'",
     "start": "yarn build && node dist/src/app.js",
@@ -17,7 +21,10 @@
     "dev-ops-server": "NODE_ENV=developement nodemon --inspect=47082 --watch dist dist/src/ops/server.js",
     "dev-ops": "yarn build && concurrently 'yarn dev-typescript' 'yarn dev-ops-server'",
     "dev": "yarn build && concurrently 'yarn dev-typescript' 'yarn dev-server'",
-    "build": "yarn generate-types && tsc",
+    "build": "yarn generate-types && tsc --project tsconfig.prod.json",
+    "build:package": "yarn generate-types && rm -rf ./package && tsc --project tsconfig.package.json && tsc-alias --project tsconfig.package.json",
+    "prepublishOnly": "yarn build:package",
+    "release": "yarn np",
     "test": "jest",
     "generate-action": "ts-node --files scripts/generate-action",
     "generate-types": "ts-node --transpile-only --files scripts/generate-types",
@@ -59,6 +66,7 @@
     "lint-staged": "^10.5.1",
     "nock": "^13.0.4",
     "nodemon": "^2.0.4",
+    "np": "^6.0.0",
     "ora": "^5.1.0",
     "prettier": "^2.1.2",
     "prompts": "^2.4.0",
@@ -66,6 +74,7 @@
     "test-listen": "^1.1.0",
     "ts-jest": "^26.4.4",
     "ts-node": "^9.0.0",
+    "tsc-alias": "^1.2.2",
     "typescript": "^4.0.5"
   },
   "dependencies": {
@@ -93,6 +102,9 @@
     "ts-custom-error": "^3.2.0",
     "uuid": "^8.3.0",
     "whatwg-mimetype": "^2.3.0"
+  },
+  "publishConfig": {
+    "access": "restricted"
   },
   "husky": {
     "hooks": {

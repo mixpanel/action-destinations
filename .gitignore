@@ -1,7 +1,5 @@
 /node_modules/
 /dist/
+/package/
 .DS_Store
 *.log
-/sample/*
-!/sample/slack/
-!/sample/templates/

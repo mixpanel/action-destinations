@@ -1,7 +1,5 @@
-import { Subscription as SubscriptionAst } from '@segment/fab5-subscriptions'
 import { IncomingHttpHeaders, OutgoingHttpHeaders } from 'http'
-import { StepResult } from './destination-kit/step'
-import { JSONLikeObject } from './json-object'
+import { SubscriptionStats } from './destination-kit'
 import logger, { LEVEL } from './logger'
 import stats from './stats'
 
@@ -37,7 +35,7 @@ interface Fields {
   service_client_requests: ServiceClientRequest[]
 
   // Subscriptions executed during the request
-  subscriptions: Subscriptions[]
+  subscriptions: SubscriptionStats[]
 }
 
 export interface ServiceClientRequest {
@@ -46,15 +44,6 @@ export interface ServiceClientRequest {
   duration: number
   retries: number
   error?: unknown
-}
-
-export interface Subscriptions {
-  duration: number
-  destination: string
-  action: string
-  subscribe: string | SubscriptionAst
-  input: JSONLikeObject
-  output: StepResult[]
 }
 
 type SetFields = Exclude<keyof Fields, AppendFields>

@@ -1,14 +1,16 @@
 import { Request, Response } from 'express'
-import { HttpError, UnprocessableEntity } from 'http-errors'
 import { IncomingHttpHeaders } from 'http'
-import { getDestinationByIdOrSlug } from '../destinations'
+import { HttpError, UnprocessableEntity } from 'http-errors'
 import MIMEType from 'whatwg-mimetype'
-import { constructTrace, Span } from './tracing'
 import Context from '@/lib/context'
 import { JSONArray, JSONObject } from '@/lib/json-object'
+import { SubscriptionStats } from '@/lib/destination-kit'
 import { StepResult } from '@/lib/destination-kit/step'
-import getEventTesterData, { EventTesterRequest, RequestToDestination, ResponseFromDestination } from './event-tester'
+import { redactSettings } from '@/lib/redact'
 import { SegmentEvent } from '@/lib/segment-event'
+import { getDestinationByIdOrSlug } from '../destinations'
+import getEventTesterData, { EventTesterRequest, RequestToDestination, ResponseFromDestination } from './event-tester'
+import { constructTrace, Span } from './tracing'
 
 function parseJsonHeader(
   headers: IncomingHttpHeaders,
@@ -40,6 +42,22 @@ function parseContentType(req: Request): MIMEType {
   return new MIMEType('application/octet-stream')
 }
 
+function onComplete(context: Context, privateSettings: JSONArray = []) {
+  return (stats: SubscriptionStats): void => {
+    context.append('subscriptions', {
+      duration: stats.duration,
+      destination: stats.destination,
+      action: stats.action,
+      subscribe: stats.subscribe,
+      input: {
+        ...stats.input,
+        settings: redactSettings((stats.input.settings as unknown) as JSONObject, privateSettings)
+      },
+      output: stats.output
+    })
+  }
+}
+
 async function handleHttp(context: Context, req: Request): Promise<StepResult[]> {
   const idOrSlug = req.params.destinationId
   const event = req.body as SegmentEvent
@@ -49,7 +67,7 @@ async function handleHttp(context: Context, req: Request): Promise<StepResult[]>
   // Try to map the id param to a slug, or treat it as the slug (easier local testing)
   const destination = getDestinationByIdOrSlug(idOrSlug)
 
-  const results = await destination.onEvent(context, event, settings, privateSettings)
+  const results = await destination.onEvent(event, settings, onComplete(context, privateSettings))
 
   return results
 }
@@ -198,7 +216,7 @@ async function handleCloudEvent(
 
   try {
     const event = cloudEvent.data
-    const results = await destination.onEvent(context, event, cloudEvent.settings, privateSettings)
+    const results = await destination.onEvent(event, cloudEvent.settings, onComplete(context, privateSettings))
     const eventTesterData = getEventTesterData(destination.responses)
     return constructCloudSuccess(cloudEvent, results, eventTesterData, { start })
   } catch (err) {

@@ -1,15 +1,23 @@
 import { validate, parseFql, Subscription as SubscriptionAst } from '@segment/fab5-subscriptions'
 import { BadRequest } from 'http-errors'
 import got, { CancelableRequest, Got, Response } from 'got'
+import { flatten } from 'lodash'
 import { JSONSchema7 } from 'json-schema'
 import { Action, ActionDefinition, Validate } from './action'
 import { ExecuteInput, StepResult } from './step'
-import Context, { Subscriptions } from '../context'
 import { time, duration } from '../time'
-import { JSONArray, JSONLikeObject, JSONObject } from '../json-object'
-import { redactSettings } from '../redact'
+import { JSONLikeObject, JSONObject } from '../json-object'
 import { SegmentEvent } from '@/lib/segment-event'
 import type { RequestExtension } from './types'
+
+export interface SubscriptionStats {
+  duration: number
+  destination: string
+  action: string
+  subscribe: string | SubscriptionAst
+  input: JSONLikeObject
+  output: StepResult[]
+}
 
 interface PartnerActions<Settings, Payload extends JSONLikeObject> {
   [key: string]: Action<Settings, Payload>
@@ -66,17 +74,6 @@ interface ApiKeyAuthentication<Settings> extends Authentication {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AuthenticationScheme<Settings = any> = ApiKeyAuthentication<Settings>
-
-function instrumentSubscription(context: Context, input: Subscriptions): void {
-  context.append('subscriptions', {
-    duration: input.duration,
-    destination: input.destination,
-    action: input.action,
-    subscribe: input.subscribe,
-    input: input.input,
-    output: input.output
-  })
-}
 
 interface EventInput<Settings> {
   readonly event: SegmentEvent
@@ -169,11 +166,10 @@ export class Destination<Settings = JSONObject> {
   }
 
   private async onSubscription(
-    context: Context,
     subscription: Subscription,
     event: SegmentEvent,
     settings: Settings,
-    privateSettings: JSONArray
+    onComplete?: (stats: SubscriptionStats) => void
   ): Promise<StepResult[]> {
     const subscriptionAst: SubscriptionAst =
       typeof subscription.subscribe === 'string' ? parseFql(subscription.subscribe) : subscription.subscribe
@@ -197,14 +193,15 @@ export class Destination<Settings = JSONObject> {
     const subscriptionEndedAt = time()
     const subscriptionDuration = duration(subscriptionStartedAt, subscriptionEndedAt)
 
-    instrumentSubscription(context, {
+    onComplete?.({
       duration: subscriptionDuration,
       destination: this.name,
       action: actionSlug,
       subscribe: subscription.subscribe,
       input: {
+        event: (input.event as unknown) as JSONLikeObject,
         mapping: input.mapping,
-        settings: redactSettings((settings as unknown) as JSONObject, privateSettings)
+        settings: (input.settings as unknown) as JSONLikeObject
       },
       output: results
     })
@@ -217,21 +214,20 @@ export class Destination<Settings = JSONObject> {
    * to have failures abort the set of subscriptions and get potentially retried by centrifuge
    */
   public async onEvent(
-    context: Context,
     event: SegmentEvent,
     settings: JSONObject,
-    privateSettings: JSONArray = []
+    onComplete?: (stats: SubscriptionStats) => void
   ): Promise<StepResult[]> {
     const subscriptions = this.getSubscriptions(settings)
     const destinationSettings = this.getDestinationSettings(settings)
 
-    const promises = subscriptions.map((s) =>
-      this.onSubscription(context, s, event, destinationSettings, privateSettings)
+    const promises = subscriptions.map((subscription) =>
+      this.onSubscription(subscription, event, destinationSettings, onComplete)
     )
 
     const results = await Promise.all(promises)
 
-    return results.flat()
+    return flatten(results)
   }
 
   private getSubscriptions(settings: JSONObject): Subscription[] {

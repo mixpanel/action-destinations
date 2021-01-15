@@ -14,12 +14,13 @@
     "noUnusedParameters": true,
     "strictPropertyInitialization": false,
     "experimentalDecorators": true,
-    "lib": ["es2020", "dom"],
+    // Need to target Node 10 so let's only use es2018 stuff for now
+    "lib": ["es2018", "dom"],
     "baseUrl": "./",
     "paths": {
       "@/*": ["./src/*"]
     }
   },
-  "exclude": ["node_modules", "dist", "templates"],
+  "exclude": ["node_modules", "dist", "package", "templates"],
   "include": ["**/*.ts", "package.json"]
 }
