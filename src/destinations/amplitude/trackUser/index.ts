@@ -4,6 +4,11 @@ import { eventSchema } from '../event-schema'
 import { Settings } from '../generated-types'
 import { Payload } from './generated-types'
 
+interface AmplitudeEvent extends Omit<Payload, 'products' | 'time' | 'session_id'> {
+  time?: number
+  session_id?: number
+}
+
 const action: ActionDefinition<Settings, Payload> = {
   title: 'Track User',
   description: 'Sends user events to Amplitude.',
@@ -16,14 +21,14 @@ const action: ActionDefinition<Settings, Payload> = {
     required: ['event_type']
   },
   perform: (req, { payload, settings }) => {
-    const event = { ...payload }
+    const event = { ...payload } as AmplitudeEvent
 
     if (payload.time) {
-      event.time = dayjs.utc(payload.time).format('x')
+      event.time = dayjs.utc(payload.time).valueOf()
     }
 
     if (payload.session_id) {
-      event.session_id = dayjs.utc(payload.session_id).format('x')
+      event.session_id = dayjs.utc(payload.session_id).valueOf()
     }
 
     return req.post('https://api2.amplitude.com/2/httpapi', {
