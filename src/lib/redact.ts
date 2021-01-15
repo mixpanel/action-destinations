@@ -169,7 +169,7 @@ function redactString(str: string): string {
   return str.slice(0, 4) + '*'.repeat(str.length - 4)
 }
 
-export function redactSettings(settings: JSONObject, privateSettings: JSONArray): JSONObject {
+export function redactSettings(settings: JSONObject = {}, privateSettings: JSONArray = []): JSONObject {
   let result = JSON.stringify(settings)
 
   for (const privateSetting of privateSettings) {
