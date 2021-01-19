@@ -1,6 +1,6 @@
 {
   "name": "@segment/destination-actions",
-  "version": "1.0.0-1",
+  "version": "1.0.0-2",
   "description": "Destination Actions engine and definitions.",
   "repository": {
     "type": "git",
