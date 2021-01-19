@@ -2,7 +2,7 @@ import { DestinationDefinition } from '../../lib/destination-kit'
 import createList from './createList'
 import createUpdateContact from './createUpdateContact'
 import removeContactFromList from './removeContactFromList'
-import { Settings } from './generated-types'
+import type { Settings } from './generated-types'
 
 const destination: DestinationDefinition<Settings> = {
   name: 'SendGrid',

@@ -1,8 +1,8 @@
 import { get } from 'lodash'
 import listIdAutocomplete from '../autocomplete/list_id'
 import { ActionDefinition } from '@/lib/destination-kit/action'
-import { Settings } from '../generated-types'
-import { Payload } from './generated-types'
+import type { Settings } from '../generated-types'
+import type { Payload } from './generated-types'
 
 // SendGrid uses a custom "SGQL" query language for finding contacts. To protect us from basic
 // injection attacks (e.g. "email = 'x@x.com' or email like '%@%'"), we can just strip all quotes

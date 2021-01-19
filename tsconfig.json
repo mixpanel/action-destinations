@@ -6,16 +6,16 @@
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "strict": true,
-    "sourceMap": true,
+    "inlineSourceMap": true,
     "incremental": true,
     "outDir": "dist",
-    "allowJs": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "strictPropertyInitialization": false,
     "experimentalDecorators": true,
     // Need to target Node 10 so let's only use es2018 stuff for now
     "lib": ["es2018", "dom"],
+    "rootDir": "./",
     "baseUrl": "./",
     "paths": {
       "@/*": ["./src/*"]

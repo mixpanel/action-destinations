@@ -1,8 +1,8 @@
 import { get } from 'lodash'
 import dayjs from '@/lib/dayjs'
 import { ActionDefinition } from '@/lib/destination-kit/action'
-import { Settings } from '../generated-types'
-import { Payload } from './generated-types'
+import type { Settings } from '../generated-types'
+import type { Payload } from './generated-types'
 
 const action: ActionDefinition<Settings, Payload> = {
   title: 'Create or Update Organization',

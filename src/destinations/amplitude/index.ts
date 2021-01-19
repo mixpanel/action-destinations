@@ -2,7 +2,7 @@ import { DestinationDefinition } from '../../lib/destination-kit'
 import identifyUser from './identifyUser'
 import trackUser from './trackUser'
 import orderCompleted from './orderCompleted'
-import { Settings } from './generated-types'
+import type { Settings } from './generated-types'
 
 const destination: DestinationDefinition<Settings> = {
   name: 'Amplitude',

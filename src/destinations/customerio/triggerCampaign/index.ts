@@ -2,8 +2,8 @@ import { Got } from 'got'
 import { AutocompleteResponse } from '@/lib/autocomplete'
 import { ActionDefinition } from '@/lib/destination-kit/action'
 import { ExecuteInput } from '@/lib/destination-kit/step'
-import { Settings } from '../generated-types'
-import { Payload } from './generated-types'
+import type { Settings } from '../generated-types'
+import type { Payload } from './generated-types'
 
 interface Campaigns {
   campaigns: Campaign[]

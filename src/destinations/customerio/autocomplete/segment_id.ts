@@ -1,6 +1,6 @@
 import { Got } from 'got'
 import { AutocompleteResponse } from '@/lib/autocomplete'
-import { Settings } from '../generated-types'
+import type { Settings } from '../generated-types'
 
 interface ListResponse {
   segments: Segment[]

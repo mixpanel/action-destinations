@@ -1,7 +1,7 @@
 import nock from 'nock'
 import { createTestDestination } from '@/../test/create-test-destination'
 import SendGrid from '../index'
-import { Settings } from '../generated-types'
+import type { Settings } from '../generated-types'
 
 const testDestination = createTestDestination(SendGrid)
 

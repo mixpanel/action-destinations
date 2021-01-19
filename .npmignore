@@ -12,4 +12,4 @@ test
 .gitignore
 .nvmrc
 Dockerfile
-tsconfig.json
+tsconfig.*json

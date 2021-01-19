@@ -1,7 +1,7 @@
 import { DestinationDefinition } from '../../lib/destination-kit'
 import createUpdateOrganization from './createUpdateOrganization'
 import createUpdatePerson from './createUpdatePerson'
-import { Settings } from './generated-types'
+import type { Settings } from './generated-types'
 
 const destination: DestinationDefinition<Settings> = {
   name: 'Pipedrive',

@@ -6,7 +6,7 @@ import removePersonFromSegment from './removePersonFromSegment'
 import trackAnonymousEvent from './trackAnonymousEvent'
 import trackEvent from './trackEvent'
 import triggerCampaign from './triggerCampaign'
-import { Settings } from './generated-types'
+import type { Settings } from './generated-types'
 
 const destination: DestinationDefinition<Settings> = {
   name: 'Customer.io',
