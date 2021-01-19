@@ -5,6 +5,10 @@ import pipedrive from './pipedrive'
 import sendgrid from './sendgrid'
 import slack from './slack'
 
+// re-export for ease of use in npm package
+export { Destination }
+export type { DestinationDefinition }
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const destinations: Record<string, DestinationDefinition<any>> = {
   amplitude,
