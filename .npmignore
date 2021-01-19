@@ -1,11 +1,11 @@
 .buildkite
 .run
 .vscode
-scripts
-dist
-src
-templates
-test
+/scripts/
+/dist/
+/src/
+/templates/
+/test/
 .dockerignore
 .editorconfig
 .eslintrc
