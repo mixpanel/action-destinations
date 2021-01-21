@@ -4,6 +4,7 @@ import fs from 'fs'
 import childProcess from 'child_process'
 import util from 'util'
 import path from 'path'
+import prettier from 'prettier'
 
 const exec = util.promisify(childProcess.exec)
 
@@ -18,6 +19,8 @@ async function checkReferences() {
   const lines = stdout.split('\n')
   const depthTree = lines.slice(1, lines.length - 2).join('\n')
   const workspaces = JSON.parse(depthTree)
+
+  const prettierOptions = await prettier.resolveConfig(path.resolve(__dirname, '../package.json'))
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function updateConfig(workspace: any, location: string, fileName: string) {
@@ -48,7 +51,12 @@ async function checkReferences() {
           })
         }
       }
-      fs.writeFileSync(tsconfigPath, JSON.stringify(workspaceConfig, null, 2))
+
+      const formatted = prettier.format(JSON.stringify(workspaceConfig), {
+        ...prettierOptions,
+        parser: 'json'
+      })
+      fs.writeFileSync(tsconfigPath, formatted)
     }
   }
 
