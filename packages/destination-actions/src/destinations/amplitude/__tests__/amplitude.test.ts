@@ -28,6 +28,26 @@ describe('Amplitude', () => {
         ])
       })
     })
+
+    it('should accept null for user_id', async () => {
+      const event = createSegmentEvent({ timestamp, userId: null, event: 'Null User' })
+
+      nock('https://api2.amplitude.com/2').post('/httpapi').reply(200, {})
+
+      const responses = await testDestination.testAction('trackUser', { event })
+      expect(responses.length).toBe(1)
+      expect(responses[0].statusCode).toBe(200)
+      expect(responses[0].body).toBe('{}')
+      expect(responses[0].request.options.json).toMatchObject({
+        api_key: undefined,
+        events: expect.arrayContaining([
+          expect.objectContaining({
+            event_type: 'Null User',
+            user_id: null
+          })
+        ])
+      })
+    })
   })
 
   describe('orderCompleted', () => {

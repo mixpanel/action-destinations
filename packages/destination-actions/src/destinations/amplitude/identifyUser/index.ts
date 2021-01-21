@@ -14,7 +14,7 @@ const action: ActionDefinition<Settings, Payload> = {
     properties: {
       user_id: {
         title: 'User ID',
-        type: 'string',
+        type: ['string', 'null'],
         description:
           'A UUID (unique user ID) specified by you. **Note:** If you send a request with a user ID that is not in the Amplitude system yet, then the user tied to that ID will not be marked new until their first event. Required unless device ID is present.',
         defaultMapping: {

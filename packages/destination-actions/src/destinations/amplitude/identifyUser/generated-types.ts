@@ -3,7 +3,15 @@
 /**
  * A UUID (unique user ID) specified by you. **Note:** If you send a request with a user ID that is not in the Amplitude system yet, then the user tied to that ID will not be marked new until their first event. Required unless device ID is present.
  */
+export type UserID2 = UserID | UserID1
+/**
+ * A UUID (unique user ID) specified by you. **Note:** If you send a request with a user ID that is not in the Amplitude system yet, then the user tied to that ID will not be marked new until their first event. Required unless device ID is present.
+ */
 export type UserID = string
+/**
+ * A UUID (unique user ID) specified by you. **Note:** If you send a request with a user ID that is not in the Amplitude system yet, then the user tied to that ID will not be marked new until their first event. Required unless device ID is present.
+ */
+export type UserID1 = null
 /**
  * A device specific identifier, such as the Identifier for Vendor (IDFV) on iOS. Required unless user ID is present.
  */
@@ -74,7 +82,7 @@ export type InitialVersion = string
 export type InsertID = string
 
 export interface Payload {
-  user_id?: UserID
+  user_id?: UserID2
   device_id?: DeviceID
   user_properties?: UserProperties
   groups?: Groups

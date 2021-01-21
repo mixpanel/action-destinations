@@ -3,7 +3,15 @@
 /**
  * A readable ID specified by you. Must have a minimum length of 5 characters. Required unless device ID is present.
  */
+export type UserID2 = UserID | UserID1
+/**
+ * A readable ID specified by you. Must have a minimum length of 5 characters. Required unless device ID is present.
+ */
 export type UserID = string
+/**
+ * A readable ID specified by you. Must have a minimum length of 5 characters. Required unless device ID is present.
+ */
+export type UserID1 = null
 /**
  * A device-specific identifier, such as the Identifier for Vendor on iOS. Required unless user ID is present. If a device ID is not sent with the event, it will be set to a hashed version of the user ID.
  */
@@ -165,7 +173,7 @@ export type Products = {
 }[]
 
 export interface Payload {
-  user_id?: UserID
+  user_id?: UserID2
   device_id?: DeviceID
   event_type: EventType
   time?: Timestamp

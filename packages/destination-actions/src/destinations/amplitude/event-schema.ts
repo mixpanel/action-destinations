@@ -5,7 +5,7 @@
 export const eventSchema = {
   user_id: {
     title: 'User ID',
-    type: 'string',
+    type: ['string', 'null'],
     description:
       'A readable ID specified by you. Must have a minimum length of 5 characters. Required unless device ID is present.',
     defaultMapping: {
