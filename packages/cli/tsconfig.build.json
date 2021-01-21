@@ -1,0 +1,20 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "outDir": "dist",
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@segment/destination-actions": ["../destination-actions/src"]
+    },
+    "composite": true
+  },
+  "exclude": ["tests", "**/__tests__/**/*.ts"],
+  "include": ["src"],
+  "references": [
+    {
+      "path": "../destination-actions/tsconfig.build.json"
+    }
+  ]
+}

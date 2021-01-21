@@ -1,0 +1,19 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@segment/destination-actions": ["../destination-actions/src"]
+    },
+    "composite": true
+  },
+  "exclude": ["**/__tests__/*.ts", "test", "**/__mocks__/*.ts"],
+  "include": ["src", "./package.json"],
+  "references": [
+    {
+      "path": "../destination-actions/tsconfig.build.json"
+    }
+  ]
+}

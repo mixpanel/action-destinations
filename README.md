@@ -2,7 +2,7 @@
 
 [![Build status](https://badge.buildkite.com/ec5e2cfa66d153ebaf3477af80de2a23f17b647e11e148c63c.svg?branch=master)](https://buildkite.com/segment/fab-5-engine)
 
-Fab 5 Engine is a prototype of five destinations following the Destinations 2.0 vision. 2.0 destinations are comprised of one or more subscriptions ("if" statements) that trigger partner actions along with a mapping that transforms the incoming event to a payload that matches the action's schema.
+Fab 5 Engine is a prototype of destinations following the Destinations 2.0 vision. 2.0 destinations are comprised of one or more subscriptions ("if" statements) that trigger partner actions along with a mapping that transforms the incoming event to a payload that matches the action's schema.
 
 ![Destinations 2.0 flow][architecture]
 
@@ -11,12 +11,40 @@ See also: [Beginner's Guide][beginner]
 [architecture]: https://user-images.githubusercontent.com/111501/83700205-10f23e80-a5bb-11ea-9fbe-b1b10c1ed464.png
 [beginner]: https://paper.dropbox.com/doc/Fab-5-Engine-Beginners-Guide--A2~KoOcu4qM1rlyX_ZfpyCFTAg-BMfDUPaKMvghmXEtaZpq2
 
+## Local Development
+
+This project is a monorepo with multiple packages using Yarn Workspaces:
+
+- `packages/cli` - a set of command line tools for interacting with the repo
+- `packages/destinations-actions` - an npm package for use in `integrations`
+- `packages/server` - a data plane ECS service (the main `app.js`) and control plane ECS service (`ops/server.js`)
+
 ```
-$ robo prod.ssh
-$ git clone git@github.com:segmentio/fab-5-engine.git
-$ cd fab-5-engine
+$ goto fab-5-engine
 $ yarn install
 ```
+
+To install deps in a particular workspace (i.e. `packages/*`) you will need to use one of our shorthand commands defined in the root package.json's `scripts` section:
+
+- `yarn engine <add/remove> <package>`
+- `yarn server <add/remove> <package>`
+- `yarn cli <add/remove> <package>`
+
+Or you can use the native Yarn longhand command:
+
+- `yarn workspace @segment/destination-actions <add/remove> <package>`
+- `yarn workspace @segment/destination-actions-server <add/remove> <package>`
+- `yarn workspace @segment/destination-actions-cli <add/remove> <package>`
+
+To install deps across all workspaces, i.e. in the root package.json:
+
+- `yarn <add/remove> -W <package>`
+
+## NPM Package
+
+This repository also is used to publish a subset of the functionality as an npm package that can be used in the `integrations` monoservice. It contains only the destination definitions and the destination-kit / mapping-kit code to run them.
+
+Publishing is done via `yarn np` and the package output is compiled using the `tsconfig.package.json`
 
 ## Test Actions Locally
 
@@ -71,7 +99,7 @@ curl --request POST \
 
 ## Configuring
 
-Fab 5 destinations are configured using a single Destination setting (`subscriptions`) that should contain a JSON blob of all subscriptions for the destination. The format should look like this:
+Action destinations are configured using a single Destination setting (`subscriptions`) that should contain a JSON blob of all subscriptions for the destination. The format should look like this:
 
 ```js
 [
@@ -125,15 +153,9 @@ Everytime the json schema changes for destinations or actions, run the following
 
 ```sh
 $ robo sshuttle
-$ yarn run sync-json-schemas
+$ yarn sync-json-schemas
 #  If the above commands worked without any issues, continue
 $ robo prod.ssh
 $ goto fab-5-engine && yarn install
-$ yarn run sync-json-schemas
+$ yarn sync-json-schemas
 ```
-
-## NPM Package
-
-This repository also is used to publish a subset of the functionality as an npm package that can be used in the `integrations` monoservice. It contains only the destination definitions and the destination-kit / mapping-kit code to run them.
-
-Publishing is done via `yarn np` and the package output is compiled using the `tsconfig.package.json`

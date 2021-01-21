@@ -1,0 +1,46 @@
+{
+  "name": "@segment/destination-actions-cli",
+  "description": "Destination Actions command line tools.",
+  "version": "1.0.0-3",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/segmentio/fab-5-engine",
+    "directory": "packages/cli"
+  },
+  "engines": {
+    "node": ">=12"
+  },
+  "engineStrict": true,
+  "private": true,
+  "scripts": {
+    "build": "yarn clean && yarn tsc -b tsconfig.build.json",
+    "build:watch": "echo 'nothing to see here.'",
+    "clean": "tsc -b tsconfig.build.json --clean",
+    "postclean": "rm -rf dist",
+    "create:destination": "ts-node src/create-destination",
+    "create:action": "ts-node src/create-action",
+    "generate-types": "ts-node --transpile-only --files src/generate-types",
+    "generate-action": "ts-node --files src/generate-action",
+    "sync-json-schemas": "ts-node --files src/sync-json-schemas",
+    "test": "echo 'nothing to see here.'",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@segment/control-plane-service-client": "ssh://git@github.com:segmentio/control-plane-service-js-client#master",
+    "@segment/destination-actions": "^1.0.0-0",
+    "@types/json-schema": "^7.0.7",
+    "@types/lodash": "^4.14.168",
+    "@types/mustache": "^4.1.0",
+    "@types/node": "^12.12.11",
+    "@types/prompts": "^2.0.9",
+    "chalk": "^4.1.0",
+    "clipboardy": "^2.3.0",
+    "execa": "^4.1.0",
+    "json-schema-to-typescript": "^9.1.1",
+    "lodash": "^4.17.20",
+    "mustache": "^4.1.0",
+    "ora": "^5.3.0",
+    "prompts": "^2.4.0",
+    "slugify": "^1.4.6"
+  }
+}
