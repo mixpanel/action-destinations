@@ -30,7 +30,7 @@ const controlPlaneService = new ControlPlaneService({
  *
  *    $ robo stage.ssh // or prod.ssh
  *    $ goto fab-5-engine
- *    $ yarn run sync-json-schema
+ *    $ yarn run sync-json-schemas
  */
 
 async function run() {

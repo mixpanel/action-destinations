@@ -21,7 +21,7 @@
     "create:action": "ts-node src/create-action",
     "generate-types": "ts-node --transpile-only --files src/generate-types",
     "generate-action": "ts-node --files src/generate-action",
-    "sync-json-schemas": "ts-node --files src/sync-json-schemas",
+    "sync-json-schemas": "yarn build && ts-node --files src/sync-json-schemas",
     "test": "echo 'nothing to see here.'",
     "typecheck": "tsc --noEmit"
   },

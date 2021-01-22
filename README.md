@@ -153,9 +153,9 @@ Everytime the json schema changes for destinations or actions, run the following
 
 ```sh
 $ robo sshuttle
-$ yarn sync-json-schemas
+$ yarn cli sync-json-schemas
 #  If the above commands worked without any issues, continue
 $ robo prod.ssh
 $ goto fab-5-engine && yarn install
-$ yarn sync-json-schemas
+$ yarn cli sync-json-schemas
 ```
