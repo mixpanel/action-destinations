@@ -596,22 +596,6 @@
     "@types/node-statsd" "^0.1.2"
     node-statsd "^0.1.1"
 
-"@segment/fab5-subscriptions@^1.0.0":
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/@segment/fab5-subscriptions/-/fab5-subscriptions-1.0.2.tgz#fdf68ba3e124d229cfc6551a621130b854f10d94"
-  integrity sha512-h9ARsF9Cse+nOg98BTTHWflIxqTs/XLc3dTKarOAEoxywR1ZzGUkWB9t7CMHdLkH/kWRUuhK1Q+4mCuuktRdIg==
-  dependencies:
-    "@segment/fql" "^1.9.1"
-    lodash "^4.17.20"
-
-"@segment/fql@^1.9.1":
-  version "1.9.1"
-  resolved "https://registry.yarnpkg.com/@segment/fql/-/fql-1.9.1.tgz#13bad562f37a63e3096284b90f92cc47cb14e35e"
-  integrity sha512-ynUIayzBbCrbEASY51iymFwC2xbBEH1Q0VQYztKcYrOwlJmPI77I7ZkCm2+tBD0quuSWXeQfBYvMHmLF9puL+g==
-  dependencies:
-    "@types/lodash" "^4.14.121"
-    lodash "^4.17.11"
-
 "@segment/remote-service-client@^2.4.0":
   version "2.4.0"
   resolved "https://registry.yarnpkg.com/@segment/remote-service-client/-/remote-service-client-2.4.0.tgz#78fd4028f92c94ecbb65a65506a51a58d5c31829"
@@ -917,11 +901,6 @@
   integrity sha512-MPtoySlAZQ37VoLaPcTHCu1RWJ4llDkULYZIzOYxlhxBqYPB0RsRlmMU0R6tahtFe27mIdkHV+551ZWV4PLmVw==
   dependencies:
     "@types/node" "*"
-
-"@types/lodash@^4.14.121":
-  version "4.14.165"
-  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.165.tgz#74d55d947452e2de0742bad65270433b63a8c30f"
-  integrity sha512-tjSSOTHhI5mCHTy/OOXYIhi2Wt1qcbHmuXD1Ha7q70CgI/I71afO4XtLb/cVexki1oVYchpul/TOuu3Arcdxrg==
 
 "@types/lodash@^4.14.168":
   version "4.14.168"
@@ -4493,7 +4472,7 @@ lodash.sortby@^4.7.0:
   resolved "https://registry.yarnpkg.com/lodash.sortby/-/lodash.sortby-4.7.0.tgz#edd14c824e2cc9c1e0b0a1b42bb5210516a42438"
   integrity sha1-7dFMgk4sycHgsKG0K7UhBRakJDg=
 
-lodash@^4.17.11, lodash@^4.17.15, lodash@^4.17.19, lodash@^4.17.20:
+lodash@^4.17.15, lodash@^4.17.19, lodash@^4.17.20:
   version "4.17.20"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.20.tgz#b44a9b6297bcb698f1c51a3545a2b3b368d59c52"
   integrity sha512-PlhdFcillOINfeV7Ni6oF1TAEayyZBoZ8bcshTHqOYJYlrqzRK5hagpagky5o4HfCzzd1TRkXPMFq6cKk9rGmA==

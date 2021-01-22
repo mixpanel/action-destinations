@@ -1,7 +1,5 @@
-import { validate, parseFql, Subscription as SubscriptionAst } from '@segment/fab5-subscriptions'
 import { BadRequest } from 'http-errors'
 import got, { CancelableRequest, Got, Response } from 'got'
-import { flatten } from 'lodash'
 import { JSONSchema7 } from 'json-schema'
 import { Action, ActionSchema, ActionDefinition, Validate } from './action'
 import { ExecuteInput, StepResult } from './step'
@@ -16,7 +14,7 @@ export interface SubscriptionStats {
   duration: number
   destination: string
   action: string
-  subscribe: string | SubscriptionAst
+  subscribe: string
   input: JSONLikeObject
   output: StepResult[]
 }
@@ -43,8 +41,21 @@ export interface DestinationDefinition<Settings = unknown> {
 
 interface Subscription {
   partnerAction: string
-  subscribe: string | SubscriptionAst
+  subscribe: string
   mapping?: JSONObject
+}
+
+function isSubscription(subscription: unknown): subscription is Subscription {
+  return (
+    typeof subscription === 'object' &&
+    subscription !== null &&
+    'partnerAction' in subscription &&
+    'subscribe' in subscription
+  )
+}
+
+type DestinationSettings = JSONObject & {
+  subscription: Subscription
 }
 
 interface TestAuthSettings<Settings> {
@@ -173,14 +184,6 @@ export class Destination<Settings = JSONObject> {
     settings: Settings,
     onComplete?: (stats: SubscriptionStats) => void
   ): Promise<StepResult[]> {
-    const subscriptionAst: SubscriptionAst =
-      typeof subscription.subscribe === 'string' ? parseFql(subscription.subscribe) : subscription.subscribe
-
-    const isSubscribed = validate(subscriptionAst, event)
-    if (!isSubscribed) {
-      return [{ output: 'not subscribed' }]
-    }
-
     const actionSlug = subscription.partnerAction
     const subscriptionStartedAt = time()
 
@@ -211,47 +214,23 @@ export class Destination<Settings = JSONObject> {
     return results
   }
 
-  /**
-   * Note: Until we move subscriptions upstream (into int-consumer) we've opted
-   * to have failures abort the set of subscriptions and get potentially retried by centrifuge
-   */
   public async onEvent(
     event: SegmentEvent,
     settings: JSONObject,
     onComplete?: (stats: SubscriptionStats) => void
   ): Promise<StepResult[]> {
-    const subscriptions = this.getSubscriptions(settings)
-    const destinationSettings = this.getDestinationSettings(settings)
+    const { subscription, ...destinationSettings } = settings as DestinationSettings
 
-    const promises = subscriptions.map((subscription) =>
-      this.onSubscription(subscription, event, destinationSettings, onComplete)
-    )
-
-    const results = await Promise.all(promises)
-
-    return flatten(results)
-  }
-
-  private getSubscriptions(settings: JSONObject): Subscription[] {
-    const { subscription, subscriptions } = settings
-    let parsedSubscriptions
-
-    // TODO remove all `else`s once https://github.com/segmentio/refinery/pull/635 lands
-    if (subscription) {
-      parsedSubscriptions = [subscription]
-    } else if (typeof subscriptions === 'string') {
-      parsedSubscriptions = JSON.parse(subscriptions)
-    } else if (Array.isArray(subscriptions)) {
-      parsedSubscriptions = subscriptions
-    } else {
-      parsedSubscriptions = []
+    // Reject messages without a singular subscription
+    if (!isSubscription(subscription)) {
+      return [{ output: 'not subscribed' }]
     }
 
-    return parsedSubscriptions as Subscription[]
-  }
-
-  private getDestinationSettings(settings: JSONObject): Settings {
-    const { subcription, subscriptions, ...otherSettings } = settings
-    return (otherSettings as unknown) as Settings
+    return this.onSubscription(
+      subscription,
+      event,
+      (destinationSettings as unknown) as Settings,
+      onComplete
+    )
   }
 }
