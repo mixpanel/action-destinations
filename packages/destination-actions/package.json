@@ -41,6 +41,7 @@
   },
   "dependencies": {
     "@segment/ajv-human-errors": "^1.1.0",
+    "@segment/fab5-subscriptions": "^1.0.0",
     "aggregate-error": "^3.1.0",
     "ajv": "^6.12.4",
     "dayjs": "^1.10.3",
