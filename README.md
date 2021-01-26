@@ -55,45 +55,45 @@ curl --request POST \
   --url http://localhost:3000/actions/5f7dd8e302173ff732db5cc4 \
   --header 'content-type: application/cloudevents-batch+json' \
   --data '[
-	{
-		"id": "dkjfksldfjiuhfenjk",
-		"source": "some-source",
-		"destination": "slack",
-		"data": {
-			"channel": "server",
-			"context": {
-				"library": {
-					"name": "unknown",
-					"version": "unknown"
-				}
-			},
-			"event": "Example Event",
-			"integrations": {},
-			"messageId": "api-1iI59hvBEtckNicjbfqG7VdjRw2",
-			"projectId": "29qHxXL9muph5R19vwAnDP",
-			"properties": {
-				"text": "Hello, from dev :blobcatwave:!"
-			},
-			"receivedAt": "2020-10-01T19:55:15.068Z",
-			"timestamp": "2020-10-01T19:55:15.068Z",
-			"type": "track",
-			"userId": "sloth@segment.com",
-			"version": 2
-		},
-		"settings": {
-			"subscription": {
-				"mapping": {
-					"channel": "test-fab-5",
-					"url": "https://hooks.slack.com/services/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",
-					"text": {
-						"@template": "Event = {{event}}, properties.text = {{properties.text}}"
-					}
-				},
-				"partnerAction": "postToChannel",
-				"subscribe": "type = \"track\""
-			}
-		}
-	}
+  {
+    "id": "dkjfksldfjiuhfenjk",
+    "source": "some-source",
+    "destination": "slack",
+    "data": {
+      "channel": "server",
+      "context": {
+        "library": {
+          "name": "unknown",
+          "version": "unknown"
+        }
+      },
+      "event": "Example Event",
+      "integrations": {},
+      "messageId": "api-1iI59hvBEtckNicjbfqG7VdjRw2",
+      "projectId": "29qHxXL9muph5R19vwAnDP",
+      "properties": {
+        "text": "Hello, from dev :blobcatwave:!"
+      },
+      "receivedAt": "2020-10-01T19:55:15.068Z",
+      "timestamp": "2020-10-01T19:55:15.068Z",
+      "type": "track",
+      "userId": "sloth@segment.com",
+      "version": 2
+    },
+    "settings": {
+      "subscription": {
+        "mapping": {
+          "channel": "test-fab-5",
+          "url": "https://hooks.slack.com/services/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",
+          "text": {
+            "@template": "Event = {{event}}, properties.text = {{properties.text}}"
+          }
+        },
+        "partnerAction": "postToChannel",
+        "subscribe": "type = \"track\""
+      }
+    }
+  }
 ]'
 ```
 
