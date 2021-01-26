@@ -15,7 +15,7 @@
     "dev:ops": "yarn build && concurrently 'yarn build:watch' 'yarn server dev:ops'",
     "engine": "yarn workspace @segment/destination-actions",
     "generate-types": "yarn cli generate-types",
-    "lint": "eslint '**/*.ts'",
+    "lint": "eslint '**/*.ts' --max-warnings=1",
     "prepare": "ts-node --project ./tsconfig.base.json ./scripts/configure-references.ts",
     "prepublishOnly": "yarn build",
     "server": "yarn workspace @segment/destination-actions-server",

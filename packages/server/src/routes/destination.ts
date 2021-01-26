@@ -4,12 +4,18 @@ import { HttpError, UnprocessableEntity } from 'http-errors'
 import MIMEType from 'whatwg-mimetype'
 import Context from '@/lib/context'
 import { redactSettings } from '@/lib/redact'
-import { SegmentEvent, getDestinationByIdOrSlug, SubscriptionStats, JSONArray, JSONObject } from '@segment/destination-actions'
+import {
+  SegmentEvent,
+  getDestinationByIdOrSlug,
+  SubscriptionStats,
+  JSONArray,
+  JSONObject
+} from '@segment/destination-actions'
 import getEventTesterData, { EventTesterRequest, RequestToDestination, ResponseFromDestination } from './event-tester'
 import { constructTrace, Span } from './tracing'
 
 function parseJsonHeader(
-headers: IncomingHttpHeaders,
+  headers: IncomingHttpHeaders,
   header: string,
   fallback = undefined
 ): JSONObject | JSONArray | undefined {
@@ -54,7 +60,7 @@ function onComplete(context: Context, privateSettings: JSONArray = []) {
   }
 }
 
-async function handleHttp(context: Context, req: Request): Promise<any> {
+async function handleHttp(context: Context, req: Request): Promise<unknown> {
   const idOrSlug = req.params.destinationId
   const event = req.body as SegmentEvent
   const settings = parseJsonHeader(req.headers, 'centrifuge-settings') as JSONObject
@@ -64,7 +70,6 @@ async function handleHttp(context: Context, req: Request): Promise<any> {
   const destination = getDestinationByIdOrSlug(idOrSlug)
 
   const results = await destination.onEvent(event, settings, onComplete(context, privateSettings))
-
   return results
 }
 
@@ -105,7 +110,7 @@ interface CloudEventResponse {
 }
 
 interface CloudEventSuccessData {
-  results: any
+  results: unknown
   debugRequests: EventTesterRequest[]
   requestsToDestination: RequestToDestination[]
   responseFromDestination: ResponseFromDestination[]
@@ -126,7 +131,7 @@ interface RequestTracing {
 
 function constructCloudSuccess(
   cloudEvent: CloudEvent,
-  result: any,
+  result: unknown[],
   eventTesterRequests: EventTesterRequest[],
   tracing: RequestTracing
 ): CloudEventResponse {

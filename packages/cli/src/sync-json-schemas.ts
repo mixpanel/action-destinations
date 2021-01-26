@@ -195,7 +195,7 @@ interface Action {
 }
 
 function getJsonSchemas(
-  destinations: Record<string, DestinationDefinition<any>>,
+  destinations: Record<string, DestinationDefinition<unknown>>,
   destinationIds: string[],
   slugToId: Dictionary<string>
 ): SchemasByDestination {
