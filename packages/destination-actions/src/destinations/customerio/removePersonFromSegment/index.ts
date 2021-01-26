@@ -21,7 +21,7 @@ const action: ActionDefinition<Settings, Payload> = {
         title: 'Person ID',
         description: 'ID of the person to remove.',
         type: 'string',
-        defaultMapping: {
+        default: {
           '@template': '{{userId}}'
         }
       }

@@ -23,7 +23,7 @@ const action: ActionDefinition<Settings, Payload> = {
         type: 'string',
         description: 'The primary email for the contact.',
         maxLength: 254,
-        defaultMapping: {
+        default: {
           '@template': '{{properties.email}}'
         }
       },
@@ -53,7 +53,7 @@ const action: ActionDefinition<Settings, Payload> = {
         type: 'string',
         description: 'The city of the contact.',
         maxLength: 60,
-        defaultMapping: {
+        default: {
           '@template': '{{context.location.city}}'
         }
       },
@@ -62,7 +62,7 @@ const action: ActionDefinition<Settings, Payload> = {
         type: 'string',
         description: 'The country of the contacts address. Accepts full name or abbreviation.',
         maxLength: 50,
-        defaultMapping: {
+        default: {
           '@template': '{{context.location.country}}'
         }
       },

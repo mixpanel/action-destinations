@@ -16,7 +16,7 @@ const action: ActionDefinition<Settings, Payload> = {
         title: 'Person ID',
         description: 'ID used to uniquely identify person in Customer.io.',
         type: 'string',
-        defaultMapping: {
+        default: {
           '@template': '{{userId}}'
         }
       },
@@ -24,7 +24,7 @@ const action: ActionDefinition<Settings, Payload> = {
         title: 'Email Address',
         description: "Person's email address.",
         type: 'string',
-        defaultMapping: {
+        default: {
           '@template': '{{traits.userId}}'
         }
       },
@@ -32,7 +32,7 @@ const action: ActionDefinition<Settings, Payload> = {
         title: 'Created At',
         description: 'Timestamp for when the person was created. Default is current date and time.',
         type: 'string',
-        defaultMapping: {
+        default: {
           '@template': '{{timestamp}}'
         }
       },
@@ -41,7 +41,7 @@ const action: ActionDefinition<Settings, Payload> = {
         description:
           'Optional custom attributes for this person. When updating a person, attributes are added and not removed.',
         type: 'object',
-        defaultMapping: {
+        default: {
           '@path': '$.traits'
         }
       }

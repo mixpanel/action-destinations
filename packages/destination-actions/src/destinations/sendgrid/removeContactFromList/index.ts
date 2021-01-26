@@ -29,7 +29,7 @@ const action: ActionDefinition<Settings, Payload> = {
         title: 'Email Address',
         description: 'Email address of the user to be removed from the list.',
         type: 'string',
-        defaultMapping: {
+        default: {
           '@template': '{{properties.email}}'
         }
       }

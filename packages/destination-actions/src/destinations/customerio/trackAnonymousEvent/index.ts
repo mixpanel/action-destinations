@@ -14,7 +14,7 @@ const action: ActionDefinition<Settings, Payload> = {
       name: {
         title: 'Event Name',
         type: 'string',
-        defaultMapping: {
+        default: {
           '@template': '{{event}}'
         }
       },
@@ -23,7 +23,7 @@ const action: ActionDefinition<Settings, Payload> = {
         description:
           'Custom data to include with the event. If "recipient", "from_address", or "reply_to" are sent, they will override settings on any campaigns triggered by this event. "recipient" is required if the event is used to trigger a campaign.',
         type: 'object',
-        defaultMapping: {
+        default: {
           '@path': '$.properties'
         }
       }

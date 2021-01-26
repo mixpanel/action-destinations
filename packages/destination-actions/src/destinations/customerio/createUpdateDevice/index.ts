@@ -16,7 +16,7 @@ const action: ActionDefinition<Settings, Payload> = {
         title: 'Person ID',
         description: 'ID of the person that this device belongs to.',
         type: 'string',
-        defaultMapping: {
+        default: {
           '@template': '{{userId}}'
         }
       },
@@ -24,7 +24,7 @@ const action: ActionDefinition<Settings, Payload> = {
         title: 'Device ID',
         description: 'Unique ID for this device.',
         type: 'string',
-        defaultMapping: {
+        default: {
           '@template': '{{context.device.id}}'
         }
       },
@@ -33,7 +33,7 @@ const action: ActionDefinition<Settings, Payload> = {
         description: 'The device platform.',
         type: 'string',
         enum: ['ios', 'android'],
-        defaultMapping: {
+        default: {
           '@template': '{{context.device.type}}'
         }
       },
@@ -41,7 +41,7 @@ const action: ActionDefinition<Settings, Payload> = {
         title: 'Last Used',
         description: 'Timestamp for when the device was last used. Default is current date and time.',
         type: 'string',
-        defaultMapping: {
+        default: {
           '@template': '{{timestamp}}'
         }
       }

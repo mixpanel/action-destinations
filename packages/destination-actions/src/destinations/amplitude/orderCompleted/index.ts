@@ -50,7 +50,7 @@ const action: ActionDefinition<Settings, Payload> = {
         description:
           'When enabled, track revenue with each product within the event. When disabled, track total revenue once for the event.',
         type: 'boolean',
-        defaultMapping: false
+        default: false
       },
       products: {
         title: 'Products',
@@ -90,7 +90,7 @@ const action: ActionDefinition<Settings, Payload> = {
             }
           }
         },
-        defaultMapping: {
+        default: {
           '@path': '$.properties.products'
         }
       }

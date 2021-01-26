@@ -15,14 +15,14 @@ const action: ActionDefinition<Settings, Payload> = {
         title: 'Person ID',
         description: 'ID of the person who triggered this event.',
         type: 'string',
-        defaultMapping: {
+        default: {
           '@template': '{{userId}}'
         }
       },
       name: {
         title: 'Event Name',
         type: 'string',
-        defaultMapping: {
+        default: {
           '@template': '{{event}}'
         }
       },
@@ -30,7 +30,7 @@ const action: ActionDefinition<Settings, Payload> = {
         title: 'Event Type',
         description: 'Override event type. Ex. "page".',
         type: 'string',
-        defaultMapping: {
+        default: {
           '@template': '{{type}}'
         }
       },
@@ -38,7 +38,7 @@ const action: ActionDefinition<Settings, Payload> = {
         title: 'Data',
         description: 'Custom data to include with the event.',
         type: 'object',
-        defaultMapping: {
+        default: {
           '@path': '$.properties'
         }
       }

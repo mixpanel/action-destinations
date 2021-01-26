@@ -53,7 +53,7 @@ const action: ActionDefinition<Settings, Payload> = {
         title: 'Data',
         description: 'Custom Liquid merge data to include with the trigger.',
         type: 'object',
-        defaultMapping: {
+        default: {
           '@path': '$.properties'
         }
       },

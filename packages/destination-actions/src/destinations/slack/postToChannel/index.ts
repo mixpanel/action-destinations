@@ -31,13 +31,13 @@ const action: ActionDefinition<Settings, Payload> = {
         title: 'User',
         description: 'User name to post messages as.',
         type: 'string',
-        defaultMapping: 'Segment'
+        default: 'Segment'
       },
       icon_url: {
         title: 'Icon URL',
         description: 'URL for user icon image.',
         type: 'string',
-        defaultMapping: 'https://logo.clearbit.com/segment.com'
+        default: 'https://logo.clearbit.com/segment.com'
       }
     },
     required: ['url', 'text']

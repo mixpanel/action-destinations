@@ -17,7 +17,7 @@ const action: ActionDefinition<Settings, Payload> = {
         type: ['string', 'null'],
         description:
           'A UUID (unique user ID) specified by you. **Note:** If you send a request with a user ID that is not in the Amplitude system yet, then the user tied to that ID will not be marked new until their first event. Required unless device ID is present.',
-        defaultMapping: {
+        default: {
           '@path': '$.userId'
         }
       },
@@ -26,7 +26,7 @@ const action: ActionDefinition<Settings, Payload> = {
         type: 'string',
         description:
           'A device specific identifier, such as the Identifier for Vendor (IDFV) on iOS. Required unless user ID is present.',
-        defaultMapping: {
+        default: {
           '@if': {
             exists: { '@path': '$.context.device.id' },
             then: { '@path': '$.context.device.id' },
@@ -39,7 +39,7 @@ const action: ActionDefinition<Settings, Payload> = {
         type: 'object',
         description:
           'Additional data tied to the user in Amplitude. Each distinct value will show up as a user segment on the Amplitude dashboard. Object depth may not exceed 40 layers. **Note:** You can store property values in an array and date values are transformed into string values.',
-        defaultMapping: {
+        default: {
           '@path': '$.traits'
         }
       },
@@ -53,7 +53,7 @@ const action: ActionDefinition<Settings, Payload> = {
         title: 'App Version',
         type: 'string',
         description: 'Version of the app the user is on.',
-        defaultMapping: {
+        default: {
           '@path': '$.context.app.version'
         }
       },
@@ -61,7 +61,7 @@ const action: ActionDefinition<Settings, Payload> = {
         title: 'Platform',
         type: 'string',
         description: 'What platform is sending the data.',
-        defaultMapping: {
+        default: {
           '@path': '$.context.device.type'
         }
       },
@@ -69,7 +69,7 @@ const action: ActionDefinition<Settings, Payload> = {
         title: 'OS Name',
         type: 'string',
         description: 'Mobile operating system or browser the user is on.',
-        defaultMapping: {
+        default: {
           '@path': '$.context.os.name'
         }
       },
@@ -77,7 +77,7 @@ const action: ActionDefinition<Settings, Payload> = {
         title: 'OS Version',
         type: 'string',
         description: 'Version of the mobile operating system or browser the user is on.',
-        defaultMapping: {
+        default: {
           '@path': '$.context.os.version'
         }
       },
@@ -85,7 +85,7 @@ const action: ActionDefinition<Settings, Payload> = {
         title: 'Device Brand',
         type: 'string',
         description: 'Device brand the user is on.',
-        defaultMapping: {
+        default: {
           '@path': '$.context.device.brand'
         }
       },
@@ -93,7 +93,7 @@ const action: ActionDefinition<Settings, Payload> = {
         title: 'Device Manufacturer',
         type: 'string',
         description: 'Device manufacturer the user is on.',
-        defaultMapping: {
+        default: {
           '@path': '$.context.device.manufacturer'
         }
       },
@@ -101,7 +101,7 @@ const action: ActionDefinition<Settings, Payload> = {
         title: 'Device Model',
         type: 'string',
         description: 'Device model the user is on.',
-        defaultMapping: {
+        default: {
           '@path': '$.context.device.model'
         }
       },
@@ -109,7 +109,7 @@ const action: ActionDefinition<Settings, Payload> = {
         title: 'Carrier',
         type: 'string',
         description: 'Carrier the user has.',
-        defaultMapping: {
+        default: {
           '@path': '$.context.network.carrier'
         }
       },
@@ -117,7 +117,7 @@ const action: ActionDefinition<Settings, Payload> = {
         title: 'Country',
         type: 'string',
         description: 'Country the user is in.',
-        defaultMapping: {
+        default: {
           '@path': '$.context.location.country'
         }
       },
@@ -125,7 +125,7 @@ const action: ActionDefinition<Settings, Payload> = {
         title: 'Region',
         type: 'string',
         description: 'Geographical region the user is in.',
-        defaultMapping: {
+        default: {
           '@path': '$.context.location.region'
         }
       },
@@ -133,7 +133,7 @@ const action: ActionDefinition<Settings, Payload> = {
         title: 'City',
         type: 'string',
         description: 'What city the user is in.',
-        defaultMapping: {
+        default: {
           '@path': '$.context.location.city'
         }
       },
@@ -146,7 +146,7 @@ const action: ActionDefinition<Settings, Payload> = {
         title: 'Language',
         type: 'string',
         description: 'Language the user has set.',
-        defaultMapping: {
+        default: {
           '@path': '$.context.locale'
         }
       },
