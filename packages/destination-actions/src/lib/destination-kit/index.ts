@@ -142,7 +142,9 @@ export class Destination<Settings = JSONObject> {
     const action = new Action<Settings, {}>(definition, this.extendRequest)
 
     action.on('response', (response) => {
-      this.responses.push(response)
+      if (response) {
+        this.responses.push(response)
+      }
     })
 
     this.actions[slug] = action
