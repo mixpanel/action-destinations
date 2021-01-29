@@ -209,11 +209,10 @@ async function handleCloudEvent(
   privateSettings?: JSONArray
 ): Promise<CloudEventResponse> {
   const start = new Date()
-
-  context.set('req_destination', cloudEvent.destination)
-  context.set('req_source', cloudEvent.source)
-
   const destination = getDestinationByIdOrSlug(destinationId)
+
+  context.set('req_destination', destination.name)
+  context.set('req_source', cloudEvent.source)
 
   try {
     const event = cloudEvent.data
