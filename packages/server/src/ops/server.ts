@@ -72,6 +72,8 @@ app.post(
     const destinationDefinition = getDestinationBySlug(destinationSlug)
 
     ow(action, ow.string.oneOf(Object.keys(destinationDefinition.actions)))
+    req.context.set('req_destination', destinationSlug)
+    req.context.set('req_action', action)
 
     const actionDefinition = destinationDefinition.actions[action]
 
@@ -106,10 +108,10 @@ app.post(
     ow(settings, ow.object)
 
     const destinationDefinition = getDestinationBySlug(destination)
+    req.context.set('req_destination', destination)
 
     try {
       await destinationDefinition.testAuthentication(settings)
-
       res.status(200).json({ ok: true })
     } catch (error) {
       if (error.name === 'AggregateAjvError') {
@@ -159,6 +161,8 @@ app.post(
     const destinationDefinition = getDestinationBySlug(destinationSlug)
 
     ow(action, ow.string.oneOf(Object.keys(destinationDefinition.actions)))
+    req.context.set('req_destination', destinationSlug)
+    req.context.set('req_action', action)
 
     const actionDefinition = destinationDefinition.actions[action]
 

@@ -29,6 +29,7 @@ interface Fields {
   req_duration?: number
   req_source?: string
   req_destination?: string
+  req_action?: string
   error?: unknown
 
   // Client requests to other services
@@ -65,6 +66,7 @@ export default class Context {
     req_duration: undefined,
     req_source: undefined,
     req_destination: undefined,
+    req_action: undefined,
     error: undefined,
     service_client_requests: [],
     subscriptions: []
@@ -112,11 +114,23 @@ export default class Context {
     // This regex should always match because we force clients to send a user-agent header in this format
     const userAgent = USER_AGENT_REGEX.exec(rawUserAgent)?.[1] ?? rawUserAgent
 
+    const actions = []
+
+    for (const sub of this.fields.subscriptions ?? []) {
+      actions.push(`action:${sub.action}`)
+    }
+
+    if (this.fields.req_action) {
+      actions.push(`action:${this.fields.req_action}`)
+    }
+
     const tags = [
       `status_code:${statusCode}`,
       `status_group:${statusGroup}`,
       `endpoint:${endpoint}`,
-      `user_agent:${userAgent}`
+      `user_agent:${userAgent}`,
+      `destination:${this.fields.req_destination ?? 'unknown'}`,
+      ...actions
     ]
 
     stats.increment('request', 1, tags)
