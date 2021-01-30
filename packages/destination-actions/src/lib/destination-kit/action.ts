@@ -150,7 +150,7 @@ class Request<Settings, Payload> extends Step<Settings, Payload> {
         this.emit('response', e.response)
       } else if (e.request) {
         // This is needed to get this working in `integrations-engine` because for some reason `e.response` isn't available there
-        const symbol = Object.getOwnPropertySymbols(request).find((s) => String(s) === 'Symbol(response)')
+        const symbol = Object.getOwnPropertySymbols(e.request).find((s) => String(s) === 'Symbol(response)')
         if (symbol && e.request[symbol]) {
           this.emit('response', e.request[symbol])
         }
