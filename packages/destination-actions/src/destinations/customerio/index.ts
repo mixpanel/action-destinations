@@ -25,6 +25,13 @@ const destination: DestinationDefinition<Settings> = {
     $schema: 'http://json-schema.org/schema#',
     type: 'object',
     properties: {
+      siteId: {
+        description:
+          'Customer.io site ID. This can be found on your [API Credentials page](https://fly.customer.io/settings/api_credentials).',
+        minLength: 20,
+        title: 'Site ID',
+        type: 'string'
+      },
       apiKey: {
         description:
           'Customer.io API key. This can be found on your [API Credentials page](https://fly.customer.io/settings/api_credentials).',
@@ -36,19 +43,12 @@ const destination: DestinationDefinition<Settings> = {
         description:
           'Customer.io App API Key. This can be found on your [API Credentials page](https://fly.customer.io/settings/api_credentials?keyType=app).',
         minLength: 20,
-        title: 'App API Key',
-        type: 'string'
-      },
-      siteId: {
-        description:
-          'Customer.io site ID. This can be found on your [API Credentials page](https://fly.customer.io/settings/api_credentials).',
-        minLength: 20,
-        title: 'Site ID',
+        title: 'App API Key (optional)',
         type: 'string'
       }
     },
     additionalProperties: false,
-    required: ['siteId', 'apiKey', 'appApiKey']
+    required: ['siteId', 'apiKey']
   },
   extendRequest({ settings }) {
     const userPass = Buffer.from(`${settings.siteId}:${settings.apiKey}`)
