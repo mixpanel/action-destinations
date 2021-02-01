@@ -257,7 +257,7 @@ async function destination(req: Request, res: Response): Promise<void> {
 
     if (isStructuredCloudEvent(contentType)) {
       const result = await handleCloudEvent(context, destinationId, req.body, privateSettings)
-      res.set('Content-Type', 'application/cloudevent+json; charset=utf-8')
+      res.set('Content-Type', 'application/cloudevents+json; charset=utf-8')
       res.status(result.status)
       res.send(result)
       return
