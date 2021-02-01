@@ -133,6 +133,34 @@ function getOptions(metadata: DestinationMetadata, destinationSchema: Destinatio
     }
   }
 
+  const requiredProperties = destinationSchema.schema?.required ?? []
+  const properties = destinationSchema.schema?.properties ?? {}
+  for (const name in properties) {
+    const property = properties[name]
+
+    if (typeof property === 'boolean') {
+      continue
+    }
+
+    const validators: string[][] = []
+
+    if (requiredProperties.includes(name)) {
+      validators.push(['required', `The ${name} property is required.`])
+    }
+
+    options[name] = {
+      default: '',
+      description: property.description,
+      encrypt: false,
+      hidden: false,
+      label: property.title,
+      private: false,
+      scope: 'event_destination',
+      type: 'string',
+      validators
+    }
+  }
+
   return options
 }
 
