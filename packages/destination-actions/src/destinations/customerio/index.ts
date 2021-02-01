@@ -1,8 +1,6 @@
 import { DestinationDefinition } from '../../lib/destination-kit'
-import addPersonToSegment from './addPersonToSegment'
 import createUpdateDevice from './createUpdateDevice'
 import createUpdatePerson from './createUpdatePerson'
-import removePersonFromSegment from './removePersonFromSegment'
 import trackAnonymousEvent from './trackAnonymousEvent'
 import trackEvent from './trackEvent'
 import triggerCampaign from './triggerCampaign'
@@ -13,11 +11,10 @@ const destination: DestinationDefinition<Settings> = {
   authentication: {
     type: 'custom',
     testAuthentication: (req, { settings }) => {
-      return req('https://beta-api.customer.io/v1/api/segments', {
+      return req('https://track.customer.io/auth', {
         prefixUrl: '',
-        headers: {
-          authorization: `Bearer ${settings.appApiKey}`
-        }
+        username: settings.siteId,
+        password: settings.apiKey
       })
     }
   },
@@ -38,13 +35,6 @@ const destination: DestinationDefinition<Settings> = {
         minLength: 20,
         title: 'API Key',
         type: 'string'
-      },
-      appApiKey: {
-        description:
-          'Customer.io App API Key. This can be found on your [API Credentials page](https://fly.customer.io/settings/api_credentials?keyType=app).',
-        minLength: 20,
-        title: 'App API Key (optional)',
-        type: 'string'
       }
     },
     additionalProperties: false,
@@ -63,10 +53,8 @@ const destination: DestinationDefinition<Settings> = {
   },
 
   actions: {
-    addPersonToSegment,
     createUpdateDevice,
     createUpdatePerson,
-    removePersonFromSegment,
     trackAnonymousEvent,
     trackEvent,
     triggerCampaign

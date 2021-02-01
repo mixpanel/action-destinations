@@ -17,9 +17,8 @@ interface Campaign {
 async function idAutocomplete(req: Got, { settings }: ExecuteInput<Settings, Payload>): Promise<AutocompleteResponse> {
   const response = await req.get<Campaigns>('https://beta-api.customer.io/v1/api/campaigns', {
     prefixUrl: '',
-    headers: {
-      Authorization: `Bearer ${settings.appApiKey}`
-    }
+    username: settings.siteId,
+    password: settings.apiKey
   })
 
   const items = response.body.campaigns.map((campaign) => ({
