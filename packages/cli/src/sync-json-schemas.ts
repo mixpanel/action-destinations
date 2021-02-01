@@ -154,7 +154,7 @@ function getOptions(metadata: DestinationMetadata, destinationSchema: Destinatio
       encrypt: false,
       hidden: false,
       label: property.title,
-      private: false,
+      private: true,
       scope: 'event_destination',
       type: 'string',
       validators
