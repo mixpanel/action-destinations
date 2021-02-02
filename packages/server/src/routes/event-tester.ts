@@ -39,14 +39,22 @@ function summarizeRequest(response: Response<unknown>): RequestToDestination {
 
   // This is needed because `request.options.body` does not contain the actual body sent in the request
   const symbol = Object.getOwnPropertySymbols(request).find((s) => String(s) === 'Symbol(body)')
+  let body
+  if (symbol) {
+    // eslint-disable-next-line
+    // @ts-ignore
+    body = request[symbol]
+  } else if (request.options.json) {
+    body = JSON.stringify(request.options.json)
+  } else {
+    body = request.options.body || ''
+  }
 
   return {
     url: response.requestUrl,
     method: request.options.method,
     headers: redactUnsafeRequestHeaders(request.options.headers),
-    // eslint-disable-next-line
-    // @ts-ignore
-    body: symbol ? request[symbol] : ''
+    body
   }
 }
 
