@@ -45,7 +45,7 @@
     "aggregate-error": "^3.1.0",
     "ajv": "^6.12.4",
     "dayjs": "^1.10.3",
-    "got": "^11.8.1",
+    "got": "^10.0.0",
     "http-errors": "^1.8.0",
     "jsonpath-plus": "^4.0.0",
     "lodash": "^4.17.20",

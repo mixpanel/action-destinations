@@ -1,4 +1,5 @@
 import { get } from 'lodash'
+import { Options } from 'got'
 import dayjs from '../../../lib/dayjs'
 import { ActionDefinition } from '../../../lib/destination-kit/action'
 import type { Settings } from '../generated-types'
@@ -79,10 +80,13 @@ const action: ActionDefinition<Settings, Payload> = {
 
   autocompleteFields: {
     org_id: async (req, { page }) => {
+      const searchParams: Options['searchParams'] = {}
+      if (typeof page === 'string') {
+        searchParams.start = Number(page)
+      }
+
       const response = await req.get<Organizations>('organizations', {
-        searchParams: {
-          start: typeof page === 'string' ? Number(page) : undefined
-        }
+        searchParams
       })
 
       const items = response.body.data.map((organization) => ({

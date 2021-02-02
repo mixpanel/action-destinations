@@ -41,7 +41,7 @@ function summarizeRequest(response: Response<unknown>): RequestToDestination {
   const symbol = Object.getOwnPropertySymbols(request).find((s) => String(s) === 'Symbol(body)')
 
   return {
-    url: request.requestUrl,
+    url: response.requestUrl,
     method: request.options.method,
     headers: redactUnsafeRequestHeaders(request.options.headers),
     // eslint-disable-next-line
