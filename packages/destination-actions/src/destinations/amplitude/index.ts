@@ -8,6 +8,21 @@ const destination: DestinationDefinition<Settings> = {
   name: 'Amplitude',
   authentication: {
     type: 'custom',
+    fields: {
+      apiKey: {
+        title: 'API Key',
+        description: 'Amplitude project API key. You can find this key in the "General" tab of your Amplitude project.',
+        type: 'string',
+        required: true
+      },
+      secretKey: {
+        title: 'Secret Key',
+        description:
+          'Amplitude project secret key. You can find this key in the "General" tab of your Amplitude project.',
+        type: 'string',
+        required: true
+      }
+    },
     testAuthentication: (req, { settings }) => {
       // Note: Amplitude has some apis that use basic auth (like this one)
       // and others that use custom auth in the request body
@@ -16,25 +31,6 @@ const destination: DestinationDefinition<Settings> = {
         password: settings.secretKey
       })
     }
-  },
-  schema: {
-    $schema: 'http://json-schema.org/schema#',
-    type: 'object',
-    properties: {
-      apiKey: {
-        title: 'API Key',
-        description: 'Amplitude project API key. You can find this key in the "General" tab of your Amplitude project.',
-        type: 'string'
-      },
-      secretKey: {
-        title: 'Secret Key',
-        description:
-          'Amplitude project secret key. You can find this key in the "General" tab of your Amplitude project.',
-        type: 'string'
-      }
-    },
-    additionalProperties: false,
-    required: ['apiKey', 'secretKey']
   },
   actions: {
     trackUser,

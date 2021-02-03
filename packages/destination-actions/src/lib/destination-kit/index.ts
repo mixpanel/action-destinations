@@ -2,15 +2,17 @@ import { validate, parseFql } from '@segment/fab5-subscriptions'
 import { BadRequest } from 'http-errors'
 import got, { CancelableRequest, Got, Response } from 'got'
 import { flatten } from 'lodash'
-import { JSONSchema7 } from 'json-schema'
+import { JSONSchema4 } from 'json-schema'
 import { Action, ActionSchema, ActionDefinition, Validate } from './action'
 import { ExecuteInput, StepResult } from './step'
 import { time, duration } from '../time'
 import { JSONLikeObject, JSONObject } from '../json-object'
 import { SegmentEvent } from '../segment-event'
-import type { RequestExtension } from './types'
+import { fieldsToJsonSchema } from './fields-to-jsonschema'
+import type { InputField, RequestExtension } from './types'
 
 export type { ActionDefinition, ActionSchema }
+export { fieldsToJsonSchema }
 
 export interface SubscriptionStats {
   duration: number
@@ -28,10 +30,7 @@ interface PartnerActions<Settings, Payload extends JSONLikeObject> {
 export interface DestinationDefinition<Settings = unknown> {
   /** The name of the destination */
   name: string
-  /** The JSON Schema representing the destination settings. When present will be used to validate settings */
-  schema?: JSONSchema7
   /** An optional function to extend requests sent from the destination (including all actions) */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   extendRequest?: RequestExtension<Settings>
   /** Optional authentication configuration */
   authentication?: AuthenticationScheme<Settings>
@@ -51,31 +50,26 @@ interface TestAuthSettings<Settings> {
   settings: Settings
 }
 
-interface AuthenticationField {
-  /** The name of the field */
-  key: string
-  /** The display name of the field */
-  label: string
-  /** The datatype of the value */
-  type: 'string'
-  /** Whether or not the field is required for authentication */
-  required: boolean
-  /** Help text describing the field and how it is used (or why it is required). */
-  description?: string
-}
-
-interface Authentication {
-  fields?: AuthenticationField[]
-}
-
-interface ApiKeyAuthentication<Settings> extends Authentication {
-  /** Typically used for "API Key" authentication. */
-  type: 'custom'
+interface Authentication<Settings> {
+  type: 'basic' | 'custom'
+  fields?: Record<string, InputField>
   testAuthentication: (req: Got, input: TestAuthSettings<Settings>) => CancelableRequest<Response<string>>
 }
 
+interface CustomAuthentication<Settings> extends Authentication<Settings> {
+  /** Typically used for "API Key" authentication. */
+  type: 'custom'
+}
+
+interface BasicAuthentication<Settings> extends Authentication<Settings> {
+  type: 'basic'
+  // TODO evalute requiring "username" and "password" fields
+  // and automatically handling the http auth stuff
+  // fields: Record<'username' | 'password', InputField>
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AuthenticationScheme<Settings = any> = ApiKeyAuthentication<Settings>
+type AuthenticationScheme<Settings = any> = BasicAuthentication<Settings> | CustomAuthentication<Settings>
 
 interface EventInput<Settings> {
   readonly event: SegmentEvent
@@ -91,16 +85,20 @@ export class Destination<Settings = JSONObject> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   readonly actions: PartnerActions<Settings, any>
   readonly responses: Response[]
-  readonly settingsSchema?: JSONSchema7
+  readonly settingsSchema?: JSONSchema4
 
   constructor(destination: DestinationDefinition<Settings>) {
     this.definition = destination
     this.name = destination.name
-    this.settingsSchema = destination.schema
     this.extendRequest = destination.extendRequest
     this.actions = {}
     this.authentication = destination.authentication
     this.responses = []
+
+    // Convert to complete JSON Schema
+    if (this.authentication?.fields) {
+      this.settingsSchema = fieldsToJsonSchema(this.authentication.fields)
+    }
 
     for (const action of Object.keys(destination.actions)) {
       this.partnerAction(action, destination.actions[action])

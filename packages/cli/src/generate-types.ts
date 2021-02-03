@@ -2,8 +2,8 @@ import fs from 'fs'
 import { JSONSchema4 } from 'json-schema'
 import { compile } from 'json-schema-to-typescript'
 import path from 'path'
-import { Options as PrettierOptions } from 'prettier'
-import { DestinationDefinition, ActionDefinition } from '@segment/destination-actions'
+import prettier from 'prettier'
+import { DestinationDefinition, ActionDefinition, fieldsToJsonSchema } from '@segment/destination-actions'
 
 const COMMENT = '// Generated file. DO NOT MODIFY IT BY HAND.'
 const destinationsPath = path.join(__dirname, '../../destination-actions', 'src/destinations')
@@ -12,25 +12,21 @@ const destinations = fs.readdirSync(destinationsPath).filter((file) => {
   return fs.statSync(path.join(destinationsPath, file)).isDirectory()
 })
 
-const prettier: PrettierOptions = {
-  semi: false,
-  singleQuote: true,
-  trailingComma: 'none',
-  printWidth: 120
-}
-
 async function run() {
+  const prettierOptions = (await prettier.resolveConfig(path.resolve(__dirname, '../../../package.json'))) ?? undefined
+
   for (const destination of destinations) {
     const destinationPath = path.join(destinationsPath, destination)
     const destinationDefinition: DestinationDefinition = (await import(destinationPath)).default
 
-    if (!destinationDefinition.schema) {
+    const destinationSettingSchema = destinationDefinition.authentication?.fields
+    if (!destinationSettingSchema) {
       continue
     }
 
-    const generated = await compile(destinationDefinition.schema as JSONSchema4, 'Settings', {
+    const generated = await compile(fieldsToJsonSchema(destinationSettingSchema), 'Settings', {
       bannerComment: COMMENT,
-      style: prettier
+      style: prettierOptions
     })
 
     const writePath = path.join(destinationsPath, destination, 'generated-types.ts')
@@ -51,7 +47,7 @@ async function run() {
 
       const generated = await compile(actionDefinition.schema as JSONSchema4, 'Payload', {
         bannerComment: COMMENT,
-        style: prettier
+        style: prettierOptions
       })
 
       const writePath = path.join(actionPath, 'generated-types.ts')

@@ -19,9 +19,9 @@
     "postclean": "rm -rf dist",
     "create:destination": "ts-node src/create-destination",
     "create:action": "ts-node src/create-action",
-    "generate-types": "ts-node --transpile-only --files src/generate-types",
-    "generate-action": "ts-node --files src/generate-action",
-    "sync-json-schemas": "yarn build && ts-node --files src/sync-json-schemas",
+    "generate-types": "ts-node --transpile-only --files -r tsconfig-paths/register src/generate-types",
+    "generate-action": "ts-node --files -r tsconfig-paths/register src/generate-action",
+    "sync-json-schemas": "ts-node --files -r tsconfig-paths/register src/sync-json-schemas",
     "test": "echo 'nothing to see here.'",
     "typecheck": "tsc --noEmit"
   },
@@ -41,6 +41,7 @@
     "mustache": "^4.1.0",
     "ora": "^5.3.0",
     "prompts": "^2.4.0",
-    "slugify": "^1.4.6"
+    "slugify": "^1.4.6",
+    "tsconfig-paths": "^3.9.0"
   }
 }

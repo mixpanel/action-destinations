@@ -7,16 +7,12 @@ const destination: DestinationDefinition<Settings> = {
   name: 'Pipedrive',
   authentication: {
     type: 'custom',
-    testAuthentication: (req) => req('users/me')
-  },
-  schema: {
-    $schema: 'http://json-schema.org/schema#',
-    type: 'object',
-    properties: {
+    fields: {
       domain: {
         title: 'Domain',
         description: 'Pipedrive domain. This is found in Pipedrive in Settings > Company settings > Company domain.',
         type: 'string',
+        required: true,
         minLength: 1
       },
       apiToken: {
@@ -24,12 +20,13 @@ const destination: DestinationDefinition<Settings> = {
         description:
           'Pipedrive API token. This is found in Pipedrive in Settings > Personal preferences > API > Your personal API token.',
         type: 'string',
+        required: true,
         minLength: 20
       }
     },
-    additionalProperties: false,
-    required: ['domain', 'apiToken']
+    testAuthentication: (req) => req('users/me')
   },
+
   extendRequest({ settings }) {
     return {
       prefixUrl: `https://${settings.domain}.pipedrive.com/api/v1/`,

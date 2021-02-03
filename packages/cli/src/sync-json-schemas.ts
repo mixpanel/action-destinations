@@ -2,7 +2,8 @@ import {
   idToSlug,
   destinations as actionDestinations,
   DestinationDefinition,
-  ActionSchema
+  ActionSchema,
+  fieldsToJsonSchema
 } from '@segment/destination-actions'
 import { Dictionary, invert, uniq } from 'lodash'
 import ControlPlaneService, {
@@ -10,7 +11,7 @@ import ControlPlaneService, {
   DestinationMetadataOptions,
   DestinationMetadataUpdateInput
 } from '@segment/control-plane-service-client'
-import { JSONSchema7 } from 'json-schema'
+import { JSONSchema4 } from 'json-schema'
 import prompts from 'prompts'
 
 const controlPlaneService = new ControlPlaneService({
@@ -102,8 +103,7 @@ function getOptions(metadata: DestinationMetadata, destinationSchema: Destinatio
     description: JSON.stringify({
       name: destinationSchema.name,
       slug: destinationSchema.slug,
-      settings: destinationSchema.schema,
-      defaultSubscriptions: []
+      settings: destinationSchema.schema
     }),
     encrypt: false,
     hidden: false,
@@ -134,7 +134,7 @@ function getOptions(metadata: DestinationMetadata, destinationSchema: Destinatio
     }
   }
 
-  const requiredProperties = destinationSchema.schema?.required ?? []
+  const requiredProperties = (destinationSchema.schema?.required as string[]) ?? []
   const properties = destinationSchema.schema?.properties ?? {}
   for (const name in properties) {
     const property = properties[name]
@@ -214,7 +214,7 @@ interface SchemasByDestination {
 interface DestinationSchema {
   name: string
   slug: string
-  schema: JSONSchema7 | undefined
+  schema: JSONSchema4 | undefined
   actions: Action[]
 }
 
@@ -257,7 +257,7 @@ function getJsonSchemas(
     schemasByDestination[destinationId] = {
       name: destination.name,
       slug: destinationSlug,
-      schema: destination.schema,
+      schema: fieldsToJsonSchema(destination.authentication?.fields),
       actions: actionPayloads
     }
   }
