@@ -20,7 +20,6 @@
     "create:destination": "ts-node src/create-destination",
     "create:action": "ts-node src/create-action",
     "generate-types": "ts-node --transpile-only --files -r tsconfig-paths/register src/generate-types",
-    "generate-action": "ts-node --files -r tsconfig-paths/register src/generate-action",
     "sync-json-schemas": "ts-node --files -r tsconfig-paths/register src/sync-json-schemas",
     "test": "echo 'nothing to see here.'",
     "typecheck": "tsc --noEmit"
