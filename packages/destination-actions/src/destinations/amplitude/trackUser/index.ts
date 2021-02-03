@@ -12,6 +12,7 @@ interface AmplitudeEvent extends Omit<Payload, 'products' | 'time' | 'session_id
 const action: ActionDefinition<Settings, Payload> = {
   title: 'Track User',
   description: 'Sends user events to Amplitude.',
+  recommended: true,
   schema: {
     $schema: 'http://json-schema.org/schema#',
     type: 'object',

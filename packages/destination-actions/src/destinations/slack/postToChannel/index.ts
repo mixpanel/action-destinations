@@ -5,6 +5,7 @@ import type { Payload } from './generated-types'
 const action: ActionDefinition<Settings, Payload> = {
   title: 'Post Message',
   description: 'Post a message to a Slack channel.',
+  recommended: true,
   schema: {
     $schema: 'http://json-schema.org/schema#',
     type: 'object',

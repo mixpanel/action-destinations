@@ -6,6 +6,7 @@ import type { Payload } from './generated-types'
 const action: ActionDefinition<Settings, Payload> = {
   title: 'Create or Update Device',
   description: "Update a person's device in Customer.io or create it if it doesn't exist.",
+  recommended: true,
   schema: {
     $schema: 'http://json-schema.org/schema#',
     type: 'object',

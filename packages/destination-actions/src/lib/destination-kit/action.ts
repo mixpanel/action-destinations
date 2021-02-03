@@ -34,6 +34,9 @@ export interface ActionDefinition<Settings, Payload = any> {
   /** The display description of the action */
   description: string
 
+  /** Whether the action is recommended for quick setup */
+  recommended: boolean
+
   /**
    * The jsonschema representation of fields used to perform the action
    *

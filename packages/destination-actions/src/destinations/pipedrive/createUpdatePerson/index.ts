@@ -30,6 +30,7 @@ interface Person {
 const action: ActionDefinition<Settings, Payload> = {
   title: 'Create or Update Person',
   description: "Update a person in Pipedrive or create them if they don't exist yet.",
+  recommended: true,
   schema: {
     $schema: 'http://json-schema.org/schema#',
     type: 'object',

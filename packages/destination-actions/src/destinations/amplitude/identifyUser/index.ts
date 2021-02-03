@@ -6,6 +6,7 @@ const action: ActionDefinition<Settings, Payload> = {
   title: 'Identify User',
   description:
     'Set the user ID for a particular device ID or update user properties without sending an event to Amplitude.',
+  recommended: true,
   schema: {
     $schema: 'http://json-schema.org/schema#',
     type: 'object',

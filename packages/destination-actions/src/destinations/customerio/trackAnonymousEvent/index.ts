@@ -5,6 +5,7 @@ import type { Payload } from './generated-types'
 const action: ActionDefinition<Settings, Payload> = {
   title: 'Track Anonymous Event',
   description: 'Track an event not tied to a known person.',
+  recommended: false,
   schema: {
     $schema: 'http://json-schema.org/schema#',
     type: 'object',
