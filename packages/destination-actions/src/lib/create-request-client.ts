@@ -1,5 +1,4 @@
 import got, { ExtendOptions, Got } from 'got'
-import { beforeRequest, lookup } from './dns'
 
 /**
  * Creates a Got client instance with Segment's default configuration + custom options
@@ -12,11 +11,6 @@ export default function createRequestClient(...options: ExtendOptions[]): Got {
     timeout: 5000,
     headers: {
       'user-agent': 'Segment'
-    },
-    // Valid
-    lookup,
-    hooks: {
-      beforeRequest: [beforeRequest]
     }
   }
 

@@ -1,4 +1,5 @@
 import '../aliases'
+import '../lib/patch-http'
 import express from 'express'
 import { NotFound } from 'http-errors'
 import ow from 'ow'

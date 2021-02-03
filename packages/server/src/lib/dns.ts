@@ -1,5 +1,5 @@
 import dns from 'dns'
-import { NormalizedOptions } from 'got'
+import type { RequestOptions } from 'http'
 import ip from 'ip'
 import net from 'net'
 
@@ -62,13 +62,12 @@ export function lookup(hostname: string, ...args: any[]): void {
 }
 
 /**
- * A `got` `beforeRequest` hook that validates ips directly
- * because they don't use dns lookup
+ * A `beforeRequest` hook that validates ips directly
+ * because ips don't use dns lookup
  */
-export function beforeRequest(options: NormalizedOptions): void {
-  const hostname = options.url.hostname
-
-  if (net.isIP(hostname) && isRestrictedIp(hostname)) {
+export function checkRestrictedIp(options: RequestOptions): void {
+  const hostname = options.hostname ?? options.host
+  if (hostname && net.isIP(hostname) && isRestrictedIp(hostname)) {
     throw new Error(`"${hostname}" is a restricted ip.`)
   }
 }

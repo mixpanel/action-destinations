@@ -1,4 +1,5 @@
 import './aliases'
+import './lib/patch-http'
 import express from 'express'
 import routes from './routes'
 import core from './middleware/core'

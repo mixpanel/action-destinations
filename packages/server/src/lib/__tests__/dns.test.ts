@@ -1,7 +1,7 @@
 import dns from 'dns'
 import got from 'got'
 import nock from 'nock'
-import { lookup, beforeRequest } from '../dns'
+import '../patch-http'
 
 jest.mock('dns', () => ({
   // @ts-ignore
@@ -13,11 +13,7 @@ const mockedDns = dns as jest.Mocked<typeof dns>
 const client = got.extend({
   retry: 0,
   throwHttpErrors: false,
-  dnsCache: false,
-  lookup,
-  hooks: {
-    beforeRequest: [beforeRequest]
-  }
+  dnsCache: false
 })
 
 describe('dns#lookup', () => {
