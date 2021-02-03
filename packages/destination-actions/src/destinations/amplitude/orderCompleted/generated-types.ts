@@ -1,15 +1,15 @@
 // Generated file. DO NOT MODIFY IT BY HAND.
 
 /**
- * A readable ID specified by you. Must have a minimum length of 5 characters. Required unless device ID is present.
+ * A readable ID specified by you. Must have a minimum length of 5 characters. Required unless device ID is present. **Note:** If you send a request with a user ID that is not in the Amplitude system yet, then the user tied to that ID will not be marked new until their first event.
  */
 export type UserID2 = UserID | UserID1
 /**
- * A readable ID specified by you. Must have a minimum length of 5 characters. Required unless device ID is present.
+ * A readable ID specified by you. Must have a minimum length of 5 characters. Required unless device ID is present. **Note:** If you send a request with a user ID that is not in the Amplitude system yet, then the user tied to that ID will not be marked new until their first event.
  */
 export type UserID = string
 /**
- * A readable ID specified by you. Must have a minimum length of 5 characters. Required unless device ID is present.
+ * A readable ID specified by you. Must have a minimum length of 5 characters. Required unless device ID is present. **Note:** If you send a request with a user ID that is not in the Amplitude system yet, then the user tied to that ID will not be marked new until their first event.
  */
 export type UserID1 = null
 /**
@@ -85,7 +85,7 @@ export type Price = number
  */
 export type Quantity = number
 /**
- * Revenue = price * quantity. If you send all 3 fields of price, quantity, and revenue, then (price * quantity) will be used as the revenue value. You can use negative values to indicate refunds.
+ * Revenue = price * quantity. If you send all 3 fields of price, quantity, and revenue, then (price * quantity) will be used as the revenue value. You can use negative values to indicate refunds. **Note:** You will need to explicitly set this if you are using the Amplitude in cloud-mode.
  */
 export type Revenue = number
 /**
@@ -212,13 +212,13 @@ export interface Payload {
   products?: Products
 }
 /**
- * An object of key-value pairs that represent additional data to be sent along with the event. You can store property values in an array. Date values are transformed into string values. Object depth may not exceed 40 layers.
+ * An object of key-value pairs that represent additional data to be sent along with the event. You can store property values in an array, but note that Amplitude only supports one-dimensional arrays. Date values are transformed into string values. Object depth may not exceed 40 layers.
  */
 export interface EventProperties {
   [k: string]: unknown
 }
 /**
- * An object of key-value pairs that represent additional data tied to the user. You can store property values in an array. Date values are transformed into string values. Object depth may not exceed 40 layers.
+ * An object of key-value pairs that represent additional data tied to the user. You can store property values in an array, but note that Amplitude only supports one-dimensional arrays. Date values are transformed into string values. Object depth may not exceed 40 layers.
  */
 export interface UserProperties {
   [k: string]: unknown
