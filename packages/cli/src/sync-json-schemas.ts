@@ -121,6 +121,7 @@ function getOptions(metadata: DestinationMetadata, destinationSchema: Destinatio
       description: JSON.stringify({
         slug: actionPayload.slug,
         schema: actionPayload.schema,
+        recommended: actionPayload.recommended,
         settings: []
       }),
       encrypt: false,
@@ -219,6 +220,7 @@ interface DestinationSchema {
 
 interface Action {
   slug: string
+  recommended: boolean
   schema: ActionSchema<unknown> & { title: string; description: string }
 }
 
@@ -243,6 +245,7 @@ function getJsonSchemas(
       const action = actions[actionSlug]
       actionPayloads.push({
         slug: actionSlug,
+        recommended: action.recommended,
         schema: {
           title: action.title,
           description: action.description,
