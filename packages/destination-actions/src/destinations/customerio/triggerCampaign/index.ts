@@ -35,9 +35,9 @@ async function idAutocomplete(req: Got, { settings }: ExecuteInput<Settings, Pay
 }
 
 const action: ActionDefinition<Settings, Payload> = {
-  title: 'Trigger Broadcast Campaign',
+  title: 'Trigger Broadcast',
   description: 'Trigger a Customer.io broadcast campaign.',
-  recommended: true,
+  recommended: false,
   schema: {
     $schema: 'http://json-schema.org/schema#',
     type: 'object',
