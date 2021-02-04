@@ -26,7 +26,7 @@ $ yarn install
 
 To install deps in a particular workspace (i.e. `packages/*`) you will need to use one of our shorthand commands defined in the root package.json's `scripts` section:
 
-- `yarn engine <add/remove> <package>`
+- `yarn actions <add/remove> <package>`
 - `yarn server <add/remove> <package>`
 - `yarn cli <add/remove> <package>`
 

@@ -15,12 +15,12 @@
   "private": true,
   "scripts": {
     "build": "yarn clean && yarn tsc -b tsconfig.build.json",
-    "build:watch": "tsc --watch --preserveWatchOutput",
     "clean": "tsc -b tsconfig.build.json --clean",
     "postclean": "rm -rf dist",
-    "dev": "NODE_ENV=development nodemon --inspect=47082 --watch dist dist/src/app.js",
-    "dev:ops": "NODE_ENV=developement nodemon --inspect=47082 --watch dist dist/src/ops/server.js",
+    "dev": "NODE_ENV=development nodemon --inspect=47082 --watch 'src/**/*.ts' --exec node -e 'js,json,ts' --require ts-node/register/transpile-only src/app.ts",
+    "dev:ops": "NODE_ENV=developement nodemon --inspect=47082 --watch 'src/**/*.ts' --exec node -e 'js,json,ts' --require ts-node/register/transpile-only src/ops/server.ts",
     "start": "node dist/src/app.js",
+    "start:ops": "node dist/src/ops/server.js",
     "test": "jest",
     "typecheck": "tsc --noEmit"
   },

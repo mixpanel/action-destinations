@@ -24,7 +24,6 @@
   },
   "scripts": {
     "build": "yarn clean && yarn tsc -b tsconfig.build.json",
-    "build:watch": "tsc --watch --preserveWatchOutput",
     "clean": "tsc -b tsconfig.build.json --clean",
     "postclean": "rm -rf dist",
     "prepublishOnly": "yarn build",
