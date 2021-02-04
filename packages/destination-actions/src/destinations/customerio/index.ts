@@ -9,7 +9,7 @@ import type { Settings } from './generated-types'
 const destination: DestinationDefinition<Settings> = {
   name: 'Customer.io',
   authentication: {
-    type: 'basic',
+    scheme: 'basic',
     fields: {
       siteId: {
         description:

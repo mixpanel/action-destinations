@@ -6,7 +6,7 @@ import type { Settings } from './generated-types'
 const destination: DestinationDefinition<Settings> = {
   name: 'Pipedrive',
   authentication: {
-    type: 'custom',
+    scheme: 'custom',
     fields: {
       domain: {
         title: 'Domain',

@@ -11,6 +11,12 @@ import ora from 'ora'
 import path from 'path'
 import prompts, { PromptObject } from 'prompts'
 
+const promptOptions = {
+  onCancel() {
+    console.log('Exiting...')
+    process.exit(0)
+  }
+}
 interface ActionData {
   destination: string
   name: string
@@ -57,7 +63,8 @@ function renderTemplate(content: string, data: ActionData) {
 }
 
 async function createAction(action: ActionData): Promise<void> {
-  const templatePath = path.join(__dirname, '../templates/action')
+  // TODO we can add more action templates later (and give users a choice to pick one)
+  const templatePath = path.join(__dirname, '../templates/actions/empty-action')
   const filesToCreate = fs.readdirSync(templatePath)
 
   const actionPath = path.join(__dirname, '../../destination-actions/src/destinations', action.destination, action.slug)
@@ -97,16 +104,12 @@ async function createAction(action: ActionData): Promise<void> {
 
   console.log(``)
   console.log(chalk.green(`Done creating "${action.name}" 🎉`))
-  console.log(
-    chalk.green(
-      `You can find it via: cd packages/destination-actions/src/destinations/${action.destination}/${action.slug}`
-    )
-  )
+  console.log(chalk.green(`You can find it via: cd ${actionPath}`))
   console.log(``)
 }
 
 async function run() {
-  const action: ActionData = await prompts(questions)
+  const action: ActionData = await prompts(questions, promptOptions)
 
   console.log(``)
 

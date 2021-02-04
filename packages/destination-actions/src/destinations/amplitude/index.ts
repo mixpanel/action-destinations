@@ -7,7 +7,7 @@ import type { Settings } from './generated-types'
 const destination: DestinationDefinition<Settings> = {
   name: 'Amplitude',
   authentication: {
-    type: 'custom',
+    scheme: 'custom',
     fields: {
       apiKey: {
         title: 'API Key',

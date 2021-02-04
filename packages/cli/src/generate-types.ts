@@ -18,10 +18,7 @@ async function run() {
     const destinationPath = path.join(destinationsPath, destination)
     const destinationDefinition: DestinationDefinition = (await import(destinationPath)).default
 
-    const destinationSettingSchema = destinationDefinition.authentication?.fields
-    if (!destinationSettingSchema) {
-      continue
-    }
+    const destinationSettingSchema = destinationDefinition.authentication?.fields ?? {}
 
     const generated = await compile(fieldsToJsonSchema(destinationSettingSchema), 'Settings', {
       bannerComment: COMMENT,

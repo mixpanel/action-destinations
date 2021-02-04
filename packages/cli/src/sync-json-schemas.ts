@@ -13,6 +13,13 @@ import ControlPlaneService, {
 import { JSONSchema4 } from 'json-schema'
 import prompts from 'prompts'
 
+const promptOptions = {
+  onCancel() {
+    console.log('Exiting...')
+    process.exit(0)
+  }
+}
+
 const controlPlaneService = new ControlPlaneService({
   name: 'control-plane-service',
   url: 'http://control-plane-service.segment.local',
@@ -36,15 +43,18 @@ const controlPlaneService = new ControlPlaneService({
 async function run() {
   const slugToId = invert(idToSlug)
   const availableSlugs = Object.keys(slugToId)
-  const { chosenSlugs } = await prompts({
-    type: 'multiselect',
-    name: 'chosenSlugs',
-    message: 'Destinations:',
-    choices: availableSlugs.map((s) => ({
-      title: s,
-      value: s
-    }))
-  })
+  const { chosenSlugs } = await prompts(
+    {
+      type: 'multiselect',
+      name: 'chosenSlugs',
+      message: 'Destinations:',
+      choices: availableSlugs.map((s) => ({
+        title: s,
+        value: s
+      }))
+    },
+    promptOptions
+  )
 
   if (!chosenSlugs) {
     return

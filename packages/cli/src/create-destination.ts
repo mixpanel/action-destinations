@@ -11,9 +11,17 @@ import path from 'path'
 import prompts, { PromptObject } from 'prompts'
 import slugify from 'slugify'
 
+const promptOptions = {
+  onCancel() {
+    console.log('Exiting...')
+    process.exit(0)
+  }
+}
+
 interface DestinationData {
   name: string
   slug: string
+  authentication: 'basic' | 'custom' | 'none'
 }
 
 const questions: PromptObject<keyof DestinationData>[] = [
@@ -28,6 +36,28 @@ const questions: PromptObject<keyof DestinationData>[] = [
     // @ts-ignore the types are missing the Function signature
     initial: (prev) => slugify(prev).toLowerCase(),
     message: 'Destination slug:'
+  },
+  {
+    type: 'select',
+    name: 'authentication',
+    message: 'What authentication scheme does the API use?',
+    choices: [
+      {
+        title: 'Custom',
+        description: 'Most "API Key" based authentication should use this.',
+        value: 'custom'
+      },
+      {
+        title: 'Basic',
+        description: 'https://tools.ietf.org/html/rfc7617',
+        value: 'basic'
+      },
+      {
+        title: 'None',
+        value: 'none'
+      }
+    ],
+    initial: 0
   }
 ]
 
@@ -37,10 +67,15 @@ function renderTemplate(content: string, data: DestinationData) {
 
 let spinner: ora.Ora
 
-async function createDirectory(destination: DestinationData): Promise<void> {
-  const templatePath = path.join(__dirname, '../templates/destination')
-  const filesToCreate = fs.readdirSync(templatePath)
+const templates = {
+  basic: 'basic-auth.ts',
+  custom: 'custom-auth.ts',
+  none: 'empty-destination.ts'
+}
 
+async function createDirectory(destination: DestinationData): Promise<void> {
+  const templateFile = templates[destination.authentication] || templates.none
+  const templatePath = path.join(__dirname, '../templates/destinations', templateFile)
   const destinationPath = path.join(__dirname, '../../destination-actions/src/destinations', destination.slug)
 
   spinner = ora().start(`Creating ${chalk.bgMagenta.white(destination.slug)}`)
@@ -53,18 +88,13 @@ async function createDirectory(destination: DestinationData): Promise<void> {
 
   fs.mkdirSync(destinationPath)
 
-  filesToCreate.forEach((file) => {
-    const filePath = path.join(templatePath, file)
+  // TODO if we need to support generating multiple files, this will need to be updated
+  const template = fs.readFileSync(templatePath, 'utf8')
+  const writePath = path.join(destinationPath, 'index.ts')
+  const contents = renderTemplate(template, destination)
 
-    spinner.text = chalk`Creating {bold src/destinations/${file}}`
-
-    // TODO if we need sub-directories, this will need to be updated
-    const template = fs.readFileSync(filePath, 'utf8')
-    const contents = renderTemplate(template, destination)
-
-    const writePath = path.join(destinationPath, file)
-    fs.writeFileSync(writePath, contents, 'utf8')
-  })
+  spinner.text = chalk`Creating {bold ${writePath}}`
+  fs.writeFileSync(writePath, contents, 'utf8')
 
   spinner.succeed(`Scaffolding directory`)
 
@@ -78,12 +108,12 @@ async function createDirectory(destination: DestinationData): Promise<void> {
 
   console.log(``)
   console.log(chalk.green(`Done creating "${destination.name}" 🎉`))
-  console.log(chalk.green(`You can find it via: cd src/destinations/${destination.slug}`))
+  console.log(chalk.green(`You can find it via: cd ${destinationPath}`))
   console.log(``)
 }
 
 async function run() {
-  const destination = await prompts(questions)
+  const destination = await prompts(questions, promptOptions)
   console.log(``)
 
   await createDirectory(destination)

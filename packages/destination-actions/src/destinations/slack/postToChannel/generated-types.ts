@@ -5,13 +5,13 @@
  */
 export type WebhookURL = string
 /**
- * Slack channel to post message to.
- */
-export type Channel = string
-/**
  * The text message to post to Slack. You can use [Slack's formatting syntax.](https://api.slack.com/reference/surfaces/formatting)
  */
 export type Message = string
+/**
+ * Slack channel to post message to.
+ */
+export type Channel = string
 /**
  * User name to post messages as.
  */
@@ -23,8 +23,8 @@ export type IconURL = string
 
 export interface Payload {
   url: WebhookURL
-  channel?: Channel
   text: Message
+  channel?: Channel
   username?: User
   icon_url?: IconURL
 }

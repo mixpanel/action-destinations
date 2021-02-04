@@ -51,18 +51,18 @@ interface TestAuthSettings<Settings> {
 }
 
 interface Authentication<Settings> {
-  type: 'basic' | 'custom'
-  fields?: Record<string, InputField>
+  scheme: 'basic' | 'custom'
+  fields: Record<string, InputField>
   testAuthentication: (req: Got, input: TestAuthSettings<Settings>) => CancelableRequest<Response<string>>
 }
 
 interface CustomAuthentication<Settings> extends Authentication<Settings> {
   /** Typically used for "API Key" authentication. */
-  type: 'custom'
+  scheme: 'custom'
 }
 
 interface BasicAuthentication<Settings> extends Authentication<Settings> {
-  type: 'basic'
+  scheme: 'basic'
   // TODO evalute requiring "username" and "password" fields
   // and automatically handling the http auth stuff
   // fields: Record<'username' | 'password', InputField>
