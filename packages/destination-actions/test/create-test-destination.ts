@@ -46,8 +46,8 @@ class TestDestination<T> extends Destination<T> {
     mapping = mapping ?? {}
 
     if (!skipDefaultMappings) {
-      const schema = this.definition.actions[action].schema
-      const defaultMappings = mapValues(schema.properties, (prop) => prop.default)
+      const fields = this.definition.actions[action].fields
+      const defaultMappings = mapValues(fields, (prop) => prop.default)
       mapping = defaults(mapping, defaultMappings)
     }
 

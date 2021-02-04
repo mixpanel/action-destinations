@@ -7,47 +7,43 @@ const action: ActionDefinition<Settings, Payload> = {
   title: 'Create or Update Person',
   description: "Update a person in Customer.io or create them if they don't exist.",
   recommended: true,
-  schema: {
-    $schema: 'http://json-schema.org/schema#',
-    type: 'object',
-    additionalProperties: false,
-    defaultSubscription: 'type = "identify"',
-    properties: {
-      id: {
-        title: 'Person ID',
-        description: 'ID used to uniquely identify person in Customer.io.',
-        type: 'string',
-        default: {
-          '@template': '{{userId}}'
-        }
-      },
-      email: {
-        title: 'Email Address',
-        description: "Person's email address.",
-        type: 'string',
-        default: {
-          '@template': '{{traits.userId}}'
-        }
-      },
-      created_at: {
-        title: 'Created At',
-        description: 'Timestamp for when the person was created. Default is current date and time.',
-        type: 'string',
-        default: {
-          '@template': '{{timestamp}}'
-        }
-      },
-      custom_attributes: {
-        title: 'Custom Attributes',
-        description:
-          'Optional custom attributes for this person. When updating a person, attributes are added and not removed.',
-        type: 'object',
-        default: {
-          '@path': '$.traits'
-        }
+  defaultSubscription: 'type = "identify"',
+  fields: {
+    id: {
+      title: 'Person ID',
+      description: 'ID used to uniquely identify person in Customer.io.',
+      type: 'string',
+      required: true,
+      default: {
+        '@template': '{{userId}}'
       }
     },
-    required: ['id', 'email']
+    email: {
+      title: 'Email Address',
+      description: "Person's email address.",
+      type: 'string',
+      required: true,
+      default: {
+        '@template': '{{traits.userId}}'
+      }
+    },
+    created_at: {
+      title: 'Created At',
+      description: 'Timestamp for when the person was created. Default is current date and time.',
+      type: 'string',
+      default: {
+        '@template': '{{timestamp}}'
+      }
+    },
+    custom_attributes: {
+      title: 'Custom Attributes',
+      description:
+        'Optional custom attributes for this person. When updating a person, attributes are added and not removed.',
+      type: 'object',
+      default: {
+        '@path': '$.traits'
+      }
+    }
   },
 
   perform: (req, { payload }) => {

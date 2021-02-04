@@ -6,45 +6,41 @@ const action: ActionDefinition<Settings, Payload> = {
   title: 'Track Event',
   description: 'Track an event for a known person.',
   recommended: true,
-  schema: {
-    $schema: 'http://json-schema.org/schema#',
-    type: 'object',
-    additionalProperties: false,
-    defaultSubscription: 'type = "track"',
-    properties: {
-      id: {
-        title: 'Person ID',
-        description: 'ID of the person who triggered this event.',
-        type: 'string',
-        default: {
-          '@template': '{{userId}}'
-        }
-      },
-      name: {
-        title: 'Event Name',
-        type: 'string',
-        default: {
-          '@template': '{{event}}'
-        }
-      },
-      type: {
-        title: 'Event Type',
-        description: 'Override event type. Ex. "page".',
-        type: 'string',
-        default: {
-          '@template': '{{type}}'
-        }
-      },
-      data: {
-        title: 'Data',
-        description: 'Custom data to include with the event.',
-        type: 'object',
-        default: {
-          '@path': '$.properties'
-        }
+  defaultSubscription: 'type = "track"',
+  fields: {
+    id: {
+      title: 'Person ID',
+      description: 'ID of the person who triggered this event.',
+      type: 'string',
+      required: true,
+      default: {
+        '@template': '{{userId}}'
       }
     },
-    required: ['id', 'name']
+    name: {
+      title: 'Event Name',
+      type: 'string',
+      required: true,
+      default: {
+        '@template': '{{event}}'
+      }
+    },
+    type: {
+      title: 'Event Type',
+      description: 'Override event type. Ex. "page".',
+      type: 'string',
+      default: {
+        '@template': '{{type}}'
+      }
+    },
+    data: {
+      title: 'Data',
+      description: 'Custom data to include with the event.',
+      type: 'object',
+      default: {
+        '@path': '$.properties'
+      }
+    }
   },
 
   perform: (request, { payload }) => {

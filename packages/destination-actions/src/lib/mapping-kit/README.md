@@ -216,11 +216,10 @@ Valid:
 
 ## Validation
 
-Mapping configurations can be validated using [JSON Schema][schema.json]. The [test
+Mapping configurations can be validated using JSON Schema. The [test
 suite][schema.test.js] is a good source-of-truth for current implementation behavior.
 
-[schema.json]: https://github.com/segmentio/fab-5-engine/blob/master/lib/mapping-kit/schema.json
-[schema.test.js]: https://github.com/segmentio/fab-5-engine/blob/master/lib/mapping-kit/schema.test.js
+[schema.test.js]: https://github.com/segmentio/fab-5-engine/blob/master/packages/destination-actions/src/lib/mapping-kit/__tests__
 
 ## Options
 

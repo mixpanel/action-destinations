@@ -2,7 +2,6 @@ import {
   idToSlug,
   destinations as actionDestinations,
   DestinationDefinition,
-  ActionSchema,
   fieldsToJsonSchema
 } from '@segment/destination-actions'
 import { Dictionary, invert, uniq } from 'lodash'
@@ -97,13 +96,13 @@ function getBasicOptions(metadata: DestinationMetadata, destinationSchema: Desti
 function getOptions(metadata: DestinationMetadata, destinationSchema: DestinationSchema): DestinationMetadataOptions {
   const options: DestinationMetadataOptions = { ...metadata.options }
 
-  // We store the destination-level JSONSchema in an option with key `metadata`
+  // We store the destination-level JSON Schema in an option with key `metadata`
   options.metadata = {
     default: '',
     description: JSON.stringify({
       name: destinationSchema.name,
       slug: destinationSchema.slug,
-      settings: destinationSchema.schema
+      settings: destinationSchema.jsonSchema
     }),
     encrypt: false,
     hidden: false,
@@ -114,14 +113,16 @@ function getOptions(metadata: DestinationMetadata, destinationSchema: Destinatio
     validators: []
   }
 
-  // We store each action-level JSONSchema in separate options
+  // We store each action-level JSON Schema in separate options
   for (const actionPayload of destinationSchema.actions) {
     options[`action${actionPayload.slug}`] = {
       default: '',
       description: JSON.stringify({
         slug: actionPayload.slug,
-        schema: actionPayload.schema,
+        schema: actionPayload.jsonSchema,
+        defaultSubscription: actionPayload.defaultSubscription,
         recommended: actionPayload.recommended,
+        // TODO figure out if `settings` property is used anywhere
         settings: []
       }),
       encrypt: false,
@@ -134,8 +135,8 @@ function getOptions(metadata: DestinationMetadata, destinationSchema: Destinatio
     }
   }
 
-  const requiredProperties = (destinationSchema.schema?.required as string[]) ?? []
-  const properties = destinationSchema.schema?.properties ?? {}
+  const requiredProperties = (destinationSchema.jsonSchema?.required as string[]) ?? []
+  const properties = destinationSchema.jsonSchema?.properties ?? {}
   for (const name in properties) {
     const property = properties[name]
 
@@ -214,14 +215,15 @@ interface SchemasByDestination {
 interface DestinationSchema {
   name: string
   slug: string
-  schema: JSONSchema4 | undefined
+  jsonSchema: JSONSchema4 | undefined
   actions: Action[]
 }
 
 interface Action {
   slug: string
   recommended: boolean
-  schema: ActionSchema<unknown> & { title: string; description: string }
+  defaultSubscription?: string
+  jsonSchema: JSONSchema4
 }
 
 function getJsonSchemas(
@@ -246,10 +248,13 @@ function getJsonSchemas(
       actionPayloads.push({
         slug: actionSlug,
         recommended: action.recommended,
-        schema: {
+        defaultSubscription: action.defaultSubscription,
+        jsonSchema: {
           title: action.title,
           description: action.description,
-          ...action.schema
+          // For parity with what is happening today
+          defaultSubscription: action.defaultSubscription,
+          ...fieldsToJsonSchema(action.fields)
         }
       })
     }
@@ -257,7 +262,7 @@ function getJsonSchemas(
     schemasByDestination[destinationId] = {
       name: destination.name,
       slug: destinationSlug,
-      schema: fieldsToJsonSchema(destination.authentication?.fields),
+      jsonSchema: fieldsToJsonSchema(destination.authentication?.fields),
       actions: actionPayloads
     }
   }

@@ -29,6 +29,7 @@ export const eventSchema = {
     title: 'Event Type',
     type: 'string',
     description: 'A unique identifier for your event.',
+    required: true,
     examples: ['watch_tutorial'],
     default: {
       '@path': '$.event'

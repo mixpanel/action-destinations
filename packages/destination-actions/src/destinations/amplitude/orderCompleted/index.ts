@@ -39,65 +39,60 @@ const action: ActionDefinition<Settings, Payload> = {
   description:
     'Track purchased products from an event. This event will produce multiple events in Amplitude from a single Segment event, one for each product in the products array.',
   recommended: false,
+  defaultSubscription: 'type = "track" and event = "Order Completed"',
   // Uses the same fields as trackUser (we can duplicate it here, if needed)
-  schema: {
-    $schema: 'http://json-schema.org/schema#',
-    type: 'object',
-    defaultSubscription: 'type = "track" and event = "Order Completed"',
-    properties: {
-      ...eventSchema,
-      trackRevenuePerProduct: {
-        title: 'Track Revenue Per Product',
-        description:
-          'When enabled, track revenue with each product within the event. When disabled, track total revenue once for the event.',
-        type: 'boolean',
-        default: false
-      },
-      products: {
-        title: 'Products',
-        description: 'The list of products purchased.',
-        type: 'array',
-        items: {
-          type: 'object',
-          properties: {
-            price: {
-              title: 'Price',
-              type: 'number',
-              description:
-                'The price of the item purchased. Required for revenue data if the revenue field is not sent. You can use negative values to indicate refunds.'
-            },
-            quantity: {
-              title: 'Quantity',
-              type: 'integer',
-              description: 'The quantity of the item purchased. Defaults to 1 if not specified.'
-            },
-            revenue: {
-              title: 'Revenue',
-              type: 'number',
-              description:
-                'Revenue = price * quantity. If you send all 3 fields of price, quantity, and revenue, then (price * quantity) will be used as the revenue value. You can use negative values to indicate refunds.'
-            },
-            productId: {
-              title: 'Product ID',
-              type: 'string',
-              description:
-                'An identifier for the item purchased. You must send a price and quantity or revenue with this field.'
-            },
-            revenueType: {
-              title: 'Revenue Type',
-              type: 'string',
-              description:
-                'The type of revenue for the item purchased. You must send a price and quantity or revenue with this field.'
-            }
-          }
-        },
-        default: {
-          '@path': '$.properties.products'
-        }
-      }
+  fields: {
+    ...eventSchema,
+    trackRevenuePerProduct: {
+      title: 'Track Revenue Per Product',
+      description:
+        'When enabled, track revenue with each product within the event. When disabled, track total revenue once for the event.',
+      type: 'boolean',
+      required: true,
+      default: false
     },
-    additionalProperties: false,
-    required: ['event_type', 'trackRevenuePerProduct']
+    products: {
+      title: 'Products',
+      description: 'The list of products purchased.',
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          price: {
+            title: 'Price',
+            type: 'number',
+            description:
+              'The price of the item purchased. Required for revenue data if the revenue field is not sent. You can use negative values to indicate refunds.'
+          },
+          quantity: {
+            title: 'Quantity',
+            type: 'integer',
+            description: 'The quantity of the item purchased. Defaults to 1 if not specified.'
+          },
+          revenue: {
+            title: 'Revenue',
+            type: 'number',
+            description:
+              'Revenue = price * quantity. If you send all 3 fields of price, quantity, and revenue, then (price * quantity) will be used as the revenue value. You can use negative values to indicate refunds.'
+          },
+          productId: {
+            title: 'Product ID',
+            type: 'string',
+            description:
+              'An identifier for the item purchased. You must send a price and quantity or revenue with this field.'
+          },
+          revenueType: {
+            title: 'Revenue Type',
+            type: 'string',
+            description:
+              'The type of revenue for the item purchased. You must send a price and quantity or revenue with this field.'
+          }
+        }
+      },
+      default: {
+        '@path': '$.properties.products'
+      }
+    }
   },
   perform: (request, { payload, settings }) => {
     // Omit revenue properties initially because we will manually stitch those into events as prescribed

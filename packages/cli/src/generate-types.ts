@@ -1,5 +1,4 @@
 import fs from 'fs'
-import { JSONSchema4 } from 'json-schema'
 import { compile } from 'json-schema-to-typescript'
 import path from 'path'
 import prettier from 'prettier'
@@ -41,11 +40,11 @@ async function run() {
       }
 
       const actionDefinition: ActionDefinition<unknown> = (await import(actionPath)).default
-      if (!actionDefinition.schema) {
+      if (!actionDefinition.fields) {
         continue
       }
 
-      const generated = await compile(actionDefinition.schema as JSONSchema4, 'Payload', {
+      const generated = await compile(fieldsToJsonSchema(actionDefinition.fields), 'Payload', {
         bannerComment: COMMENT,
         style: prettierOptions
       })

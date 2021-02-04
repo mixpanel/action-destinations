@@ -13,14 +13,8 @@ const action: ActionDefinition<Settings, Payload> = {
   title: 'Track User',
   description: 'Sends user events to Amplitude.',
   recommended: true,
-  schema: {
-    $schema: 'http://json-schema.org/schema#',
-    type: 'object',
-    defaultSubscription: 'type = "track"',
-    properties: eventSchema,
-    additionalProperties: false,
-    required: ['event_type']
-  },
+  defaultSubscription: 'type = "track"',
+  fields: eventSchema,
   perform: (req, { payload, settings }) => {
     const event = { ...payload } as AmplitudeEvent
 

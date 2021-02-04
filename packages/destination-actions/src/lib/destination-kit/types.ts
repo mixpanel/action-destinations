@@ -2,7 +2,7 @@ import { Options } from 'got'
 import { JSONSchema4 } from 'json-schema'
 import { ExecuteInput } from './step'
 
-// TODO evaluate using JSONSchema at all
+// TODO evaluate using JSON Schema at all
 export interface InputField extends Omit<JSONSchema4, 'required'> {
   required?: boolean
 }

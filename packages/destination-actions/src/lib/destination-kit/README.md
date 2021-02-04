@@ -21,7 +21,12 @@ company", "track user", "trigger campaign").
 ```js
 // Create or update a customer record in Customer.io
 export default {
-  schema: require('./payload.schema.json'),
+  fields: {
+    id: { ... },
+    custom_attributes: { ... },
+    created_at: { ... },
+    // ... more
+  },
   perform: (req, { payload, settings }) => {
     const { id, custom_attributes: customAttrs, created_at, ...body } = payload
 
@@ -56,9 +61,8 @@ const destination: DestinationDefinition = {
   // The human-readable name of the destination
   name: 'Your Destination Name',
 
-  // The top-level settings for your destination represented as JSON Schema
-  // Would include things like `api_key`, `subdomain`, etc
-  schema: {},
+  // The authentication scheme and fields
+  authentication: {},
 
   // An optional function to extend the instance of `got` used for all actions
   extendRequest: ({ settings }) => {},
@@ -99,8 +103,8 @@ performing the action (aka talking to the partner API). Actions will look like t
 ```ts
 const action: ActionDefinition = {
   // The action-specific settings represented as JSON Schema
-  // Ideally the `properties` in this schema match the payload that the partner API expects
-  schema: {},
+  // Ideally these fields will match what the partner API expects
+  fields: {},
 
   // The set of fields that support UI-triggered interaction with the partner API to fetch choices (using the authenticated account)
   // For example: fetching a list of Slack channels the user can select

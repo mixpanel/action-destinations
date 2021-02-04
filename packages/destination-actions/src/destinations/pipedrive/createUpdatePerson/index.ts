@@ -31,52 +31,47 @@ const action: ActionDefinition<Settings, Payload> = {
   title: 'Create or Update Person',
   description: "Update a person in Pipedrive or create them if they don't exist yet.",
   recommended: true,
-  schema: {
-    $schema: 'http://json-schema.org/schema#',
-    type: 'object',
-    additionalProperties: false,
-    defaultSubscription: 'type = "identify"',
-    properties: {
-      identifier: {
-        title: 'Person ID',
-        description:
-          'Identifier used to find existing person in Pipedrive. Can be an email, name, phone number, or custom field value. Custom person fields may be included by using the long hash keys of the custom fields. These look like "33595c732cd7a027c458ea115a48a7f8a254fa86".',
-        type: 'string',
-        default: {
-          '@template': '{{userId}}'
-        }
-      },
-      name: {
-        title: 'Person Name',
-        type: 'string'
-      },
-      org_id: {
-        title: 'Organization ID',
-        description: 'ID of the organization this person will belong to.',
-        type: 'number',
-        autocomplete: true
-      },
-      email: {
-        title: 'Email Address',
-        description: 'Email addresses for this person.',
-        type: 'array',
-        items: {
-          type: 'string'
-        }
-      },
-      phone: {
-        title: 'Phone Number',
-        description: 'Phone number for the person.',
-        type: 'string'
-      },
-      add_time: {
-        title: 'Created At',
-        description:
-          'If the person is created, use this timestamp as the creation timestamp. Format: YYY-MM-DD HH:MM:SS',
+  defaultSubscription: 'type = "identify"',
+  fields: {
+    identifier: {
+      title: 'Person ID',
+      description:
+        'Identifier used to find existing person in Pipedrive. Can be an email, name, phone number, or custom field value. Custom person fields may be included by using the long hash keys of the custom fields. These look like "33595c732cd7a027c458ea115a48a7f8a254fa86".',
+      type: 'string',
+      required: true,
+      default: {
+        '@template': '{{userId}}'
+      }
+    },
+    name: {
+      title: 'Person Name',
+      type: 'string',
+      required: true
+    },
+    org_id: {
+      title: 'Organization ID',
+      description: 'ID of the organization this person will belong to.',
+      type: 'number',
+      autocomplete: true
+    },
+    email: {
+      title: 'Email Address',
+      description: 'Email addresses for this person.',
+      type: 'array',
+      items: {
         type: 'string'
       }
     },
-    required: ['identifier', 'name']
+    phone: {
+      title: 'Phone Number',
+      description: 'Phone number for the person.',
+      type: 'string'
+    },
+    add_time: {
+      title: 'Created At',
+      description: 'If the person is created, use this timestamp as the creation timestamp. Format: YYY-MM-DD HH:MM:SS',
+      type: 'string'
+    }
   },
 
   autocompleteFields: {

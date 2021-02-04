@@ -8,20 +8,12 @@ import NodeCache from 'node-cache'
 import createRequestClient from '../create-request-client'
 import { JSONLikeObject } from '../json-object'
 import { transform } from '../mapping-kit'
+import { fieldsToJsonSchema } from './fields-to-jsonschema'
 import { ExecuteInput, Step, StepResult, Steps } from './step'
-import type { RequestExtension, RequestExtensions } from './types'
+import type { InputField, RequestExtension, RequestExtensions } from './types'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type RequestFn<Settings, Payload> = (request: Got, data: ExecuteInput<Settings, Payload>) => any
-
-export interface ActionSchema<Payload> {
-  $schema: string
-  type: string
-  additionalProperties: boolean
-  properties: Record<keyof Payload, Record<string, unknown>>
-  defaultSubscription?: string
-  required?: string[]
-}
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface ActionDefinition<Settings, Payload = any> {
@@ -37,16 +29,20 @@ export interface ActionDefinition<Settings, Payload = any> {
   /** Whether the action is recommended for quick setup */
   recommended: boolean
 
+  /** An optional fql query that will be used to prepopulate the action when it is first set up */
+  defaultSubscription?: string
+
   /**
-   * The jsonschema representation of fields used to perform the action
+   * The fields used to perform the action. These fields should match what the partner API expects.
    *
-   * We may eventually auto-generate the jsonschema from a definition object
-   * instead of requiring devs to build and modify jsonschema directly.
+   * This is a set of JSON Schema properties right now.
+   * We may eventually auto-generate the JSON Schema from a definition object
+   * instead of requiring devs to build and modify JSON Schema directly.
    *
-   * Plus, jsonschema cannot fully represent our action or field definitions
+   * Plus, JSON Schema cannot fully represent our action or field definitions
    * without many custom keywords.
    */
-  schema: ActionSchema<Payload>
+  fields: Record<string, InputField>
 
   /**
    * Temporary way to "register" autocomplete fields.
@@ -295,8 +291,8 @@ export class Action<Settings, Payload extends JSONLikeObject> extends EventEmitt
   }
 
   private loadDefinition(definition: ActionDefinition<Settings, Payload>): void {
-    if (definition.schema) {
-      this.validatePayload(definition.schema)
+    if (definition.fields) {
+      this.validatePayload(definition.fields)
     }
 
     Object.entries(definition.autocompleteFields ?? {}).forEach(([field, callback]) => {
@@ -315,8 +311,8 @@ export class Action<Settings, Payload extends JSONLikeObject> extends EventEmitt
     }
   }
 
-  private validatePayload(schema: object): void {
-    const step = new Validate('payload', schema)
+  private validatePayload(fields: Record<string, InputField>): void {
+    const step = new Validate('payload', fieldsToJsonSchema(fields))
     this.steps.push(step)
   }
 

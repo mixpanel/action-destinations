@@ -6,13 +6,7 @@ const action: ActionDefinition<Settings, Payload> = {
   title: '{{name}}',
   description: '{{description}}',
   recommended: true,
-  schema: {
-    $schema: 'http://json-schema.org/schema#',
-    type: 'object',
-    additionalProperties: false,
-    properties: {},
-    required: []
-  },
+  fields: {},
   perform: (_request, _data) => {
     // Make your partner api request here!
   }

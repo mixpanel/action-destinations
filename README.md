@@ -107,13 +107,8 @@ Action destinations are configured using a single Destination setting (`subscrip
     "subscribe": "<fql query>",
     "partnerAction": "<actionSlug>",
 
-    // See ./lib/mapping-kit/README.md for documentation. The schema for each partner action is
-    // defined in ./destinations/<destinationSlug/<actionSlug>/schema.json
-    "mapping": { ... },
-
-    // See ./destinations/<destinationSlug>/<actionSlug>/settings.json. This can be a mapping-kit
-    // mapping definition. See ./lib/mapping-kit/README.md for documentation.
-    "settings": { ... }
+    // See ./lib/mapping-kit/README.md for documentation. The keys in this object should match the `action.fields`
+    "mapping": { ... }
   }
 ]
 ```
@@ -149,7 +144,7 @@ Here's a full example:
 
 ## Syncing json schemas
 
-Everytime the json schema changes for destinations or actions, run the following commands:
+Everytime the definition for destinations or actions changes, run the following commands:
 
 ```sh
 $ robo sshuttle

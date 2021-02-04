@@ -3,7 +3,7 @@ import { BadRequest } from 'http-errors'
 import got, { CancelableRequest, Got, Response } from 'got'
 import { flatten } from 'lodash'
 import { JSONSchema4 } from 'json-schema'
-import { Action, ActionSchema, ActionDefinition, Validate } from './action'
+import { Action, ActionDefinition, Validate } from './action'
 import { ExecuteInput, StepResult } from './step'
 import { time, duration } from '../time'
 import { JSONLikeObject, JSONObject } from '../json-object'
@@ -11,7 +11,7 @@ import { SegmentEvent } from '../segment-event'
 import { fieldsToJsonSchema } from './fields-to-jsonschema'
 import type { InputField, RequestExtension } from './types'
 
-export type { ActionDefinition, ActionSchema }
+export type { ActionDefinition }
 export { fieldsToJsonSchema }
 
 export interface SubscriptionStats {

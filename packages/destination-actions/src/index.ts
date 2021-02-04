@@ -1,6 +1,5 @@
 export * from './destinations'
 export {
-  ActionSchema,
   ActionDefinition,
   Destination,
   DestinationDefinition,

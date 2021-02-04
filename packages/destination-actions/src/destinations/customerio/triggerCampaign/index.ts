@@ -38,38 +38,32 @@ const action: ActionDefinition<Settings, Payload> = {
   title: 'Trigger Broadcast',
   description: 'Trigger a Customer.io broadcast campaign.',
   recommended: false,
-  schema: {
-    $schema: 'http://json-schema.org/schema#',
-    type: 'object',
-    additionalProperties: false,
-    properties: {
-      id: {
-        title: 'Campaign ID',
-        description: 'ID of the campaign to trigger.',
-        type: 'number',
-        autocomplete: true
-      },
-      data: {
-        title: 'Data',
-        description: 'Custom Liquid merge data to include with the trigger.',
-        type: 'object',
-        default: {
-          '@path': '$.properties'
-        }
-      },
-      recipients: {
-        title: 'Recipients',
-        description: 'Additional recipient conditions to filter recipients. If this is used, "IDs" may not be used.',
-        type: 'object'
-      },
-      ids: {
-        title: 'Profile IDs',
-        description:
-          'List of profile IDs to use as campaign recipients. If this is used, "Recipients" may not be used.',
-        type: 'array'
+  fields: {
+    id: {
+      title: 'Campaign ID',
+      description: 'ID of the campaign to trigger.',
+      type: 'number',
+      required: true,
+      autocomplete: true
+    },
+    data: {
+      title: 'Data',
+      description: 'Custom Liquid merge data to include with the trigger.',
+      type: 'object',
+      default: {
+        '@path': '$.properties'
       }
     },
-    required: ['id']
+    recipients: {
+      title: 'Recipients',
+      description: 'Additional recipient conditions to filter recipients. If this is used, "IDs" may not be used.',
+      type: 'object'
+    },
+    ids: {
+      title: 'Profile IDs',
+      description: 'List of profile IDs to use as campaign recipients. If this is used, "Recipients" may not be used.',
+      type: 'array'
+    }
   },
 
   autocompleteFields: {
