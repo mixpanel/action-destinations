@@ -26,3 +26,16 @@ export function fieldsToJsonSchema(fields: Record<string, InputField> = {}): JSO
     required
   }
 }
+
+export function jsonSchemaToFields(schema: JSONSchema4 = {}): Record<string, InputField> {
+  const requiredFields = (schema.required as string[]) ?? []
+  const properties = (schema.properties as Record<string, InputField>) ?? {}
+
+  for (const key of Object.keys(properties)) {
+    if (requiredFields.includes(key)) {
+      properties[key].required = true
+    }
+  }
+
+  return properties
+}

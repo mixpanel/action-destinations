@@ -2,15 +2,20 @@ import {
   idToSlug,
   destinations as actionDestinations,
   DestinationDefinition,
-  fieldsToJsonSchema
+  fieldsToJsonSchema,
+  jsonSchemaToFields,
+  ActionDefinition
 } from '@segment/destination-actions'
-import { Dictionary, invert, uniq } from 'lodash'
+import chalk from 'chalk'
+import { Dictionary, invert, pick, uniq } from 'lodash'
 import ControlPlaneService, {
   DestinationMetadata,
   DestinationMetadataOptions,
   DestinationMetadataUpdateInput
 } from '@segment/control-plane-service-client'
+import { diffString } from 'json-diff'
 import { JSONSchema4 } from 'json-schema'
+import ora from 'ora'
 import prompts from 'prompts'
 
 const promptOptions = {
@@ -30,6 +35,19 @@ const controlPlaneService = new ControlPlaneService({
   }
 })
 
+interface PromptAnswers {
+  chosenSlugs: string[]
+}
+
+type DefinitionJson = Omit<DestinationDefinition, 'actions' | 'extendRequest' | 'authentication'> & {
+  authentication?: Omit<NonNullable<DestinationDefinition['authentication']>, 'testAuthentication'>
+  actions: {
+    [slug: string]: Omit<ActionDefinition<unknown>, 'perform' | 'autocompleteFields' | 'cachedFields'>
+  }
+}
+
+let spinner: ora.Ora
+
 /**
  * This script syncs our json schema settings for each destination and its actions into the corresponding destination metadata.
  *
@@ -43,7 +61,7 @@ const controlPlaneService = new ControlPlaneService({
 async function run() {
   const slugToId = invert(idToSlug)
   const availableSlugs = Object.keys(slugToId)
-  const { chosenSlugs } = await prompts(
+  const { chosenSlugs }: PromptAnswers = await prompts(
     {
       type: 'multiselect',
       name: 'chosenSlugs',
@@ -66,21 +84,64 @@ async function run() {
     destinationIds.push(id)
   }
 
+  console.log('')
+  spinner = ora()
+  spinner.start(`Fetching existing definitions for ${chosenSlugs.map((slug) => chalk.greenBright(slug)).join(', ')}...`)
+
   const schemasByDestination = getJsonSchemas(actionDestinations, destinationIds, slugToId)
   const metadatas = await getDestinationMetadatas(destinationIds)
 
   if (metadatas.length !== Object.keys(schemasByDestination).length) {
+    spinner.fail()
     throw new Error('Number of metadatas must match number of schemas')
   }
 
+  spinner.stop()
+
   const promises = []
-
   for (const metadata of metadatas) {
-    console.log(`Syncing ${metadata.slug}`)
-
     const schemaForDestination = schemasByDestination[metadata.id]
+    const slug = schemaForDestination.slug
+
+    console.log('')
+    console.log(`${chalk.bold.whiteBright(slug)}`)
+    spinner.start(`Generating diff for ${chalk.bold(slug)}...`)
+
     const basicOptions = getBasicOptions(metadata, schemaForDestination)
     const options = getOptions(metadata, schemaForDestination)
+    const settingsDiff = diffString(
+      asJson(pick(metadata, ['basicOptions', 'options'])),
+      asJson({ basicOptions, options })
+    )
+
+    const oldDefinition = settingsToDefinition(metadata, schemaForDestination.definition)
+    const newDefinition = definitionToJson(schemaForDestination.definition)
+    const definitionDiff = diffString(oldDefinition, newDefinition)
+
+    if (definitionDiff) {
+      spinner.warn(`Detected definition diff for ${chalk.bold(schemaForDestination.slug)}, please review:`)
+      console.log(`\n${definitionDiff}`)
+    } else if (settingsDiff) {
+      spinner.warn(`Detected settings diff for ${chalk.bold(schemaForDestination.slug)}, please review:`)
+      console.log(`\n${settingsDiff}`)
+    } else {
+      spinner.info(`No change for ${chalk.bold(schemaForDestination.slug)}. Skipping.`)
+      continue
+    }
+
+    const { shouldContinue } = await prompts(
+      {
+        type: 'confirm',
+        name: 'shouldContinue',
+        message: `Publish change for ${slug}?`,
+        initial: false
+      },
+      promptOptions
+    )
+
+    if (!shouldContinue) {
+      continue
+    }
 
     promises.push(
       updateDestinationMetadata(metadata.id, {
@@ -91,6 +152,86 @@ async function run() {
   }
 
   await Promise.all(promises)
+}
+
+function asJson(obj: unknown) {
+  if (typeof obj !== 'object' || Array.isArray(obj) || obj === null) {
+    return obj
+  }
+
+  const newObj: Record<string, unknown> = { ...obj }
+  for (const key of Object.keys(newObj)) {
+    let value = newObj[key]
+    if (typeof value === 'string') {
+      try {
+        value = JSON.parse(value)
+      } catch (_err) {
+        // do nothing
+      }
+    }
+    newObj[key] = asJson(value)
+  }
+
+  return newObj
+}
+
+function definitionToJson(definition: DestinationDefinition) {
+  // Create a copy that only includes serializable properties
+  const copy = JSON.parse(JSON.stringify(definition))
+
+  for (const action of Object.keys(copy.actions)) {
+    delete copy.actions[action]?.autocompleteFields
+    delete copy.actions[action]?.cachedFields
+  }
+
+  return copy
+}
+
+function settingsToDefinition(
+  { basicOptions, options }: DestinationMetadata,
+  definition: DestinationDefinition
+): DefinitionJson {
+  const existingDefinition: DefinitionJson = {
+    name: definition.name,
+    actions: {}
+  }
+
+  // grab the destination-level definition from the `metadata` option
+  if (typeof options.metadata?.description === 'string') {
+    const meta = JSON.parse(options.metadata.description) as { settings: JSONSchema4 }
+
+    // pull out authentication-related fields from a JSON Schema-looking thing
+    const authFields = jsonSchemaToFields(meta?.settings)
+
+    if (Object.keys(authFields).length > 0) {
+      existingDefinition.authentication = {
+        scheme: definition.authentication?.scheme ?? 'custom',
+        fields: authFields
+      }
+    }
+  }
+
+  // find actions based on the naming scheme `action${slug}` in the `basicOptions`
+  const actionSlugs = basicOptions
+    .filter((option) => option.startsWith('action'))
+    .map((option) => option.replace(/^action/, ''))
+
+  for (const slug of actionSlugs) {
+    const meta = JSON.parse(options[`action${slug}`]?.description ?? 'null')
+    if (!meta) continue
+
+    existingDefinition.actions[slug] = {
+      title: meta.schema?.title,
+      description: meta.schema?.description,
+      // backwards compat for now
+      defaultSubscription: meta.defaultSubscription ?? meta.schema?.defaultSubscription,
+      recommended: meta.recommended,
+      fields: jsonSchemaToFields(meta.schema)
+    }
+  }
+
+  // Remove undefined values
+  return JSON.parse(JSON.stringify(existingDefinition))
 }
 
 function getBasicOptions(metadata: DestinationMetadata, destinationSchema: DestinationSchema): string[] {
@@ -227,6 +368,7 @@ interface DestinationSchema {
   slug: string
   jsonSchema: JSONSchema4 | undefined
   actions: Action[]
+  definition: DestinationDefinition
 }
 
 interface Action {
@@ -273,7 +415,8 @@ function getJsonSchemas(
       name: destination.name,
       slug: destinationSlug,
       jsonSchema: fieldsToJsonSchema(destination.authentication?.fields),
-      actions: actionPayloads
+      actions: actionPayloads,
+      definition: destination
     }
   }
 

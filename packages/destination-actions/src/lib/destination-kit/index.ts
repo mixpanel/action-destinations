@@ -8,11 +8,11 @@ import { ExecuteInput, StepResult } from './step'
 import { time, duration } from '../time'
 import { JSONLikeObject, JSONObject } from '../json-object'
 import { SegmentEvent } from '../segment-event'
-import { fieldsToJsonSchema } from './fields-to-jsonschema'
+import { fieldsToJsonSchema, jsonSchemaToFields } from './fields-to-jsonschema'
 import type { InputField, RequestExtension } from './types'
 
 export type { ActionDefinition }
-export { fieldsToJsonSchema }
+export { fieldsToJsonSchema, jsonSchemaToFields }
 
 export interface SubscriptionStats {
   duration: number

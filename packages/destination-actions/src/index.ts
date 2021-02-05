@@ -4,7 +4,8 @@ export {
   Destination,
   DestinationDefinition,
   SubscriptionStats,
-  fieldsToJsonSchema
+  fieldsToJsonSchema,
+  jsonSchemaToFields
 } from './lib/destination-kit'
 export { SegmentEvent } from './lib/segment-event'
 export * from './lib/json-object'
