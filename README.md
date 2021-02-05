@@ -6,10 +6,10 @@ Fab 5 Engine is a prototype of destinations following the Destinations 2.0 visio
 
 ![Destinations 2.0 flow][architecture]
 
-See also: [Beginner's Guide][beginner]
+See also: [Destination Actions Interface][paper]
 
 [architecture]: https://user-images.githubusercontent.com/111501/83700205-10f23e80-a5bb-11ea-9fbe-b1b10c1ed464.png
-[beginner]: https://paper.dropbox.com/doc/Fab-5-Engine-Beginners-Guide--A2~KoOcu4qM1rlyX_ZfpyCFTAg-BMfDUPaKMvghmXEtaZpq2
+[paper]: https://paper.dropbox.com/doc/Destination-Actions-Interface--BEm_rg0r5EoNyrJriPt~tOA7Ag-BS1RKGj9VKTcjqLrCSuBV
 
 ## Local Development
 
