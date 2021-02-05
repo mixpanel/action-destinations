@@ -131,4 +131,30 @@ describe('Amplitude', () => {
       })
     })
   })
+
+  describe('mapUser', () => {
+    it('should work with default mappings', async () => {
+      const event = createSegmentEvent({
+        type: 'alias',
+        userId: 'some-user-id',
+        previousId: 'some-previous-user-id'
+      })
+
+      nock('https://api.amplitude.com').post('/usermap').reply(200, {})
+
+      const responses = await testDestination.testAction('mapUser', { event })
+      expect(responses.length).toBe(1)
+      expect(responses[0].statusCode).toBe(200)
+      expect(responses[0].body).toBe('{}')
+      expect(responses[0].request.options.form).toMatchObject({
+        api_key: undefined,
+        mapping: JSON.stringify([
+          {
+            user_id: event.previousId,
+            global_user_id: event.userId
+          }
+        ])
+      })
+    })
+  })
 })
