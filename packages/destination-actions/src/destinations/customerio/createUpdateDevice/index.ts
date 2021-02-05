@@ -7,7 +7,7 @@ const action: ActionDefinition<Settings, Payload> = {
   title: 'Create or Update Device',
   description: "Update a person's device in Customer.io or create it if it doesn't exist.",
   recommended: true,
-  defaultSubscription: 'event = "Application Installed"',
+  defaultSubscription: 'type = "track" and event = "Application Installed"',
   fields: {
     person_id: {
       title: 'Person ID',
