@@ -23,12 +23,11 @@ interface InputData<Settings> {
    */
   settings?: Settings
   /**
-   * Whether or not to *skip* default mappings (only happens during testing).
-   * Set to `true` if you want to explicitly provide the raw input.
-   * Set to `false` or omit if you want to test that defaultMappings
-   * work for any missing properties.
+   * Whether or not to use default mappings in the test.
+   * Set to `false` or omit if you want to explicitly provide the raw input.
+   * Set to `true` if you want to test the defaultMappings (along with any mapping passed in)
    */
-  skipDefaultMappings?: boolean
+  useDefaultMappings?: boolean
 }
 
 class TestDestination<T> extends Destination<T> {
@@ -41,11 +40,11 @@ class TestDestination<T> extends Destination<T> {
   /** Testing method that runs an action e2e while allowing slightly more flexible inputs */
   async testAction(
     action: string,
-    { event, mapping, settings, skipDefaultMappings }: InputData<T>
+    { event, mapping, settings, useDefaultMappings }: InputData<T>
   ): Promise<Destination['responses']> {
     mapping = mapping ?? {}
 
-    if (!skipDefaultMappings) {
+    if (useDefaultMappings) {
       const fields = this.definition.actions[action].fields
       const defaultMappings = mapValues(fields, (prop) => prop.default)
       mapping = defaults(mapping, defaultMappings)

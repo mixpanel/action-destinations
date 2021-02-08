@@ -13,7 +13,7 @@ describe('Amplitude', () => {
 
       nock('https://api2.amplitude.com/2').post('/httpapi').reply(200, {})
 
-      const responses = await testDestination.testAction('trackUser', { event })
+      const responses = await testDestination.testAction('trackUser', { event, useDefaultMappings: true })
       expect(responses.length).toBe(1)
       expect(responses[0].statusCode).toBe(200)
       expect(responses[0].body).toBe('{}')
@@ -34,7 +34,7 @@ describe('Amplitude', () => {
 
       nock('https://api2.amplitude.com/2').post('/httpapi').reply(200, {})
 
-      const responses = await testDestination.testAction('trackUser', { event })
+      const responses = await testDestination.testAction('trackUser', { event, useDefaultMappings: true })
       expect(responses.length).toBe(1)
       expect(responses[0].statusCode).toBe(200)
       expect(responses[0].body).toBe('{}')
@@ -69,7 +69,7 @@ describe('Amplitude', () => {
 
       nock('https://api2.amplitude.com/2').post('/httpapi').reply(200, {})
 
-      const responses = await testDestination.testAction('orderCompleted', { event })
+      const responses = await testDestination.testAction('orderCompleted', { event, useDefaultMappings: true })
       expect(responses.length).toBe(1)
       expect(responses[0].statusCode).toBe(200)
       expect(responses[0].request.options.json).toMatchObject({
@@ -111,7 +111,7 @@ describe('Amplitude', () => {
         trackRevenuePerProduct: true
       }
 
-      const responses = await testDestination.testAction('orderCompleted', { event, mapping })
+      const responses = await testDestination.testAction('orderCompleted', { event, mapping, useDefaultMappings: true })
       expect(responses.length).toBe(1)
       expect(responses[0].statusCode).toBe(200)
       expect(responses[0].request.options.json).toMatchObject({
@@ -142,7 +142,7 @@ describe('Amplitude', () => {
 
       nock('https://api.amplitude.com').post('/usermap').reply(200, {})
 
-      const responses = await testDestination.testAction('mapUser', { event })
+      const responses = await testDestination.testAction('mapUser', { event, useDefaultMappings: true })
       expect(responses.length).toBe(1)
       expect(responses[0].statusCode).toBe(200)
       expect(responses[0].body).toBe('{}')
