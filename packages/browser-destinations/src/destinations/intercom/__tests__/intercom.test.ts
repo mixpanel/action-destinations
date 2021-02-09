@@ -44,7 +44,8 @@ beforeEach(async () => {
   const jsd = new jsdom.JSDOM(html, {
     runScripts: 'dangerously',
     resources: 'usable',
-    url: 'https://localhost'
+    // navigate to intercom itself, so we can actually load their app id
+    url: 'https://intercom.com'
   })
 
   const windowSpy = jest.spyOn(global, 'window', 'get')
@@ -55,16 +56,17 @@ test('can load intercom', async () => {
   const intercom = browserDestinationPlugin(
     intercomDestination,
     {
-      app_id: 'abc'
+      // using itercom's app_id from intercom.com
+      app_id: 'tx2p130c'
     },
     example
   )
 
   jest.spyOn(intercomDestination.actions.show, 'perform')
-  jest.spyOn(intercomDestination, 'bootstrap')
+  jest.spyOn(intercomDestination, 'initialize')
 
   await intercom.load(Context.system(), {} as Analytics)
-  expect(intercomDestination.bootstrap).toHaveBeenCalled()
+  expect(intercomDestination.initialize).toHaveBeenCalled()
 
   const ctx = await intercom.track?.(
     new Context({
@@ -82,7 +84,7 @@ test('can load intercom', async () => {
   expect(scripts).toMatchInlineSnapshot(`
     NodeList [
       <script
-        src="https://widget.intercom.io/widget/abc"
+        src="https://widget.intercom.io/widget/tx2p130c"
         status="loaded"
         type="text/javascript"
       />,

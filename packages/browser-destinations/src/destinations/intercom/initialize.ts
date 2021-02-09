@@ -14,7 +14,7 @@ async function load(appId: string) {
   }
 }
 
-export async function bootstrap({ app_id }: Settings): Promise<Intercom_.IntercomStatic> {
+export async function initialize({ app_id }: Settings): Promise<Intercom_.IntercomStatic> {
   window.intercomSettings = { app_id }
   await load(app_id)
   await resolveWhen(() => window.document.querySelector('#intercom-frame') !== null)

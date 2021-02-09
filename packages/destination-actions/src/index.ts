@@ -4,6 +4,9 @@ export {
   Destination,
   DestinationDefinition,
   SubscriptionStats,
+  AuthenticationScheme,
+  BasicAuthentication,
+  CustomAuthentication,
   fieldsToJsonSchema,
   jsonSchemaToFields
 } from './lib/destination-kit'

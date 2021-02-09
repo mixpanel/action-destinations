@@ -56,12 +56,12 @@ interface Authentication<Settings> {
   testAuthentication: (req: Got, input: TestAuthSettings<Settings>) => CancelableRequest<Response<string>>
 }
 
-interface CustomAuthentication<Settings> extends Authentication<Settings> {
+export interface CustomAuthentication<Settings> extends Authentication<Settings> {
   /** Typically used for "API Key" authentication. */
   scheme: 'custom'
 }
 
-interface BasicAuthentication<Settings> extends Authentication<Settings> {
+export interface BasicAuthentication<Settings> extends Authentication<Settings> {
   scheme: 'basic'
   // TODO evalute requiring "username" and "password" fields
   // and automatically handling the http auth stuff
@@ -69,7 +69,7 @@ interface BasicAuthentication<Settings> extends Authentication<Settings> {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AuthenticationScheme<Settings = any> = BasicAuthentication<Settings> | CustomAuthentication<Settings>
+export type AuthenticationScheme<Settings = any> = BasicAuthentication<Settings> | CustomAuthentication<Settings>
 
 interface EventInput<Settings> {
   readonly event: SegmentEvent

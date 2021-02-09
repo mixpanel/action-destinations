@@ -9,6 +9,7 @@
   },
   "scripts": {
     "actions": "yarn workspace @segment/destination-actions",
+    "browser": "yarn workspace @segment/browser-destinations",
     "build": "yarn generate-types && yarn workspaces run build",
     "cli": "yarn workspace @segment/destination-actions-cli",
     "dev": "yarn server dev",

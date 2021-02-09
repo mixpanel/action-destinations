@@ -1,5 +1,8 @@
-import { validate, parseFql } from '@segment/fab5-subscriptions'
-import { Plugin, Context } from '@segment/analytics-next'
+import { Context, Plugin } from '@segment/analytics-next'
+import { JSONObject } from '@segment/destination-actions'
+import { ExecuteInput } from '@segment/destination-actions/dist/lib/destination-kit/step'
+import { transform } from '@segment/destination-actions/dist/lib/mapping-kit'
+import { parseFql, validate } from '@segment/fab5-subscriptions'
 import { BrowserDestinationDefinition, Subscription } from '../lib/browser-destinations'
 
 export function browserDestinationPlugin<S, C>(
@@ -17,9 +20,11 @@ export function browserDestinationPlugin<S, C>(
 
     const invocations = validSubs.map(async (sub) => {
       const actionSlug = sub.partnerAction
-      const input = {
-        event: ctx.event,
-        mapping: sub.mapping ?? {},
+
+      const input: ExecuteInput<S, unknown> = {
+        payload: ctx.event,
+        mapping: (sub.mapping ?? {}) as JSONObject,
+        cachedFields: {},
         settings
       }
 
@@ -28,7 +33,11 @@ export function browserDestinationPlugin<S, C>(
         return
       }
 
-      return action.perform(client, input, settings)
+      if (sub.mapping) {
+        input.payload = transform(sub.mapping, input.payload as JSONObject)
+      }
+
+      return action.perform(client, input)
     })
 
     await Promise.all(invocations)
@@ -44,7 +53,7 @@ export function browserDestinationPlugin<S, C>(
 
     isLoaded: () => client !== undefined,
     load: async () => {
-      client = await def.bootstrap(settings)
+      client = await def.initialize(settings)
     },
 
     track: evaluate,

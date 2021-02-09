@@ -1,10 +1,8 @@
 // Generated file. DO NOT MODIFY IT BY HAND.
 
-/**
- * Intercom App Id. This can be found on your [Developer Hub](https://app.intercom.com/a/apps/_/developer-hub).
- */
-export type AppId = string
-
 export interface Settings {
-  app_id: AppId
+  /**
+   * Your workspace ID (this appears as app _id in your code) is a unique code assigned to your app when you create it in Intercom. https://www.intercom.com/help/en/articles/3539-where-can-i-find-my-workspace-id-app-id
+   */
+  app_id: string
 }
