@@ -64,7 +64,6 @@
   },
   "jest": {
     "preset": "ts-jest",
-    "testEnvironment": "node",
     "forceExit": true,
     "globals": {
       "ts-jest": {

@@ -17,6 +17,7 @@ This project is a monorepo with multiple packages using Yarn Workspaces:
 
 - `packages/cli` - a set of command line tools for interacting with the repo
 - `packages/destinations-actions` - an npm package for use in `integrations`
+- `packages/browser-destinations` - an npm package for use in `@segment/analytics-next`
 - `packages/server` - a data plane ECS service (the main `app.js`) and control plane ECS service (`ops/server.js`)
 
 ```
@@ -33,6 +34,7 @@ To install deps in a particular workspace (i.e. `packages/*`) you will need to u
 Or you can use the native Yarn longhand command:
 
 - `yarn workspace @segment/destination-actions <add/remove> <package>`
+- `yarn workspace @segment/browser-destinations <add/remove> <package>`
 - `yarn workspace @segment/destination-actions-server <add/remove> <package>`
 - `yarn workspace @segment/destination-actions-cli <add/remove> <package>`
 

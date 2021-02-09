@@ -1,0 +1,14 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "target": "es2018",
+    "lib": ["es2018", "dom"],
+    "declaration": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "composite": true
+  },
+  "exclude": ["tests", "**/__tests__/**/*.ts"],
+  "include": ["src"],
+  "references": [{ "path": "../destination-actions/tsconfig.build.json" }]
+}
