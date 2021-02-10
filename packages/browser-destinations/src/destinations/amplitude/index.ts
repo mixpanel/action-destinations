@@ -1,4 +1,6 @@
 import logEvent from './logEvent'
+import orderCompleted from './orderCompleted'
+
 import { AmplitudeClient } from 'amplitude-js'
 import type { Settings } from './generated-types'
 import { BrowserDestinationDefinition } from '../../lib/browser-destinations'
@@ -17,7 +19,8 @@ const destination: BrowserDestinationDefinition<Settings, AmplitudeClient> = {
     }
   },
   actions: {
-    logEvent
+    logEvent,
+    orderCompleted
   },
   initialize: async (settings) => {
     await loadScript('https://cdn.amplitude.com/libs/amplitude-7.2.1-min.gz.js')
