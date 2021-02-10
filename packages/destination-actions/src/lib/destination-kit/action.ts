@@ -140,16 +140,7 @@ class Request<Settings, Payload> extends Step<Settings, Payload> {
 
     const request = this.createRequestClient(data)
 
-    let response: Response | JSONLikeObject | null
-    try {
-      response = await this.requestFn(request, data)
-      this.emit('response', response)
-    } catch (e) {
-      if (e.response) {
-        this.emit('response', e.response)
-      }
-      throw e
-    }
+    const response: Response | JSONLikeObject | null = await this.requestFn(request, data)
 
     if (response === null) {
       return 'TODO: null'
@@ -160,7 +151,25 @@ class Request<Settings, Payload> extends Step<Settings, Payload> {
 
   protected createRequestClient(data: ExecuteInput<Settings, Payload>): Got {
     const options = this.extensions.map((extension) => extension(data))
-    return createRequestClient(...options)
+    const client = createRequestClient(...options).extend({
+      hooks: {
+        beforeError: [
+          (error) => {
+            // @ts-ignore the type is wrong in got
+            const { response } = error
+            this.emit('response', response)
+            return error
+          }
+        ],
+        afterResponse: [
+          (response) => {
+            this.emit('response', response)
+            return response
+          }
+        ]
+      }
+    })
+    return client
   }
 }
 
