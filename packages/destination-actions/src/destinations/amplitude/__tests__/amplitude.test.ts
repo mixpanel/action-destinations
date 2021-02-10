@@ -2,6 +2,7 @@ import nock from 'nock'
 import { createSegmentEvent } from '../../../../test/create-segment-event'
 import { createTestDestination } from '../../../../test/create-test-destination'
 import Amplitude from '../index'
+import dayjs from '../../../lib/dayjs'
 
 const testDestination = createTestDestination(Amplitude)
 const timestamp = new Date().toISOString()
@@ -152,6 +153,82 @@ describe('Amplitude', () => {
           {
             user_id: event.previousId,
             global_user_id: event.userId
+          }
+        ])
+      })
+    })
+  })
+
+  describe('groupIdentifyUser', () => {
+    const event = createSegmentEvent({
+      timestamp,
+      type: 'group',
+      userId: 'some-user-id',
+      traits: {
+        'some-trait-key': 'some-trait-value'
+      }
+    })
+
+    const mapping = {
+      insert_id: 'some-insert-id',
+      group_type: 'some-type',
+      group_value: 'some-value'
+    }
+
+    const groups = {
+      [mapping.group_type]: mapping.group_value
+    }
+
+    it('should fire identify call to Amplitude', async () => {
+      nock('https://api.amplitude.com').post('/identify').reply(200, {})
+      nock('https://api.amplitude.com').post('/groupidentify').reply(200, {})
+
+      const [response] = await testDestination.testAction('groupIdentifyUser', {
+        event,
+        mapping,
+        useDefaultMappings: true
+      })
+
+      expect(response.statusCode).toBe(200)
+      expect(response.body).toBe('{}')
+      expect(response.request.options.form).toMatchObject({
+        api_key: undefined,
+        identification: JSON.stringify([
+          {
+            device_id: event.anonymousId,
+            groups,
+            insert_id: mapping.insert_id,
+            library: 'segment',
+            time: dayjs.utc(timestamp).valueOf(),
+            user_id: event.userId,
+            user_properties: groups
+          }
+        ])
+      })
+    })
+
+    it('should fire groupidentify call to Amplitude', async () => {
+      nock('https://api.amplitude.com').post('/identify').reply(200, {})
+      nock('https://api.amplitude.com').post('/groupidentify').reply(200, {})
+
+      const [, response] = await testDestination.testAction('groupIdentifyUser', {
+        event,
+        mapping,
+        useDefaultMappings: true
+      })
+
+      expect(response.statusCode).toBe(200)
+      expect(response.body).toBe('{}')
+      expect(response.request.options.form).toMatchObject({
+        api_key: undefined,
+        identification: JSON.stringify([
+          {
+            group_properties: {
+              'some-trait-key': 'some-trait-value'
+            },
+            group_value: mapping.group_value,
+            group_type: mapping.group_type,
+            library: 'segment'
           }
         ])
       })

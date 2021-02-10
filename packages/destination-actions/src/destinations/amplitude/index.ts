@@ -3,6 +3,7 @@ import identifyUser from './identifyUser'
 import trackUser from './trackUser'
 import orderCompleted from './orderCompleted'
 import mapUser from './mapUser'
+import groupIdentifyUser from './groupIdentifyUser'
 import type { Settings } from './generated-types'
 
 const destination: DestinationDefinition<Settings> = {
@@ -37,7 +38,8 @@ const destination: DestinationDefinition<Settings> = {
     trackUser,
     identifyUser,
     orderCompleted,
-    mapUser
+    mapUser,
+    groupIdentifyUser
   }
 }
 
