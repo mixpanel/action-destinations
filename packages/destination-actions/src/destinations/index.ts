@@ -4,8 +4,10 @@ import customerio from './customerio'
 import pipedrive from './pipedrive'
 import slack from './slack'
 
+export type ActionDestinationSlug = 'amplitude' | 'customerio' | 'pipedrive' | 'slack'
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const destinations: Record<string, DestinationDefinition<any>> = {
+export const destinations: Record<ActionDestinationSlug, DestinationDefinition<any>> = {
   amplitude,
   customerio,
   pipedrive,
@@ -20,7 +22,7 @@ export const idToSlug: Record<string, string> = {
 }
 
 export function getDestinationBySlug(slug: string): Destination {
-  const destination = destinations[slug]
+  const destination = destinations[slug as ActionDestinationSlug]
 
   if (!destination) {
     throw new Error('Destination not found')
