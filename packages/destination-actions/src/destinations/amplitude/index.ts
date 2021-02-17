@@ -4,6 +4,8 @@ import trackUser from './trackUser'
 import orderCompleted from './orderCompleted'
 import mapUser from './mapUser'
 import groupIdentifyUser from './groupIdentifyUser'
+import trackPageView from './trackPageView'
+import trackScreenView from './trackScreenView'
 import type { Settings } from './generated-types'
 
 const destination: DestinationDefinition<Settings> = {
@@ -38,6 +40,8 @@ const destination: DestinationDefinition<Settings> = {
     trackUser,
     identifyUser,
     orderCompleted,
+    trackPageView,
+    trackScreenView,
     mapUser,
     groupIdentifyUser
   }
