@@ -29,6 +29,7 @@ const controlPlaneService = new ControlPlaneService({
   name: 'control-plane-service',
   url: 'http://control-plane-service.segment.local',
   userAgent: 'Segment (fab-5)',
+  timeout: 10000,
   headers: {
     // All calls from this script are system-to-system and shouldn't require authz checks
     'skip-authz': '1'
