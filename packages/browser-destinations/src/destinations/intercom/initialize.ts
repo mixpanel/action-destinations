@@ -2,6 +2,7 @@
 import { loadScript } from '../../runtime/load-script'
 import { resolveWhen } from '../../runtime/resolve-when'
 import { Settings } from './generated-types'
+import { InitializeOptions } from '../../lib/browser-destinations'
 
 async function load(appId: string) {
   const ic = window.Intercom
@@ -14,7 +15,9 @@ async function load(appId: string) {
   }
 }
 
-export async function initialize({ app_id }: Settings): Promise<Intercom_.IntercomStatic> {
+export async function initialize(options: InitializeOptions<Settings>): Promise<Intercom_.IntercomStatic> {
+  const app_id = options.settings.app_id
+
   window.intercomSettings = { app_id }
   await load(app_id)
   await resolveWhen(() => window.document.querySelector('#intercom-frame') !== null)

@@ -65,10 +65,10 @@ test('can load intercom', async () => {
   jest.spyOn(intercomDestination.actions.show, 'perform')
   jest.spyOn(intercomDestination, 'initialize')
 
-  await intercom.load(Context.system(), {} as Analytics)
+  await intercom.show.load(Context.system(), {} as Analytics)
   expect(intercomDestination.initialize).toHaveBeenCalled()
 
-  const ctx = await intercom.track?.(
+  const ctx = await intercom.show.track?.(
     new Context({
       type: 'track',
       properties: {

@@ -1,5 +1,6 @@
 import logEvent from './logEvent'
 import orderCompleted from './orderCompleted'
+import sessionPlugin from './sessionPlugin'
 
 import { AmplitudeClient } from 'amplitude-js'
 import type { Settings } from './generated-types'
@@ -20,12 +21,20 @@ const destination: BrowserDestinationDefinition<Settings, AmplitudeClient> = {
   },
   actions: {
     logEvent,
-    orderCompleted
+    orderCompleted,
+    sessionPlugin
   },
-  initialize: async (settings) => {
+  initialize: async ({ settings, analytics }) => {
     await loadScript('https://cdn.amplitude.com/libs/amplitude-7.2.1-min.gz.js')
     const instance = window.amplitude.getInstance()
-    instance.init(settings.apiKey)
+
+    const user = analytics.user()
+    const userId = user.id() ?? user.anonymousId()
+
+    instance.init(settings.apiKey, undefined, {
+      deviceId: userId ?? undefined
+    })
+
     return instance
   }
 }
