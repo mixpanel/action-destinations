@@ -49,7 +49,10 @@ module.exports = {
     ]
   },
   resolve: {
-    extensions: ['.ts', '.js']
+    extensions: ['.ts', '.js'],
+    fallback: {
+      vm: require.resolve('vm-browserify')
+    }
   },
   devServer: {
     contentBase: path.resolve(__dirname, 'build')

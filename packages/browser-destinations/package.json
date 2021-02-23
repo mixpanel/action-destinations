@@ -6,6 +6,8 @@
   "private": true,
   "scripts": {
     "build": "yarn clean && yarn tsc -b tsconfig.build.json",
+    "build-web": "NODE_ENV=production yarn webpack -c webpack.config.js",
+    "deploy": "yarn build-web && aws-okta exec stage-privileged -- aws s3 sync ./dist/web/ s3://ajs-next-integrations/fab-5",
     "clean": "tsc -b tsconfig.build.json --clean",
     "postclean": "rm -rf dist",
     "prepublishOnly": "yarn build",
@@ -15,7 +17,8 @@
   "dependencies": {
     "@segment/analytics-next": "^1.8.0",
     "@segment/destination-actions": "^1.0.0-11",
-    "@segment/fab5-subscriptions": "^1.0.0"
+    "@segment/fab5-subscriptions": "^1.0.0",
+    "vm-browserify": "^1.1.2"
   },
   "devDependencies": {
     "@babel/core": "^7.12.13",
