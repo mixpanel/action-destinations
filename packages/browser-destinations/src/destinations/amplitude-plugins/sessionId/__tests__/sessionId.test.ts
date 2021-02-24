@@ -4,6 +4,29 @@ import browserPluginsDestination from '../..'
 import { Subscription } from '../../../../lib/browser-destinations'
 import { browserDestinationPlugin } from '../../../../runtime'
 
+expect.extend({
+  toBeWithinOneSecondOf(got, expected) {
+    if (typeof got === 'string') {
+      got = parseInt(got, 10)
+    }
+
+    if (typeof expected === 'string') {
+      got = parseInt(expected, 10)
+    }
+
+    const oneSecond = 1000
+
+    const timeDiff = Math.abs(expected - got)
+    const timeDiffInSeconds = timeDiff / 1000
+
+    const pass = timeDiff < oneSecond
+    const message = () =>
+      `${got} should be within a second of ${expected}, ` + `actual difference: ${timeDiffInSeconds.toFixed(1)}s`
+
+    return { pass, message }
+  }
+})
+
 const example: Subscription[] = [
   {
     partnerAction: 'sessionId',
@@ -60,7 +83,8 @@ describe('ajs-integration', () => {
     })
 
     const updatedCtx = await browserActions.sessionId.track?.(ctx)
-    expect(updatedCtx?.event.context?.session_id).not.toBeUndefined()
+    // @ts-expect-error Need to fix ajs-next types to allow for complex objects in `integrations`
+    expect(updatedCtx?.event.integrations?.Amplitude?.session_id).not.toBeUndefined()
   })
 
   test('runs as an enrichment middleware', async () => {
@@ -95,7 +119,7 @@ describe('sessoinId', () => {
     await browserActions.sessionId.load(Context.system(), ajs)
   })
 
-  const id = () => Math.floor(new Date().getTime() / 1000)
+  const id = () => new Date().getTime()
 
   describe('new sessions', () => {
     test('sets a session id', async () => {
@@ -108,7 +132,8 @@ describe('sessoinId', () => {
       })
 
       const updatedCtx = await browserActions.sessionId.track?.(ctx)
-      expect(updatedCtx?.event.context?.session_id).toEqual(id())
+      // @ts-expect-error Need to fix ajs-next types to allow for complex objects in `integrations`
+      expect(updatedCtx?.event.integrations?.Amplitude?.session_id).toBeWithinOneSecondOf(id())
     })
 
     test('persists the session id', async () => {
@@ -122,8 +147,8 @@ describe('sessoinId', () => {
 
       await browserActions.sessionId.track?.(ctx)
 
-      expect(window.localStorage.getItem('analytics_session_id')).toEqual(id().toString())
-      expect(window.localStorage.getItem('analytics_session_id.last_access')).toEqual(id().toString())
+      expect(window.localStorage.getItem('analytics_session_id')).toBeWithinOneSecondOf(id().toString())
+      expect(window.localStorage.getItem('analytics_session_id.last_access')).toBeWithinOneSecondOf(id().toString())
     })
   })
 
@@ -143,7 +168,8 @@ describe('sessoinId', () => {
       })
 
       const updatedCtx = await browserActions.sessionId.track?.(ctx)
-      expect(updatedCtx?.event.context?.session_id).toEqual(then)
+      // @ts-expect-error Need to fix ajs-next types to allow for complex objects in `integrations`
+      expect(updatedCtx?.event.integrations?.Amplitude?.session_id).toBeWithinOneSecondOf(then)
     })
 
     test('keeps track of when the session was last accessed', async () => {
@@ -162,9 +188,10 @@ describe('sessoinId', () => {
       })
 
       const updatedCtx = await browserActions.sessionId.track?.(ctx)
-      expect(updatedCtx?.event.context?.session_id).toEqual(then)
+      // @ts-expect-error Need to fix ajs-next types to allow for complex objects in `integrations`
+      expect(updatedCtx?.event.integrations?.Amplitude?.session_id).toBeWithinOneSecondOf(then)
 
-      expect(window.localStorage.getItem('analytics_session_id.last_access')).toEqual(now.toString())
+      expect(window.localStorage.getItem('analytics_session_id.last_access')).toBeWithinOneSecondOf(now)
     })
 
     test('reset session when stale', async () => {
@@ -186,10 +213,11 @@ describe('sessoinId', () => {
       })
 
       const updatedCtx = await browserActions.sessionId.track?.(ctx)
-      expect(updatedCtx?.event.context?.session_id).toEqual(now)
+      // @ts-expect-error Need to fix ajs-next types to allow for complex objects in `integrations`
+      expect(updatedCtx?.event.integrations?.Amplitude?.session_id).toBeWithinOneSecondOf(now)
 
-      expect(window.localStorage.getItem('analytics_session_id')).toEqual(now.toString())
-      expect(window.localStorage.getItem('analytics_session_id.last_access')).toEqual(now.toString())
+      expect(window.localStorage.getItem('analytics_session_id')).toBeWithinOneSecondOf(now.toString())
+      expect(window.localStorage.getItem('analytics_session_id.last_access')).toBeWithinOneSecondOf(now.toString())
     })
   })
 })

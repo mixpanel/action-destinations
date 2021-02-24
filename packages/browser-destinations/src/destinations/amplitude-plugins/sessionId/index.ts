@@ -7,7 +7,7 @@ function newSessionId(): number {
 }
 
 function now(): number {
-  return Math.floor(new Date().getTime() / 1000)
+  return new Date().getTime()
 }
 
 const THIRTY_MINUTES = 30 * 60000
@@ -40,20 +40,21 @@ const action: BrowserActionDefinition<Settings, {}, Payload> = {
   lifecycleHook: 'enrichment',
   perform: (_, { context, payload }) => {
     const ls = window.localStorage
+    const newSession = newSessionId()
 
     const raw = ls.getItem('analytics_session_id')
     const updated = ls.getItem('analytics_session_id.last_access')
 
     let id: number | string | null = raw
     if (stale(raw, updated, payload.sessionLength)) {
-      id = newSessionId()
+      id = newSession
       ls.setItem('analytics_session_id', id.toString())
     } else {
       id = parseInt(id as string, 10)
     }
 
-    ls.setItem('analytics_session_id.last_access', now().toString())
-    context.updateEvent('integrations.Amplitude.session_id', id.toString())
+    ls.setItem('analytics_session_id.last_access', newSession.toString())
+    context.updateEvent('integrations.Amplitude.session_id', id)
 
     return
   }
