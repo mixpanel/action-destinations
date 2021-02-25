@@ -187,12 +187,14 @@ export class Destination<Settings = JSONObject> {
 
     try {
       if (typeof subscription.subscribe !== 'string') {
+        state = 'skipped'
         results = [{ output: 'invalid subscription' }]
         return results
       }
 
       const isSubscribed = validate(parseFql(subscription.subscribe), event)
       if (!isSubscribed) {
+        state = 'skipped'
         results = [{ output: 'not subscribed' }]
         return results
       }
@@ -201,6 +203,10 @@ export class Destination<Settings = JSONObject> {
       state = 'done'
 
       return results
+    } catch (error) {
+      state = 'errored'
+      results = [{ error }]
+      throw error
     } finally {
       const subscriptionEndedAt = time()
       const subscriptionDuration = duration(subscriptionStartedAt, subscriptionEndedAt)
@@ -210,7 +216,7 @@ export class Destination<Settings = JSONObject> {
         destination: this.name,
         action: actionSlug,
         subscribe: subscription.subscribe,
-        state: state !== 'done' ? 'errored' : 'done',
+        state,
         input: {
           event: (input.event as unknown) as JSONLikeObject,
           mapping: input.mapping,
