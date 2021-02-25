@@ -41,7 +41,6 @@ const action: ActionDefinition<Settings, Payload> = {
     time: {
       title: 'Timestamp',
       type: 'string',
-      format: 'date-time',
       description:
         'The timestamp of the event. If time is not sent with the event, it will be set to the request upload time.',
       default: {

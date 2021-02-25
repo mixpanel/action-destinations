@@ -18,11 +18,11 @@ const action: ActionDefinition<Settings, Payload> = {
   perform: (req, { payload, settings }) => {
     const event = { ...payload } as AmplitudeEvent
 
-    if (payload.time) {
+    if (payload.time && dayjs.utc(payload.time).isValid()) {
       event.time = dayjs.utc(payload.time).valueOf()
     }
 
-    if (payload.session_id) {
+    if (payload.session_id && dayjs.utc(payload.session_id).isValid()) {
       event.session_id = dayjs.utc(payload.session_id).valueOf()
     }
 

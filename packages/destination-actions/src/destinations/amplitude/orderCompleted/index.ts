@@ -5,9 +5,8 @@ import { eventSchema } from '../event-schema'
 import type { Settings } from '../generated-types'
 import type { Payload } from './generated-types'
 
-interface AmplitudeEvent extends Omit<Payload, 'products' | 'trackRevenuePerProduct' | 'time' | 'session_id'> {
+interface AmplitudeEvent extends Omit<Payload, 'products' | 'trackRevenuePerProduct' | 'time'> {
   time?: number
-  session_id?: number
 }
 
 const revenueKeys = ['revenue', 'price', 'productId', 'quantity', 'revenueType']
@@ -99,11 +98,11 @@ const action: ActionDefinition<Settings, Payload> = {
     const { products = [], trackRevenuePerProduct, time, session_id, ...rest } = omit(payload, revenueKeys)
 
     const properties = rest as AmplitudeEvent
-    if (time) {
+    if (time && dayjs.utc(time).isValid()) {
       properties.time = dayjs.utc(time).valueOf()
     }
 
-    if (session_id) {
+    if (session_id && dayjs.utc(session_id).isValid()) {
       properties.session_id = dayjs.utc(session_id).valueOf()
     }
 

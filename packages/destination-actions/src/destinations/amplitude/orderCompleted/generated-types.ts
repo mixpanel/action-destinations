@@ -131,7 +131,15 @@ export type EventID = number
 /**
  * The start time of the session, necessary if you want to associate events with a particular system.
  */
+export type SessionID2 = SessionID | SessionID1
+/**
+ * The start time of the session, necessary if you want to associate events with a particular system.
+ */
 export type SessionID = string
+/**
+ * The start time of the session, necessary if you want to associate events with a particular system.
+ */
+export type SessionID1 = number
 /**
  * Amplitude will deduplicate subsequent events sent with this ID we have already seen before within the past 7 days. Amplitude recommends generating a UUID or using some combination of device ID, user ID, event type, event ID, and time.
  */
@@ -206,7 +214,7 @@ export interface Payload {
   adid?: GooglePlayServicesAdvertisingID
   android_id?: AndroidID
   event_id?: EventID
-  session_id?: SessionID
+  session_id?: SessionID2
   insert_id?: InsertID
   trackRevenuePerProduct: TrackRevenuePerProduct
   products?: Products

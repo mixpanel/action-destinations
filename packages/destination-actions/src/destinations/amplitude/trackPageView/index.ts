@@ -4,9 +4,8 @@ import { eventSchema } from '../event-schema'
 import type { Settings } from '../generated-types'
 import type { Payload } from './generated-types'
 
-interface AmplitudeEvent extends Omit<Payload, 'products' | 'time' | 'session_id'> {
+interface AmplitudeEvent extends Omit<Payload, 'products' | 'time'> {
   time?: number
-  session_id?: number
 }
 
 const action: ActionDefinition<Settings, Payload> = {
@@ -19,11 +18,11 @@ const action: ActionDefinition<Settings, Payload> = {
     // This is identical to `trackUser` action. Clearly opportunity to re-think
     const event = { ...payload } as AmplitudeEvent
 
-    if (payload.time) {
+    if (payload.time && dayjs.utc(payload.time).isValid()) {
       event.time = dayjs.utc(payload.time).valueOf()
     }
 
-    if (payload.session_id) {
+    if (payload.session_id && dayjs.utc(payload.session_id).isValid()) {
       event.session_id = dayjs.utc(payload.session_id).valueOf()
     }
 
