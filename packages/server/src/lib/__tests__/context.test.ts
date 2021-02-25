@@ -17,6 +17,7 @@ test('can append a field', () => {
     destination: 'some destination',
     action: 'some action',
     subscribe: 'foo',
+    state: 'done',
     input: {
       payload: {},
       settings: {},

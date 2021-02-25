@@ -19,8 +19,9 @@ export interface SubscriptionStats {
   destination: string
   action: string
   subscribe: string
+  state: string
   input: JSONLikeObject
-  output: StepResult[]
+  output: StepResult[] | null
 }
 
 interface PartnerActions<Settings, Payload extends JSONLikeObject> {
@@ -173,43 +174,51 @@ export class Destination<Settings = JSONObject> {
     settings: Settings,
     onComplete?: (stats: SubscriptionStats) => void
   ): Promise<StepResult[]> {
-    if (typeof subscription.subscribe !== 'string') {
-      return [{ output: 'invalid subscription' }]
-    }
-
-    const isSubscribed = validate(parseFql(subscription.subscribe), event)
-    if (!isSubscribed) {
-      return [{ output: 'not subscribed' }]
-    }
-
-    const actionSlug = subscription.partnerAction
     const subscriptionStartedAt = time()
-
+    const actionSlug = subscription.partnerAction
     const input = {
       event,
       mapping: subscription.mapping || {},
       settings
     }
 
-    const results = await this.executeAction(actionSlug, input)
+    let state = 'pending'
+    let results: StepResult[] | null = null
 
-    const subscriptionEndedAt = time()
-    const subscriptionDuration = duration(subscriptionStartedAt, subscriptionEndedAt)
+    try {
+      if (typeof subscription.subscribe !== 'string') {
+        results = [{ output: 'invalid subscription' }]
+        return results
+      }
 
-    onComplete?.({
-      duration: subscriptionDuration,
-      destination: this.name,
-      action: actionSlug,
-      subscribe: subscription.subscribe,
-      input: {
-        event: (input.event as unknown) as JSONLikeObject,
-        mapping: input.mapping,
-        settings: (input.settings as unknown) as JSONLikeObject
-      },
-      output: results
-    })
+      const isSubscribed = validate(parseFql(subscription.subscribe), event)
+      if (!isSubscribed) {
+        results = [{ output: 'not subscribed' }]
+        return results
+      }
 
-    return results
+      results = await this.executeAction(actionSlug, input)
+      state = 'done'
+
+      return results
+    } finally {
+      const subscriptionEndedAt = time()
+      const subscriptionDuration = duration(subscriptionStartedAt, subscriptionEndedAt)
+
+      onComplete?.({
+        duration: subscriptionDuration,
+        destination: this.name,
+        action: actionSlug,
+        subscribe: subscription.subscribe,
+        state: state !== 'done' ? 'errored' : 'done',
+        input: {
+          event: (input.event as unknown) as JSONLikeObject,
+          mapping: input.mapping,
+          settings: (input.settings as unknown) as JSONLikeObject
+        },
+        output: results
+      })
+    }
   }
 
   /**

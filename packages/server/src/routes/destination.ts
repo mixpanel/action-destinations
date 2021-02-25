@@ -51,6 +51,7 @@ function onComplete(context: Context, privateSettings: JSONArray = []) {
       destination: stats.destination,
       action: stats.action,
       subscribe: stats.subscribe,
+      state: stats.state,
       input: {
         mapping: stats.input?.mapping,
         settings: redactSettings((stats.input?.settings as unknown) as JSONObject, privateSettings)
