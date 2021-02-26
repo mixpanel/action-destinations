@@ -182,10 +182,19 @@ app.post(
         response: JSON.stringify(response, null, '\t')
       })
     } catch (error) {
+      // got@10 may return Buffer/string/object types
+      let response: string = error.message
+      const responseBody = error?.response.body
+
+      if (Buffer.isBuffer(responseBody) || typeof responseBody === 'string') {
+        response = responseBody.toString()
+      } else if (typeof responseBody === 'object') {
+        response = JSON.stringify(responseBody)
+      }
+
       res.status(200).json({
         ok: false,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-        response: error.name === 'HTTPError' ? error.response.rawBody.toString() : error.message
+        response
       })
     }
   })
