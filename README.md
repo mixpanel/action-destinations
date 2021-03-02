@@ -156,3 +156,15 @@ $ robo prod.ssh
 $ goto fab-5-engine && yarn install
 $ yarn cli sync-json-schemas
 ```
+
+## Deploying
+
+Deploying changes to destination actions is slightly different depending on changes for browser destinations (the `browser-destinations` package) or cloud destinations (the `destination-actions` package). For cloud destinations you can follow this guide:
+
+1. Merge PR into `master` (with tests + approval)
+2. Check out latest master changes locally – `git checkout master && git fetch origin && git rebase origin/master`
+3. Publish privately to npm – `yarn workspace @segment/destination-actions publish --access restricted`
+4. In [`integrations`](https://github.com/segmentio/integrations/), upgrade the package: `yarn upgrade @segment/destination-actions`
+5. Merge your `integrations` PR once CI passes and it is approved by the Integrations team ([here's an example PR](https://github.com/segmentio/integrations/pull/1820/files#diff-7ae45ad102eab3b6d7e7896acd08c427a9b25b346470d7bc6507b6481575d519))
+
+Once your commit to `integrations#master` finishes in CI, [autotreb will deploy it](https://github.com/segmentio/integrations/blob/master/.run/integration-actions.yml#L36-L40) separately from the rest of the integrations services (to avoid disrupting other integrations and a lengthy deploy process via terraform).
