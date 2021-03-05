@@ -21,7 +21,7 @@ export const idToSlug: Record<string, string> = {
   '5f7dd78fe27ce7ff2b8bfa37': 'customerio',
   '5f7dd8191ad74f868ab1fc48': 'pipedrive',
   '5f7dd8e302173ff732db5cc4': 'slack',
-  '602de78c2083b12d45869c9d': 'twilio'
+  '602efa1f249b9a5e2bf8a813': 'twilio'
 }
 
 export function getDestinationBySlug(slug: string): Destination {
