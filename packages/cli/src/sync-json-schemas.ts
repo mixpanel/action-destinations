@@ -108,8 +108,8 @@ async function run() {
     console.log(`${chalk.bold.whiteBright(slug)}`)
     spinner.start(`Generating diff for ${chalk.bold(slug)}...`)
 
-    const basicOptions = getBasicOptions(metadata, schemaForDestination)
     const options = getOptions(metadata, schemaForDestination)
+    const basicOptions = getBasicOptions(metadata, options)
     const settingsDiff = diffString(
       asJson(pick(metadata, ['basicOptions', 'options'])),
       asJson({ basicOptions, options })
@@ -235,14 +235,8 @@ function settingsToDefinition(
   return JSON.parse(JSON.stringify(existingDefinition))
 }
 
-function getBasicOptions(metadata: DestinationMetadata, destinationSchema: DestinationSchema): string[] {
-  const basicOptions: string[] = []
-
-  for (const actionPayload of destinationSchema.actions) {
-    basicOptions.push(`action${actionPayload.slug}`)
-  }
-
-  return uniq([...metadata.basicOptions, ...basicOptions, 'metadata'])
+function getBasicOptions(metadata: DestinationMetadata, options: DestinationMetadataOptions): string[] {
+  return uniq([...metadata.basicOptions, ...Object.keys(options)])
 }
 
 function getOptions(metadata: DestinationMetadata, destinationSchema: DestinationSchema): DestinationMetadataOptions {
