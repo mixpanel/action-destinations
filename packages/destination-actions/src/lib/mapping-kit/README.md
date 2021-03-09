@@ -736,8 +736,7 @@ Mappings:
 
 ### @template
 
-The @template directive resolves to a string using the given
-[mustache.js](http://mustache.github.io/) template string.
+The @template directive resolves to a string replacing curly brace `{{}}` placeholders.
 
 ```json
 Input:

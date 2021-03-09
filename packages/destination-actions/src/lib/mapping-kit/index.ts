@@ -1,9 +1,9 @@
 import { JSONPath } from 'jsonpath-plus'
-import Mustache from 'mustache'
 import { v4 as uuidv4 } from 'uuid'
 import dayjs from '../dayjs'
 import { JSONObject, JSONValue, JSONLike, JSONLikeObject } from '../json-object'
 import { isDirective } from './is-directive'
+import { render } from './placeholders'
 import { realTypeOf, isObject, isString, isArray } from './real-type-of'
 import { removeUndefined } from './remove-undefined'
 import validate from './validate'
@@ -147,7 +147,7 @@ registerDirective('@pick', (opts, payload) => {
 registerDirective('@root', (_, payload) => payload)
 
 registerStringDirective('@template', (template: string, payload) => {
-  return Mustache.render(template, payload)
+  return render(template, payload)
 })
 
 registerDirective('@timestamp', (opts, payload) => {

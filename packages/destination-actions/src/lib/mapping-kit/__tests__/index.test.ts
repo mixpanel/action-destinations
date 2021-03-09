@@ -461,12 +461,6 @@ describe('@template', () => {
     const output = transform({ '@template': '{{oops.yo}}' }, {})
     expect(output).toStrictEqual('')
   })
-
-  test('invalid template', () => {
-    expect(() => {
-      transform({ '@template': '{{' }, {})
-    }).toThrowError()
-  })
 })
 
 describe('@timestamp', () => {
