@@ -1,6 +1,7 @@
 import http, { RequestOptions } from 'http'
 import https from 'https'
 import net from 'net'
+import { URL } from 'url'
 import { checkRestrictedIp, lookup } from './dns'
 
 type BeforeRequestFn = (options: RequestOptions) => void
