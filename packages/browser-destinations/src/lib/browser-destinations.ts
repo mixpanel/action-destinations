@@ -5,7 +5,7 @@ import {
   CustomAuthentication,
   JSONLikeObject
 } from '@segment/destination-actions'
-import { ExecuteInput } from '@segment/destination-actions/dist/lib/destination-kit/step'
+import { ExecuteInput } from '@segment/destination-actions/src/lib/destination-kit/step'
 
 export type ActionInput<Settings, Payload> = ExecuteInput<Settings, Payload> & {
   analytics: Analytics

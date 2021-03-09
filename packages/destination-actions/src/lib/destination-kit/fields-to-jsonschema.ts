@@ -1,5 +1,4 @@
 import { JSONSchema4 } from 'json-schema'
-import { omit } from 'lodash'
 import type { InputField } from './types'
 
 export function fieldsToJsonSchema(fields: Record<string, InputField> = {}): JSONSchema4 {
@@ -10,7 +9,8 @@ export function fieldsToJsonSchema(fields: Record<string, InputField> = {}): JSO
     const field = fields[key]
 
     // Remove the `required` property from fields because it'll get lifted up into an array of required keys
-    properties[key] = omit(field, 'required')
+    properties[key] = Object.assign({}, field) as JSONSchema4
+    delete properties[key].required
 
     // Grab all the field keys with `required: true`
     if (field.required) {

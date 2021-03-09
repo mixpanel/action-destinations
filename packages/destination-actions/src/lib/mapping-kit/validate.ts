@@ -1,5 +1,4 @@
 import AggregateError from 'aggregate-error'
-import { flatMap } from 'lodash'
 import { CustomError } from 'ts-custom-error'
 import { isDirective } from './is-directive'
 import { isObject, realTypeOf, Dictionary } from './real-type-of'
@@ -11,13 +10,17 @@ class ValidationError extends CustomError {
 }
 
 function flatAggregate(errors: Error[]): Error[] {
-  return flatMap(errors, (e) => {
-    if (e instanceof AggregateError) {
-      return [...e]
+  const result: Error[] = []
+
+  errors.forEach((error) => {
+    if (error instanceof AggregateError) {
+      result.push(...error)
     } else {
-      return e
+      result.push(error)
     }
   })
+
+  return result
 }
 
 function realTypeOrDirective(value: unknown) {

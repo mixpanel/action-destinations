@@ -20,7 +20,9 @@ const plugins = [new CompressionPlugin()]
 entries['runtime'] = './src/runtime/index.ts'
 
 if (process.env.ANALYZE) {
-  plugins.push(new BundleAnalyzerPlugin())
+  plugins.push(new BundleAnalyzerPlugin({
+    defaultSizes: 'stat'
+  }))
 }
 
 module.exports = {
@@ -36,15 +38,8 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.tsx?$/,
-        use: [
-          {
-            loader: 'ts-loader',
-            options: {
-              transpileOnly: true
-            }
-          }
-        ]
+        test: /\.(js|ts)$/,
+        use: 'babel-loader'
       }
     ]
   },
@@ -56,6 +51,9 @@ module.exports = {
   },
   devServer: {
     contentBase: path.resolve(__dirname, 'build')
+  },
+  performance: {
+    hints: 'warning'
   },
   optimization: {
     moduleIds: 'deterministic',

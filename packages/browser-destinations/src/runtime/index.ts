@@ -1,6 +1,6 @@
 import { Analytics, Context, Plugin } from '@segment/analytics-next'
 import { JSONObject } from '@segment/destination-actions'
-import { transform } from '@segment/destination-actions/dist/lib/mapping-kit'
+import { transform } from '@segment/destination-actions/src/lib/mapping-kit'
 import { parseFql, validate } from '@segment/fab5-subscriptions'
 import { ActionInput, BrowserDestinationDefinition, Subscription } from '../lib/browser-destinations'
 

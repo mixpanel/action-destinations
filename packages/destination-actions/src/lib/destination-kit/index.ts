@@ -1,7 +1,6 @@
 import { validate, parseFql } from '@segment/fab5-subscriptions'
 import { BadRequest } from 'http-errors'
 import got, { CancelableRequest, Got, Response } from 'got'
-import { flatten } from 'lodash'
 import { JSONSchema4 } from 'json-schema'
 import { Action, ActionDefinition, Validate } from './action'
 import { ExecuteInput, StepResult } from './step'
@@ -245,7 +244,7 @@ export class Destination<Settings = JSONObject> {
 
     const results = await Promise.all(promises)
 
-    return flatten(results)
+    return ([] as StepResult[]).concat(...results)
   }
 
   private getSubscriptions(settings: JSONObject): Subscription[] {

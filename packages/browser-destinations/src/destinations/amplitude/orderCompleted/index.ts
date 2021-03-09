@@ -1,13 +1,16 @@
 import { AmplitudeClient } from 'amplitude-js'
-import { omit } from 'lodash'
+import dayjs from '@segment/destination-actions/src/lib/dayjs'
 import { BrowserActionDefinition } from '../../../lib/browser-destinations'
 import type { Settings } from '../generated-types'
 import type { Payload } from './generated-types'
 import { eventSchema } from '../event-schema'
-import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
 
-dayjs.extend(utc)
+function omit<T extends object, K extends string[]>(obj: T, keys: K) {
+  return Object.keys(obj).reduce((newObject, key) => {
+    if (keys.indexOf(key) === -1) newObject[key] = (obj as Record<string, unknown>)[key]
+    return newObject
+  }, {} as Record<string, unknown>) as Omit<T, keyof K>
+}
 
 interface AmplitudeEvent extends Omit<Payload, 'products' | 'trackRevenuePerProduct' | 'time'> {
   time?: number

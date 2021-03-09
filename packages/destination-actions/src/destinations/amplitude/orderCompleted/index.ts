@@ -1,6 +1,6 @@
-import { omit } from 'lodash'
 import dayjs from '../../../lib/dayjs'
 import { ActionDefinition } from '../../../lib/destination-kit/action'
+import { omit } from '../../../lib/omit'
 import { eventSchema } from '../event-schema'
 import type { Settings } from '../generated-types'
 import type { Payload } from './generated-types'

@@ -1,4 +1,4 @@
-import { get } from 'lodash'
+import { get } from '../get'
 import { realTypeOf } from './real-type-of'
 
 const entityMap: Record<string, string> = {
@@ -41,7 +41,7 @@ export function render(template: string, data: unknown = {}): string {
         return String(escapeHtml(value) ?? '')
       }
 
-      return value ?? ''
+      return (value ?? '') as string
     }
   }
 
