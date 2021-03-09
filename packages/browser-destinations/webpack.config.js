@@ -38,8 +38,15 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.(js|ts)$/,
-        use: 'babel-loader'
+        test: /\.ts$/,
+        use: [
+          {
+            loader: 'ts-loader',
+            options: {
+              transpileOnly: true
+            }
+          }
+        ]
       }
     ]
   },

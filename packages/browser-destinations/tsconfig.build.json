@@ -1,13 +1,13 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "noEmit": true,
+    "importHelpers": true,
+    "declaration": true,
     "target": "es2018",
     "lib": ["es2018", "dom"],
     "outDir": "./dist",
     "rootDir": "./src",
-    "composite": true,
-    "isolatedModules": true
+    "composite": true
   },
   "exclude": ["tests", "**/__tests__/**/*.ts"],
   "include": ["src"],
