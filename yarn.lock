@@ -1239,12 +1239,11 @@
     node-statsd "^0.1.1"
 
 "@segment/fab5-subscriptions@^1.0.0":
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/@segment/fab5-subscriptions/-/fab5-subscriptions-1.2.0.tgz#ff2934aafc279b1467e573b8d8541c0c96cd2140"
-  integrity sha512-I3Z25bF4InbFV5jkEDsAHmPbq+Aih9gS2AJi4+iax9f3XMLjmDshF6jZ1t9f5qYGIfINuDIZpbeb3ElLvV9N1w==
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/@segment/fab5-subscriptions/-/fab5-subscriptions-1.3.0.tgz#f6bf6a3cbe36a15c11e6d8e194c9c6fa2a3e2e71"
+  integrity sha512-KbbG0jNCa4Sbg7Mvszx1XOtO08uJtwFanNmNjZcIRM+I9wB3aTcld1Hy0W8EqUn8aoO0AbjYfIUSDfqtA+8ryA==
   dependencies:
     "@segment/fql" "^1.9.1"
-    lodash "^4.17.20"
 
 "@segment/facade@^3.3.7":
   version "3.3.7"
