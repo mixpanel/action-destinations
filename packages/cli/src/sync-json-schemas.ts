@@ -251,9 +251,9 @@ function getOptions(metadata: DestinationMetadata, destinationSchema: Destinatio
       settings: destinationSchema.jsonSchema
     }),
     encrypt: false,
-    hidden: false,
+    hidden: true,
     label: `Destination Metadata`,
-    private: false,
+    private: true,
     scope: 'event_destination',
     type: 'string',
     validators: []
@@ -272,9 +272,9 @@ function getOptions(metadata: DestinationMetadata, destinationSchema: Destinatio
         settings: []
       }),
       encrypt: false,
-      hidden: false,
+      hidden: true,
       label: `Action Metadata: ${actionPayload.slug}`,
-      private: false,
+      private: true,
       scope: 'event_destination',
       type: 'string',
       validators: []
