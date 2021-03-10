@@ -1,5 +1,6 @@
 /**
  * Lightweight alternative to lodash.get with similar coverage
+ * Supports basic path lookup via dot notation `'foo.bar[0].baz'` or an array ['foo', 'bar', '0', 'baz']
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function get<T = unknown>(obj: any, path: string | string[], defValue?: unknown): T | undefined {
@@ -12,5 +13,5 @@ export function get<T = unknown>(obj: any, path: string | string[], defValue?: u
 
   // Find value if exist return otherwise return undefined value
   const value = pathArray.reduce((prevObj, key) => prevObj && prevObj[key], obj)
-  return value || defValue
+  return typeof value !== 'undefined' ? value : defValue
 }

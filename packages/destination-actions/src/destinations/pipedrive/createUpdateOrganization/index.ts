@@ -1,6 +1,6 @@
-import { get } from 'lodash'
 import dayjs from '../../../lib/dayjs'
 import { ActionDefinition } from '../../../lib/destination-kit/action'
+import { get } from '../../../lib/get'
 import type { Settings } from '../generated-types'
 import type { Payload } from './generated-types'
 
