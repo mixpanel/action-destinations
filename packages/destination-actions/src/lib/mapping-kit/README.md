@@ -603,9 +603,7 @@ Mappings:
 
 ### @path
 
-The @path directive resolves to the value at the given
-[JSONPath](https://goessner.net/articles/JsonPath/) location. @path supports the
-[`jsonpath-plus`](https://github.com/s3u/JSONPath) extensions.
+The @path directive resolves to the value at the given path. @path supports basic dot notation. Like JSONPath, you can include or omit the leading `$.`
 
 ```json
 Input:
@@ -624,7 +622,7 @@ Mappings:
 
 { "@path": "$.foo.bar" } => 42
 
-{ "@path": "$.foo.baz..num" } => [1, 2]
+{ "@path": "$.foo.baz[0].num" } => 1
 ```
 
 ### @pick

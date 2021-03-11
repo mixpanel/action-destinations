@@ -45,11 +45,11 @@ export function render(template: string, data: unknown = {}): string {
     }
   }
 
-  // Replace unescaped content
-  template = template.replace(/\{\{\{([^}]+)\}\}\}/g, replacer(3, false))
-
-  // Replace escaped content
-  template = template.replace(/\{\{([^}]+)\}\}/g, replacer(2, true))
-
-  return template
+  return (
+    template
+      // Replace unescaped content
+      .replace(/\{\{\{([^}]+)\}\}\}/g, replacer(3, false))
+      // Replace escaped content
+      .replace(/\{\{([^}]+)\}\}/g, replacer(2, true))
+  )
 }

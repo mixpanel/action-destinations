@@ -1,6 +1,6 @@
-import { JSONPath } from 'jsonpath-plus'
 import { v4 as uuidv4 } from 'uuid'
 import dayjs from '../dayjs'
+import { get } from '../get'
 import { JSONObject, JSONValue, JSONLike, JSONLikeObject } from '../json-object'
 import { isDirective } from './is-directive'
 import { render } from './placeholders'
@@ -122,13 +122,7 @@ registerDirective('@omit', (opts, payload) => {
 })
 
 registerStringDirective('@path', (path, payload) => {
-  const found: JSONLike[] = JSONPath({ path, json: payload })
-
-  if (found.length > 1) {
-    return found
-  }
-
-  return found[0]
+  return get(payload, path.replace('$.', ''))
 })
 
 registerDirective('@pick', (opts, payload) => {

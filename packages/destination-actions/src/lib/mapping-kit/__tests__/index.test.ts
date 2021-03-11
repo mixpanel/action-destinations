@@ -317,11 +317,6 @@ describe('@path', () => {
     expect(output).toStrictEqual('baz')
   })
 
-  test('JSONPath features', () => {
-    const output = transform({ '@path': '$.foo..bar' }, { foo: [{ bar: 1 }, { bar: 2 }] })
-    expect(output).toStrictEqual([1, 2])
-  })
-
   test('invalid path', () => {
     const output = transform({ neat: { '@path': '$.oops' } }, { foo: 'bar' })
     expect(output).toStrictEqual({})
