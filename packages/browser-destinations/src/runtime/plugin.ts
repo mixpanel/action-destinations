@@ -4,11 +4,17 @@ import { transform } from '@segment/destination-actions/src/lib/mapping-kit'
 import { parseFql, validate } from '@segment/fab5-subscriptions'
 import { ActionInput, BrowserDestinationDefinition, Subscription } from '../lib/browser-destinations'
 
-export function browserDestinationPlugin<S, C>(
+export function browserDestination<S, C>(definition: BrowserDestinationDefinition<S, C>) {
+  return (settings: S & { subscriptions?: Subscription[] }) => {
+    return generatePlugins(definition, settings, settings?.subscriptions || [])
+  }
+}
+
+export function generatePlugins<S, C>(
   def: BrowserDestinationDefinition<S, C>,
   settings: S,
   subscriptions: Subscription[]
-): Record<keyof BrowserDestinationDefinition<S, C>['actions'], Plugin> {
+): Plugin[] {
   let client: C
   let analytics: Analytics
 
@@ -21,7 +27,12 @@ export function browserDestinationPlugin<S, C>(
     analytics = analyticsInstance
   }
 
+  // Only load the actions that have active subscriptions
+  const actionsToLoad = subscriptions.filter((s) => s.enabled).map((s) => s.partnerAction)
+
   return Object.entries(def.actions).reduce((acc, [key, action]) => {
+    if (!actionsToLoad.includes(key)) return acc
+
     async function evaluate(ctx: Context): Promise<Context> {
       const validSubs = subscriptions.filter((subscription) => {
         const isSubscribed = validate(parseFql(subscription.subscribe), ctx.event)
@@ -71,9 +82,7 @@ export function browserDestinationPlugin<S, C>(
       group: evaluate
     }
 
-    return {
-      ...acc,
-      [key]: plugin
-    }
-  }, {} as Record<keyof BrowserDestinationDefinition<S, C>['actions'], Plugin>)
+    acc.push(plugin)
+    return acc
+  }, [] as Plugin[])
 }

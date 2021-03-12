@@ -1,9 +1,10 @@
-import show from './show'
 import type { Settings } from './generated-types'
-import { BrowserDestinationDefinition } from '../../lib/browser-destinations'
+import type { BrowserDestinationDefinition } from '../../lib/browser-destinations'
+import { browserDestination } from '../../runtime/plugin'
 import { initialize } from './initialize'
+import show from './show'
 
-const destination: BrowserDestinationDefinition<Settings, Intercom_.IntercomStatic> = {
+export const destination: BrowserDestinationDefinition<Settings, Intercom_.IntercomStatic> = {
   name: 'Intercom',
 
   authentication: {
@@ -22,4 +23,4 @@ const destination: BrowserDestinationDefinition<Settings, Intercom_.IntercomStat
   initialize
 }
 
-export default destination
+export default browserDestination(destination)

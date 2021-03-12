@@ -15,9 +15,7 @@ const entries = files.reduce((acc, current) => {
   }
 }, {})
 
-const plugins = [new CompressionPlugin()]
-
-entries['runtime'] = './src/runtime/index.ts'
+const plugins = isProd ? [new CompressionPlugin()] : []
 
 if (process.env.ANALYZE) {
   plugins.push(new BundleAnalyzerPlugin({
@@ -33,7 +31,8 @@ module.exports = {
     filename: '[name].js',
     path: path.resolve(__dirname, 'dist/web'),
     library: '[name]Destination',
-    libraryTarget: 'umd'
+    libraryTarget: 'umd',
+    libraryExport: 'default'
   },
   module: {
     rules: [
@@ -51,6 +50,8 @@ module.exports = {
     ]
   },
   resolve: {
+    // use current node_modules directory first (e.g. for tslib)
+    modules: [path.resolve(__dirname, 'node_modules'), 'node_modules'],
     extensions: ['.ts', '.js'],
     fallback: {
       vm: require.resolve('vm-browserify')

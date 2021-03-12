@@ -6,8 +6,9 @@ import { AmplitudeClient } from 'amplitude-js'
 import type { Settings } from './generated-types'
 import { BrowserDestinationDefinition } from '../../lib/browser-destinations'
 import { loadScript } from '../../runtime/load-script'
+import { browserDestination } from '../../runtime/plugin'
 
-const destination: BrowserDestinationDefinition<Settings, AmplitudeClient> = {
+export const destination: BrowserDestinationDefinition<Settings, AmplitudeClient> = {
   name: 'Amplitude',
   authentication: {
     fields: {
@@ -39,4 +40,4 @@ const destination: BrowserDestinationDefinition<Settings, AmplitudeClient> = {
   }
 }
 
-export default destination
+export default browserDestination(destination)

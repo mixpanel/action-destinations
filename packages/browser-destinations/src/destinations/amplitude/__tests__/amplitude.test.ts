@@ -1,8 +1,7 @@
 import { Analytics, Context, Plugin } from '@segment/analytics-next'
 import * as jsdom from 'jsdom'
-import amplitudeDestination from '..'
+import amplitudeDestination, { destination } from '..'
 import { Subscription } from '../../../lib/browser-destinations'
-import { browserDestinationPlugin } from '../../../runtime'
 
 const example: Subscription[] = [
   {
@@ -28,7 +27,9 @@ const example: Subscription[] = [
   }
 ]
 
-let amplitudeActions: Record<string, Plugin>
+let amplitudeActions: Plugin[]
+let logEventPlugin: Plugin
+let sessionPlugin: Plugin
 let ajs: Analytics
 
 beforeEach(async () => {
@@ -54,14 +55,14 @@ beforeEach(async () => {
   const windowSpy = jest.spyOn(global, 'window', 'get')
   windowSpy.mockImplementation(() => (jsd.window as unknown) as Window & typeof globalThis)
 
-  amplitudeActions = browserDestinationPlugin(
-    amplitudeDestination,
-    {
-      // use amplitude's API key from amplitude.com
-      apiKey: 'e3e918f274fa30555c627abdb29840d5'
-    },
-    example
-  )
+  amplitudeActions = amplitudeDestination({
+    // use amplitude's API key from amplitude.com
+    apiKey: 'e3e918f274fa30555c627abdb29840d5',
+    subscriptions: example
+  })
+
+  logEventPlugin = amplitudeActions[0]
+  sessionPlugin = amplitudeActions[1]
 
   ajs = new Analytics({
     writeKey: 'w_123'
@@ -70,13 +71,13 @@ beforeEach(async () => {
 
 describe('logEvent', () => {
   test('can load amplitude', async () => {
-    jest.spyOn(amplitudeDestination.actions.logEvent, 'perform')
-    jest.spyOn(amplitudeDestination, 'initialize')
+    jest.spyOn(destination.actions.logEvent, 'perform')
+    jest.spyOn(destination, 'initialize')
 
-    await amplitudeActions.logEvent.load(Context.system(), ajs)
-    expect(amplitudeDestination.initialize).toHaveBeenCalled()
+    await logEventPlugin.load(Context.system(), ajs)
+    expect(destination.initialize).toHaveBeenCalled()
 
-    const ctx = await amplitudeActions.logEvent.track?.(
+    const ctx = await logEventPlugin.track?.(
       new Context({
         type: 'track',
         event: 'greet',
@@ -86,7 +87,7 @@ describe('logEvent', () => {
       })
     )
 
-    expect(amplitudeDestination.actions.logEvent.perform).toHaveBeenCalled()
+    expect(destination.actions.logEvent.perform).toHaveBeenCalled()
     expect(ctx).not.toBeUndefined()
 
     const scripts = window.document.querySelectorAll('script')
@@ -105,10 +106,10 @@ describe('logEvent', () => {
   })
 
   test('can map event fields properly', async () => {
-    jest.spyOn(amplitudeDestination.actions.logEvent, 'perform')
-    await amplitudeActions.logEvent.load(Context.system(), ajs)
+    jest.spyOn(destination.actions.logEvent, 'perform')
+    await logEventPlugin.load(Context.system(), ajs)
 
-    await amplitudeActions.logEvent.track?.(
+    await logEventPlugin.track?.(
       new Context({
         type: 'track',
         event: 'greet',
@@ -118,7 +119,7 @@ describe('logEvent', () => {
       })
     )
 
-    expect(amplitudeDestination.actions.logEvent.perform).toHaveBeenCalledWith(
+    expect(destination.actions.logEvent.perform).toHaveBeenCalledWith(
       window.amplitude.getInstance(),
       expect.objectContaining({
         payload: expect.objectContaining({
@@ -132,12 +133,12 @@ describe('logEvent', () => {
   })
 
   test('delegates calls to amplitude', async () => {
-    await amplitudeActions.logEvent.load(Context.system(), ajs)
+    await logEventPlugin.load(Context.system(), ajs)
 
     const instance = window.amplitude.getInstance()
     jest.spyOn(instance, 'logEvent')
 
-    await amplitudeActions.logEvent.track?.(
+    await logEventPlugin.track?.(
       new Context({
         type: 'track',
         event: 'greet',
@@ -153,7 +154,7 @@ describe('logEvent', () => {
 
 describe('sessionPlugin', () => {
   test('updates the original event with an amplitude session id', async () => {
-    await amplitudeActions.sessionPlugin.load(Context.system(), ajs)
+    await sessionPlugin.load(Context.system(), ajs)
 
     const instance = window.amplitude.getInstance()
     jest.spyOn(instance, 'getSessionId').mockReturnValueOnce(1037)
@@ -166,16 +167,15 @@ describe('sessionPlugin', () => {
       }
     })
 
-    const updatedCtx = await amplitudeActions.sessionPlugin.track?.(ctx)
+    const updatedCtx = await sessionPlugin.track?.(ctx)
     expect(updatedCtx?.event.context?.amplitude_session_id).toEqual(1037)
   })
 
   test('runs as an enrichment middleware', async () => {
-    await ajs.register(amplitudeActions.logEvent)
-    await ajs.register(amplitudeActions.sessionPlugin)
+    await Promise.all(amplitudeActions.map(async (action) => ajs.register(action)))
 
-    jest.spyOn(amplitudeActions.sessionPlugin, 'track')
-    jest.spyOn(amplitudeActions.logEvent, 'track')
+    jest.spyOn(sessionPlugin, 'track')
+    jest.spyOn(logEventPlugin, 'track')
 
     const ctx = new Context({
       type: 'track',
@@ -187,8 +187,8 @@ describe('sessionPlugin', () => {
 
     await ajs.track(ctx.event)
 
-    expect(amplitudeActions.sessionPlugin.track).toHaveBeenCalled()
-    expect(amplitudeActions.logEvent.track).toHaveBeenCalled()
+    expect(logEventPlugin.track).toHaveBeenCalled()
+    expect(sessionPlugin.track).toHaveBeenCalled()
     expect(ajs.queue.plugins.map((p) => ({ name: p.name, type: p.type }))).toMatchInlineSnapshot(`
       Array [
         Object {

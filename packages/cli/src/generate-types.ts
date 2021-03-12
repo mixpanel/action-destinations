@@ -29,7 +29,9 @@ async function run() {
   const prettierOptions = (await prettier.resolveConfig(path.resolve(__dirname, '../../../package.json'))) ?? undefined
 
   for (const destinationPath of paths) {
-    const destinationDefinition: DestinationDefinition = (await import(destinationPath)).default
+    const mod = await import(destinationPath)
+    // browser destinations expose as `export const destination` because their default export is wrapped as a plugin
+    const destinationDefinition: DestinationDefinition = mod.destination || mod.default
 
     const destinationSettingSchema = destinationDefinition.authentication?.fields ?? {}
 

@@ -1,8 +1,7 @@
 import { Analytics, Context } from '@segment/analytics-next'
 import * as jsdom from 'jsdom'
-import intercomDestination from '..'
+import intercomPlugins, { destination } from '..'
 import { Subscription } from '../../../lib/browser-destinations'
-import { browserDestinationPlugin } from '../../../runtime'
 
 const example: Subscription[] = [
   {
@@ -53,22 +52,19 @@ beforeEach(async () => {
 })
 
 test('can load intercom', async () => {
-  const intercom = browserDestinationPlugin(
-    intercomDestination,
-    {
-      // using itercom's app_id from intercom.com
-      app_id: 'tx2p130c'
-    },
-    example
-  )
+  const [show] = intercomPlugins({
+    // using itercom's app_id from intercom.com
+    app_id: 'tx2p130c',
+    subscriptions: example
+  })
 
-  jest.spyOn(intercomDestination.actions.show, 'perform')
-  jest.spyOn(intercomDestination, 'initialize')
+  jest.spyOn(destination.actions.show, 'perform')
+  jest.spyOn(destination, 'initialize')
 
-  await intercom.show.load(Context.system(), {} as Analytics)
-  expect(intercomDestination.initialize).toHaveBeenCalled()
+  await show.load(Context.system(), {} as Analytics)
+  expect(destination.initialize).toHaveBeenCalled()
 
-  const ctx = await intercom.show.track?.(
+  const ctx = await show.track?.(
     new Context({
       type: 'track',
       properties: {
@@ -77,7 +73,7 @@ test('can load intercom', async () => {
     })
   )
 
-  expect(intercomDestination.actions.show.perform).toHaveBeenCalled()
+  expect(destination.actions.show.perform).toHaveBeenCalled()
   expect(ctx).not.toBeUndefined()
 
   const scripts = window.document.querySelectorAll('script')
