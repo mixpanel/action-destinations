@@ -8,7 +8,7 @@
     "directory": "packages/cli"
   },
   "engines": {
-    "node": ">=12"
+    "node": ">=10.20"
   },
   "engineStrict": true,
   "private": true,
@@ -30,7 +30,7 @@
     "@types/json-schema": "^7.0.7",
     "@types/lodash": "^4.14.168",
     "@types/mustache": "^4.1.0",
-    "@types/node": "^12.12.11",
+    "@types/node": "^10.17.0",
     "@types/prompts": "^2.0.9",
     "chalk": "^4.1.0",
     "clipboardy": "^2.3.0",

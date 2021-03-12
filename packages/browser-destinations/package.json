@@ -15,7 +15,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@segment/analytics-next": "^1.8.0",
+    "@segment/analytics-next": "^1.13.3",
     "@segment/destination-actions": "*",
     "@segment/fab5-subscriptions": "^1.0.0",
     "tslib": "^2.1.0",

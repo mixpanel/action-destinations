@@ -1196,10 +1196,10 @@
   resolved "https://registry.yarnpkg.com/@segment/ajv-human-errors/-/ajv-human-errors-1.1.0.tgz#547e4cf4cd81bf06db771f2f673459790afe80c7"
   integrity sha512-zmnLpOicwOOIvHrPCLyw957rn0W6XyZX82kpGoK8MGSjn8m5/qpwFBr3sBVTWJBaFZ8/3RTXkItlnsO/EtHKtw==
 
-"@segment/analytics-next@^1.8.0":
-  version "1.8.0"
-  resolved "https://registry.yarnpkg.com/@segment/analytics-next/-/analytics-next-1.8.0.tgz#13d87d72feaabbcc149d53b24f7a4b73efb0fbfd"
-  integrity sha512-ddCEfNgElrbxLjEib26ROX3JXZ4g+wkFcML95Fj0EHeKzUI9k+fv70fWN7xwRFxJsXGIqtTVqSmBV/ci/uWPjw==
+"@segment/analytics-next@^1.13.3":
+  version "1.13.3"
+  resolved "https://registry.yarnpkg.com/@segment/analytics-next/-/analytics-next-1.13.3.tgz#0b9f1f843f2b2c7b05da07a7dc61059fd88c67b3"
+  integrity sha512-r9pgl4RQndZPkYn8hjkBXKn+rpo8ldjuaOJi7OLsePUiSRev3MsNrTTyaz+K6f7evEWW+QjTnhnzL1GbKaxLeQ==
   dependencies:
     "@lukeed/uuid" "^2.0.0"
     "@segment/facade" "^3.3.7"
@@ -1641,10 +1641,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-14.14.32.tgz#90c5c4a8d72bbbfe53033f122341343249183448"
   integrity sha512-/Ctrftx/zp4m8JOujM5ZhwzlWLx22nbQJiVqz8/zE15gOeEW+uly3FSX4fGFpcfEvFzXcMCJwq9lGVWgyARXhg==
 
-"@types/node@^12.12.11":
-  version "12.19.16"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-12.19.16.tgz#15753af35cbef636182d8d8ca55b37c8583cecb3"
-  integrity sha512-7xHmXm/QJ7cbK2laF+YYD7gb5MggHIIQwqyjin3bpEGiSuvScMQ5JZZXPvRipi1MwckTQbJZROMns/JxdnIL1Q==
+"@types/node@^10.17.0":
+  version "10.17.55"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-10.17.55.tgz#a147f282edec679b894d4694edb5abeb595fecbd"
+  integrity sha512-koZJ89uLZufDvToeWO5BrC4CR4OUfHnUz2qoPs/daQH6qq3IN62QFxCTZ+bKaCE0xaoCAJYE4AXre8AbghCrhg==
 
 "@types/normalize-package-data@^2.4.0":
   version "2.4.0"
@@ -2898,7 +2898,7 @@ component-type@^1.2.1:
   resolved "https://registry.yarnpkg.com/component-type/-/component-type-1.2.1.tgz#8a47901700238e4fc32269771230226f24b415a9"
   integrity sha1-ikeQFwAjjk/DIml3EjAibyS0Fak=
 
-component-url@component/url:
+"component-url@github:component/url":
   version "0.2.1"
   resolved "https://codeload.github.com/component/url/tar.gz/00fb08f25edc2ed657ac2aa07ae3851ac68dca80"
 

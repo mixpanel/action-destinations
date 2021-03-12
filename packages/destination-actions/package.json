@@ -14,7 +14,7 @@
     "package.json"
   ],
   "engines": {
-    "node": ">=10"
+    "node": ">=10.20"
   },
   "engineStrict": true,
   "license": "UNLICENSED",
