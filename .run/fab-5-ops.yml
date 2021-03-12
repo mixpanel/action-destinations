@@ -41,6 +41,7 @@ autodeploy:
 
 config:
   production:
+    AWS_REGION: us-west-2
     NODE_ENV: production
     PORT: 3000
     UV_THREADPOOL_SIZE: 128
@@ -48,6 +49,7 @@ config:
     SENTRY_DSN: https://e1f53320787f46a28883db55c7e73c71@o19879.ingest.sentry.io/5510102
 
   stage: &stage_config
+    AWS_REGION: us-west-2
     NODE_ENV: stage
     PORT: 3000
     UV_THREADPOOL_SIZE: 128
