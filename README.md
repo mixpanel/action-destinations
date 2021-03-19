@@ -23,6 +23,7 @@ This project is a monorepo with multiple packages using Yarn Workspaces:
 ```
 $ goto fab-5-engine
 $ yarn install
+$ yarn start
 ```
 
 To install deps in a particular workspace (i.e. `packages/*`) you will need to use one of our shorthand commands defined in the root package.json's `scripts` section:
