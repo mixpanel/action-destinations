@@ -14,7 +14,6 @@ steps:
       - yarn test
       - mv node_modules node_modules_dev
       - yarn install --frozen-lockfile --production
-      - node -e "require('./packages/server/dist/src/app'); process.exit(0)"
       - node -e "require('./packages/server/dist/src/ops/server'); process.exit(0)"
       - make -f .buildkite/Makefile.ci ci-docker-build
       - mv node_modules node_modules_prod
