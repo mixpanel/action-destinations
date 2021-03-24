@@ -33,12 +33,6 @@ count:
     max: 3
     autoscale_policy: cpu_mem_tracking
 
-autodeploy:
-  production:
-    branch: master
-  stage:
-    branch: staging
-
 security-groups:
   from-config:
     - 'DEFAULT_SECURITY_GROUP'
