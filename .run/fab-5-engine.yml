@@ -1,0 +1,89 @@
+name: fab-5-engine
+
+labels:
+  team: destinations
+  owner: epd-destinations@segment.com
+  Override::IAM::Role: integration-service-role
+  Override::ECS::Cluster: integrations
+  Autoscale::Target::CPU: 80
+  Autoscale::Target::Mem: 70
+
+container:
+  image: fab-5-engine
+  repository: 528451384384.dkr.ecr.us-west-2.amazonaws.com
+
+expose:
+  - name: http
+    port: 3000
+    proto: http
+    health_check_path: /health
+    health_check_status: 204
+
+resources:
+  cpu_shares: 512
+  mem_mb: 512
+
+count:
+  production:
+    min: 2
+    max: 50
+    autoscale_policy: cpu_mem_tracking
+  stage:
+    min: 1
+    max: 3
+    autoscale_policy: cpu_mem_tracking
+
+autodeploy:
+  production:
+    branch: master
+  stage:
+    branch: staging
+
+security-groups:
+  from-config:
+    - 'DEFAULT_SECURITY_GROUP'
+    - 'INTEGRATIONS_CLUSTER_SECURITY_GROUP'
+
+config-providers:
+  - name: 'tfe-stage'
+    type: 'terraform'
+    options:
+      environment: 'segment/stage'
+  - name: 'tfe-integrations-stage'
+    type: 'terraform'
+    options:
+      environment: 'segment/integrations-stage_ecs-cluster'
+  - name: 'tfe-production'
+    type: 'terraform'
+    options:
+      environment: 'segment/production'
+  - name: 'tfe-integrations-production'
+    type: 'terraform'
+    options:
+      environment: 'segment/integrations-production_ecs-cluster'
+
+config:
+  production:
+    NODE_ENV: production
+    UV_THREADPOOL_SIZE: 128
+    DATADOG_AGENT_ADDR: '172.17.42.1:8125'
+    SENTRY_DSN: https://e1f53320787f46a28883db55c7e73c71@o19879.ingest.sentry.io/5510102
+    # Integrations services require specifying these security groups to work
+    DEFAULT_SECURITY_GROUP:
+      provider: 'tfe-production'
+      key: 'security_groups'
+    INTEGRATIONS_CLUSTER_SECURITY_GROUP: 'sg-0eb1bce2a5e3c0c3d'
+
+  stage: &stage_config
+    NODE_ENV: stage
+    UV_THREADPOOL_SIZE: 128
+    DATADOG_AGENT_ADDR: '172.17.42.1:8125'
+    SENTRY_DSN: https://e1f53320787f46a28883db55c7e73c71@o19879.ingest.sentry.io/5510102
+    # Integrations services require specifying these security groups to work
+    DEFAULT_SECURITY_GROUP:
+      provider: 'tfe-stage'
+      key: 'security_groups'
+    INTEGRATIONS_CLUSTER_SECURITY_GROUP: 'sg-09d2280967931c89f'
+
+  dev:
+    <<: *stage_config
