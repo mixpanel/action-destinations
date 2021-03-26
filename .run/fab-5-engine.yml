@@ -62,6 +62,7 @@ config:
     UV_THREADPOOL_SIZE: 128
     DATADOG_AGENT_ADDR: '172.17.42.1:8125'
     SENTRY_DSN: https://e1f53320787f46a28883db55c7e73c71@o19879.ingest.sentry.io/5510102
+    STATS_PREFIX: fab-5-engine
     # Integrations services require specifying these security groups to work
     DEFAULT_SECURITY_GROUP:
       provider: 'tfe-production'
@@ -73,6 +74,7 @@ config:
     UV_THREADPOOL_SIZE: 128
     DATADOG_AGENT_ADDR: '172.17.42.1:8125'
     SENTRY_DSN: https://e1f53320787f46a28883db55c7e73c71@o19879.ingest.sentry.io/5510102
+    STATS_PREFIX: fab-5-engine
     # Integrations services require specifying these security groups to work
     DEFAULT_SECURITY_GROUP:
       provider: 'tfe-stage'
