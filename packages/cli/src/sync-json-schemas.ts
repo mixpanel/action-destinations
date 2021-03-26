@@ -120,13 +120,13 @@ async function run() {
     const definitionDiff = diffString(oldDefinition, newDefinition)
 
     if (definitionDiff) {
-      spinner.warn(`Detected definition diff for ${chalk.bold(schemaForDestination.slug)}, please review:`)
+      spinner.warn(`Detected definition diff for ${chalk.bold(slug)}, please review:`)
       console.log(`\n${definitionDiff}`)
     } else if (settingsDiff) {
-      spinner.warn(`Detected settings diff for ${chalk.bold(schemaForDestination.slug)}, please review:`)
+      spinner.warn(`Detected settings diff for ${chalk.bold(slug)}, please review:`)
       console.log(`\n${settingsDiff}`)
     } else {
-      spinner.info(`No change for ${chalk.bold(schemaForDestination.slug)}. Skipping.`)
+      spinner.info(`No change for ${chalk.bold(slug)}. Skipping.`)
       continue
     }
 
@@ -181,8 +181,9 @@ function definitionToJson(definition: DestinationDefinition) {
   const copy = JSON.parse(JSON.stringify(definition))
 
   for (const action of Object.keys(copy.actions)) {
-    delete copy.actions[action]?.autocompleteFields
-    delete copy.actions[action]?.cachedFields
+    delete copy.actions[action].autocompleteFields
+    delete copy.actions[action].cachedFields
+    copy.actions[action].hidden = copy.actions[action].hidden ?? false
   }
 
   return copy
@@ -213,17 +214,17 @@ function settingsToDefinition(
   }
 
   // find actions based on the naming scheme `action${slug}` in the `basicOptions`
-  const actionSlugs = basicOptions
-    .filter((option) => option.startsWith('action'))
-    .map((option) => option.replace(/^action/, ''))
+  const actionOptions = basicOptions.filter((option) => option.startsWith('action'))
 
-  for (const slug of actionSlugs) {
-    const meta = JSON.parse(options[`action${slug}`]?.description ?? 'null')
+  for (const option of actionOptions) {
+    const slug = option.replace(/^action/, '')
+    const meta = JSON.parse(options[option]?.description ?? 'null')
     if (!meta) continue
 
     existingDefinition.actions[slug] = {
       title: meta.schema?.title,
       description: meta.schema?.description,
+      hidden: options[option]?.hidden,
       // backwards compat for now
       defaultSubscription: meta.defaultSubscription ?? meta.schema?.defaultSubscription,
       recommended: meta.recommended,
@@ -272,7 +273,7 @@ function getOptions(metadata: DestinationMetadata, destinationSchema: Destinatio
         settings: []
       }),
       encrypt: false,
-      hidden: true,
+      hidden: actionPayload.hidden,
       label: `Action Metadata: ${actionPayload.slug}`,
       private: true,
       scope: 'event_destination',
@@ -368,6 +369,7 @@ interface DestinationSchema {
 
 interface Action {
   slug: string
+  hidden: boolean
   recommended: boolean
   defaultSubscription?: string
   jsonSchema: JSONSchema4
@@ -394,6 +396,7 @@ function getJsonSchemas(
       const action = actions[actionSlug]
       actionPayloads.push({
         slug: actionSlug,
+        hidden: action.hidden ?? false,
         recommended: action.recommended,
         defaultSubscription: action.defaultSubscription,
         jsonSchema: {

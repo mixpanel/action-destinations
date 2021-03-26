@@ -32,6 +32,9 @@ export interface ActionDefinition<Settings, Payload = any> {
   /** An optional fql query that will be used to prepopulate the action when it is first set up */
   defaultSubscription?: string
 
+  /** Whether or not this action should be visible/configurable in the UI */
+  hidden?: boolean
+
   /**
    * The fields used to perform the action. These fields should match what the partner API expects.
    *
