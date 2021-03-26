@@ -14,7 +14,7 @@ const action: ActionDefinition<Settings, Payload> = {
       type: 'string',
       required: true,
       default: {
-        '@template': '{{userId}}'
+        '@path': '$.userId'
       }
     },
     name: {
@@ -22,7 +22,7 @@ const action: ActionDefinition<Settings, Payload> = {
       type: 'string',
       required: true,
       default: {
-        '@template': '{{event}}'
+        '@path': '$.event'
       }
     },
     type: {
@@ -30,7 +30,7 @@ const action: ActionDefinition<Settings, Payload> = {
       description: 'Override event type. Ex. "page".',
       type: 'string',
       default: {
-        '@template': '{{type}}'
+        '@path': '$.type'
       }
     },
     data: {

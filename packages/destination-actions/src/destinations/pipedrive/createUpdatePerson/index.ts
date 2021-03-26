@@ -30,7 +30,6 @@ interface Person {
 const action: ActionDefinition<Settings, Payload> = {
   title: 'Create or Update Person',
   description: "Update a person in Pipedrive or create them if they don't exist yet.",
-  recommended: true,
   defaultSubscription: 'type = "identify"',
   fields: {
     identifier: {
@@ -40,7 +39,7 @@ const action: ActionDefinition<Settings, Payload> = {
       type: 'string',
       required: true,
       default: {
-        '@template': '{{userId}}'
+        '@path': '$.userId'
       }
     },
     name: {

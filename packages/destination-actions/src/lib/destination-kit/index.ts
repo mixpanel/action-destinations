@@ -38,9 +38,12 @@ export interface DestinationDefinition<Settings = unknown> {
   actions: {
     [key: string]: ActionDefinition<Settings>
   }
+  /** Subscription presets automatically applied in quick setup */
+  presets?: Subscription[]
 }
 
 interface Subscription {
+  name?: string
   partnerAction: string
   subscribe: string
   mapping?: JSONObject

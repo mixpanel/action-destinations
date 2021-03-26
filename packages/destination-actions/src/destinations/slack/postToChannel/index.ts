@@ -5,7 +5,6 @@ import type { Payload } from './generated-types'
 const action: ActionDefinition<Settings, Payload> = {
   title: 'Post Message',
   description: 'Post a message to a Slack channel.',
-  recommended: true,
   fields: {
     url: {
       title: 'Webhook URL',

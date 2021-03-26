@@ -5,7 +5,6 @@ import type { Payload } from './generated-types'
 const action: ActionDefinition<Settings, Payload> = {
   title: 'Map User',
   description: 'Merge two users together that would otherwise have different User IDs tracked in Amplitude.',
-  recommended: false,
   defaultSubscription: 'type = "alias"',
   fields: {
     user_id: {

@@ -1,4 +1,5 @@
 import { DestinationDefinition } from '../../lib/destination-kit'
+import getDefaults from '../../lib/defaults'
 import createUpdateDevice from './createUpdateDevice'
 import createUpdatePerson from './createUpdatePerson'
 import trackAnonymousEvent from './trackAnonymousEvent'
@@ -51,7 +52,28 @@ const destination: DestinationDefinition<Settings> = {
     trackAnonymousEvent,
     trackEvent,
     triggerCampaign
-  }
+  },
+
+  presets: [
+    {
+      name: 'Create or Update Person',
+      subscribe: 'type = "identify"',
+      partnerAction: 'createUpdatePerson',
+      mapping: getDefaults(createUpdatePerson.fields)
+    },
+    {
+      name: 'Create or Update Device',
+      subscribe: 'type = "track" and event = "Application Installed"',
+      partnerAction: 'createUpdateDevice',
+      mapping: getDefaults(createUpdateDevice.fields)
+    },
+    {
+      name: 'Track Event',
+      subscribe: 'type = "track"',
+      partnerAction: 'trackEvent',
+      mapping: getDefaults(trackEvent.fields)
+    }
+  ]
 }
 
 export default destination

@@ -249,6 +249,7 @@ function getOptions(metadata: DestinationMetadata, destinationSchema: Destinatio
     description: JSON.stringify({
       name: destinationSchema.name,
       slug: destinationSchema.slug,
+      presets: destinationSchema.definition.presets,
       settings: destinationSchema.jsonSchema
     }),
     encrypt: false,
@@ -370,7 +371,7 @@ interface DestinationSchema {
 interface Action {
   slug: string
   hidden: boolean
-  recommended: boolean
+  recommended?: boolean
   defaultSubscription?: string
   jsonSchema: JSONSchema4
 }

@@ -37,7 +37,6 @@ async function idAutocomplete(req: Got, { settings }: ExecuteInput<Settings, Pay
 const action: ActionDefinition<Settings, Payload> = {
   title: 'Trigger Broadcast',
   description: 'Trigger a Customer.io broadcast campaign.',
-  recommended: false,
   fields: {
     id: {
       title: 'Campaign ID',

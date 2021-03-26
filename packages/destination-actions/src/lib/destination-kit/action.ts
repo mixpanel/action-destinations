@@ -27,7 +27,7 @@ export interface ActionDefinition<Settings, Payload = any> {
   description: string
 
   /** Whether the action is recommended for quick setup */
-  recommended: boolean
+  recommended?: boolean
 
   /** An optional fql query that will be used to prepopulate the action when it is first set up */
   defaultSubscription?: string

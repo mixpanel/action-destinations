@@ -1,12 +1,39 @@
-import { DestinationDefinition } from '../../lib/destination-kit'
+import type { DestinationDefinition } from '../../lib/destination-kit'
+import getDefaults from '../../lib/defaults'
 import identifyUser from './identifyUser'
-import trackUser from './trackUser'
+import logEvent from './logEvent'
 import orderCompleted from './orderCompleted'
 import mapUser from './mapUser'
 import groupIdentifyUser from './groupIdentifyUser'
-import trackPageView from './trackPageView'
-import trackScreenView from './trackScreenView'
 import type { Settings } from './generated-types'
+
+/** used in the quick setup */
+const presets: DestinationDefinition['presets'] = [
+  {
+    name: 'Track Calls',
+    subscribe: 'type = "track"',
+    partnerAction: 'logEvent',
+    mapping: getDefaults(logEvent.fields)
+  },
+  {
+    name: 'Page Calls',
+    subscribe: 'type = "page"',
+    partnerAction: 'logEvent',
+    mapping: getDefaults(logEvent.fields)
+  },
+  {
+    name: 'Screen Calls',
+    subscribe: 'type = "screen"',
+    partnerAction: 'logEvent',
+    mapping: getDefaults(logEvent.fields)
+  },
+  {
+    name: 'Identify Calls',
+    subscribe: 'type = "identify"',
+    partnerAction: 'identifyUser',
+    mapping: getDefaults(identifyUser.fields)
+  }
+]
 
 const destination: DestinationDefinition<Settings> = {
   name: 'Amplitude',
@@ -36,12 +63,11 @@ const destination: DestinationDefinition<Settings> = {
       })
     }
   },
+  presets,
   actions: {
-    trackUser,
+    logEvent,
     identifyUser,
     orderCompleted,
-    trackPageView,
-    trackScreenView,
     mapUser,
     groupIdentifyUser
   }

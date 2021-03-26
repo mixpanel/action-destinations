@@ -15,7 +15,7 @@ const action: ActionDefinition<Settings, Payload> = {
       type: 'string',
       required: true,
       default: {
-        '@template': '{{userId}}'
+        '@path': '$.userId'
       }
     },
     device_id: {
@@ -24,7 +24,7 @@ const action: ActionDefinition<Settings, Payload> = {
       type: 'string',
       required: true,
       default: {
-        '@template': '{{context.device.id}}'
+        '@path': '$.context.device.id'
       }
     },
     platform: {
@@ -34,7 +34,7 @@ const action: ActionDefinition<Settings, Payload> = {
       required: true,
       enum: ['ios', 'android'],
       default: {
-        '@template': '{{context.device.type}}'
+        '@path': '$.context.device.type'
       }
     },
     last_used: {
@@ -42,7 +42,7 @@ const action: ActionDefinition<Settings, Payload> = {
       description: 'Timestamp for when the device was last used. Default is current date and time.',
       type: 'string',
       default: {
-        '@template': '{{timestamp}}'
+        '@path': '$.timestamp'
       }
     }
   },

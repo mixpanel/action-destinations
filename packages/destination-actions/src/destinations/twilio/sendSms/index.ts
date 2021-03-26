@@ -5,7 +5,6 @@ import type { Payload } from './generated-types'
 const action: ActionDefinition<Settings, Payload> = {
   title: 'Send SMS',
   description: 'Sends an SMS message',
-  recommended: true,
   defaultSubscription: 'type = "track"',
   fields: {
     To: {

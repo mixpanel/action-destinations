@@ -5,7 +5,6 @@ import type { Payload } from './generated-types'
 const action: ActionDefinition<Settings, Payload> = {
   title: '{{name}}',
   description: '{{description}}',
-  recommended: true,
   defaultSubscription: 'type = "track"',
   fields: {},
   perform: (_request, _data) => {

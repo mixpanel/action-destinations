@@ -37,7 +37,6 @@ const action: ActionDefinition<Settings, Payload> = {
   title: 'Order Completed',
   description:
     'Track purchased products from an event. This event will produce multiple events in Amplitude from a single Segment event, one for each product in the products array.',
-  recommended: false,
   defaultSubscription: 'type = "track" and event = "Order Completed"',
   // Uses the same fields as trackUser (we can duplicate it here, if needed)
   fields: {

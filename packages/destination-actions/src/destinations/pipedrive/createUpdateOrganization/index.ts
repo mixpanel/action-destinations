@@ -7,7 +7,6 @@ import type { Payload } from './generated-types'
 const action: ActionDefinition<Settings, Payload> = {
   title: 'Create or Update Organization',
   description: "Update an organization in Pipedrive or create it if it doesn't exist yet.",
-  recommended: true,
   defaultSubscription: 'type = "group"',
   fields: {
     identifier: {

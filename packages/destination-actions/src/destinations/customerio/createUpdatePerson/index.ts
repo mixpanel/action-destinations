@@ -15,7 +15,7 @@ const action: ActionDefinition<Settings, Payload> = {
       type: 'string',
       required: true,
       default: {
-        '@template': '{{userId}}'
+        '@path': '$.userId'
       }
     },
     email: {
@@ -32,7 +32,7 @@ const action: ActionDefinition<Settings, Payload> = {
       description: 'Timestamp for when the person was created. Default is current date and time.',
       type: 'string',
       default: {
-        '@template': '{{timestamp}}'
+        '@path': '$.timestamp'
       }
     },
     custom_attributes: {

@@ -29,7 +29,7 @@ const action: BrowserActionDefinition<Settings, {}, Payload> = {
   title: 'Session Plugin',
   description: 'Generates a Session ID and attaches it to every Amplitude browser based event.',
   recommended: true,
-  defaultSubscription: 'type = *',
+  defaultSubscription: 'type = "track" or type = "identify" or type = "group" or type = "page" or type = "alias"',
   fields: {
     sessionLength: {
       type: 'number',

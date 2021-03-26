@@ -4,7 +4,7 @@ import type { Settings } from '../generated-types'
 import type { Payload } from './generated-types'
 
 const action: BrowserActionDefinition<Settings, AmplitudeClient, Payload> = {
-  title: 'LogEvent',
+  title: 'Log Event',
   description:
     'Log an event with eventType and eventProperties. https://amplitude.github.io/Amplitude-JavaScript/#amplitudeclientlogevent',
   recommended: true,

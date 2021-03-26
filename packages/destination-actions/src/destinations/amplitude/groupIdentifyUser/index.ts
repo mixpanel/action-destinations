@@ -7,7 +7,6 @@ const action: ActionDefinition<Settings, Payload> = {
   title: 'Group Identify User',
   description:
     'Set or update properties of particular groups. Note that these updates will only affect events going forward.',
-  recommended: false,
   defaultSubscription: 'type = "group"',
   fields: {
     user_id: {

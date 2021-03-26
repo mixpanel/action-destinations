@@ -1,6 +1,6 @@
 import dayjs from '../../../lib/dayjs'
-import { ActionDefinition } from '../../../lib/destination-kit/action'
 import { eventSchema } from '../event-schema'
+import type { ActionDefinition } from '../../../lib/destination-kit/action'
 import type { Settings } from '../generated-types'
 import type { Payload } from './generated-types'
 
@@ -10,8 +10,8 @@ interface AmplitudeEvent extends Omit<Payload, 'products' | 'time' | 'session_id
 }
 
 const action: ActionDefinition<Settings, Payload> = {
-  title: 'Track User',
-  description: 'Sends user events to Amplitude.',
+  title: 'Log Event',
+  description: 'Send an event to Amplitude.',
   recommended: true,
   defaultSubscription: 'type = "track"',
   fields: eventSchema,

@@ -8,13 +8,13 @@ const testDestination = createTestDestination(Amplitude)
 const timestamp = new Date().toISOString()
 
 describe('Amplitude', () => {
-  describe('trackUser', () => {
+  describe('logEvent', () => {
     it('should work with default mappings', async () => {
       const event = createSegmentEvent({ timestamp, event: 'Test Event' })
 
       nock('https://api2.amplitude.com/2').post('/httpapi').reply(200, {})
 
-      const responses = await testDestination.testAction('trackUser', { event, useDefaultMappings: true })
+      const responses = await testDestination.testAction('logEvent', { event, useDefaultMappings: true })
       expect(responses.length).toBe(1)
       expect(responses[0].statusCode).toBe(200)
       expect(responses[0].body).toBe('{}')
@@ -35,7 +35,7 @@ describe('Amplitude', () => {
 
       nock('https://api2.amplitude.com/2').post('/httpapi').reply(200, {})
 
-      const responses = await testDestination.testAction('trackUser', { event, useDefaultMappings: true })
+      const responses = await testDestination.testAction('logEvent', { event, useDefaultMappings: true })
       expect(responses.length).toBe(1)
       expect(responses[0].statusCode).toBe(200)
       expect(responses[0].body).toBe('{}')
