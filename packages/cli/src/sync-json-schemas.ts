@@ -47,6 +47,13 @@ type DefinitionJson = Omit<DestinationDefinition, 'actions' | 'extendRequest' | 
   }
 }
 
+interface ActionDestinationMetadata {
+  name: string
+  slug: string
+  presets?: DestinationDefinition['presets']
+  settings: JSONSchema4
+}
+
 let spinner: ora.Ora
 
 /**
@@ -200,7 +207,11 @@ function settingsToDefinition(
 
   // grab the destination-level definition from the `metadata` option
   if (typeof options.metadata?.description === 'string') {
-    const meta = JSON.parse(options.metadata.description) as { settings: JSONSchema4 }
+    const meta = JSON.parse(options.metadata.description) as ActionDestinationMetadata
+
+    if (meta.presets) {
+      existingDefinition.presets = meta.presets
+    }
 
     // pull out authentication-related fields from a JSON Schema-looking thing
     const authFields = jsonSchemaToFields(meta?.settings)
