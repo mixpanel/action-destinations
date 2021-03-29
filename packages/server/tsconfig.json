@@ -1,8 +1,11 @@
 {
   "extends": "./tsconfig.build.json",
-  "exclude": [],
-  "include": ["src", "test"],
   "compilerOptions": {
-    "composite": false
-  }
+    "paths": {
+      "@/*": ["./src/*"],
+      "@segment/destination-actions": ["../destination-actions/src"]
+    }
+  },
+  "exclude": [],
+  "include": ["src", "test"]
 }

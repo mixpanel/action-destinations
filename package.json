@@ -4,6 +4,7 @@
   "license": "UNLICENSED",
   "workspaces": {
     "packages": [
+      "packages/destination-actions",
       "packages/*"
     ]
   },
@@ -16,7 +17,6 @@
     "dev:ops": "yarn server dev:ops",
     "generate-types": "yarn cli generate-types",
     "lint": "eslint '**/*.ts' --max-warnings=10",
-    "prepare": "ts-node --transpile-only --project ./tsconfig.base.json ./scripts/configure-references.ts",
     "server": "yarn workspace @segment/destination-actions-server",
     "start": "yarn build && yarn server start",
     "test": "yarn workspaces run test",

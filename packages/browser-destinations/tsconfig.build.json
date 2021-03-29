@@ -6,10 +6,8 @@
     "target": "es2018",
     "lib": ["es2018", "dom"],
     "outDir": "./dist",
-    "rootDir": "./src",
-    "composite": true
+    "rootDir": "./src"
   },
   "exclude": ["tests", "**/__tests__/**/*.ts"],
-  "include": ["src"],
-  "references": [{ "path": "../destination-actions/tsconfig.build.json" }]
+  "include": ["src"]
 }

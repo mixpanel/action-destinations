@@ -1,8 +1,8 @@
 {
   "extends": "./tsconfig.build.json",
   "compilerOptions": {
-    "composite": false,
-    "rootDir": "."
+    "rootDir": ".",
+    "paths": { "@segment/destination-actions": ["../destination-actions/src"] }
   },
   "include": ["src", "test"],
   "exclude": ["webpack.config.js"]
