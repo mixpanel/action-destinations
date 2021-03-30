@@ -32,6 +32,12 @@ const presets: DestinationDefinition['presets'] = [
     subscribe: 'type = "identify"',
     partnerAction: 'identifyUser',
     mapping: getDefaults(identifyUser.fields)
+  },
+  {
+    name: 'Browser Session Tracking',
+    subscribe: 'type = "track" or type = "identify" or type = "group" or type = "page" or type = "alias"',
+    partnerAction: 'sessionId',
+    mapping: {}
   }
 ]
 
