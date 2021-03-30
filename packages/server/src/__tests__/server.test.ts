@@ -1,6 +1,6 @@
 import listen from 'test-listen'
 import got from 'got'
-import server from '../app'
+import server from '../ops/server'
 
 const client = got.extend({
   retry: 0, // Disable retries so that 500 errors don't make the tests super slow

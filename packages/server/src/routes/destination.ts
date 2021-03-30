@@ -236,11 +236,6 @@ async function handleCloudEventBatch(
   return results
 }
 
-// TODO support quasar
-// TODO support `deadline`/timeout?
-// TODO support `attempt` metrics?
-// TODO support `debug`?
-// TODO support `headers['centrifuge-features']`?
 async function destination(req: Request, res: Response): Promise<void> {
   const { context } = req
   const destinationId = req.params.destinationId
