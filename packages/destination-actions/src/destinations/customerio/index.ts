@@ -1,10 +1,10 @@
-import { DestinationDefinition } from '../../lib/destination-kit'
-import getDefaults from '../../lib/defaults'
+import { defaultValues } from '@segment/actions-core'
 import createUpdateDevice from './createUpdateDevice'
 import createUpdatePerson from './createUpdatePerson'
 import trackAnonymousEvent from './trackAnonymousEvent'
 import trackEvent from './trackEvent'
 import triggerCampaign from './triggerCampaign'
+import type { DestinationDefinition } from '@segment/actions-core'
 import type { Settings } from './generated-types'
 
 const destination: DestinationDefinition<Settings> = {
@@ -59,19 +59,19 @@ const destination: DestinationDefinition<Settings> = {
       name: 'Create or Update Person',
       subscribe: 'type = "identify"',
       partnerAction: 'createUpdatePerson',
-      mapping: getDefaults(createUpdatePerson.fields)
+      mapping: defaultValues(createUpdatePerson.fields)
     },
     {
       name: 'Create or Update Device',
       subscribe: 'type = "track" and event = "Application Installed"',
       partnerAction: 'createUpdateDevice',
-      mapping: getDefaults(createUpdateDevice.fields)
+      mapping: defaultValues(createUpdateDevice.fields)
     },
     {
       name: 'Track Event',
       subscribe: 'type = "track"',
       partnerAction: 'trackEvent',
-      mapping: getDefaults(trackEvent.fields)
+      mapping: defaultValues(trackEvent.fields)
     }
   ]
 }

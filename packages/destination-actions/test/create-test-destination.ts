@@ -1,9 +1,8 @@
-import { Response } from 'got'
 import { defaults, mapValues } from 'lodash'
-import { Destination, DestinationDefinition } from '../src/lib/destination-kit'
-import { JSONObject } from '../src/lib/json-object'
-import { SegmentEvent } from '../src/lib/segment-event'
+import { Destination } from '@segment/actions-core'
 import { createSegmentEvent } from './create-segment-event'
+import type { Response } from 'got'
+import type { DestinationDefinition, JSONObject, SegmentEvent } from '@segment/actions-core'
 
 interface InputData<Settings> {
   /**

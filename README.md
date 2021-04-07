@@ -110,7 +110,7 @@ Action destinations are configured using a single Destination setting (`subscrip
     "subscribe": "<fql query>",
     "partnerAction": "<actionSlug>",
 
-    // See ./lib/mapping-kit/README.md for documentation. The keys in this object should match the `action.fields`
+    // See ./packages/core/src/mapping-kit/README.md for documentation. The keys in this object should match the `action.fields`
     "mapping": { ... }
   }
 ]

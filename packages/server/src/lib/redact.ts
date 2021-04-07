@@ -1,6 +1,6 @@
 import { IncomingHttpHeaders, OutgoingHttpHeaders } from 'http'
 import { escapeRegExp } from 'lodash'
-import { JSONArray, JSONObject } from '@segment/destination-actions'
+import type { JSONArray, JSONObject } from '@segment/actions-core'
 
 const safeRequestHeaders = [
   // Standard request fields

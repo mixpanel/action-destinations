@@ -1,5 +1,5 @@
 import { JSONObject } from '../json-object'
-import { isObject } from './real-type-of'
+import { isObject } from '../real-type-of'
 
 export function isDirective(obj: unknown): obj is JSONObject {
   if (!isObject(obj)) {

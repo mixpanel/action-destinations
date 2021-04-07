@@ -1,4 +1,4 @@
-import { Destination, DestinationDefinition } from '../lib/destination-kit'
+import { Destination, DestinationDefinition } from '@segment/actions-core'
 import amplitude from './amplitude'
 import customerio from './customerio'
 import pipedrive from './pipedrive'

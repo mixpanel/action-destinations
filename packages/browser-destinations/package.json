@@ -15,9 +15,10 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@segment/actions-core": "^1.2.0",
     "@segment/analytics-next": "^1.13.3",
-    "@segment/destination-actions": "*",
     "@segment/fab5-subscriptions": "^1.0.0",
+    "dayjs": "^1.10.3",
     "tslib": "^2.1.0",
     "vm-browserify": "^1.1.2"
   },
@@ -44,6 +45,9 @@
   },
   "jest": {
     "forceExit": true,
+    "moduleNameMapper": {
+      "@segment/actions-core": "<rootDir>/../core/src/index.ts"
+    },
     "transform": {
       "^.+\\.[t|j]sx?$": "babel-jest"
     },

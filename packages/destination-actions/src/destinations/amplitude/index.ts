@@ -1,5 +1,5 @@
-import type { DestinationDefinition } from '../../lib/destination-kit'
-import getDefaults from '../../lib/defaults'
+import type { DestinationDefinition } from '@segment/actions-core'
+import { defaultValues } from '@segment/actions-core'
 import identifyUser from './identifyUser'
 import logEvent from './logEvent'
 import orderCompleted from './orderCompleted'
@@ -13,25 +13,25 @@ const presets: DestinationDefinition['presets'] = [
     name: 'Track Calls',
     subscribe: 'type = "track"',
     partnerAction: 'logEvent',
-    mapping: getDefaults(logEvent.fields)
+    mapping: defaultValues(logEvent.fields)
   },
   {
     name: 'Page Calls',
     subscribe: 'type = "page"',
     partnerAction: 'logEvent',
-    mapping: getDefaults(logEvent.fields)
+    mapping: defaultValues(logEvent.fields)
   },
   {
     name: 'Screen Calls',
     subscribe: 'type = "screen"',
     partnerAction: 'logEvent',
-    mapping: getDefaults(logEvent.fields)
+    mapping: defaultValues(logEvent.fields)
   },
   {
     name: 'Identify Calls',
     subscribe: 'type = "identify"',
     partnerAction: 'identifyUser',
-    mapping: getDefaults(identifyUser.fields)
+    mapping: defaultValues(identifyUser.fields)
   },
   {
     name: 'Browser Session Tracking',

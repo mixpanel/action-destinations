@@ -4,8 +4,8 @@ import { get } from '../get'
 import { JSONObject, JSONValue, JSONLike, JSONLikeObject } from '../json-object'
 import { isDirective } from './is-directive'
 import { render } from './placeholders'
-import { realTypeOf, isObject, isString, isArray } from './real-type-of'
-import { removeUndefined } from './remove-undefined'
+import { realTypeOf, isObject, isString, isArray } from '../real-type-of'
+import { removeUndefined } from '../remove-undefined'
 import validate from './validate'
 
 type Directive = (options: JSONValue, payload: JSONObject) => JSONLike

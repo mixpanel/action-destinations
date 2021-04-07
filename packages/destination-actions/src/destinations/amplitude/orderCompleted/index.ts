@@ -1,7 +1,7 @@
 import dayjs from '../../../lib/dayjs'
-import { ActionDefinition } from '../../../lib/destination-kit/action'
-import { omit } from '../../../lib/omit'
+import { omit } from '@segment/actions-core'
 import { eventSchema } from '../event-schema'
+import type { ActionDefinition } from '@segment/actions-core'
 import type { Settings } from '../generated-types'
 import type { Payload } from './generated-types'
 

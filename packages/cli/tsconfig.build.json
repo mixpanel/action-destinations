@@ -2,7 +2,13 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "noEmit": true,
-    "outDir": "dist"
+    "outDir": "dist",
+    "baseUrl": ".",
+    "paths": {
+      "@segment/actions-core": ["../core/src"],
+      "@segment/actions-core/*": ["../core/src/*"],
+      "@segment/destination-actions": ["../destination-actions/src"]
+    }
   },
   "exclude": ["tests", "**/__tests__/**/*.ts"],
   "include": ["src"]

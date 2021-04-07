@@ -1,6 +1,6 @@
-import { JSONSchema4, JSONSchema4Type } from 'json-schema'
+import type { JSONSchema4, JSONSchema4Type } from 'json-schema'
 
-export default function getDefaults(fields: Record<string, unknown>) {
+export function defaultValues(fields: Record<string, unknown>) {
   const obj: Record<string, JSONSchema4Type> = {}
 
   for (const field of Object.keys(fields)) {

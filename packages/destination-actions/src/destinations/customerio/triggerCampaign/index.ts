@@ -1,7 +1,5 @@
-import { Got } from 'got'
-import { AutocompleteResponse } from '../../../lib/autocomplete'
-import { ActionDefinition } from '../../../lib/destination-kit/action'
-import { ExecuteInput } from '../../../lib/destination-kit/step'
+import type { Got } from 'got'
+import type { ActionDefinition, AutocompleteResponse, ExecuteInput } from '@segment/actions-core'
 import type { Settings } from '../generated-types'
 import type { Payload } from './generated-types'
 

@@ -2,6 +2,20 @@ import { Options } from 'got'
 import { JSONSchema4 } from 'json-schema'
 import { ExecuteInput } from './step'
 
+export interface AutocompleteResponse {
+  body: {
+    data: AutocompleteItem[]
+    pagination: {
+      nextPage?: string
+    }
+  }
+}
+
+export interface AutocompleteItem {
+  label: string
+  value: string
+}
+
 // TODO evaluate using JSON Schema at all
 export interface InputField extends Omit<JSONSchema4, 'required'> {
   required?: boolean

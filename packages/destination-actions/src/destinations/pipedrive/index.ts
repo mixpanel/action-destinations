@@ -1,6 +1,6 @@
-import { DestinationDefinition } from '../../lib/destination-kit'
 import createUpdateOrganization from './createUpdateOrganization'
 import createUpdatePerson from './createUpdatePerson'
+import type { DestinationDefinition } from '@segment/actions-core'
 import type { Settings } from './generated-types'
 
 const destination: DestinationDefinition<Settings> = {

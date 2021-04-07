@@ -1,6 +1,6 @@
 import { AmplitudeClient } from 'amplitude-js'
-import dayjs from '@segment/destination-actions/src/lib/dayjs'
-import { BrowserActionDefinition } from '../../../lib/browser-destinations'
+import dayjs from '../../../lib/dayjs'
+import type { BrowserActionDefinition } from '../../../lib/browser-destinations'
 import type { Settings } from '../generated-types'
 import type { Payload } from './generated-types'
 import { eventSchema } from '../event-schema'

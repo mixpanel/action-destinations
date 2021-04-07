@@ -1,5 +1,5 @@
 import dayjs from '../../../lib/dayjs'
-import { ActionDefinition } from '../../../lib/destination-kit/action'
+import type { ActionDefinition } from '@segment/actions-core'
 import type { Settings } from '../generated-types'
 import type { Payload } from './generated-types'
 

@@ -4,13 +4,8 @@ import { HttpError, UnprocessableEntity } from 'http-errors'
 import MIMEType from 'whatwg-mimetype'
 import Context from '@/lib/context'
 import { redactSettings } from '@/lib/redact'
-import {
-  SegmentEvent,
-  getDestinationByIdOrSlug,
-  SubscriptionStats,
-  JSONArray,
-  JSONObject
-} from '@segment/destination-actions'
+import { getDestinationByIdOrSlug } from '@segment/destination-actions'
+import type { JSONArray, JSONObject, SubscriptionStats, SegmentEvent } from '@segment/actions-core'
 import getEventTesterData, { EventTesterRequest, RequestToDestination, ResponseFromDestination } from './event-tester'
 import { constructTrace, Span } from './tracing'
 

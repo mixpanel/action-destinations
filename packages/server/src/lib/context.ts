@@ -1,5 +1,5 @@
 import { IncomingHttpHeaders, OutgoingHttpHeaders } from 'http'
-import { SubscriptionStats } from '@segment/destination-actions'
+import type { SubscriptionStats } from '@segment/actions-core'
 import logger, { LEVEL } from './logger'
 import stats from './stats'
 

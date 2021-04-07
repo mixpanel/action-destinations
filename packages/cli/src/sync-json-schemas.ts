@@ -1,11 +1,5 @@
-import {
-  idToSlug,
-  destinations as actionDestinations,
-  DestinationDefinition,
-  fieldsToJsonSchema,
-  jsonSchemaToFields,
-  ActionDefinition
-} from '@segment/destination-actions'
+import { idToSlug, destinations as actionDestinations } from '@segment/destination-actions'
+import { DestinationDefinition, fieldsToJsonSchema, jsonSchemaToFields, ActionDefinition } from '@segment/actions-core'
 import chalk from 'chalk'
 import { Dictionary, invert, pick, uniq } from 'lodash'
 import ControlPlaneService, {
@@ -14,7 +8,7 @@ import ControlPlaneService, {
   DestinationMetadataUpdateInput
 } from '@segment/control-plane-service-client'
 import { diffString } from 'json-diff'
-import { JSONSchema4 } from 'json-schema'
+import type { JSONSchema4 } from 'json-schema'
 import ora from 'ora'
 import prompts from 'prompts'
 

@@ -2,7 +2,8 @@ import fs from 'fs'
 import { compile } from 'json-schema-to-typescript'
 import path from 'path'
 import prettier from 'prettier'
-import { DestinationDefinition, ActionDefinition, fieldsToJsonSchema } from '@segment/destination-actions'
+import { fieldsToJsonSchema } from '@segment/actions-core'
+import type { DestinationDefinition, ActionDefinition } from '@segment/actions-core'
 
 const COMMENT = '// Generated file. DO NOT MODIFY IT BY HAND.'
 

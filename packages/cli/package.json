@@ -1,5 +1,5 @@
 {
-  "name": "@segment/destination-actions-cli",
+  "name": "@segment/actions-cli",
   "description": "Destination Actions command line tools.",
   "version": "1.0.0-3",
   "repository": {
@@ -20,12 +20,12 @@
     "create:action": "ts-node --transpile-only src/create-action",
     "generate-types": "ts-node --transpile-only --files -r tsconfig-paths/register src/generate-types",
     "sync-json-schemas": "ts-node --files -r tsconfig-paths/register src/sync-json-schemas",
-    "test": "echo 'nothing to see here.'",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@segment/control-plane-service-client": "ssh://git@github.com:segmentio/control-plane-service-js-client#master",
-    "@segment/destination-actions": "^1.0.0-0",
+    "@segment/actions-core": "^1.2.0",
+    "@segment/destination-actions": "^1.0.0",
     "@types/json-diff": "^0.5.1",
     "@types/json-schema": "^7.0.7",
     "@types/lodash": "^4.14.168",

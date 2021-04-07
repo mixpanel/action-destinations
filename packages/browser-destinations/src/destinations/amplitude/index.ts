@@ -4,7 +4,7 @@ import sessionPlugin from './sessionPlugin'
 
 import { AmplitudeClient } from 'amplitude-js'
 import type { Settings } from './generated-types'
-import { BrowserDestinationDefinition } from '../../lib/browser-destinations'
+import type { BrowserDestinationDefinition } from '../../lib/browser-destinations'
 import { loadScript } from '../../runtime/load-script'
 import { browserDestination } from '../../runtime/plugin'
 

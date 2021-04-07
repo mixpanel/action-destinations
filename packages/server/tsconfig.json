@@ -3,6 +3,7 @@
   "compilerOptions": {
     "paths": {
       "@/*": ["./src/*"],
+      "@segment/actions-core": ["../core/src"],
       "@segment/destination-actions": ["../destination-actions/src"]
     }
   },

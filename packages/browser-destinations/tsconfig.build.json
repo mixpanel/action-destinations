@@ -1,12 +1,9 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "outDir": "dist",
     "importHelpers": true,
-    "declaration": true,
-    "target": "es2018",
-    "lib": ["es2018", "dom"],
-    "outDir": "./dist",
-    "rootDir": "./src"
+    "lib": ["es2018", "dom"]
   },
   "exclude": ["tests", "**/__tests__/**/*.ts"],
   "include": ["src"]

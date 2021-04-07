@@ -50,11 +50,26 @@ module.exports = {
     ]
   },
   resolve: {
-    // use current node_modules directory first (e.g. for tslib)
-    modules: [path.resolve(__dirname, 'node_modules'), 'node_modules'],
+    modules: [
+      // use current node_modules directory first (e.g. for tslib)
+      path.resolve(__dirname, 'node_modules'),
+      'node_modules',
+    ],
     extensions: ['.ts', '.js'],
     fallback: {
-      vm: require.resolve('vm-browserify')
+      vm: require.resolve('vm-browserify'),
+      // Needed if any Node.js modules get pulled in (`got`)
+      // dns: false,
+      // fs: false,
+      // http: false,
+      // https: false,
+      // net: false,
+      // os: false,
+      // stream: false,
+      // tls: false,
+      // url: false,
+      // util: false,
+      // zlib: false
     }
   },
   devServer: {

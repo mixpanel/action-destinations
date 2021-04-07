@@ -1,11 +1,11 @@
 import { Analytics, Context, Plugin } from '@segment/analytics-next'
-import {
+import type {
   DestinationDefinition,
+  ExecuteInput,
   ActionDefinition,
   CustomAuthentication,
   JSONLikeObject
-} from '@segment/destination-actions'
-import { ExecuteInput } from '@segment/destination-actions/src/lib/destination-kit/step'
+} from '@segment/actions-core'
 
 export type ActionInput<Settings, Payload> = ExecuteInput<Settings, Payload> & {
   analytics: Analytics

@@ -1,5 +1,5 @@
 import { get } from '../get'
-import { realTypeOf } from './real-type-of'
+import { realTypeOf } from '../real-type-of'
 
 const entityMap: Record<string, string> = {
   '&': '&amp;',

@@ -1,14 +1,14 @@
 export * from './destinations'
-export {
+
+export { Destination } from '@segment/actions-core'
+
+export type {
   ActionDefinition,
-  Destination,
   DestinationDefinition,
   SubscriptionStats,
   AuthenticationScheme,
   BasicAuthentication,
-  CustomAuthentication,
-  fieldsToJsonSchema,
-  jsonSchemaToFields
-} from './lib/destination-kit'
-export { SegmentEvent } from './lib/segment-event'
-export * from './lib/json-object'
+  CustomAuthentication
+} from '@segment/actions-core'
+
+export type { SegmentEvent } from '@segment/actions-core'

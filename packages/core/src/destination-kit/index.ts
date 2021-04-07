@@ -10,7 +10,7 @@ import { SegmentEvent } from '../segment-event'
 import { fieldsToJsonSchema, jsonSchemaToFields } from './fields-to-jsonschema'
 import type { InputField, RequestExtension } from './types'
 
-export type { ActionDefinition }
+export type { ActionDefinition, ExecuteInput }
 export { fieldsToJsonSchema, jsonSchemaToFields }
 
 export interface SubscriptionStats {
@@ -42,7 +42,7 @@ export interface DestinationDefinition<Settings = unknown> {
   presets?: Subscription[]
 }
 
-interface Subscription {
+export interface Subscription {
   name?: string
   partnerAction: string
   subscribe: string

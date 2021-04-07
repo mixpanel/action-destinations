@@ -1,7 +1,10 @@
 {
   "extends": "./tsconfig.build.json",
   "compilerOptions": {
-    "rootDir": "."
+    "baseUrl": ".",
+    "paths": {
+      "@segment/actions-core": ["../core/src"]
+    }
   },
   "include": ["src", "test"]
 }

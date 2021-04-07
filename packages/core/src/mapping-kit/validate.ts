@@ -1,7 +1,7 @@
 import AggregateError from 'aggregate-error'
 import { CustomError } from 'ts-custom-error'
 import { isDirective } from './is-directive'
-import { isObject, realTypeOf, Dictionary } from './real-type-of'
+import { isObject, realTypeOf, Dictionary } from '../real-type-of'
 
 class ValidationError extends CustomError {
   constructor(message: string, stack: string[] = []) {

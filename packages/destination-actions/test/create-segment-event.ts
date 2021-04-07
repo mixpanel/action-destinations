@@ -1,6 +1,6 @@
 import { defaultsDeep } from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
-import { SegmentEvent } from '../src/lib/segment-event'
+import type { SegmentEvent } from '@segment/actions-core'
 
 export function createSegmentEvent(event: Partial<SegmentEvent> = {}): SegmentEvent {
   const testEvent: SegmentEvent = {
