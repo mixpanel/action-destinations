@@ -10,7 +10,7 @@ labels:
 container:
   image: fab-5-engine
   repository: 528451384384.dkr.ecr.us-west-2.amazonaws.com
-  cmd: ['./scripts/run-ops.sh']
+  cmd: ['./scripts/run.sh']
 
 expose:
   - name: http

@@ -17,7 +17,7 @@ This project is a monorepo with multiple packages using Yarn Workspaces:
 
 - `packages/cli` - a set of command line tools for interacting with the repo
 - `packages/destinations-actions` - an npm package for use in `integrations`
-- `packages/browser-destinations` - an npm package for use in `@segment/analytics-next`
+- `packages/browser-destinations` - S3 bundles for use with `@segment/analytics-next`
 - `packages/server` - a data plane ECS service (the main `app.js`) and control plane ECS service (`ops/server.js`)
 
 ```
