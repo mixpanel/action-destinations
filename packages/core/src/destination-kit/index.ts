@@ -1,5 +1,4 @@
 import { validate, parseFql } from '@segment/fab5-subscriptions'
-import { BadRequest } from 'http-errors'
 import got, { CancelableRequest, Got, Response } from 'got'
 import { JSONSchema4 } from 'json-schema'
 import { Action, ActionDefinition, Validate } from './action'
@@ -8,6 +7,7 @@ import { time, duration } from '../time'
 import { JSONLikeObject, JSONObject } from '../json-object'
 import { SegmentEvent } from '../segment-event'
 import { fieldsToJsonSchema, jsonSchemaToFields } from './fields-to-jsonschema'
+import { UnsupportedActionError } from '../errors'
 import type { InputField, RequestExtension } from './types'
 
 export type { ActionDefinition, ExecuteInput }
@@ -159,7 +159,7 @@ export class Destination<Settings = JSONObject> {
   ): Promise<StepResult[]> {
     const action = this.actions[actionSlug]
     if (!action) {
-      throw new BadRequest(`"${actionSlug}" is not a valid action`)
+      throw new UnsupportedActionError(actionSlug)
     }
 
     return action.execute({

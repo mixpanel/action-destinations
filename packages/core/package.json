@@ -54,7 +54,6 @@
     "ajv": "^6.12.4",
     "dayjs": "^1.10.3",
     "got": "^10.0.0",
-    "http-errors": "^1.8.0",
     "node-cache": "^5.1.2",
     "ts-custom-error": "^3.2.0",
     "uuid": "^8.3.2"
