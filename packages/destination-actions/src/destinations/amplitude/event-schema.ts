@@ -284,7 +284,10 @@ export const eventSchema = {
   session_id: {
     title: 'Session ID',
     type: ['string', 'number'],
-    description: 'The start time of the session, necessary if you want to associate events with a particular system.'
+    description: 'The start time of the session, necessary if you want to associate events with a particular system.',
+    default: {
+      '@path': '$.integration.Amplitude.session_id'
+    }
   },
   insert_id: {
     title: 'Insert ID',
