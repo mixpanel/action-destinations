@@ -5,6 +5,6 @@
     "importHelpers": true,
     "lib": ["es2018", "dom"]
   },
-  "exclude": ["tests", "**/__tests__/**/*.ts"],
+  "exclude": ["**/__tests__/**/*.ts"],
   "include": ["src"]
 }

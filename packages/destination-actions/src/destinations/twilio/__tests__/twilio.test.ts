@@ -1,16 +1,15 @@
 import nock from 'nock'
-import { createSegmentEvent } from '../../../../test/create-segment-event'
-import { createTestDestination } from '../../../../test/create-test-destination'
+import { createTestEvent, createTestIntegration } from '@segment/actions-core'
 import Twilio from '../index'
 
-const testDestination = createTestDestination(Twilio)
+const testDestination = createTestIntegration(Twilio)
 const timestamp = new Date().toISOString()
 const accountId = '_account_'
 
 describe('Twilio', () => {
   describe('trackUser', () => {
     it('should work with default mappings', async () => {
-      const event = createSegmentEvent({
+      const event = createTestEvent({
         timestamp,
         event: 'Test Event',
         properties: {

@@ -1,12 +1,14 @@
-import { defaults, mapValues } from 'lodash'
-import { Destination } from '@segment/actions-core'
-import { createSegmentEvent } from './create-segment-event'
+import { createTestEvent } from './create-test-event'
+import { Destination } from './destination-kit'
+import { mapValues } from './map-values'
+import type { DestinationDefinition } from './destination-kit'
+import type { JSONObject } from './json-object'
+import type { SegmentEvent } from './segment-event'
 import type { Response } from 'got'
-import type { DestinationDefinition, JSONObject, SegmentEvent } from '@segment/actions-core'
 
 interface InputData<Settings> {
   /**
-   * The Segment event. You can use `createSegmentEvent` if you want
+   * The Segment event. You can use `createTestEvent` if you want
    * to construct an event from partial data.
    */
   event?: Partial<SegmentEvent>
@@ -45,12 +47,12 @@ class TestDestination<T> extends Destination<T> {
 
     if (useDefaultMappings) {
       const fields = this.definition.actions[action].fields
-      const defaultMappings = mapValues(fields, (prop) => prop.default)
-      mapping = defaults(mapping, defaultMappings)
+      const defaultMappings = mapValues(fields, 'default')
+      mapping = { ...defaultMappings, ...mapping }
     }
 
     await super.executeAction(action, {
-      event: createSegmentEvent(event),
+      event: createTestEvent(event),
       mapping,
       settings: settings ?? ({} as T)
     })
@@ -62,6 +64,6 @@ class TestDestination<T> extends Destination<T> {
   }
 }
 
-export function createTestDestination<T>(destination: DestinationDefinition<T>): TestDestination<T> {
+export function createTestIntegration<T>(destination: DestinationDefinition<T>): TestDestination<T> {
   return new TestDestination(destination)
 }

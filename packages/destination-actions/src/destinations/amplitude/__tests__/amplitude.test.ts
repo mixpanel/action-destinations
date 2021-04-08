@@ -1,16 +1,15 @@
 import nock from 'nock'
-import { createSegmentEvent } from '../../../../test/create-segment-event'
-import { createTestDestination } from '../../../../test/create-test-destination'
+import { createTestEvent, createTestIntegration } from '@segment/actions-core'
 import Amplitude from '../index'
 import dayjs from '../../../lib/dayjs'
 
-const testDestination = createTestDestination(Amplitude)
+const testDestination = createTestIntegration(Amplitude)
 const timestamp = new Date().toISOString()
 
 describe('Amplitude', () => {
   describe('logEvent', () => {
     it('should work with default mappings', async () => {
-      const event = createSegmentEvent({ timestamp, event: 'Test Event' })
+      const event = createTestEvent({ timestamp, event: 'Test Event' })
 
       nock('https://api2.amplitude.com/2').post('/httpapi').reply(200, {})
 
@@ -31,7 +30,7 @@ describe('Amplitude', () => {
     })
 
     it('should accept null for user_id', async () => {
-      const event = createSegmentEvent({ timestamp, userId: null, event: 'Null User' })
+      const event = createTestEvent({ timestamp, userId: null, event: 'Null User' })
 
       nock('https://api2.amplitude.com/2').post('/httpapi').reply(200, {})
 
@@ -53,7 +52,7 @@ describe('Amplitude', () => {
 
   describe('orderCompleted', () => {
     it('should work with default mappings', async () => {
-      const event = createSegmentEvent({
+      const event = createTestEvent({
         event: 'Order Completed',
         timestamp,
         properties: {
@@ -93,7 +92,7 @@ describe('Amplitude', () => {
     it('should work with per product revenue tracking', async () => {
       nock('https://api2.amplitude.com/2').post('/httpapi').reply(200, {})
 
-      const event = createSegmentEvent({
+      const event = createTestEvent({
         event: 'Order Completed',
         timestamp,
         properties: {
@@ -135,7 +134,7 @@ describe('Amplitude', () => {
 
   describe('mapUser', () => {
     it('should work with default mappings', async () => {
-      const event = createSegmentEvent({
+      const event = createTestEvent({
         type: 'alias',
         userId: 'some-user-id',
         previousId: 'some-previous-user-id'
@@ -160,7 +159,7 @@ describe('Amplitude', () => {
   })
 
   describe('groupIdentifyUser', () => {
-    const event = createSegmentEvent({
+    const event = createTestEvent({
       timestamp,
       type: 'group',
       userId: 'some-user-id',

@@ -1,9 +1,8 @@
-import { defaultsDeep } from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
-import type { SegmentEvent } from '@segment/actions-core'
+import type { SegmentEvent } from './segment-event'
 
-export function createSegmentEvent(event: Partial<SegmentEvent> = {}): SegmentEvent {
-  const testEvent: SegmentEvent = {
+export function createTestEvent(event: Partial<SegmentEvent> = {}): SegmentEvent {
+  return {
     anonymousId: uuidv4(),
     context: {
       ip: '8.8.8.8',
@@ -38,8 +37,7 @@ export function createSegmentEvent(event: Partial<SegmentEvent> = {}): SegmentEv
     timestamp: new Date().toISOString(),
     traits: {},
     type: 'track',
-    userId: 'user1234'
+    userId: 'user1234',
+    ...event
   }
-
-  return defaultsDeep(event, testEvent)
 }

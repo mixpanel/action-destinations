@@ -10,6 +10,6 @@
       "@segment/destination-actions": ["../destination-actions/src"]
     }
   },
-  "exclude": ["tests", "**/__tests__/**/*.ts"],
+  "exclude": ["**/__tests__/**/*.ts"],
   "include": ["src"]
 }

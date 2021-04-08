@@ -5,6 +5,6 @@
     "baseUrl": "./",
     "paths": { "@/*": ["./src/*"] }
   },
-  "exclude": ["**/__tests__/*.ts", "test", "**/__mocks__/*.ts"],
+  "exclude": ["**/__tests__/*.ts", "**/__mocks__/*.ts"],
   "include": ["src", "./package.json"]
 }
