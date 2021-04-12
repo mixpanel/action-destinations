@@ -17,7 +17,7 @@
   "dependencies": {
     "@segment/actions-core": "^2.0.0",
     "@segment/analytics-next": "^1.13.3",
-    "@segment/fab5-subscriptions": "^1.0.0",
+    "@segment/fab5-subscriptions": "^2.0.1",
     "dayjs": "^1.10.3",
     "tslib": "^2.1.0",
     "vm-browserify": "^1.1.2"
