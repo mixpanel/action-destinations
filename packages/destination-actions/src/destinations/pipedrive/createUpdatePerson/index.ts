@@ -1,4 +1,3 @@
-import { Options } from 'got'
 import dayjs from '../../../lib/dayjs'
 import { get } from '@segment/actions-core'
 import type { ActionDefinition } from '@segment/actions-core'
@@ -74,25 +73,26 @@ const action: ActionDefinition<Settings, Payload> = {
   },
 
   autocompleteFields: {
-    org_id: async (req, { page }) => {
-      const searchParams: Options['searchParams'] = {}
+    org_id: async (request, { page, settings }) => {
+      const searchParams: Record<string, number> = {}
       if (typeof page === 'string') {
         searchParams.start = Number(page)
       }
 
-      const response = await req.get<Organizations>('organizations', {
+      const response = await request(`https://${settings.domain}.pipedrive.com/api/v1/organizations`, {
         searchParams
       })
+      const body = response.data as Organizations
 
-      const items = response.body.data.map((organization) => ({
+      const items = body.data.map((organization) => ({
         label: organization.name,
         value: organization.id
       }))
 
       let nextPage: string | undefined
 
-      if (typeof response.body.additional_data.pagination.next_start === 'number') {
-        nextPage = String(response.body.additional_data.pagination.next_start)
+      if (typeof body.additional_data.pagination.next_start === 'number') {
+        nextPage = String(body.additional_data.pagination.next_start)
       }
 
       return {
@@ -108,16 +108,16 @@ const action: ActionDefinition<Settings, Payload> = {
     personId: {
       ttl: 60,
       key: ({ payload }) => payload.identifier,
-      value: async (req, { payload }) => {
-        const search = await req.get('persons/search', {
+      value: async (request, { payload, settings }) => {
+        const search = await request(`https://${settings.domain}.pipedrive.com/api/v1/persons/search`, {
           searchParams: { term: payload.identifier }
         })
-        return get(search.body, 'data.items[0].item.id')
+        return get(search.data, 'data.items[0].item.id')
       }
     }
   },
 
-  perform: (req, { payload, cachedFields }) => {
+  perform: (request, { payload, settings, cachedFields }) => {
     const personId = cachedFields.personId
 
     const person: Person = {
@@ -132,10 +132,13 @@ const action: ActionDefinition<Settings, Payload> = {
         person.add_time = dayjs.utc(person.add_time).format('YYYY-MM-DD HH:MM:SS')
       }
 
-      return req.post('persons', { json: person })
+      return request(`https://${settings.domain}.pipedrive.com/api/v1/persons`, { method: 'post', json: person })
     }
 
-    return req.put(`persons/${personId}`, { json: person })
+    return request(`https://${settings.domain}.pipedrive.com/api/v1/persons/${personId}`, {
+      method: 'put',
+      json: person
+    })
   }
 }
 

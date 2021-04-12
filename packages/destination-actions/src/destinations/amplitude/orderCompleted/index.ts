@@ -124,7 +124,8 @@ const action: ActionDefinition<Settings, Payload> = {
       })
     }
 
-    return request.post('https://api2.amplitude.com/2/httpapi', {
+    return request('https://api2.amplitude.com/2/httpapi', {
+      method: 'post',
       json: {
         api_key: settings.apiKey,
         events

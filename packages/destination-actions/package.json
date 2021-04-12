@@ -37,8 +37,7 @@
   },
   "dependencies": {
     "@segment/actions-core": "^1.3.0-next.1",
-    "dayjs": "^1.10.3",
-    "got": "^10.0.0"
+    "dayjs": "^1.10.3"
   },
   "jest": {
     "preset": "ts-jest",

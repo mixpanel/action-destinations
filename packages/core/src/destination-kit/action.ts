@@ -2,7 +2,6 @@
 import { AggregateAjvError } from '@segment/ajv-human-errors'
 import Ajv from 'ajv'
 import { EventEmitter } from 'events'
-import { Got, Response } from 'got'
 import NodeCache from 'node-cache'
 import createRequestClient from '../create-request-client'
 import { get } from '../get'
@@ -10,10 +9,16 @@ import { JSONLikeObject } from '../json-object'
 import { transform } from '../mapping-kit'
 import { fieldsToJsonSchema } from './fields-to-jsonschema'
 import { ExecuteInput, Step, StepResult, Steps } from './step'
-import type { InputField, RequestExtension, RequestExtensions } from './types'
+import type { AutocompleteResponse, InputField, RequestExtension } from './types'
+
+type MaybePromise<T> = T | Promise<T>
+type RequestClient = ReturnType<typeof createRequestClient>
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type RequestFn<Settings, Payload> = (request: Got, data: ExecuteInput<Settings, Payload>) => any
+export type RequestFn<Settings, Payload, Return = any> = (
+  request: RequestClient,
+  data: ExecuteInput<Settings, Payload>
+) => MaybePromise<Return>
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface ActionDefinition<Settings, Payload = any> {
@@ -52,7 +57,7 @@ export interface ActionDefinition<Settings, Payload = any> {
    * This is likely going to change as we productionalize the data model and definition object
    */
   autocompleteFields?: {
-    [K in keyof Payload]?: RequestFn<Settings, Payload>
+    [K in keyof Payload]?: RequestFn<Settings, Payload, AutocompleteResponse>
   }
 
   /**
@@ -121,18 +126,17 @@ export class Validate<Settings, Payload> extends Step<Settings, Payload> {
 }
 
 /**
- * Request handles delivering a payload to an external API. It uses the `got` library under the hood.
+ * Request handles delivering a payload to an external API. It uses the `fetch` API under the hood.
  *
  * The callback should be  able to return the raw request instead of needing to do `return response.data` etc.
  */
 class Request<Settings, Payload> extends Step<Settings, Payload> {
   requestFn: RequestFn<Settings, Payload> | undefined
-  // TODO change this to single extension? we never pass more than 1
-  extensions: RequestExtensions<Settings, Payload>
+  extendRequest: RequestExtension<Settings, Payload> | undefined
 
-  constructor(extensions: RequestExtensions<Settings, Payload>, requestFn?: RequestFn<Settings, Payload>) {
+  constructor(extendRequest: RequestExtension<Settings, Payload> | undefined, requestFn?: RequestFn<Settings, Payload>) {
     super()
-    this.extensions = extensions || []
+    this.extendRequest = extendRequest
     this.requestFn = requestFn
   }
 
@@ -152,25 +156,24 @@ class Request<Settings, Payload> extends Step<Settings, Payload> {
     return response.body as string
   }
 
-  protected createRequestClient(data: ExecuteInput<Settings, Payload>): Got {
-    const options = this.extensions.map((extension) => extension(data))
-    const client = createRequestClient(...options).extend({
-      hooks: {
-        beforeError: [
-          (error) => {
-            // @ts-ignore the type is wrong in got
-            const { response } = error
-            this.emit('response', response)
-            return error
-          }
-        ],
-        afterResponse: [
-          (response) => {
-            this.emit('response', response)
-            return response
-          }
-        ]
-      }
+  protected createRequestClient(data: ExecuteInput<Settings, Payload>): RequestClient {
+    // TODO turn `extendRequest` into a beforeRequest hook
+    const options = this.extendRequest?.(data) ?? {}
+    const client = createRequestClient(options, {
+      afterResponse: [
+        // Keep track of the request(s) associated with a response
+        (request, options, response) => {
+          // TODO figure out the types here...
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const modifiedResponse: any = response.clone()
+          modifiedResponse.request = request
+          modifiedResponse.options = options
+
+          this.emit('response', modifiedResponse)
+
+          return modifiedResponse
+        }
+      ]
     })
     return client
   }
@@ -192,8 +195,8 @@ class CachedRequest<Settings, Payload> extends Request<Settings, Payload> {
   negative: boolean
   cache: NodeCache
 
-  constructor(extensions: RequestExtensions<Settings, Payload>, config: CachedRequestConfig<Settings, Payload>) {
-    super(extensions)
+  constructor(extension: RequestExtension<Settings, Payload> | undefined, config: CachedRequestConfig<Settings, Payload>) {
+    super(extension)
 
     this.keyFn = config.key
     this.valueFn = config.value
@@ -220,7 +223,7 @@ class CachedRequest<Settings, Payload> extends Request<Settings, Payload> {
     try {
       v = await this.valueFn(request, data)
     } catch (e) {
-      if (get(e, 'response.statusCode') === 404) {
+      if (get(e, 'response.status') === 404) {
         v = undefined
       } else {
         throw e
@@ -254,7 +257,7 @@ type ExecuteInputField = 'payload' | 'settings'
  */
 export class Action<Settings, Payload extends JSONLikeObject> extends EventEmitter {
   readonly steps: Steps<Settings, Payload>
-  private requestExtensions: RequestExtensions<Settings, Payload>
+  private extendRequest: RequestExtension<Settings, Payload> | undefined
   private autocompleteCache: { [key: string]: RequestFn<Settings, Payload> }
 
   constructor(definition: ActionDefinition<Settings, Payload>, extendRequest?: RequestExtension<Settings, Payload>) {
@@ -265,13 +268,12 @@ export class Action<Settings, Payload extends JSONLikeObject> extends EventEmitt
     this.steps.push(step)
 
     this.autocompleteCache = {}
-    this.requestExtensions = []
 
     if (extendRequest) {
       // This must come before we load the definition because
       // it instantiates "steps" with whatever request extensions
       // are defined at that moment in time
-      this.requestExtensions.push(extendRequest)
+      this.extendRequest = extendRequest
     }
 
     this.loadDefinition(definition)
@@ -297,7 +299,7 @@ export class Action<Settings, Payload extends JSONLikeObject> extends EventEmitt
       }
     }
 
-    const step = new Request<Settings, Payload>(this.requestExtensions, this.autocompleteCache[field])
+    const step = new Request<Settings, Payload>(this.extendRequest, this.autocompleteCache[field])
 
     return step.executeStep(data)
   }
@@ -333,13 +335,13 @@ export class Action<Settings, Payload extends JSONLikeObject> extends EventEmitt
   }
 
   private request(requestFn: RequestFn<Settings, Payload>): void {
-    const step = new Request<Settings, Payload>(this.requestExtensions, requestFn)
+    const step = new Request<Settings, Payload>(this.extendRequest, requestFn)
     step.on('response', (response) => this.emit('response', response))
     this.steps.push(step)
   }
 
   private cachedRequest(config: CachedRequestConfig<Settings, Payload>): void {
-    const step = new CachedRequest(this.requestExtensions, config)
+    const step = new CachedRequest(this.extendRequest, config)
     this.steps.push(step)
   }
 }

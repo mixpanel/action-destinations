@@ -4,7 +4,6 @@ import { mapValues } from './map-values'
 import type { DestinationDefinition } from './destination-kit'
 import type { JSONObject } from './json-object'
 import type { SegmentEvent } from './segment-event'
-import type { Response } from 'got'
 
 interface InputData<Settings> {
   /**
@@ -32,7 +31,7 @@ interface InputData<Settings> {
 }
 
 class TestDestination<T> extends Destination<T> {
-  responses: Response[]
+  responses: Destination['responses'] = []
 
   constructor(destination: DestinationDefinition<T>) {
     super(destination)

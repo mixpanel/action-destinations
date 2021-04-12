@@ -40,14 +40,14 @@ const action: ActionDefinition<Settings, Payload> = {
   },
 
   perform: (request, { payload }) => {
-    return request.post(payload.url, {
+    return request(payload.url, {
+      method: 'post',
       json: {
         channel: payload.channel,
         text: payload.text,
         username: payload.username,
         icon_url: payload.icon_url
-      },
-      responseType: 'text'
+      }
     })
   }
 }

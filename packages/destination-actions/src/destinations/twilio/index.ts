@@ -5,7 +5,7 @@ import sendSMS from './sendSms'
 const destination: DestinationDefinition<Settings> = {
   name: 'Twilio',
   authentication: {
-    scheme: 'custom',
+    scheme: 'basic',
     fields: {
       accountId: {
         title: 'Account Id',
@@ -26,15 +26,12 @@ const destination: DestinationDefinition<Settings> = {
         required: true
       }
     },
-    testAuthentication: (req) => {
-      return req('https://api.twilio.com/2010-04-01/Accounts')
+    testAuthentication: (request) => {
+      return request('https://api.twilio.com/2010-04-01/Accounts')
     }
   },
   extendRequest({ settings }) {
     return {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
-      },
       username: settings.accountId,
       password: settings.token
     }

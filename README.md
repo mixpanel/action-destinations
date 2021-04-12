@@ -26,11 +26,10 @@ $ yarn install
 $ yarn start
 ```
 
-To install deps in a particular workspace (i.e. `packages/*`) you will need to use one of our shorthand commands defined in the root package.json's `scripts` section:
+To install deps in a particular workspace (i.e. `packages/*`) you can use [`lerna add`](https://github.com/lerna/lerna/tree/main/commands/add), for example:
 
-- `yarn actions <add/remove> <package>`
-- `yarn server <add/remove> <package>`
-- `yarn cli <add/remove> <package>`
+- `lerna add @some/thing packages/core` will add `@some/thing` to the core package
+- `yarn core remove @some/thing` to remove the package (lerna doesn't have `remove`)
 
 Or you can use the native Yarn longhand command:
 
@@ -164,7 +163,7 @@ Deploying changes to destination actions is slightly different depending on chan
 
 1. Merge PR into `master` (with tests + approval)
 2. Check out latest master changes locally – `git checkout master && git fetch origin && git rebase origin/master`
-3. Publish privately to npm – `yarn workspace @segment/destination-actions publish --access restricted`
+3. Publish privately to npm – `lerna publish`
 4. In [`integrations`](https://github.com/segmentio/integrations/), upgrade the package: `yarn upgrade @segment/destination-actions`
 5. Merge your `integrations` PR once CI passes and it is approved by the Integrations team ([here's an example PR](https://github.com/segmentio/integrations/pull/1820/files#diff-7ae45ad102eab3b6d7e7896acd08c427a9b25b346470d7bc6507b6481575d519))
 

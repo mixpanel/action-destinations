@@ -1,3 +1,4 @@
+import { URLSearchParams } from 'url'
 import type { ActionDefinition } from '@segment/actions-core'
 import type { Settings } from '../generated-types'
 import type { Payload } from './generated-types'
@@ -22,11 +23,13 @@ const action: ActionDefinition<Settings, Payload> = {
   },
   perform: (request, data) => {
     return request(`https://api.twilio.com/2010-04-01/Accounts/${data.settings.accountId}/Messages.json`, {
-      method: 'POST',
-      form: {
+      method: 'post',
+      // Fetch will automatically set the content-type for this `body`
+      // to application/x-www-form-urlencoded;charset=UTF-8
+      body: new URLSearchParams({
         From: data.settings.phoneNumber,
         ...data.payload
-      }
+      })
     })
   }
 }

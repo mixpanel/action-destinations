@@ -24,16 +24,16 @@ const destination: DestinationDefinition<Settings> = {
         minLength: 20
       }
     },
-    testAuthentication: (req) => req('users/me')
+    testAuthentication: (request, { settings }) => {
+      return request(`https://${settings.domain}.pipedrive.com/api/v1/users/me`)
+    }
   },
 
   extendRequest({ settings }) {
     return {
-      prefixUrl: `https://${settings.domain}.pipedrive.com/api/v1/`,
       searchParams: {
         api_token: settings.apiToken
-      },
-      responseType: 'json'
+      }
     }
   },
 

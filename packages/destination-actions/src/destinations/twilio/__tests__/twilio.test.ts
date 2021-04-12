@@ -7,7 +7,7 @@ const timestamp = new Date().toISOString()
 const accountId = '_account_'
 
 describe('Twilio', () => {
-  describe('trackUser', () => {
+  describe('sendSMS', () => {
     it('should work with default mappings', async () => {
       const event = createTestEvent({
         timestamp,
@@ -39,25 +39,40 @@ describe('Twilio', () => {
       })
 
       expect(responses.length).toBe(1)
-      expect(responses[0].statusCode).toBe(201)
+      expect(responses[0].status).toBe(201)
 
-      expect(responses[0].request.options.form).toMatchInlineSnapshot(`
-        Object {
-          "Body": "Hello, World!",
-          "From": "+12056065576",
-          "To": "+17758638863",
+      expect(responses[0].options.body).toMatchInlineSnapshot(`
+        URLSearchParams {
+          Symbol(query): Array [
+            "From",
+            "+12056065576",
+            "To",
+            "+17758638863",
+            "Body",
+            "Hello, World!",
+          ],
+          Symbol(context): null,
         }
       `)
 
-      expect(responses[0].request.options.headers).toMatchInlineSnapshot(`
-        Object {
-          "content-type": "application/x-www-form-urlencoded;charset=UTF-8",
-          "user-agent": "Segment",
+      expect(responses[0].request.headers).toMatchInlineSnapshot(`
+        Headers {
+          Symbol(map): Object {
+            "Content-Type": Array [
+              "application/x-www-form-urlencoded;charset=UTF-8",
+            ],
+            "authorization": Array [
+              "Basic X2FjY291bnRfOl90b2tlbl8=",
+            ],
+            "user-agent": Array [
+              "Segment",
+            ],
+          },
         }
       `)
 
-      expect(responses[0].request.options.username).toMatchInlineSnapshot(`"_account_"`)
-      expect(responses[0].request.options.password).toMatchInlineSnapshot(`"_token_"`)
+      expect(responses[0].options.username).toMatchInlineSnapshot(`"_account_"`)
+      expect(responses[0].options.password).toMatchInlineSnapshot(`"_token_"`)
     })
   })
 })

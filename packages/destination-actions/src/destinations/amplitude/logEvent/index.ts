@@ -15,7 +15,7 @@ const action: ActionDefinition<Settings, Payload> = {
   recommended: true,
   defaultSubscription: 'type = "track"',
   fields: eventSchema,
-  perform: (req, { payload, settings }) => {
+  perform: (request, { payload, settings }) => {
     const event = { ...payload } as AmplitudeEvent
 
     if (payload.time && dayjs.utc(payload.time).isValid()) {
@@ -26,7 +26,8 @@ const action: ActionDefinition<Settings, Payload> = {
       event.session_id = dayjs.utc(payload.session_id).valueOf()
     }
 
-    return req.post('https://api2.amplitude.com/2/httpapi', {
+    return request('https://api2.amplitude.com/2/httpapi', {
+      method: 'post',
       json: {
         api_key: settings.apiKey,
         events: [event]

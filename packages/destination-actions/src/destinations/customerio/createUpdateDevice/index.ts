@@ -47,8 +47,9 @@ const action: ActionDefinition<Settings, Payload> = {
     }
   },
 
-  perform: (req, { payload }) => {
-    return req.put(`customers/${payload.person_id}/devices`, {
+  perform: (request, { payload }) => {
+    return request(`https://track.customer.io/api/v1/customers/${payload.person_id}/devices`, {
+      method: 'put',
       json: {
         device: {
           id: payload.device_id,

@@ -57,19 +57,7 @@ module.exports = {
     ],
     extensions: ['.ts', '.js'],
     fallback: {
-      vm: require.resolve('vm-browserify'),
-      // Needed if any Node.js modules get pulled in (`got`)
-      // dns: false,
-      // fs: false,
-      // http: false,
-      // https: false,
-      // net: false,
-      // os: false,
-      // stream: false,
-      // tls: false,
-      // url: false,
-      // util: false,
-      // zlib: false
+      vm: require.resolve('vm-browserify')
     }
   },
   devServer: {

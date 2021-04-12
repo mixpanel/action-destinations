@@ -27,10 +27,11 @@ export default {
     created_at: { ... },
     // ... more
   },
-  perform: (req, { payload, settings }) => {
+  perform: (request, { payload, settings }) => {
     const { id, custom_attributes: customAttrs, created_at, ...body } = payload
 
-    return req.put(`customers/${id}`, {
+    return request(`https://example.com/customers/${id}`, {
+      method: 'put',
       json: { ...customAttrs, ...body }
     })
   }
@@ -64,7 +65,7 @@ const destination: DestinationDefinition = {
   // The authentication scheme and fields
   authentication: {},
 
-  // An optional function to extend the instance of `got` used for all actions
+  // Extends the instance of the `fetch` client with request options
   extendRequest: ({ settings }) => {},
 
   // See "Actions" section below
@@ -75,7 +76,7 @@ const destination: DestinationDefinition = {
 #### extendRequest(function(Data))
 
 extendRequest() adds a callback function that can set default
-[`got`](https://github.com/sindresorhus/got) request options for all requests made by actions
+`fetch` request options for all requests made by actions
 registered with this destination. It returns the base destination object.
 
 ```ts
@@ -86,8 +87,7 @@ const destination: DestinationDefinition = {
     return {
       headers: {
         Authorization: `Bearer ${settings.apiKey}`
-      },
-      responseType: 'json'
+      }
     }
   }
 }
@@ -145,7 +145,7 @@ The config object accepts the following fields (all fields are required unless o
 | ---------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `ttl`      | `number`                  | Time, in seconds, that values are cached before they are expunged. E.g. `60` = 1 minute                                                                                                                       |
 | `key`      | `function(Data)`          | A callback function that receives the [Data](#the-data-object) object and should return a unique string that identifies the object fetched by the `value` callback for the given payload.                     |
-| `value`    | `function(Got, Conntext)` | A callback function that receives the [`got`-based](https://github.com/sindresorhus/got) request object and the [Data](#the-data-object) object and returns the value that should be associated with the key. |
+| `value`    | `function(RequestClient, Data)` | A callback function that receives the `fetch`-based request client and the [Data](#the-data-object) object and returns the value that should be associated with the key. |
 | `negative` | `boolean`                 | (Optional) Set this to `true` to cache negative values (null, undefined).                                                                                                                                     |
 
 ```ts
@@ -156,8 +156,8 @@ const action = {
     userEmail: {
       ttl: 60, // 1 minute
       key: ({ payload }) => payload.userId,
-      value: (req, { payload }) => {
-        const resp = req.get(`http://example.com/users/${payload.userId}`)
+      value: async (request, { payload }) => {
+        const resp = await request(`http://example.com/users/${payload.userId}`)
         return resp.data
       }
     }
@@ -167,7 +167,7 @@ const action = {
 
 #### perform
 
-`perform()` accepts a callback function that receives a [`got`-based](https://github.com/sindresorhus/got) request object and the [Data](#the-data-object)
+`perform()` accepts a callback function that receives a `fetch`-based request client and the [Data](#the-data-object)
 object and returns the value that should be associated with the key.
 
 ```ts
@@ -175,11 +175,11 @@ const action = {
   // ...
 
   perform: (request, { payload, settings }) => {
-    return request.put(`http://example.com/users/${payload.userId}`, {
+    return request(`http://example.com/users/${payload.userId}`, {
+      method: 'put',
       headers: {
         Authorization: `Bearer ${settings.apiKey}`
       },
-      responseType: 'json',
       json: payload.userProperties
     })
   }

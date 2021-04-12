@@ -1,7 +1,6 @@
 import nock from 'nock'
 import { createTestEvent, createTestIntegration } from '@segment/actions-core'
 import Amplitude from '../index'
-import dayjs from '../../../lib/dayjs'
 
 const testDestination = createTestIntegration(Amplitude)
 const timestamp = new Date().toISOString()
@@ -15,9 +14,9 @@ describe('Amplitude', () => {
 
       const responses = await testDestination.testAction('logEvent', { event, useDefaultMappings: true })
       expect(responses.length).toBe(1)
-      expect(responses[0].statusCode).toBe(200)
-      expect(responses[0].body).toBe('{}')
-      expect(responses[0].request.options.json).toMatchObject({
+      expect(responses[0].status).toBe(200)
+      expect(responses[0].data).toMatchObject({})
+      expect(responses[0].options.json).toMatchObject({
         api_key: undefined,
         events: expect.arrayContaining([
           expect.objectContaining({
@@ -36,9 +35,9 @@ describe('Amplitude', () => {
 
       const responses = await testDestination.testAction('logEvent', { event, useDefaultMappings: true })
       expect(responses.length).toBe(1)
-      expect(responses[0].statusCode).toBe(200)
-      expect(responses[0].body).toBe('{}')
-      expect(responses[0].request.options.json).toMatchObject({
+      expect(responses[0].status).toBe(200)
+      expect(responses[0].data).toMatchObject({})
+      expect(responses[0].options.json).toMatchObject({
         api_key: undefined,
         events: expect.arrayContaining([
           expect.objectContaining({
@@ -71,8 +70,8 @@ describe('Amplitude', () => {
 
       const responses = await testDestination.testAction('orderCompleted', { event, useDefaultMappings: true })
       expect(responses.length).toBe(1)
-      expect(responses[0].statusCode).toBe(200)
-      expect(responses[0].request.options.json).toMatchObject({
+      expect(responses[0].status).toBe(200)
+      expect(responses[0].options.json).toMatchObject({
         api_key: undefined,
         events: expect.arrayContaining([
           expect.objectContaining({
@@ -113,8 +112,8 @@ describe('Amplitude', () => {
 
       const responses = await testDestination.testAction('orderCompleted', { event, mapping, useDefaultMappings: true })
       expect(responses.length).toBe(1)
-      expect(responses[0].statusCode).toBe(200)
-      expect(responses[0].request.options.json).toMatchObject({
+      expect(responses[0].status).toBe(200)
+      expect(responses[0].options.json).toMatchObject({
         api_key: undefined,
         events: expect.arrayContaining([
           expect.objectContaining({
@@ -144,23 +143,26 @@ describe('Amplitude', () => {
 
       const responses = await testDestination.testAction('mapUser', { event, useDefaultMappings: true })
       expect(responses.length).toBe(1)
-      expect(responses[0].statusCode).toBe(200)
-      expect(responses[0].body).toBe('{}')
-      expect(responses[0].request.options.form).toMatchObject({
-        api_key: undefined,
-        mapping: JSON.stringify([
-          {
-            user_id: event.previousId,
-            global_user_id: event.userId
-          }
-        ])
-      })
+      expect(responses[0].status).toBe(200)
+      expect(responses[0].data).toMatchObject({})
+      expect(responses[0].options.body).toMatchInlineSnapshot(`
+        URLSearchParams {
+          Symbol(query): Array [
+            "api_key",
+            "undefined",
+            "mapping",
+            "[{\\"user_id\\":\\"some-previous-user-id\\",\\"global_user_id\\":\\"some-user-id\\"}]",
+          ],
+          Symbol(context): null,
+        }
+      `)
     })
   })
 
   describe('groupIdentifyUser', () => {
     const event = createTestEvent({
-      timestamp,
+      anonymousId: 'some-anonymous-id',
+      timestamp: '2021-04-12T16:32:37.710Z',
       type: 'group',
       userId: 'some-user-id',
       traits: {
@@ -174,10 +176,6 @@ describe('Amplitude', () => {
       group_value: 'some-value'
     }
 
-    const groups = {
-      [mapping.group_type]: mapping.group_value
-    }
-
     it('should fire identify call to Amplitude', async () => {
       nock('https://api.amplitude.com').post('/identify').reply(200, {})
       nock('https://api.amplitude.com').post('/groupidentify').reply(200, {})
@@ -188,22 +186,19 @@ describe('Amplitude', () => {
         useDefaultMappings: true
       })
 
-      expect(response.statusCode).toBe(200)
-      expect(response.body).toBe('{}')
-      expect(response.request.options.form).toMatchObject({
-        api_key: undefined,
-        identification: JSON.stringify([
-          {
-            device_id: event.anonymousId,
-            groups,
-            insert_id: mapping.insert_id,
-            library: 'segment',
-            time: dayjs.utc(timestamp).valueOf(),
-            user_id: event.userId,
-            user_properties: groups
-          }
-        ])
-      })
+      expect(response.status).toBe(200)
+      expect(response.data).toMatchObject({})
+      expect(response.options.body).toMatchInlineSnapshot(`
+        URLSearchParams {
+          Symbol(query): Array [
+            "api_key",
+            "undefined",
+            "identification",
+            "[{\\"device_id\\":\\"some-anonymous-id\\",\\"groups\\":{\\"some-type\\":\\"some-value\\"},\\"insert_id\\":\\"some-insert-id\\",\\"library\\":\\"segment\\",\\"time\\":1618245157710,\\"user_id\\":\\"some-user-id\\",\\"user_properties\\":{\\"some-type\\":\\"some-value\\"}}]",
+          ],
+          Symbol(context): null,
+        }
+      `)
     })
 
     it('should fire groupidentify call to Amplitude', async () => {
@@ -216,21 +211,19 @@ describe('Amplitude', () => {
         useDefaultMappings: true
       })
 
-      expect(response.statusCode).toBe(200)
-      expect(response.body).toBe('{}')
-      expect(response.request.options.form).toMatchObject({
-        api_key: undefined,
-        identification: JSON.stringify([
-          {
-            group_properties: {
-              'some-trait-key': 'some-trait-value'
-            },
-            group_value: mapping.group_value,
-            group_type: mapping.group_type,
-            library: 'segment'
-          }
-        ])
-      })
+      expect(response.status).toBe(200)
+      expect(response.data).toMatchObject({})
+      expect(response.options.body).toMatchInlineSnapshot(`
+        URLSearchParams {
+          Symbol(query): Array [
+            "api_key",
+            "undefined",
+            "identification",
+            "[{\\"group_properties\\":{\\"some-trait-key\\":\\"some-trait-value\\"},\\"group_value\\":\\"some-value\\",\\"group_type\\":\\"some-type\\",\\"library\\":\\"segment\\"}]",
+          ],
+          Symbol(context): null,
+        }
+      `)
     })
   })
 })

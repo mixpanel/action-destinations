@@ -182,9 +182,8 @@ app.post(
         response: JSON.stringify(response, null, '\t')
       })
     } catch (error) {
-      // got@10 may return Buffer/string/object types
       let response: string = error.message
-      const responseBody = error?.response.body
+      const responseBody = error.response?.data ?? error.response?.body
 
       if (Buffer.isBuffer(responseBody) || typeof responseBody === 'string') {
         response = responseBody.toString()

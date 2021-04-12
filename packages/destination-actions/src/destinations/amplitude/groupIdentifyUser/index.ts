@@ -1,3 +1,4 @@
+import { URLSearchParams } from 'url'
 import type { ActionDefinition } from '@segment/actions-core'
 import type { Settings } from '../generated-types'
 import type { Payload } from './generated-types'
@@ -71,8 +72,9 @@ const action: ActionDefinition<Settings, Payload> = {
     const groupAssociation = { [payload.group_type]: payload.group_value }
 
     // Associate user to group
-    await request.post('https://api.amplitude.com/identify', {
-      form: {
+    await request('https://api.amplitude.com/identify', {
+      method: 'post',
+      body: new URLSearchParams({
         api_key: settings.apiKey,
         identification: JSON.stringify([
           {
@@ -85,12 +87,13 @@ const action: ActionDefinition<Settings, Payload> = {
             user_properties: groupAssociation
           }
         ])
-      }
+      })
     })
 
     // Associate group properties
-    return request.post('https://api.amplitude.com/groupidentify', {
-      form: {
+    return request('https://api.amplitude.com/groupidentify', {
+      method: 'post',
+      body: new URLSearchParams({
         api_key: settings.apiKey,
         identification: JSON.stringify([
           {
@@ -100,7 +103,7 @@ const action: ActionDefinition<Settings, Payload> = {
             library: 'segment'
           }
         ])
-      }
+      })
     })
   }
 }

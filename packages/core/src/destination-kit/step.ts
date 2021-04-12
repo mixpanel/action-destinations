@@ -14,7 +14,7 @@ export interface ExecuteInput<Settings, Payload> {
   /** The transformed input data, based on `mapping` + `event` */
   payload: Payload
   /** The ids from cached requests */
-  cachedFields: { [key: string]: string }
+  cachedFields: { [key: string]: string | null | undefined }
   /** The page used in autocomplete */
   page?: string
 }

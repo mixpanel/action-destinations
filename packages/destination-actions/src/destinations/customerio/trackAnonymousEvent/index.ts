@@ -27,7 +27,8 @@ const action: ActionDefinition<Settings, Payload> = {
   },
 
   perform: (request, { payload }) => {
-    return request.post('events', {
+    return request('https://track.customer.io/api/v1/events', {
+      method: 'post',
       json: payload
     })
   }

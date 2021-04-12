@@ -29,20 +29,15 @@ const destination: DestinationDefinition<Settings> = {
         required: true
       }
     },
-    testAuthentication: (req) => {
-      return req('https://track.customer.io/auth', {
-        // overwrite the main prefix url
-        prefixUrl: ''
-      })
+    testAuthentication: (request) => {
+      return request('https://track.customer.io/auth')
     }
   },
 
   extendRequest({ settings }) {
     return {
-      prefixUrl: 'https://track.customer.io/api/v1',
       username: settings.siteId,
-      password: settings.apiKey,
-      responseType: 'json'
+      password: settings.apiKey
     }
   },
 

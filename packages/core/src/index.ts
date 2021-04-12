@@ -11,6 +11,9 @@ export { time, duration } from './time'
 
 export { realTypeOf, isObject, isArray, isString } from './real-type-of'
 
+export type { RequestOptions } from './request-client'
+export { default as fetch, Request, Response, Headers } from './fetch'
+
 export type {
   ActionDefinition,
   DestinationDefinition,
@@ -19,17 +22,12 @@ export type {
   SubscriptionStats,
   AuthenticationScheme,
   BasicAuthentication,
-  CustomAuthentication
+  CustomAuthentication,
+  RequestFn,
+  DecoratedResponse
 } from './destination-kit'
 
-export type {
-  AutocompleteResponse,
-  AutocompleteItem,
-  InputField,
-  RequestOptions,
-  RequestExtension,
-  RequestExtensions
-} from './destination-kit/types'
+export type { AutocompleteResponse, AutocompleteItem, InputField, RequestExtension } from './destination-kit/types'
 
 export type { JSONPrimitive, JSONValue, JSONObject, JSONArray, JSONLike, JSONLikeObject } from './json-object'
 

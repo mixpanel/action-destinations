@@ -1,3 +1,4 @@
+import { URLSearchParams } from 'url'
 import type { ActionDefinition } from '@segment/actions-core'
 import type { Settings } from '../generated-types'
 import type { Payload } from './generated-types'
@@ -25,11 +26,12 @@ const action: ActionDefinition<Settings, Payload> = {
     }
   },
   perform: (request, { payload, settings }) => {
-    return request.post('https://api.amplitude.com/usermap', {
-      form: {
+    return request('https://api.amplitude.com/usermap', {
+      method: 'post',
+      body: new URLSearchParams({
         api_key: settings.apiKey,
         mapping: JSON.stringify([payload])
-      }
+      })
     })
   }
 }

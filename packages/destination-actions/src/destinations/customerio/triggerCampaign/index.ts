@@ -1,5 +1,4 @@
-import type { Got } from 'got'
-import type { ActionDefinition, AutocompleteResponse, ExecuteInput } from '@segment/actions-core'
+import type { ActionDefinition, AutocompleteResponse, RequestFn } from '@segment/actions-core'
 import type { Settings } from '../generated-types'
 import type { Payload } from './generated-types'
 
@@ -12,14 +11,13 @@ interface Campaign {
   name: string
 }
 
-async function idAutocomplete(req: Got, { settings }: ExecuteInput<Settings, Payload>): Promise<AutocompleteResponse> {
-  const response = await req.get<Campaigns>('https://beta-api.customer.io/v1/api/campaigns', {
-    prefixUrl: '',
+const idAutocomplete: RequestFn<Settings, Payload, AutocompleteResponse> = async (request, { settings }) => {
+  const response = await request('https://beta-api.customer.io/v1/api/campaigns', {
     username: settings.siteId,
     password: settings.apiKey
   })
 
-  const items = response.body.campaigns.map((campaign) => ({
+  const items = (response.data as Campaigns).campaigns.map((campaign) => ({
     label: campaign.name,
     value: campaign.id
   }))
@@ -67,8 +65,9 @@ const action: ActionDefinition<Settings, Payload> = {
     id: idAutocomplete
   },
 
-  perform: (req, { payload }) => {
-    return req.post(`https://api.customer.io/v1/api/campaigns/${payload.id}/triggers`, {
+  perform: (request, { payload }) => {
+    return request(`https://api.customer.io/v1/api/campaigns/${payload.id}/triggers`, {
+      method: 'post',
       json: {
         ids: payload.ids,
         data: payload.data,

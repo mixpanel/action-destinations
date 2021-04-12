@@ -1,31 +1,69 @@
+import btoa from 'btoa-lite'
 import nock from 'nock'
 import createRequestClient from '../create-request-client'
 
 describe('createRequestClient', () => {
   it('should create a request client instance that has Segment defaults', async () => {
-    const request = createRequestClient()
+    const log: Record<string, any> = {}
+
+    const request = createRequestClient({
+      afterResponse: [
+        (request, options, response) => {
+          log.request = request
+          log.options = options
+          log.response = response
+        }
+      ]
+    })
 
     nock('https://example.com').get('/').reply(200, 'Hello world!')
 
-    const response = await request.get('http://example.com')
-    expect(response.request.options.headers).toMatchObject({ 'user-agent': 'Segment' })
-    expect(response.request.options.retry.limit).toBe(0)
-    expect(response.request.options.timeout.request).toBe(5000)
+    await request('http://example.com')
+    expect(log.request.headers.get('user-agent')).toBe('Segment')
+    expect(log.options.timeout).toBe(10000)
   })
 
   it('should merge custom options when creating the request client instance', async () => {
+    const log: Record<string, any> = {}
+
     const request = createRequestClient({
-      prefixUrl: 'https://api.sendgrid.com/v3/',
       headers: { Authorization: `Bearer supersekret` },
-      responseType: 'json',
-      timeout: 10000
+      afterResponse: [
+        (request, options, response) => {
+          log.request = request
+          log.options = options
+          log.response = response
+        }
+      ]
     })
 
     nock('https://api.sendgrid.com/v3').get('/hello-world').reply(200, { greeting: 'Yo' })
 
-    const response = await request.get('hello-world')
-    expect(response.body).toMatchObject({ greeting: 'Yo' })
-    expect(response.requestUrl).toBe('https://api.sendgrid.com/v3/hello-world')
-    expect(response.request.options.headers).toMatchObject({ authorization: 'Bearer supersekret' })
+    const response = await request('https://api.sendgrid.com/v3/hello-world', { headers: { 'user-agent': 'foo' } })
+    expect(await response.json()).toMatchObject({ greeting: 'Yo' })
+    expect(response.url).toBe('https://api.sendgrid.com/v3/hello-world')
+    expect(log.request).toBeDefined()
+    expect(log.request.url).toBe('https://api.sendgrid.com/v3/hello-world')
+    expect(log.request.headers.get('user-agent')).toBe('foo')
+    expect(log.request.headers.get('authorization')).toBe('Bearer supersekret')
+  })
+
+  it('should automatically base64 encode username:password', async () => {
+    const log: Record<string, any> = {}
+
+    const request = createRequestClient({
+      afterResponse: [
+        (request, options, response) => {
+          log.request = request
+          log.options = options
+          log.response = response
+        }
+      ]
+    })
+
+    nock('https://example.com').get('/hello-world').reply(200, { greeting: 'Yo' })
+
+    await request('https://example.com/hello-world', { username: 'foo', password: 'bar' })
+    expect(log.request.headers.get('authorization')).toBe(`Basic ${btoa('foo:bar')}`)
   })
 })

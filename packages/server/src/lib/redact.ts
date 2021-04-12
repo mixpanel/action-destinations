@@ -125,12 +125,14 @@ const safeResponseHeaders = [
   'x-xss-protection'
 ]
 
-export function redactUnsafeRequestHeaders(headers: OutgoingHttpHeaders): OutgoingHttpHeaders {
+export function redactUnsafeRequestHeaders(headers: Headers): OutgoingHttpHeaders {
   const safeHeaders: OutgoingHttpHeaders = {}
 
-  for (const key in headers) {
+  // @ts-ignore the types are wrong here
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+  for (const [key, value] of headers.entries()) {
     if (isSafeRequestHeader(key)) {
-      safeHeaders[key] = headers[key]
+      safeHeaders[key] = value
     } else {
       safeHeaders[key] = '<redacted>'
     }
@@ -139,12 +141,14 @@ export function redactUnsafeRequestHeaders(headers: OutgoingHttpHeaders): Outgoi
   return safeHeaders
 }
 
-export function redactUnsafeResponseHeaders(headers: IncomingHttpHeaders): IncomingHttpHeaders {
+export function redactUnsafeResponseHeaders(headers: Headers): IncomingHttpHeaders {
   const safeHeaders: IncomingHttpHeaders = {}
 
-  for (const key in headers) {
+  // @ts-ignore the types are wrong here
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+  for (const [key, value] of headers.entries()) {
     if (isSafeResponseHeader(key)) {
-      safeHeaders[key] = headers[key]
+      safeHeaders[key] = value
     } else {
       safeHeaders[key] = '<redacted>'
     }

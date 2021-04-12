@@ -1,4 +1,4 @@
-import { Response } from 'got'
+import { DecoratedResponse as Response } from '@segment/actions-core'
 import { IncomingHttpHeaders, OutgoingHttpHeaders } from 'http'
 import { redactUnsafeRequestHeaders, redactUnsafeResponseHeaders } from '../lib/redact'
 
@@ -21,7 +21,7 @@ export interface ResponseFromDestination {
   body: unknown
 }
 
-export default function getEventTesterData(responses: Response<unknown>[]): EventTesterRequest[] {
+export default function getEventTesterData(responses: Response[]): EventTesterRequest[] {
   const requests: EventTesterRequest[] = []
 
   for (const response of responses) {
@@ -34,35 +34,22 @@ export default function getEventTesterData(responses: Response<unknown>[]): Even
   return requests
 }
 
-function summarizeRequest(response: Response<unknown>): RequestToDestination {
+function summarizeRequest(response: Response): RequestToDestination {
   const request = response.request
 
-  // This is needed because `request.options.body` does not contain the actual body sent in the request
-  const symbol = Object.getOwnPropertySymbols(request).find((s) => String(s) === 'Symbol(body)')
-  let body
-  if (symbol) {
-    // eslint-disable-next-line
-    // @ts-ignore
-    body = request[symbol]
-  } else if (request.options.json) {
-    body = JSON.stringify(request.options.json)
-  } else {
-    body = request.options.body || ''
-  }
-
   return {
-    url: response.requestUrl,
-    method: request.options.method,
-    headers: redactUnsafeRequestHeaders(request.options.headers),
-    body
+    url: request.url,
+    method: request.method,
+    headers: redactUnsafeRequestHeaders(request.headers),
+    body: request.body ?? ''
   }
 }
 
-function summarizeResponse(response: Response<unknown>): ResponseFromDestination {
+function summarizeResponse(response: Response): ResponseFromDestination {
   return {
-    statusCode: response.statusCode,
-    statusMessage: response.statusMessage,
+    statusCode: response.status,
+    statusMessage: response.statusText,
     headers: redactUnsafeResponseHeaders(response.headers),
-    body: response.body
+    body: response.data ?? response
   }
 }

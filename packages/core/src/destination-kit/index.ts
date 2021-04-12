@@ -1,16 +1,17 @@
 import { validate, parseFql } from '@segment/fab5-subscriptions'
-import got, { CancelableRequest, Got, Response } from 'got'
 import { JSONSchema4 } from 'json-schema'
-import { Action, ActionDefinition, Validate } from './action'
+import { Action, ActionDefinition, Validate, RequestFn } from './action'
 import { ExecuteInput, StepResult } from './step'
 import { time, duration } from '../time'
 import { JSONLikeObject, JSONObject } from '../json-object'
 import { SegmentEvent } from '../segment-event'
 import { fieldsToJsonSchema, jsonSchemaToFields } from './fields-to-jsonschema'
 import { UnsupportedActionError } from '../errors'
+import createRequestClient, { RequestClient } from '../create-request-client'
 import type { InputField, RequestExtension } from './types'
+import type { AllRequestOptions, ModifiedResponse } from '../request-client'
 
-export type { ActionDefinition, ExecuteInput }
+export type { ActionDefinition, ExecuteInput, RequestFn }
 export { fieldsToJsonSchema, jsonSchemaToFields }
 
 export interface SubscriptionStats {
@@ -56,9 +57,8 @@ interface TestAuthSettings<Settings> {
 interface Authentication<Settings> {
   scheme: 'basic' | 'custom'
   fields: Record<string, InputField>
-  testAuthentication: (req: Got, input: TestAuthSettings<Settings>) => CancelableRequest<Response<string>>
+  testAuthentication: (request: RequestClient, input: TestAuthSettings<Settings>) => Promise<unknown> | unknown
 }
-
 export interface CustomAuthentication<Settings> extends Authentication<Settings> {
   /** Typically used for "API Key" authentication. */
   scheme: 'custom'
@@ -80,6 +80,11 @@ interface EventInput<Settings> {
   readonly settings: Settings
 }
 
+export interface DecoratedResponse extends ModifiedResponse {
+  request: Request
+  options: AllRequestOptions
+}
+
 export class Destination<Settings = JSONObject> {
   readonly definition: DestinationDefinition<Settings>
   readonly name: string
@@ -87,7 +92,7 @@ export class Destination<Settings = JSONObject> {
   readonly extendRequest?: RequestExtension<Settings>
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   readonly actions: PartnerActions<Settings, any>
-  readonly responses: Response[]
+  readonly responses: DecoratedResponse[]
   readonly settingsSchema?: JSONSchema4
 
   constructor(destination: DestinationDefinition<Settings>) {
@@ -120,20 +125,11 @@ export class Destination<Settings = JSONObject> {
       return
     }
 
-    let request = got.extend({
-      retry: 0,
-      timeout: 3000,
-      headers: {
-        'user-agent': undefined
-      }
-    })
-
-    if (typeof this.extendRequest === 'function') {
-      request = request.extend(this.extendRequest(context))
-    }
+    const options = this.extendRequest?.(context) ?? {}
+    const requestClient = createRequestClient(options)
 
     try {
-      await this.authentication.testAuthentication(request, { settings })
+      await this.authentication.testAuthentication(requestClient, { settings })
     } catch (error) {
       throw new Error('Credentials are invalid')
     }

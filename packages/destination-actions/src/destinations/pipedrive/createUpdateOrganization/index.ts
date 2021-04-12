@@ -39,16 +39,16 @@ const action: ActionDefinition<Settings, Payload> = {
     organizationId: {
       ttl: 60,
       key: ({ payload }) => payload.identifier,
-      value: async (req, { payload }) => {
-        const search = await req.get('organizations/search', {
+      value: async (request, { payload, settings }) => {
+        const search = await request(`https://${settings.domain}.pipedrive.com/api/v1/organizations/search`, {
           searchParams: { term: payload.identifier }
         })
-        return get(search.body, 'data.items[0].item.id')
+        return get(search.data, 'data.items[0].item.id')
       }
     }
   },
 
-  perform: (req, { payload, cachedFields }) => {
+  perform: (request, { payload, settings, cachedFields }) => {
     const organizationId = cachedFields.organizationId
 
     const organization = {
@@ -57,7 +57,8 @@ const action: ActionDefinition<Settings, Payload> = {
     }
 
     if (organizationId === undefined || organizationId === null) {
-      return req.post('organizations', {
+      return request(`https://${settings.domain}.pipedrive.com/api/v1/organizations`, {
+        method: 'post',
         json: {
           ...organization,
           add_time: payload.add_time ? dayjs.utc(payload.add_time).format('YYYY-MM-DD HH:MM:SS') : undefined
@@ -65,7 +66,8 @@ const action: ActionDefinition<Settings, Payload> = {
       })
     }
 
-    return req.put(`organizations/${organizationId}`, {
+    return request(`https://${settings.domain}.pipedrive.com/api/v1/organizations/${organizationId}`, {
+      method: 'put',
       json: organization
     })
   }
