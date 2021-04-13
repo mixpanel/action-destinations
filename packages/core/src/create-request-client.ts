@@ -1,5 +1,8 @@
-import addBasicAuthHeader from './middleware/add-basic-auth-header'
+import addBasicAuthHeader from './middleware/before-request/add-basic-auth-header'
+import prepareHeaders from './middleware/after-response/prepare-headers'
+import prepareResponse from './middleware/after-response/prepare-response'
 import createInstance, { AllRequestOptions, RequestOptions } from './request-client'
+import type { ModifiedResponse } from './types'
 
 const baseClient = createInstance({
   timeout: 10000,
@@ -9,7 +12,8 @@ const baseClient = createInstance({
   beforeRequest: [
     // Automatically handle username/password -> basic auth header
     addBasicAuthHeader
-  ]
+  ],
+  afterResponse: [prepareResponse, prepareHeaders]
 })
 
 export type RequestClient = ReturnType<typeof createRequestClient>
@@ -22,12 +26,12 @@ export default function createRequestClient(...requestOptions: AllRequestOptions
 
   // TODO include `data` bundle in before/after hooks
   // TODO expose before/after hooks to destination definition and action definition?
-  for (const options of (requestOptions ?? [])) {
+  for (const options of requestOptions ?? []) {
     client = client.extend(options)
   }
 
   // Limit request client interface and handle basic auth scheme
-  return (url: string, options?: RequestOptions) => {
-    return client(url, options)
+  return <Data = unknown>(url: string, options?: RequestOptions) => {
+    return client<ModifiedResponse<Data>>(url, options)
   }
 }

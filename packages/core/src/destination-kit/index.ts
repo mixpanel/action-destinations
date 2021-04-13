@@ -8,8 +8,9 @@ import { SegmentEvent } from '../segment-event'
 import { fieldsToJsonSchema, jsonSchemaToFields } from './fields-to-jsonschema'
 import { UnsupportedActionError } from '../errors'
 import createRequestClient, { RequestClient } from '../create-request-client'
+import type { ModifiedResponse } from '../types'
 import type { InputField, RequestExtension } from './types'
-import type { AllRequestOptions, ModifiedResponse } from '../request-client'
+import type { AllRequestOptions } from '../request-client'
 
 export type { ActionDefinition, ExecuteInput, RequestFn }
 export { fieldsToJsonSchema, jsonSchemaToFields }

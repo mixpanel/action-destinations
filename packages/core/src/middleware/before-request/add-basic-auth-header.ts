@@ -1,5 +1,5 @@
 import btoa from 'btoa-lite'
-import type { BeforeRequestHook } from '../request-client'
+import type { BeforeRequestHook } from '../../request-client'
 
 const addBasicAuthHeader: BeforeRequestHook = (options) => {
   if (options.username || options.password) {

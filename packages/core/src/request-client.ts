@@ -3,8 +3,6 @@ import { CustomError } from 'ts-custom-error'
 import fetch, { Headers, Request, Response } from './fetch'
 import { isObject } from './real-type-of'
 
-type LowerAndUpper<T extends string> = Lowercase<T> | Uppercase<T>
-
 /**
  * The supported request options you can use with the request client
  */
@@ -23,7 +21,7 @@ export interface RequestOptions extends Omit<RequestInit, 'headers'> {
    * Internally, the standard methods (`GET`, `POST`, `PUT`, `PATCH`, `HEAD` and `DELETE`) are uppercased in order to avoid server errors due to case sensitivity.
    * @default 'get'
    */
-  method?: LowerAndUpper<'get' | 'post' | 'put' | 'delete' | 'patch' | 'head'>
+  method?: 'get' | 'post' | 'put' | 'delete' | 'patch' | 'head' | 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD'
   /**
    * When provided, will automatically apply basic authentication
    */
@@ -70,7 +68,7 @@ export interface NormalizedOptions extends Omit<AllRequestOptions, 'headers'> {
   // the merging process turns these into a Headers object, but you can pass in more
   headers: RequestInit['headers']
   // method is expected to be defined at this point
-  method: Uppercase<'get' | 'post' | 'put' | 'delete' | 'patch' | 'head'>
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD'
 }
 
 type MaybePromise<T> = Promise<T> | T
@@ -79,11 +77,11 @@ type MaybePromise<T> = Promise<T> | T
 export type BeforeRequestHook = (options: NormalizedOptions) => MaybePromise<RequestOptions | void>
 
 /** A hook that executes after a response is received. Useful for logging, cleanup, or modifying the response object */
-export type AfterResponseHook = (
+export type AfterResponseHook<OutputResponse extends Response = Response> = (
   request: Request,
   options: NormalizedOptions,
   response: Response
-) => MaybePromise<Response | void>
+) => MaybePromise<OutputResponse | void>
 
 // We need the loose definition of "object" to iterate over things like `[object Headers]`
 const isObjectLike = (value: unknown): value is { [key: string]: unknown } => {
@@ -159,17 +157,17 @@ function mergeOptions(...sources: Array<NormalizedOptions | AllRequestOptions>):
   return merge({}, ...sources) as AllRequestOptions
 }
 
-function getRequestMethod<T extends string>(method: T): Uppercase<T> {
-  return method.toUpperCase() as Uppercase<T>
+function getRequestMethod<T extends string>(method: T): T {
+  return method.toUpperCase() as T
 }
 
 /** Error thrown when a response has a non-2xx response. */
 export class HTTPError extends CustomError {
   request: Request
-  response: ModifiedResponse
+  response: Response
   options: NormalizedOptions
 
-  constructor(response: ModifiedResponse, request: Request, options: NormalizedOptions) {
+  constructor(response: Response, request: Request, options: NormalizedOptions) {
     super(response.statusText ?? String(response.status ?? 'Unknown response error'))
     this.response = response
     this.request = request
@@ -211,10 +209,6 @@ function timeoutFetch(
       .catch(reject)
       .then(() => clearTimeout(timer))
   })
-}
-
-export interface ModifiedResponse extends Response {
-  data?: unknown
 }
 
 class RequestClient {
@@ -269,25 +263,13 @@ class RequestClient {
     }
   }
 
-  async executeRequest() {
-    let response: ModifiedResponse = await this.fetch()
+  async executeRequest<T extends Response>(): Promise<T> {
+    let response = await this.fetch()
 
     for (const hook of this.options.afterResponse ?? []) {
-      const modifiedResponse = await hook(this.request, this.options, response.clone())
+      const modifiedResponse = await hook(this.request, this.options, response)
       if (modifiedResponse instanceof Response) {
         response = modifiedResponse
-      }
-    }
-
-    // Automatically attempt to parse json responses, matching the content-type
-    const contentType = response.headers.get('content-type')
-    if (contentType?.includes('application/json')) {
-      try {
-        // call `.json` on a clone, to prevent `TypeError: body used already` in callers
-        response.data = await response.clone().json()
-      } catch (_error) {
-        // Ignore the error
-        response.data = null
       }
     }
 
@@ -295,7 +277,7 @@ class RequestClient {
       throw new HTTPError(response, this.request, this.options)
     }
 
-    return response
+    return response as T
   }
 
   /**
@@ -322,8 +304,8 @@ class RequestClient {
  * optionally with default configuration to apply to all requests made with the client
  */
 export default function createInstance(defaults: AllRequestOptions = {}) {
-  const client = (url: string, options: RequestOptions = {}) =>
-    new RequestClient(url, mergeOptions(defaults, options)).executeRequest()
+  const client = <R extends Response = Response>(url: string, options: RequestOptions = {}) =>
+    new RequestClient(url, mergeOptions(defaults, options)).executeRequest<R>()
   client.extend = (newDefaults: AllRequestOptions) => createInstance(mergeOptions(defaults, newDefaults))
   return client
 }

@@ -79,10 +79,10 @@ const action: ActionDefinition<Settings, Payload> = {
         searchParams.start = Number(page)
       }
 
-      const response = await request(`https://${settings.domain}.pipedrive.com/api/v1/organizations`, {
+      const response = await request<Organizations>(`https://${settings.domain}.pipedrive.com/api/v1/organizations`, {
         searchParams
       })
-      const body = response.data as Organizations
+      const body = response.data
 
       const items = body.data.map((organization) => ({
         label: organization.name,

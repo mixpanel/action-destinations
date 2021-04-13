@@ -5,10 +5,12 @@ import { EventEmitter } from 'events'
 import NodeCache from 'node-cache'
 import createRequestClient from '../create-request-client'
 import { get } from '../get'
-import { JSONLikeObject } from '../json-object'
+import { JSONLikeObject, JSONObject } from '../json-object'
 import { transform } from '../mapping-kit'
 import { fieldsToJsonSchema } from './fields-to-jsonschema'
+import { Response } from '../fetch'
 import { ExecuteInput, Step, StepResult, Steps } from './step'
+import type { ModifiedResponse } from '../types'
 import type { AutocompleteResponse, InputField, RequestExtension } from './types'
 
 type MaybePromise<T> = T | Promise<T>
@@ -128,32 +130,40 @@ export class Validate<Settings, Payload> extends Step<Settings, Payload> {
 /**
  * Request handles delivering a payload to an external API. It uses the `fetch` API under the hood.
  *
- * The callback should be  able to return the raw request instead of needing to do `return response.data` etc.
+ * The callback should be able to return the raw request instead of needing to do `return response.data` etc.
  */
 class Request<Settings, Payload> extends Step<Settings, Payload> {
   requestFn: RequestFn<Settings, Payload> | undefined
   extendRequest: RequestExtension<Settings, Payload> | undefined
 
-  constructor(extendRequest: RequestExtension<Settings, Payload> | undefined, requestFn?: RequestFn<Settings, Payload>) {
+  constructor(
+    extendRequest: RequestExtension<Settings, Payload> | undefined,
+    requestFn?: RequestFn<Settings, Payload>
+  ) {
     super()
     this.extendRequest = extendRequest
     this.requestFn = requestFn
   }
 
-  async executeStep(data: ExecuteInput<Settings, Payload>): Promise<string> {
+  async executeStep(data: ExecuteInput<Settings, Payload>): Promise<JSONObject | string | null | undefined> {
     if (!this.requestFn) {
       return ''
     }
 
-    const request = this.createRequestClient(data)
+    const requestClient = this.createRequestClient(data)
 
-    const response: Response | JSONLikeObject | null = await this.requestFn(request, data)
+    const response = await this.requestFn(requestClient, data)
 
-    if (response === null) {
-      return 'TODO: null'
+    /**
+     * Try to use the parsed response `.data` or `.content` string
+     * @see {@link ../middleware/after-response/prepare-response.ts}
+     */
+    if (response instanceof Response) {
+      return ((response as ModifiedResponse).data as JSONObject) ?? (response as ModifiedResponse).content
     }
 
-    return response.body as string
+    // otherwise, we don't really know what this is, so return as-is
+    return response
   }
 
   protected createRequestClient(data: ExecuteInput<Settings, Payload>): RequestClient {
@@ -165,7 +175,7 @@ class Request<Settings, Payload> extends Step<Settings, Payload> {
         (request, options, response) => {
           // TODO figure out the types here...
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const modifiedResponse: any = response.clone()
+          const modifiedResponse: any = response
           modifiedResponse.request = request
           modifiedResponse.options = options
 
@@ -195,7 +205,10 @@ class CachedRequest<Settings, Payload> extends Request<Settings, Payload> {
   negative: boolean
   cache: NodeCache
 
-  constructor(extension: RequestExtension<Settings, Payload> | undefined, config: CachedRequestConfig<Settings, Payload>) {
+  constructor(
+    extension: RequestExtension<Settings, Payload> | undefined,
+    config: CachedRequestConfig<Settings, Payload>
+  ) {
     super(extension)
 
     this.keyFn = config.key

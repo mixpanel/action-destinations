@@ -12,12 +12,12 @@ interface Campaign {
 }
 
 const idAutocomplete: RequestFn<Settings, Payload, AutocompleteResponse> = async (request, { settings }) => {
-  const response = await request('https://beta-api.customer.io/v1/api/campaigns', {
+  const response = await request<Campaigns>('https://beta-api.customer.io/v1/api/campaigns', {
     username: settings.siteId,
     password: settings.apiKey
   })
 
-  const items = (response.data as Campaigns).campaigns.map((campaign) => ({
+  const items = response.data.campaigns.map((campaign) => ({
     label: campaign.name,
     value: campaign.id
   }))

@@ -1,5 +1,5 @@
 import btoa from 'btoa-lite'
-import nock from 'nock'
+import createTestServer from 'create-test-server'
 import createRequestClient from '../create-request-client'
 
 describe('createRequestClient', () => {
@@ -16,11 +16,16 @@ describe('createRequestClient', () => {
       ]
     })
 
-    nock('https://example.com').get('/').reply(200, 'Hello world!')
+    const server = await createTestServer()
+    server.get('/', (_request, response) => {
+      response.write('Hello world!')
+      response.end()
+    })
 
-    await request('http://example.com')
+    await request(server.url)
     expect(log.request.headers.get('user-agent')).toBe('Segment')
     expect(log.options.timeout).toBe(10000)
+    await server.close()
   })
 
   it('should merge custom options when creating the request client instance', async () => {
@@ -37,15 +42,19 @@ describe('createRequestClient', () => {
       ]
     })
 
-    nock('https://api.sendgrid.com/v3').get('/hello-world').reply(200, { greeting: 'Yo' })
+    const server = await createTestServer()
+    server.get('/', (_request, response) => {
+      response.json({ greeting: 'Yo' })
+    })
 
-    const response = await request('https://api.sendgrid.com/v3/hello-world', { headers: { 'user-agent': 'foo' } })
+    const response = await request(server.url, { headers: { 'user-agent': 'foo' } })
     expect(await response.json()).toMatchObject({ greeting: 'Yo' })
-    expect(response.url).toBe('https://api.sendgrid.com/v3/hello-world')
+    expect(response.url).toBe(`${server.url}/`)
     expect(log.request).toBeDefined()
-    expect(log.request.url).toBe('https://api.sendgrid.com/v3/hello-world')
+    expect(log.request.url).toBe(`${server.url}/`)
     expect(log.request.headers.get('user-agent')).toBe('foo')
     expect(log.request.headers.get('authorization')).toBe('Bearer supersekret')
+    await server.close()
   })
 
   it('should automatically base64 encode username:password', async () => {
@@ -61,9 +70,45 @@ describe('createRequestClient', () => {
       ]
     })
 
-    nock('https://example.com').get('/hello-world').reply(200, { greeting: 'Yo' })
+    const server = await createTestServer()
+    server.get('/', (_request, response) => {
+      response.json({ greeting: 'Yo' })
+    })
 
-    await request('https://example.com/hello-world', { username: 'foo', password: 'bar' })
+    await request(server.url, { username: 'foo', password: 'bar' })
     expect(log.request.headers.get('authorization')).toBe(`Basic ${btoa('foo:bar')}`)
+    await server.close()
+  })
+
+  it('`response.data` should contain the json parsed body when content-type is application/json', async () => {
+    const server = await createTestServer()
+    server.post('/', (_request, response) => {
+      response.json({ hello: 'world' })
+    })
+
+    const request = createRequestClient()
+
+    await expect(request(server.url, { method: 'post', json: { foo: true } })).resolves.toMatchObject({
+      data: expect.objectContaining({ hello: 'world' })
+    })
+    await server.close()
+  })
+
+  it('`response.data` should be null if parsing fails when content-type is application/json', async () => {
+    const server = await createTestServer()
+    server.post('/', (_request, response) => {
+      response.set('Content-Type', 'application/json')
+      // lies!
+      response.write('')
+      response.end()
+    })
+
+    const request = createRequestClient()
+
+    await expect(request(server.url, { method: 'post', json: { foo: true } })).resolves.toMatchObject({
+      data: undefined,
+      content: ''
+    })
+    await server.close()
   })
 })

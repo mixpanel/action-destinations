@@ -24,7 +24,7 @@ export interface ExecuteInput<Settings, Payload> {
  * catching errors, and returning a result object.
  */
 export class Step<Settings, Payload> extends EventEmitter {
-  executeStep?(data: ExecuteInput<Settings, Payload>): Promise<string>
+  executeStep?(data: ExecuteInput<Settings, Payload>): Promise<JSONObject | string | null | undefined>
 
   async execute(data: ExecuteInput<Settings, Payload>): Promise<StepResult> {
     const result: StepResult = {

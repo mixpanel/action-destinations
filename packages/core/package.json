@@ -1,7 +1,7 @@
 {
   "name": "@segment/actions-core",
   "description": "Core runtime for Destinations Actions.",
-  "version": "2.0.1",
+  "version": "2.0.2-next.2",
   "repository": {
     "type": "git",
     "url": "https://github.com/segmentio/fab-5-engine",
@@ -44,8 +44,7 @@
     "@types/json-schema": "^7.0.7",
     "@types/uuid": "^8.3.0",
     "create-test-server": "^3.0.1",
-    "jest": "^26.6.3",
-    "nock": "^13.0.4"
+    "jest": "^26.6.3"
   },
   "dependencies": {
     "@segment/ajv-human-errors": "^1.1.0",
@@ -65,9 +64,6 @@
     "testEnvironment": "node",
     "modulePathIgnorePatterns": [
       "<rootDir>/dist/"
-    ],
-    "setupFilesAfterEnv": [
-      "<rootDir>/test/setup-after-env.ts"
     ],
     "forceExit": true
   }

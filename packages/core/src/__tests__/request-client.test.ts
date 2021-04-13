@@ -261,37 +261,6 @@ describe('request()', () => {
     await server.close()
   })
 
-  it('`response.data` should contain the json parsed body when content-type is application/json', async () => {
-    const server = await createTestServer()
-    server.post('/', (_request, response) => {
-      response.json({ hello: 'world' })
-    })
-
-    const request = createInstance()
-
-    await expect(request(server.url, { method: 'post', json: { foo: true } })).resolves.toMatchObject({
-      data: expect.objectContaining({ hello: 'world' })
-    })
-    await server.close()
-  })
-
-  it('`response.data` should be null if parsing fails when content-type is application/json', async () => {
-    const server = await createTestServer()
-    server.post('/', (_request, response) => {
-      response.set('Content-Type', 'application/json')
-      // lies!
-      response.write('')
-      response.end()
-    })
-
-    const request = createInstance()
-
-    await expect(request(server.url, { method: 'post', json: { foo: true } })).resolves.toMatchObject({
-      data: null
-    })
-    await server.close()
-  })
-
   it('`throwHttpErrors` should not throw for non-2xx status codes when `false`', async () => {
     const server = await createTestServer()
     server.get('/', (_request, response) => {
