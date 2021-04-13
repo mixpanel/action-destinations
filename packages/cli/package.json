@@ -1,7 +1,7 @@
 {
   "name": "@segment/actions-cli",
   "description": "Destination Actions command line tools.",
-  "version": "2.0.2-next.2",
+  "version": "2.0.2",
   "repository": {
     "type": "git",
     "url": "https://github.com/segmentio/fab-5-engine",
@@ -23,9 +23,9 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "@segment/actions-core": "^2.0.2-next.2",
+    "@segment/actions-core": "^2.0.2",
     "@segment/control-plane-service-client": "ssh://git@github.com:segmentio/control-plane-service-js-client#master",
-    "@segment/destination-actions": "^2.0.2-next.2",
+    "@segment/destination-actions": "^2.0.2",
     "@types/json-diff": "^0.5.1",
     "@types/json-schema": "^7.0.7",
     "@types/lodash": "^4.14.168",
