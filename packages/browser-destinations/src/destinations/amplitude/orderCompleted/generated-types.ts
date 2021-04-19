@@ -3,15 +3,7 @@
 /**
  * A readable ID specified by you. Must have a minimum length of 5 characters. Required unless device ID is present. **Note:** If you send a request with a user ID that is not in the Amplitude system yet, then the user tied to that ID will not be marked new until their first event.
  */
-export type UserID2 = UserID | UserID1
-/**
- * A readable ID specified by you. Must have a minimum length of 5 characters. Required unless device ID is present. **Note:** If you send a request with a user ID that is not in the Amplitude system yet, then the user tied to that ID will not be marked new until their first event.
- */
-export type UserID = string
-/**
- * A readable ID specified by you. Must have a minimum length of 5 characters. Required unless device ID is present. **Note:** If you send a request with a user ID that is not in the Amplitude system yet, then the user tied to that ID will not be marked new until their first event.
- */
-export type UserID1 = null
+export type UserID = string | null
 /**
  * A device-specific identifier, such as the Identifier for Vendor on iOS. Required unless user ID is present. If a device ID is not sent with the event, it will be set to a hashed version of the user ID.
  */
@@ -131,15 +123,7 @@ export type EventID = number
 /**
  * The start time of the session, necessary if you want to associate events with a particular system.
  */
-export type SessionID2 = SessionID | SessionID1
-/**
- * The start time of the session, necessary if you want to associate events with a particular system.
- */
-export type SessionID = string
-/**
- * The start time of the session, necessary if you want to associate events with a particular system.
- */
-export type SessionID1 = number
+export type SessionID = string | number
 /**
  * Amplitude will deduplicate subsequent events sent with this ID we have already seen before within the past 7 days. Amplitude recommends generating a UUID or using some combination of device ID, user ID, event type, event ID, and time.
  */
@@ -181,7 +165,7 @@ export type Products = {
 }[]
 
 export interface Payload {
-  user_id?: UserID2
+  user_id?: UserID
   device_id?: DeviceID
   event_type: EventType
   time?: Timestamp
@@ -214,7 +198,7 @@ export interface Payload {
   adid?: GooglePlayServicesAdvertisingID
   android_id?: AndroidID
   event_id?: EventID
-  session_id?: SessionID2
+  session_id?: SessionID
   insert_id?: InsertID
   trackRevenuePerProduct: TrackRevenuePerProduct
   products?: Products
