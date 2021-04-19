@@ -1,4 +1,13 @@
 #!/usr/bin/env node
+const path = require('path')
+const { register } = require('tsconfig-paths')
+const tsConfig = require('../tsconfig.json')
+
+// For now we have to register tsconfig-paths manually, and cleanup after
+register({
+  baseUrl: path.join(__dirname, '../'),
+  paths: tsConfig.compilerOptions.paths
+})
 
 require('@oclif/command')
   .run()

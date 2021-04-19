@@ -96,7 +96,7 @@ async function createAction(action: ActionData): Promise<void> {
 
   try {
     spinner.start(chalk`Generating types for {bgMagenta.white ${action.slug}} action`)
-    await execa('yarn', ['generate-types'])
+    await execa('yarn', ['generate:types'])
     spinner.succeed()
   } catch (err) {
     spinner.fail(err.message)

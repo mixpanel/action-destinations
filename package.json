@@ -14,10 +14,10 @@
     "core": "yarn workspace @segment/actions-core",
     "server": "yarn workspace @segment/actions-server",
     "bootstrap": "lerna bootstrap",
-    "build": "yarn cli generate-types && lerna run build",
+    "build": "npx segment generate:types && lerna run build",
     "dev": "yarn server dev",
     "dev:ops": "yarn server dev:ops",
-    "generate-types": "yarn cli generate-types",
+    "generate:types": "npx segment generate:types",
     "lint": "eslint '**/*.ts' --max-warnings=10",
     "start": "yarn build && yarn server start",
     "test": "lerna run test",
@@ -50,8 +50,10 @@
     }
   },
   "lint-staged": {
+    "**/destinations/*/index.ts": [
+      "npx segment generate:types"
+    ],
     "!(templates)/**/*.ts": [
-      "yarn cli generate-types",
       "eslint --fix",
       "prettier --write"
     ],

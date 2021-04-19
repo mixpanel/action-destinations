@@ -1,13 +1,12 @@
 import { Command, flags } from '@oclif/command'
 import chalk from 'chalk'
-// TODO replace with running through oclif
-import execa from 'execa'
 import fs from 'fs-extra'
 import ora from 'ora'
 import path from 'path'
 import slugify from 'slugify'
 import { autoPrompt } from '../prompt'
 import { renderTemplate } from '../templates'
+import GenerateTypes from './generate/types'
 
 const templates = {
   'basic-auth': 'basic-auth.ts',
@@ -91,7 +90,8 @@ export default class Init extends Command {
     }
 
     // For now, include the slug in the path, but when we support external repos, we'll have to change this
-    const targetDirectory = path.join(process.cwd(), directory, args.path || slug)
+    const relativePath = path.join(directory, args.path || slug)
+    const targetDirectory = path.join(process.cwd(), relativePath)
     this.spinner.start(`Creating ${chalk.bold(name)}`)
 
     if (fs.existsSync(targetDirectory)) {
@@ -115,12 +115,11 @@ export default class Init extends Command {
     this.spinner.succeed(`Scaffolding directory`)
 
     try {
-      this.spinner.start(chalk`Generating types for {bgMagenta.white ${slug}} destination`)
-
-      await execa('yarn', ['generate-types'])
+      this.spinner.start(chalk`Generating types for {magenta ${slug}} destination`)
+      await GenerateTypes.run(['--path', relativePath])
       this.spinner.succeed()
     } catch (err) {
-      this.spinner.fail()
+      this.spinner.fail(chalk`Generating types for {magenta ${slug}} destination: ${err.message}`)
     }
 
     this.log(chalk.green(`Done creating "${name}" 🎉`))
