@@ -50,7 +50,7 @@
     }
   },
   "lint-staged": {
-    "**/destinations/*/index.ts": [
+    "**/src/destinations/*/index.ts": [
       "npx segment generate:types"
     ],
     "!(templates)/**/*.ts": [

@@ -27,12 +27,17 @@ export default class GenerateTypes extends Command {
   }
 
   static args = []
+  static strict = false
 
   async run() {
     const { flags } = this.parse(GenerateTypes)
 
     const globs = flags.path || ['./packages/*/src/destinations/*/index.ts']
-    const files = await globby(globs)
+    const files = await globby(globs, {
+      expandDirectories: false,
+      gitignore: true,
+      ignore: ['node_modules']
+    })
 
     for (const file of files) {
       const destination = await loadDestination(file).catch((error) => {

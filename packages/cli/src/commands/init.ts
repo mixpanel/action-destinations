@@ -1,21 +1,14 @@
 import { Command, flags } from '@oclif/command'
 import chalk from 'chalk'
-import fs from 'fs-extra'
 import ora from 'ora'
 import path from 'path'
 import slugify from 'slugify'
 import { autoPrompt } from '../prompt'
-import { renderTemplate } from '../templates'
+import { renderTemplates } from '../templates'
 import GenerateTypes from './generate/types'
 
-const templates = {
-  'basic-auth': 'basic-auth.ts',
-  'custom-auth': 'custom-auth.ts',
-  minimal: 'empty-destination.ts'
-}
-
 export default class Init extends Command {
-  protected spinner: ora.Ora = ora()
+  private spinner: ora.Ora = ora()
 
   static description = `
     Scaffolds a new integration directory with a template. This does not register or deploy the integration.
@@ -92,27 +85,16 @@ export default class Init extends Command {
     // For now, include the slug in the path, but when we support external repos, we'll have to change this
     const relativePath = path.join(directory, args.path || slug)
     const targetDirectory = path.join(process.cwd(), relativePath)
-    this.spinner.start(`Creating ${chalk.bold(name)}`)
+    const templatePath = path.join(__dirname, '../../templates/destinations', template)
 
-    if (fs.existsSync(targetDirectory)) {
-      this.spinner.fail()
-      this.warn(chalk.red(`There's already content in ${targetDirectory}. Exiting.`))
+    try {
+      this.spinner.start(`Creating ${chalk.bold(name)}`)
+      renderTemplates(templatePath, targetDirectory, answers)
+      this.spinner.succeed(`Scaffold integration`)
+    } catch (err) {
+      this.spinner.fail(`Scaffold integration: ${chalk.red(err.message)}`)
       this.exit()
     }
-
-    fs.mkdirSync(targetDirectory)
-
-    // TODO if we need to support generating multiple files, this will need to be updated
-    // TODO extract the common bits
-    const templateFile = templates[template as keyof typeof templates] || templates.minimal
-    const templatePath = path.join(__dirname, '../../templates/destinations', templateFile)
-    const templateContent = fs.readFileSync(templatePath, 'utf8')
-    const contents = renderTemplate(templateContent, answers)
-    const writePath = path.join(targetDirectory, 'index.ts')
-
-    this.spinner.text = chalk`Creating {bold ${writePath}}`
-    fs.writeFileSync(writePath, contents, 'utf8')
-    this.spinner.succeed(`Scaffolding directory`)
 
     try {
       this.spinner.start(chalk`Generating types for {magenta ${slug}} destination`)
@@ -127,7 +109,9 @@ export default class Init extends Command {
   }
 
   async catch(error: unknown) {
-    this.spinner?.fail()
+    if (this.spinner?.isSpinning) {
+      this.spinner.fail()
+    }
     throw error
   }
 }
