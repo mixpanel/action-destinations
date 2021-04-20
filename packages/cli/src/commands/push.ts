@@ -1,5 +1,6 @@
-import { idToSlug, destinations as actionDestinations } from '@segment/destination-actions'
+import { Command, flags } from '@oclif/command'
 import { DestinationDefinition, fieldsToJsonSchema, jsonSchemaToFields, ActionDefinition } from '@segment/actions-core'
+import { idToSlug, destinations as actionDestinations } from '@segment/destination-actions'
 import chalk from 'chalk'
 import { Dictionary, invert, pick, uniq } from 'lodash'
 import ControlPlaneService, {
@@ -10,14 +11,7 @@ import ControlPlaneService, {
 import { diffString } from 'json-diff'
 import type { JSONSchema4 } from 'json-schema'
 import ora from 'ora'
-import prompts from 'prompts'
-
-const promptOptions = {
-  onCancel() {
-    console.log('Exiting...')
-    process.exit(0)
-  }
-}
+import { prompt } from 'src/prompt'
 
 const controlPlaneService = new ControlPlaneService({
   name: 'control-plane-service',
@@ -29,10 +23,6 @@ const controlPlaneService = new ControlPlaneService({
     'skip-authz': '1'
   }
 })
-
-interface PromptAnswers {
-  chosenSlugs: string[]
-}
 
 type DefinitionJson = Omit<DestinationDefinition, 'actions' | 'extendRequest' | 'authentication'> & {
   authentication?: Omit<NonNullable<DestinationDefinition['authentication']>, 'testAuthentication'>
@@ -48,112 +38,109 @@ interface ActionDestinationMetadata {
   settings: JSONSchema4
 }
 
-let spinner: ora.Ora
+export default class Push extends Command {
+  private spinner: ora.Ora = ora()
 
-/**
- * This script syncs our json schema settings for each destination and its actions into the corresponding destination metadata.
- *
- * Usage:
- *
- *    $ robo stage.ssh // or prod.ssh
- *    $ goto fab-5-engine
- *    $ yarn run sync-json-schemas
- */
+  static description = `
+    Introspects your integration definition to build and upload your integration to Segment. Requires \`robo stage.ssh\` or \`robo prod.ssh\`.
+  `
 
-async function run() {
-  const slugToId = invert(idToSlug)
-  const availableSlugs = Object.keys(slugToId)
-  const { chosenSlugs }: PromptAnswers = await prompts(
-    {
+  static examples = [`$ segment push`]
+
+  static flags = {
+    help: flags.help({ char: 'h' })
+  }
+
+  static args = []
+
+  async run() {
+    const slugToId = invert(idToSlug)
+    const availableSlugs = Object.keys(slugToId)
+    const { chosenSlugs } = await prompt<{ chosenSlugs: string[] }>({
       type: 'multiselect',
       name: 'chosenSlugs',
-      message: 'Destinations:',
+      message: 'Integrations:',
       choices: availableSlugs.map((s) => ({
         title: s,
         value: s
       }))
-    },
-    promptOptions
-  )
+    })
 
-  if (!chosenSlugs) {
-    return
-  }
-
-  const destinationIds: string[] = []
-  for (const slug of chosenSlugs) {
-    const id = slugToId[slug]
-    destinationIds.push(id)
-  }
-
-  console.log('')
-  spinner = ora()
-  spinner.start(`Fetching existing definitions for ${chosenSlugs.map((slug) => chalk.greenBright(slug)).join(', ')}...`)
-
-  const schemasByDestination = getJsonSchemas(actionDestinations, destinationIds, slugToId)
-  const metadatas = await getDestinationMetadatas(destinationIds)
-
-  if (metadatas.length !== Object.keys(schemasByDestination).length) {
-    spinner.fail()
-    throw new Error('Number of metadatas must match number of schemas')
-  }
-
-  spinner.stop()
-
-  const promises = []
-  for (const metadata of metadatas) {
-    const schemaForDestination = schemasByDestination[metadata.id]
-    const slug = schemaForDestination.slug
-
-    console.log('')
-    console.log(`${chalk.bold.whiteBright(slug)}`)
-    spinner.start(`Generating diff for ${chalk.bold(slug)}...`)
-
-    const options = getOptions(metadata, schemaForDestination)
-    const basicOptions = getBasicOptions(metadata, options)
-    const settingsDiff = diffString(
-      asJson(pick(metadata, ['basicOptions', 'options'])),
-      asJson({ basicOptions, options })
-    )
-
-    const oldDefinition = settingsToDefinition(metadata, schemaForDestination.definition)
-    const newDefinition = definitionToJson(schemaForDestination.definition)
-    const definitionDiff = diffString(oldDefinition, newDefinition)
-
-    if (definitionDiff) {
-      spinner.warn(`Detected definition diff for ${chalk.bold(slug)}, please review:`)
-      console.log(`\n${definitionDiff}`)
-    } else if (settingsDiff) {
-      spinner.warn(`Detected settings diff for ${chalk.bold(slug)}, please review:`)
-      console.log(`\n${settingsDiff}`)
-    } else {
-      spinner.info(`No change for ${chalk.bold(slug)}. Skipping.`)
-      continue
+    if (!chosenSlugs) {
+      return
     }
 
-    const { shouldContinue } = await prompts(
-      {
+    const destinationIds: string[] = []
+    for (const slug of chosenSlugs) {
+      const id = slugToId[slug]
+      destinationIds.push(id)
+    }
+
+    this.spinner.start(
+      `Fetching existing definitions for ${chosenSlugs.map((slug) => chalk.greenBright(slug)).join(', ')}...`
+    )
+    const schemasByDestination = getJsonSchemas(actionDestinations, destinationIds, slugToId)
+    const metadatas = await getDestinationMetadatas(destinationIds)
+
+    if (metadatas.length !== Object.keys(schemasByDestination).length) {
+      this.spinner.fail()
+      throw new Error('Number of metadatas must match number of schemas')
+    }
+
+    this.spinner.stop()
+
+    const promises = []
+    for (const metadata of metadatas) {
+      const schemaForDestination = schemasByDestination[metadata.id]
+      const slug = schemaForDestination.slug
+
+      this.log('')
+      this.log(`${chalk.bold.whiteBright(slug)}`)
+      this.spinner.start(`Generating diff for ${chalk.bold(slug)}...`)
+
+      const options = getOptions(metadata, schemaForDestination)
+      const basicOptions = getBasicOptions(metadata, options)
+      const settingsDiff = diffString(
+        asJson(pick(metadata, ['basicOptions', 'options'])),
+        asJson({ basicOptions, options })
+      )
+
+      const oldDefinition = settingsToDefinition(metadata, schemaForDestination.definition)
+      const newDefinition = definitionToJson(schemaForDestination.definition)
+      const definitionDiff = diffString(oldDefinition, newDefinition)
+
+      if (definitionDiff) {
+        this.spinner.warn(`Detected definition diff for ${chalk.bold(slug)}, please review:`)
+        this.log(`\n${definitionDiff}`)
+      } else if (settingsDiff) {
+        this.spinner.warn(`Detected settings diff for ${chalk.bold(slug)}, please review:`)
+        this.log(`\n${settingsDiff}`)
+      } else {
+        this.spinner.info(`No change for ${chalk.bold(slug)}. Skipping.`)
+        continue
+      }
+
+      const { shouldContinue } = await prompt({
         type: 'confirm',
         name: 'shouldContinue',
         message: `Publish change for ${slug}?`,
         initial: false
-      },
-      promptOptions
-    )
+      })
 
-    if (!shouldContinue) {
-      continue
+      if (!shouldContinue) {
+        continue
+      }
+
+      promises.push(
+        updateDestinationMetadata(metadata.id, {
+          basicOptions,
+          options
+        })
+      )
     }
 
-    promises.push(
-      updateDestinationMetadata(metadata.id, {
-        basicOptions,
-        options
-      })
-    )
+    await Promise.all(promises)
   }
-
-  await Promise.all(promises)
 }
 
 function asJson(obj: unknown) {
@@ -426,12 +413,3 @@ function getJsonSchemas(
 
   return schemasByDestination
 }
-
-run()
-  .then(() => {
-    process.exit(0)
-  })
-  .catch((err) => {
-    console.error(err)
-    process.exit(1)
-  })

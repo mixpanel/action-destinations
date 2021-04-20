@@ -144,17 +144,17 @@ Here's a full example:
 ]
 ```
 
-## Syncing json schemas
+## Pushing definition changes into Segment
 
 Everytime the definition for destinations or actions changes, run the following commands:
 
 ```sh
 $ robo sshuttle
-$ yarn cli sync-json-schemas
+$ npx segment push
 #  If the above commands worked without any issues, continue
 $ robo prod.ssh
 $ goto fab-5-engine && yarn install
-$ yarn cli sync-json-schemas
+$ npx segment push
 ```
 
 ## Deploying

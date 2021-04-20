@@ -11,7 +11,7 @@ export default class Init extends Command {
   private spinner: ora.Ora = ora()
 
   static description = `
-    Scaffolds a new integration directory with a template. This does not register or deploy the integration.
+    Scaffolds a new integration with a template. This does not register or deploy the integration.
   `
 
   static examples = [
@@ -21,7 +21,7 @@ export default class Init extends Command {
 
   static flags = {
     help: flags.help({ char: 'h' }),
-    directory: flags.string({ char: 'd', description: 'base directory to scaffold the integration', default: '.' }),
+    directory: flags.string({ char: 'd', description: 'target directory to scaffold the integration', default: '.' }),
     name: flags.string({ char: 'n', description: 'name of the integration' }),
     slug: flags.string({ char: 's', description: 'url-friendly slug of the integration' }),
     template: flags.enum({

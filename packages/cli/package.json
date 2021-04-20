@@ -29,7 +29,6 @@
     "clean": "tsc -b tsconfig.build.json --clean",
     "postclean": "rm -rf dist",
     "create:destination": "npx segment init --directory packages/destination-actions/src/destinations",
-    "sync-json-schemas": "ts-node --files -r tsconfig-paths/register src/sync-json-schemas",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {

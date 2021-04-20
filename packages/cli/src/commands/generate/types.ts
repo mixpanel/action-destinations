@@ -17,6 +17,9 @@ export default class GenerateTypes extends Command {
     `$ segment generate:types --path ./packages/*/src/destinations/*/index.ts`
   ]
 
+  // Allow variable length args (to work with tools like lint-staged)
+  static strict = false
+
   static flags = {
     help: flags.help({ char: 'h' }),
     path: flags.string({
@@ -27,7 +30,6 @@ export default class GenerateTypes extends Command {
   }
 
   static args = []
-  static strict = false
 
   async run() {
     const { flags } = this.parse(GenerateTypes)
