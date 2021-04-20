@@ -8,9 +8,7 @@ import prettier from 'prettier'
 import { loadDestination } from '../../destinations'
 
 export default class GenerateTypes extends Command {
-  static description = `
-    Generates TypeScript definitions for an integration.
-  `
+  static description = `Generates TypeScript definitions for an integration.`
 
   static examples = [
     `$ segment generate:types`,

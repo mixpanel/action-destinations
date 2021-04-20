@@ -9,9 +9,7 @@ import GenerateTypes from './types'
 export default class GenerateAction extends Command {
   private spinner: ora.Ora = ora()
 
-  static description = `
-    Scaffolds a new integration action.
-  `
+  static description = `Scaffolds a new integration action.`
 
   static examples = [
     `$ segment generate:action ACTION`,

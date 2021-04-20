@@ -41,9 +41,7 @@ interface ActionDestinationMetadata {
 export default class Push extends Command {
   private spinner: ora.Ora = ora()
 
-  static description = `
-    Introspects your integration definition to build and upload your integration to Segment. Requires \`robo stage.ssh\` or \`robo prod.ssh\`.
-  `
+  static description = `Introspects your integration definition to build and upload your integration to Segment. Requires \`robo stage.ssh\` or \`robo prod.ssh\`.`
 
   static examples = [`$ segment push`]
 

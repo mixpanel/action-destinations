@@ -10,9 +10,7 @@ import GenerateTypes from './generate/types'
 export default class Init extends Command {
   private spinner: ora.Ora = ora()
 
-  static description = `
-    Scaffolds a new integration with a template. This does not register or deploy the integration.
-  `
+  static description = `Scaffolds a new integration with a template. This does not register or deploy the integration.`
 
   static examples = [
     `$ segment init my-integration`,
