@@ -35,6 +35,14 @@ export const eventSchema = {
       '@path': '$.event'
     }
   },
+  session_id: {
+    title: 'Session ID',
+    type: ['string', 'number'],
+    description: 'The start time of the session, necessary if you want to associate events with a particular system.',
+    default: {
+      '@path': '$.integrations.Amplitude.session_id'
+    }
+  },
   time: {
     title: 'Timestamp',
     type: 'string',
@@ -280,14 +288,6 @@ export const eventSchema = {
     type: 'integer',
     description:
       'An incrementing counter to distinguish events with the same user ID and timestamp from each other. Amplitude recommends you send an event ID, increasing over time, especially if you expect events to occur simultanenously.'
-  },
-  session_id: {
-    title: 'Session ID',
-    type: ['string', 'number'],
-    description: 'The start time of the session, necessary if you want to associate events with a particular system.',
-    default: {
-      '@path': '$.integrations.Amplitude.session_id'
-    }
   },
   insert_id: {
     title: 'Insert ID',

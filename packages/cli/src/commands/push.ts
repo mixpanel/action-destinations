@@ -46,12 +46,14 @@ export default class Push extends Command {
   static examples = [`$ segment push`]
 
   static flags = {
-    help: flags.help({ char: 'h' })
+    help: flags.help({ char: 'h' }),
+    force: flags.boolean({ char: 'f' })
   }
 
   static args = []
 
   async run() {
+    const { flags } = this.parse(Push)
     const slugToId = invert(idToSlug)
     const availableSlugs = Object.keys(slugToId)
     const { chosenSlugs } = await prompt<{ chosenSlugs: string[] }>({
@@ -113,6 +115,9 @@ export default class Push extends Command {
       } else if (settingsDiff) {
         this.spinner.warn(`Detected settings diff for ${chalk.bold(slug)}, please review:`)
         this.log(`\n${settingsDiff}`)
+      } else if (flags.force) {
+        this.spinner.warn(`No change detected for ${chalk.bold(slug)}. Using force, please review:`)
+        this.log(`\n${newDefinition}`)
       } else {
         this.spinner.info(`No change for ${chalk.bold(slug)}. Skipping.`)
         continue
