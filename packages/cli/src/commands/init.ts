@@ -19,7 +19,11 @@ export default class Init extends Command {
 
   static flags = {
     help: flags.help({ char: 'h' }),
-    directory: flags.string({ char: 'd', description: 'target directory to scaffold the integration', default: '.' }),
+    directory: flags.string({
+      char: 'd',
+      description: 'target directory to scaffold the integration',
+      default: './packages/destination-actions/src/destinations'
+    }),
     name: flags.string({ char: 'n', description: 'name of the integration' }),
     slug: flags.string({ char: 's', description: 'url-friendly slug of the integration' }),
     template: flags.enum({
