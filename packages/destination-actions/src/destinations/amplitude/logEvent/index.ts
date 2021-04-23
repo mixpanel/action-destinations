@@ -14,7 +14,16 @@ const action: ActionDefinition<Settings, Payload> = {
   description: 'Send an event to Amplitude.',
   recommended: true,
   defaultSubscription: 'type = "track"',
-  fields: eventSchema,
+  fields: {
+    ...eventSchema,
+    use_batch_endpoint: {
+      title: 'Use Batch Endpoint',
+      description:
+        "If true, events are sent to Amplitude's `batch` endpoint rather than their `httpapi` events endpoint. Enabling this setting may help reduce 429s – or throttling errors – from Amplitude. More information about Amplitude's throttling is available in [their docs](https://developers.amplitude.com/docs/batch-event-upload-api#429s-in-depth).",
+      type: 'boolean',
+      default: false
+    }
+  },
   perform: (request, { payload, settings }) => {
     const event = { ...payload } as AmplitudeEvent
 
@@ -26,7 +35,11 @@ const action: ActionDefinition<Settings, Payload> = {
       event.session_id = dayjs.utc(payload.session_id).valueOf()
     }
 
-    return request('https://api2.amplitude.com/2/httpapi', {
+    const endpoint = payload.use_batch_endpoint
+      ? 'https://api2.amplitude.com/batch'
+      : 'https://api2.amplitude.com/2/httpapi'
+
+    return request(endpoint, {
       method: 'post',
       json: {
         api_key: settings.apiKey,

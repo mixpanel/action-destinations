@@ -128,6 +128,10 @@ export type EventID = number
  * Amplitude will deduplicate subsequent events sent with this ID we have already seen before within the past 7 days. Amplitude recommends generating a UUID or using some combination of device ID, user ID, event type, event ID, and time.
  */
 export type InsertID = string
+/**
+ * If true, events are sent to Amplitude's `batch` endpoint rather than their `httpapi` events endpoint. Enabling this setting may help reduce 429s – or throttling errors – from Amplitude. More information about Amplitude's throttling is available in [their docs](https://developers.amplitude.com/docs/batch-event-upload-api#429s-in-depth).
+ */
+export type UseBatchEndpoint = boolean
 
 export interface Payload {
   user_id?: UserID
@@ -165,6 +169,7 @@ export interface Payload {
   android_id?: AndroidID
   event_id?: EventID
   insert_id?: InsertID
+  use_batch_endpoint?: UseBatchEndpoint
 }
 /**
  * An object of key-value pairs that represent additional data to be sent along with the event. You can store property values in an array, but note that Amplitude only supports one-dimensional arrays. Date values are transformed into string values. Object depth may not exceed 40 layers.
