@@ -1,6 +1,10 @@
 // Generated file. DO NOT MODIFY IT BY HAND.
 
 /**
+ * When enabled, track revenue with each product within the event. When disabled, track total revenue once for the event.
+ */
+export type TrackRevenuePerProduct = boolean
+/**
  * A readable ID specified by you. Must have a minimum length of 5 characters. Required unless device ID is present. **Note:** If you send a request with a user ID that is not in the Amplitude system yet, then the user tied to that ID will not be marked new until their first event.
  */
 export type UserID = string | null
@@ -129,11 +133,43 @@ export type EventID = number
  */
 export type InsertID = string
 /**
+ * The price of the item purchased. Required for revenue data if the revenue field is not sent. You can use negative values to indicate refunds.
+ */
+export type Price1 = number
+/**
+ * The quantity of the item purchased. Defaults to 1 if not specified.
+ */
+export type Quantity1 = number
+/**
+ * Revenue = price * quantity. If you send all 3 fields of price, quantity, and revenue, then (price * quantity) will be used as the revenue value. You can use negative values to indicate refunds.
+ */
+export type Revenue1 = number
+/**
+ * An identifier for the item purchased. You must send a price and quantity or revenue with this field.
+ */
+export type ProductID1 = string
+/**
+ * The type of revenue for the item purchased. You must send a price and quantity or revenue with this field.
+ */
+export type RevenueType1 = string
+/**
+ * The list of products purchased.
+ */
+export type Products = {
+  price?: Price1
+  quantity?: Quantity1
+  revenue?: Revenue1
+  productId?: ProductID1
+  revenueType?: RevenueType1
+  [k: string]: unknown
+}[]
+/**
  * If true, events are sent to Amplitude's `batch` endpoint rather than their `httpapi` events endpoint. Enabling this setting may help reduce 429s – or throttling errors – from Amplitude. More information about Amplitude's throttling is available in [their docs](https://developers.amplitude.com/docs/batch-event-upload-api#429s-in-depth).
  */
 export type UseBatchEndpoint = boolean
 
 export interface Payload {
+  trackRevenuePerProduct?: TrackRevenuePerProduct
   user_id?: UserID
   device_id?: DeviceID
   event_type: EventType
@@ -169,6 +205,7 @@ export interface Payload {
   android_id?: AndroidID
   event_id?: EventID
   insert_id?: InsertID
+  products?: Products
   use_batch_endpoint?: UseBatchEndpoint
 }
 /**

@@ -19,13 +19,23 @@ const presets: DestinationDefinition['presets'] = [
     name: 'Page Calls',
     subscribe: 'type = "page"',
     partnerAction: 'logEvent',
-    mapping: defaultValues(logEvent.fields)
+    mapping: {
+      ...defaultValues(logEvent.fields),
+      event_type: {
+        '@template': 'Viewed {{name}}'
+      }
+    }
   },
   {
     name: 'Screen Calls',
     subscribe: 'type = "screen"',
     partnerAction: 'logEvent',
-    mapping: defaultValues(logEvent.fields)
+    mapping: {
+      ...defaultValues(logEvent.fields),
+      event_type: {
+        '@template': 'Viewed {{name}}'
+      }
+    }
   },
   {
     name: 'Identify Calls',

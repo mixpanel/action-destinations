@@ -47,9 +47,7 @@ describe('Amplitude', () => {
         ])
       })
     })
-  })
 
-  describe('orderCompleted', () => {
     it('should work with default mappings', async () => {
       const event = createTestEvent({
         event: 'Order Completed',
@@ -68,7 +66,7 @@ describe('Amplitude', () => {
 
       nock('https://api2.amplitude.com/2').post('/httpapi').reply(200, {})
 
-      const responses = await testDestination.testAction('orderCompleted', { event, useDefaultMappings: true })
+      const responses = await testDestination.testAction('logEvent', { event, useDefaultMappings: true })
       expect(responses.length).toBe(1)
       expect(responses[0].status).toBe(200)
       expect(responses[0].options.json).toMatchObject({
@@ -110,7 +108,7 @@ describe('Amplitude', () => {
         trackRevenuePerProduct: true
       }
 
-      const responses = await testDestination.testAction('orderCompleted', { event, mapping, useDefaultMappings: true })
+      const responses = await testDestination.testAction('logEvent', { event, mapping, useDefaultMappings: true })
       expect(responses.length).toBe(1)
       expect(responses[0].status).toBe(200)
       expect(responses[0].options.json).toMatchObject({
