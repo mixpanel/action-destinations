@@ -2,7 +2,6 @@ import type { DestinationDefinition } from '@segment/actions-core'
 import { defaultValues } from '@segment/actions-core'
 import identifyUser from './identifyUser'
 import logEvent from './logEvent'
-import orderCompleted from './orderCompleted'
 import mapUser from './mapUser'
 import groupIdentifyUser from './groupIdentifyUser'
 import type { Settings } from './generated-types'
@@ -83,7 +82,6 @@ const destination: DestinationDefinition<Settings> = {
   actions: {
     logEvent,
     identifyUser,
-    orderCompleted,
     mapUser,
     groupIdentifyUser
   }
