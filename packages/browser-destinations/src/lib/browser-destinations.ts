@@ -1,4 +1,4 @@
-import { Analytics, Context, Plugin } from '@segment/analytics-next'
+import type { Analytics, Context, Plugin } from '@segment/analytics-next'
 import type {
   DestinationDefinition,
   ExecuteInput,

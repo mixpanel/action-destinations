@@ -9,6 +9,7 @@
     "resolveJsonModule": true,
     "strict": true,
     "sourceMap": true,
+    "removeComments": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "strictPropertyInitialization": false,

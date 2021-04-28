@@ -1,4 +1,4 @@
-import { Analytics, Context, Plugin } from '@segment/analytics-next'
+import type { Analytics, Context, Plugin } from '@segment/analytics-next'
 import type { JSONObject } from '@segment/actions-core'
 import { transform } from '@segment/actions-core/mapping-kit'
 import { parseFql, validate } from '@segment/fab5-subscriptions'

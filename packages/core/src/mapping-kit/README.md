@@ -813,7 +813,7 @@ Mappings:
 ### @uuid
 
 The @uuid directive resolves to a v4 UUID string generated using the [uuid
-package](https://www.npmjs.com/package/uuid).
+package](https://www.npmjs.com/package/@lukeed/uuid).
 
 ```json
 Mappings:

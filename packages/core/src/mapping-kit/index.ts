@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid'
+import { v4 as uuidv4 } from '@lukeed/uuid/secure'
 import dayjs from '../dayjs'
 import { get } from '../get'
 import { JSONObject, JSONValue, JSONLike, JSONLikeObject } from '../json-object'
