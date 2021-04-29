@@ -1,8 +1,0 @@
-{
-  "mapping": {
-    "@timestamp": {
-      "timestamp": "2020-06-01"
-    }
-  },
-  "expectError": "/@timestamp should have field \"format\" but it doesn't."
-}

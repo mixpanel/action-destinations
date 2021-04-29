@@ -1,8 +1,0 @@
-{
-  "mapping": {
-    "@merge": {
-      "oops": true
-    }
-  },
-  "expectError": "/@merge should be an array but it is an object."
-}

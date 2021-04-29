@@ -105,37 +105,6 @@ function validateDirectiveOrString(v: unknown, stack: string[] = []) {
   }
 }
 
-function validateDirectiveOrObject(v: unknown, stack: string[] = []) {
-  const type = realTypeOrDirective(v)
-  switch (type) {
-    case 'directive':
-      return validateDirective(v, stack)
-    case 'object':
-      return validateObject(v, stack)
-    default:
-      throw new ValidationError(
-        `should be a mapping directive or an object but it is ${indefiniteArticle(type)} ${type}`,
-        stack
-      )
-  }
-}
-
-function validateDirectiveOrArray(v: unknown, stack: string[] = []) {
-  const type = realTypeOrDirective(v)
-
-  switch (type) {
-    case 'directive':
-      return validateDirective(v, stack)
-    case 'array':
-      return validateArray(v, stack)
-    default:
-      throw new ValidationError(
-        `should be a mapping directive or an array but it is ${indefiniteArticle(type)} ${type}`,
-        stack
-      )
-  }
-}
-
 function validateObject(value: unknown, stack: string[] = []) {
   const type = realTypeOrDirective(value)
   if (type !== 'object') {
@@ -229,10 +198,6 @@ function directive(names: string[] | string, fn: DirectiveValidator): void {
   })
 }
 
-directive('@base64', (v, stack) => {
-  validateDirectiveOrString(v, stack)
-})
-
 directive('@if', (v, stack) => {
   validateObjectWithFields(
     v,
@@ -246,86 +211,12 @@ directive('@if', (v, stack) => {
   )
 })
 
-directive('@json', (v, stack) => {
-  validateDirectiveOrRaw(v, stack)
-})
-
-directive('@lowercase', (v, stack) => {
-  validateDirectiveOrString(v, stack)
-})
-
-directive('@merge', (v, stack = []) => {
-  validateArray(v, stack)
-
-  const arr = v as unknown[]
-  const errors: Error[] = []
-
-  arr.forEach((obj, i) => {
-    try {
-      validateDirectiveOrObject(obj, [...stack, `${i}`])
-    } catch (error) {
-      errors.push(error)
-    }
-  })
-  if (errors.length) {
-    throw new AggregateError(errors)
-  }
-})
-
-directive(['@omit', '@pick'], (v, stack = []) => {
-  validateObjectWithFields(
-    v,
-    {
-      object: { required: validateDirectiveOrObject },
-      fields: { required: validateDirectiveOrArray }
-    },
-    stack
-  )
-
-  const obj = v as Dictionary
-  if (Array.isArray(obj.fields)) {
-    const errors: Error[] = []
-
-    obj.fields.forEach((field, i) => {
-      try {
-        validateDirectiveOrString(field, [...stack, i.toString()])
-      } catch (error) {
-        errors.push(error)
-      }
-    })
-
-    if (errors.length) {
-      throw new AggregateError(errors)
-    }
-  }
-})
-
 directive('@path', (v, stack) => {
   validateDirectiveOrString(v, stack)
 })
 
-directive('@root', () => {
-  // no-op
-})
-
 directive('@template', (v, stack) => {
   validateDirectiveOrString(v, stack)
-})
-
-directive('@timestamp', (v, stack) => {
-  validateObjectWithFields(
-    v,
-    {
-      format: { required: validateDirectiveOrString },
-      inputFormat: { optional: validateDirectiveOrString },
-      timestamp: { required: validateDirectiveOrString }
-    },
-    stack
-  )
-})
-
-directive('@uuid', () => {
-  // no-op
 })
 
 function indefiniteArticle(s: string): string {

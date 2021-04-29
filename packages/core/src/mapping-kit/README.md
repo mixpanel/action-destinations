@@ -58,17 +58,9 @@ Output:
   - [merge](#merge)
 - [Removing values from object](#removing-values-from-object)
 - [Directives](#directives)
-  - [@base64](#base64)
   - [@if](#if)
-  - [@lowercase](#lowercase)
-  - [@merge](#merge)
-  - [@omit](#omit)
   - [@path](#path)
-  - [@pick](#pick)
-  - [@root](#root)
   - [@template](#template)
-  - [@timestamp](#timestamp)
-  - [@uuid](#uuid)
 
 <!-- tocstop -->
 
@@ -106,13 +98,6 @@ input payload or transform some data:
 { "@path": "$.properties.name" }
 
 { "@template": "Hello there, {{traits.name}}" }
-
-{
-  "@merge": [
-    { "name": "No name found" },
-    { "@path": "$.traits" }
-  ]
-}
 ```
 
 In this document, the act of converting a directive to its final raw value is called "resolving" the
@@ -131,10 +116,7 @@ Mapping:
     "@path": "$.traits.email"
   },
   "userProperties": {
-    "@pick": {
-      "object": "traits",
-      "fields": ["name", "email", "plan"]
-    }
+    "@path": "$.traits"
   }
 }
 
@@ -165,7 +147,15 @@ Output:
   "userProperties": {
     "name": "Peter Gibbons",
     "email": "peter@example.com",
-    "plan": "premium"
+    "plan": "premium",
+    "logins": 5,
+    "address": {
+      "street": "6th St",
+      "city": "San Francisco",
+      "state": "CA",
+      "postalCode": "94103",
+      "country": "USA"
+    }
   }
 }
 ```
@@ -195,10 +185,7 @@ Invalid:
 
 {
   "@path": "$.foo.bar",
-  "@pick": {
-    "object": "biz.baz",
-    "fields": ["a", "b", "c"]
-  }
+  "@template": "{{biz.baz}"
 }
 
 Valid:
@@ -206,10 +193,7 @@ Valid:
 {
   "foo": { "@path": "$.foo.bar" },
   "baz": {
-    "@pick": {
-      "object": "biz.baz",
-      "fields": ["a", "b", "c"]
-    }
+    "@template": "{{biz.baz}}"
   }
 }
 ```
@@ -324,23 +308,6 @@ Mappings:
 
 ## Directives
 
-### @base64
-
-The @base64 directive resolves to the base64-encoded version of the given string:
-
-```json
-Input:
-
-{
-  "hello": "world!"
-}
-
-Mappings:
-
-{ "@base64": "x" } => "eAo="
-{ "@base64": { "@path": "$.hello" } } => "d29ybGQhCg=="
-```
-
 ### @if
 
 The @if directive resolves to different values based on a given conditional. It must have at least
@@ -441,166 +408,6 @@ Mappings:
 {}
 ```
 
-### @lowercase
-
-The @lowercase directive resolves to the lowercase version of the given string.
-
-```json
-Input:
-
-{
-  "greeting": "Hello, world!"
-}
-
-Mappings:
-
-{ "@lowercase": "HELLO" } => "hello"
-{ "@lowercase": { "@path": "$.greeting" } } => "hello, world!"
-```
-
-### @merge
-
-The @merge directive accepts a list of one or more objects (either raw objects or directives that
-resolve to objects) and resolves to a single object. The resolved object is built by combining each
-object in turn, overwriting any duplicate keys.
-
-```json
-Input:
-
-{
-  "traits": {
-    "name": "Mr. Rogers",
-    "greeting": "Neighbor",
-    "neighborhood": "Latrobe"
-
-  },
-  "properties": {
-    "neighborhood": "Make Believe"
-  }
-}
-
-Mappings:
-
-{
-  "@merge": [
-    { "@path": "$.traits" },
-    { "@path": "$.properties" }
-  ]
-}
-=>
-{
-  "name": "Mr. Rogers",
-  "greeting": "Neighbor",
-  "neighborhood": "Make Believe"
-}
-
-{
-  "@merge": [
-    { "@path": "$.properties" },
-    { "@path": "$.traits" }
-  ]
-}
-=>
-{
-  "name": "Mr. Rogers",
-  "greeting": "Neighbor",
-  "neighborhood": "Latrobe"
-}
-```
-
-The @merge directive is especially useful for providing default values:
-
-```json
-Input:
-
-{
-  "traits": {
-    "name": "Mr. Rogers"
-  }
-}
-
-Mapping:
-
-{
-  "@merge": [
-    {
-      "name": "Missing name",
-      "neighborhood": "Missing neighborhood"
-    },
-    { "@path": "$.traits" }
-  ]
-}
-
-Output:
-
-{
-  "name": "Mr. Rogers",
-  "neighborhood": "Missing neighborhood"
-}
-```
-
-### @omit
-
-The @omit directive resolves an object with the given list of fields removed from it:
-
-```json
-Input:
-
-{
-  "foo": {
-    "a": 1,
-    "b": 2,
-    "c": 3
-  }
-}
-
-Mapping:
-
-{
-  "@omit": {
-    "object": { "@path": "$.foo" },
-    "fields": ["a", "c"]
-  }
-}
-=>
-{ "b": 2 }
-```
-
-The "fields" list can also be a directive that resolves to an array of strings or it can be an array
-of strings and directives that resolve to strings:
-
-```json
-Input:
-
-{
-  "fieldList": ["b"],
-  "singleField": "c"
-}
-
-Mappings:
-
-{
-  "@omit": {
-    "object": { "a": 1, "b": 2, "c": 3 },
-    "fields": { "@path": "$.fieldList" }
-  }
-}
-=>
-{ "a": 1, "c": 3 }
-
-{
-  "@omit": {
-    "object": { "a": 1, "b": 2, "c": 3 },
-    "fields": [
-      "a",
-      { "@path": "$.singleField" }
-    ]
-  }
-}
-=>
-{ "b": 2 }
-```
-
 ### @path
 
 The @path directive resolves to the value at the given path. @path supports basic dot notation. Like JSONPath, you can include or omit the leading `$.`
@@ -625,113 +432,6 @@ Mappings:
 { "@path": "$.foo.baz[0].num" } => 1
 ```
 
-### @pick
-
-The @pick directive resolves an object with the only the given list of fields in it:
-
-```json
-Input:
-
-{
-  "foo": {
-    "a": 1,
-    "b": 2,
-    "c": 3
-  }
-}
-
-Mapping:
-
-{
-  "@pick": {
-    "object": { "@path": "$.foo" },
-    "fields": ["a", "c"]
-  }
-}
-=>
-{ "a": 1, "c": 3 }
-```
-
-The "fields" list can also be a directive that resolves to an array of strings or it can be an array
-of strings and directives that resolve to strings:
-
-```json
-Input:
-
-{
-  "fieldList": ["b"],
-  "singleField": "c"
-}
-
-Mappings:
-
-{
-  "@pick": {
-    "object": { "a": 1, "b": 2, "c": 3 },
-    "fields": { "@path": "$.fieldList" }
-  }
-}
-=>
-{ "b": 2 }
-
-{
-  "@pick": {
-    "object": { "a": 1, "b": 2, "c": 3 },
-    "fields": [
-      "a",
-      { "@path": "$.singleField" }
-    ]
-  }
-}
-=>
-{ "a": 1, "c": 3 }
-```
-
-### @root
-
-The @root directive resolves to the root of the input JSON object. The value of the "@root" key is
-ignored.
-
-```json
-Input:
-
-{
-  "cool": true
-}
-
-Mappings:
-
-{ "@root": true } => { "cool": true }
-{ "@root": {} } => { "cool": true }
-{ "@root": "" } => { "cool": true }
-```
-
-The @root directive is useful for adding or overriding keys to the root input JSON object:
-
-```json
-Input:
-
-{
-  "a": 1,
-  "b": 2
-}
-
-Mappings:
-
-{
-  "@merge": [
-    { "@root": {} },
-    { "b": 22, "c": 33 }
-  ]
-}
-=>
-{
-  "a": 1,
-  "b": 22,
-  "c": 33
-}
-```
-
 ### @template
 
 The @template directive resolves to a string replacing curly brace `{{}}` placeholders.
@@ -753,74 +453,4 @@ Mappings:
 { "@template": "Hello, {{traits.fullName}}!" } => "Hello, !"
 
 { "@template": "{{traits.name}} ({{userId}})" } => "Mr.Rogers (abc123)"
-```
-
-### @timestamp
-
-The @timestamp directive parses a string or number timestamp and resolves to a string timestamp
-using the given format. The @timestamp directive uses [day.js](https://day.js.org/) to parse and
-format timestamps.
-
-```json
-Input:
-
-{
-  "ts": "Mon, 01 Jun 2020 00:00:00"
-}
-
-Mappings:
-
-{
-  "timestamp": "Mon, 01 Jun 2020 00:00:00",
-  "format": "YYYY-MM-DD"
-}
-=>
-"2020-06-01"
-
-{
-  "timestamp": { "@path": "$.ts" },
-  "format": "json"
-}
-=>
-"2020-06-01T07:00:00.000Z"
-```
-
-The @timestamp directive is fairly liberal in what it accepts by default. In order, it checks for
-the ISO 8601 format, RFC 2822 format, and then it falls back to `new Date(...)`. In Node.js, `new Date(...)` also accepts a UNIX timestamp (seconds since epoch) as a number or string. If you want to
-use a custom format, supply a `inputFormat` value using the [format specified by
-day.js](https://day.js.org/docs/en/parse/string-format):
-
-```json
-Mappings:
-
-{
-  "timestamp": "20-6-1",
-  "inputFormat": "YY-M-D",
-  "format": "json"
-}
-=>
-"2020-06-01T07:00:00.000Z"
-
-{
-  "timestamp": "MMM Do, YYYY",
-  "inputFormat": "June 1st, 2020",
-  "format": "json"
-}
-=>
-"2020-06-01T07:00:00.000Z"
-```
-
-### @uuid
-
-The @uuid directive resolves to a v4 UUID string generated using the [uuid
-package](https://www.npmjs.com/package/@lukeed/uuid).
-
-```json
-Mappings:
-
-{
-  "uuid": {}
-}
-=>
-"a3c8e5ac-fff9-43d1-b053-3049a62fcbeb"
 ```

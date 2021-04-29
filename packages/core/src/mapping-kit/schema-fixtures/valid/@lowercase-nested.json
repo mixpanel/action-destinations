@@ -1,7 +1,0 @@
-{
-  "mapping": {
-    "@lowercase": {
-      "@path": "$.foo.bar"
-    }
-  }
-}

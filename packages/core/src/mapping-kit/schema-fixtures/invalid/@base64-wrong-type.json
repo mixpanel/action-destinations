@@ -1,8 +1,0 @@
-{
-  "mapping": {
-    "@base64": {
-      "oops": true
-    }
-  },
-  "expectError": "/@base64 should be a string or a mapping directive but it is an object."
-}
