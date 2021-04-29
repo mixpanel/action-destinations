@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<head>
+  <script src="dist/web/amplitude-plugins.js"></script>
+  <script src="dist/web/intercom.js"></script>
+</head>
+<body>
+  <script>
+    async function getPlugins(key, settings = {}) {
+      if (typeof window[key] === 'function') {
+        return await window[key](settings)
+      }
+    }
+
+    const umdLibraryNames = {
+      'amplitude-pluginsDestination': JSON.stringify([{
+        name: 'foo',
+        partnerAction: 'sessionId',
+        enabled: true,
+        mapping: {}
+      }]),
+      'intercomDestination': JSON.stringify([
+      ])
+    }
+
+    for (const libraryName of Object.keys(umdLibraryNames)) {
+      getPlugins(libraryName, { subscriptions: umdLibraryNames[libraryName] })
+        .then(plugins => console.log(libraryName, plugins))
+        .catch(error => console.warn(error))
+    }
+  </script>
+  <div>Loaded</div>
+</body>

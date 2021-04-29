@@ -28,8 +28,8 @@ module.exports = {
   mode: process.env.NODE_ENV || 'development',
   devtool: 'source-map',
   output: {
-    filename: '[name].js',
     path: path.resolve(__dirname, 'dist/web'),
+    publicPath: isProd ? 'https://ajs-next-integrations.s3-us-west-2.amazonaws.com/fab-5/' : undefined,
     library: '[name]Destination',
     libraryTarget: 'umd',
     libraryExport: 'default'
@@ -81,7 +81,17 @@ module.exports = {
           }
         }
       })
-    ]
+    ],
+    splitChunks: {
+      cacheGroups: {
+        default: false,
+        defaultVendors: false,
+        commons: {
+          chunks: 'all',
+          minChunks: 2
+        }
+      }
+    }
   },
   plugins
 }

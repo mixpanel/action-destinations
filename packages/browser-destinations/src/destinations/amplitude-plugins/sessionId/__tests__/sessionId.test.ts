@@ -63,7 +63,7 @@ beforeEach(async () => {
   const windowSpy = jest.spyOn(global, 'window', 'get')
   windowSpy.mockImplementation(() => (jsd.window as unknown) as Window & typeof globalThis)
 
-  browserActions = browserPluginsDestination({ subscriptions: example })
+  browserActions = await browserPluginsDestination({ subscriptions: example })
   sessionIdPlugin = browserActions[0]
 
   ajs = new Analytics({

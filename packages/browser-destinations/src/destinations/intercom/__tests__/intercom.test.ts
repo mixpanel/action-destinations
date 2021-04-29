@@ -52,7 +52,7 @@ beforeEach(async () => {
 })
 
 test('can load intercom', async () => {
-  const [show] = intercomPlugins({
+  const [show] = await intercomPlugins({
     // using itercom's app_id from intercom.com
     app_id: 'tx2p130c',
     subscriptions: example

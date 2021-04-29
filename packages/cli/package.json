@@ -39,7 +39,7 @@
     "@types/lodash": "^4.14.168",
     "@types/mustache": "^4.1.0",
     "@types/node": "^10.17.0",
-    "@types/prompts": "^2.0.9"
+    "@types/prompts": "^2.0.10"
   },
   "dependencies": {
     "@oclif/command": "^1",
@@ -49,17 +49,17 @@
     "@segment/actions-core": "^2.0.2",
     "@segment/control-plane-service-client": "ssh://git@github.com:segmentio/control-plane-service-js-client#master",
     "@segment/destination-actions": "^2.2.0",
-    "chalk": "^4.1.0",
+    "chalk": "^4.1.1",
     "execa": "^4.1.0",
     "fs-extra": "^9.1.0",
     "globby": "^11.0.3",
     "json-diff": "^0.5.4",
     "json-schema-to-typescript": "^10.1.4",
     "lodash": "^4.17.20",
-    "mustache": "^4.1.0",
-    "ora": "^5.3.0",
-    "prompts": "^2.4.0",
-    "slugify": "^1.4.6",
+    "mustache": "^4.2.0",
+    "ora": "^5.4.0",
+    "prompts": "^2.4.1",
+    "slugify": "^1.5.0",
     "tsconfig-paths": "^3.9.0",
     "tslib": "^2"
   },

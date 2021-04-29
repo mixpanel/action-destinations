@@ -1,6 +1,6 @@
 import type { Settings } from './generated-types'
 import type { BrowserDestinationDefinition } from '../../lib/browser-destinations'
-import { browserDestination } from '../../runtime/plugin'
+import { browserDestination } from '../../runtime/shim'
 import { initialize } from './initialize'
 import show from './show'
 

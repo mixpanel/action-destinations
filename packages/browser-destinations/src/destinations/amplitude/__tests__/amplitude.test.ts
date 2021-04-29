@@ -55,7 +55,7 @@ beforeEach(async () => {
   const windowSpy = jest.spyOn(global, 'window', 'get')
   windowSpy.mockImplementation(() => (jsd.window as unknown) as Window & typeof globalThis)
 
-  amplitudeActions = amplitudeDestination({
+  amplitudeActions = await amplitudeDestination({
     // use amplitude's API key from amplitude.com
     apiKey: 'e3e918f274fa30555c627abdb29840d5',
     subscriptions: example

@@ -4,16 +4,10 @@ import { transform } from '@segment/actions-core/mapping-kit'
 import { parseFql, validate } from '@segment/fab5-subscriptions'
 import { ActionInput, BrowserDestinationDefinition, Subscription } from '../lib/browser-destinations'
 
-export function browserDestination<S, C>(definition: BrowserDestinationDefinition<S, C>) {
-  return (settings: S & { subscriptions?: Subscription[] }) => {
-    return generatePlugins(definition, settings, settings?.subscriptions || [])
-  }
-}
-
 export function generatePlugins<S, C>(
   def: BrowserDestinationDefinition<S, C>,
   settings: S,
-  subscriptions: Subscription[]
+  subscriptions: string | Subscription[]
 ): Plugin[] {
   let client: C
   let analytics: Analytics
@@ -28,13 +22,14 @@ export function generatePlugins<S, C>(
   }
 
   // Only load the actions that have active subscriptions
-  const actionsToLoad = subscriptions.filter((s) => s.enabled).map((s) => s.partnerAction)
+  const parsedSubs: Subscription[] = typeof subscriptions === 'string' ? JSON.parse(subscriptions) : subscriptions
+  const actionsToLoad = parsedSubs.filter((s) => s.enabled).map((s) => s.partnerAction)
 
   return Object.entries(def.actions).reduce((acc, [key, action]) => {
     if (!actionsToLoad.includes(key)) return acc
 
     async function evaluate(ctx: Context): Promise<Context> {
-      const validSubs = subscriptions.filter((subscription) => {
+      const validSubs = parsedSubs.filter((subscription) => {
         const isSubscribed = validate(parseFql(subscription.subscribe), ctx.event)
         return isSubscribed
       })
