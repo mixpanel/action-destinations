@@ -100,7 +100,7 @@ export default class Init extends Command {
 
     try {
       this.spinner.start(chalk`Generating types for {magenta ${slug}} destination`)
-      await GenerateTypes.run(['--path', relativePath])
+      await GenerateTypes.run(['--path', `${relativePath}/index.ts`])
       this.spinner.succeed()
     } catch (err) {
       this.spinner.fail(chalk`Generating types for {magenta ${slug}} destination: ${err.message}`)
