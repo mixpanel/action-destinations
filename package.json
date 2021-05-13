@@ -69,7 +69,6 @@
   },
   "jest": {
     "preset": "ts-jest",
-    "forceExit": true,
     "globals": {
       "ts-jest": {
         "isolatedModules": true

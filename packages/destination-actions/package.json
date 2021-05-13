@@ -50,7 +50,6 @@
     },
     "setupFilesAfterEnv": [
       "<rootDir>/test/setup-after-env.ts"
-    ],
-    "forceExit": true
+    ]
   }
 }

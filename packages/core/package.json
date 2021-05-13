@@ -68,7 +68,6 @@
     "testEnvironment": "node",
     "modulePathIgnorePatterns": [
       "<rootDir>/dist/"
-    ],
-    "forceExit": true
+    ]
   }
 }

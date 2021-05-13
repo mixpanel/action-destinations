@@ -45,7 +45,6 @@
     "webpack-cli": "^4.4.0"
   },
   "jest": {
-    "forceExit": true,
     "moduleNameMapper": {
       "@segment/actions-core": "<rootDir>/../core/src/index.ts"
     },
