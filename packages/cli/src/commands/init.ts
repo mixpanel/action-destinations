@@ -53,7 +53,7 @@ export default class Init extends Command {
         name: 'slug',
         // @ts-ignore the types are wrong
         initial: (prev) => slugify(flags.name || prev).toLowerCase(),
-        message: 'Integrationg slug:'
+        message: 'Integration slug:'
       },
       {
         type: 'select',

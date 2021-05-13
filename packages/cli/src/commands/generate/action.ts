@@ -1,8 +1,10 @@
 import { Command, flags } from '@oclif/command'
 import chalk from 'chalk'
-import { camelCase } from 'lodash'
+import globby from 'globby'
+import { camelCase, capitalize } from 'lodash'
 import ora from 'ora'
 import path from 'path'
+import { autoPrompt } from 'src/prompt'
 import { renderTemplates } from '../../templates'
 import GenerateTypes from './types'
 
@@ -19,16 +21,48 @@ export default class GenerateAction extends Command {
   static flags = {
     help: flags.help({ char: 'h' }),
     force: flags.boolean({ char: 'f' }),
-    directory: flags.string({ char: 'd', description: 'base directory to scaffold the action', default: './' })
+    title: flags.boolean({ char: 't', description: 'the display name of the action' }),
+    directory: flags.string({ char: 'd', description: 'base directory to scaffold the action' })
   }
 
   static args = [{ name: 'name', description: 'the action name', required: true }]
 
   async run() {
     const { args, flags } = this.parse(GenerateAction)
-    const slug = camelCase(args.name)
 
-    const relativePath = path.join(flags.directory, slug)
+    // TODO make this configurable
+    const integrationsGlob = './packages/destination-actions/src/destinations/*'
+    const integrationDirs = await globby(integrationsGlob, {
+      expandDirectories: false,
+      onlyDirectories: true,
+      gitignore: true,
+      ignore: ['node_modules']
+    })
+
+    const answers = await autoPrompt(flags, [
+      {
+        type: 'text',
+        name: 'title',
+        message: 'Action title:',
+        initial: capitalize(args.name)
+      },
+      {
+        type: 'select',
+        name: 'directory',
+        message: 'Which integration (directory)?',
+        choices: integrationDirs.map((integrationPath) => {
+          const [name] = integrationPath.split(path.sep).reverse()
+          return {
+            title: name,
+            value: integrationPath
+          }
+        })
+      }
+    ])
+
+    const slug = camelCase(args.name)
+    const directory = answers.directory || './'
+    const relativePath = path.join(directory, slug)
     const targetDirectory = path.join(process.cwd(), relativePath)
     const templatePath = path.join(__dirname, '../../../templates/actions/empty-action')
 
@@ -38,7 +72,7 @@ export default class GenerateAction extends Command {
         templatePath,
         targetDirectory,
         {
-          name: args.name,
+          name: answers.title,
           description: '',
           slug
         },
@@ -53,7 +87,7 @@ export default class GenerateAction extends Command {
     // TODO get types working for actions again
     try {
       this.spinner.start(chalk`Generating types for {magenta ${slug}} action`)
-      await GenerateTypes.run(['--path', flags.directory])
+      await GenerateTypes.run(['--path', directory])
       this.spinner.succeed()
     } catch (err) {
       this.spinner.fail(chalk`Generating types for {magenta ${slug}} action: ${err.message}`)
