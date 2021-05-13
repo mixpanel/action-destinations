@@ -58,6 +58,15 @@ module.exports = {
         '@typescript-eslint/no-unsafe-call': 'off',
         '@typescript-eslint/no-explicit-any': 'off'
       }
+    },
+    {
+      files: ['**/benchmarks/**/*.js'],
+      env: {
+        node: true
+      },
+      rules: {
+        '@typescript-eslint/no-var-requires': 'off'
+      }
     }
   ]
 }

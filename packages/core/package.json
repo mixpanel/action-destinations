@@ -48,6 +48,7 @@
     "@types/express": "^4.17.11",
     "@types/jest": "^26.0.23",
     "@types/json-schema": "^7.0.7",
+    "benny": "^3.6.15",
     "create-test-server": "^3.0.1",
     "jest": "^26.6.3"
   },
