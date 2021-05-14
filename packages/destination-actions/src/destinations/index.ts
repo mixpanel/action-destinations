@@ -32,8 +32,20 @@ export const idToSlug: Record<string, string> = {
   '602efa1f249b9a5e2bf8a813': 'twilio'
 }
 
-export function getDestinationBySlug(slug: string): Destination {
-  const destination = destinations[slug as ActionDestinationSlug]
+/** Attempts to load a destination definition from a given file path */
+export async function getDestinationLazy(slug: string): Promise<null | DestinationDefinition> {
+  const destination = await import(`./${slug}`).then((mod) => mod.default)
+
+  // Loose validation on a destination definition
+  if (!destination?.name || typeof destination?.actions !== 'object') {
+    return null
+  }
+
+  return destination
+}
+
+export async function getDestinationBySlug(slug: string): Promise<Destination> {
+  const destination = destinations[slug as ActionDestinationSlug] ?? (await getDestinationLazy(slug))
 
   if (!destination) {
     throw new Error('Destination not found')
@@ -42,7 +54,7 @@ export function getDestinationBySlug(slug: string): Destination {
   return new Destination(destination)
 }
 
-export function getDestinationByIdOrSlug(idOrSlug: string): Destination {
+export async function getDestinationByIdOrSlug(idOrSlug: string): Promise<Destination> {
   const slug = idToSlug[idOrSlug] ?? idOrSlug
   return getDestinationBySlug(slug)
 }

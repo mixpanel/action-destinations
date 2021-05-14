@@ -70,7 +70,7 @@ app.post(
 
     ow(settings, ow.optional.object)
 
-    const destinationDefinition = getDestinationBySlug(destinationSlug)
+    const destinationDefinition = await getDestinationBySlug(destinationSlug)
 
     ow(action, ow.string.oneOf(Object.keys(destinationDefinition.actions)))
     req.context.set('req_destination', destinationDefinition.name)
@@ -108,7 +108,7 @@ app.post(
 
     ow(settings, ow.object)
 
-    const destinationDefinition = getDestinationBySlug(destination)
+    const destinationDefinition = await getDestinationBySlug(destination)
     req.context.set('req_destination', destinationDefinition.name)
 
     try {
@@ -159,7 +159,7 @@ app.post(
 
     ow(settings, ow.optional.object)
 
-    const destinationDefinition = getDestinationBySlug(destinationSlug)
+    const destinationDefinition = await getDestinationBySlug(destinationSlug)
 
     ow(action, ow.string.oneOf(Object.keys(destinationDefinition.actions)))
     req.context.set('req_destination', destinationDefinition.name)

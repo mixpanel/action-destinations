@@ -63,7 +63,7 @@ async function handleHttp(context: Context, req: Request): Promise<unknown> {
   const privateSettings = parseJsonHeader(req.headers, 'centrifuge-private-settings') as JSONArray
 
   // Try to map the id param to a slug, or treat it as the slug (easier local testing)
-  const destination = getDestinationByIdOrSlug(idOrSlug)
+  const destination = await getDestinationByIdOrSlug(idOrSlug)
 
   const results = await destination.onEvent(event, settings, onComplete(context, privateSettings))
   return results
@@ -205,7 +205,7 @@ async function handleCloudEvent(
   privateSettings?: JSONArray
 ): Promise<CloudEventResponse> {
   const start = new Date()
-  const destination = getDestinationByIdOrSlug(destinationId)
+  const destination = await getDestinationByIdOrSlug(destinationId)
 
   context.set('req_destination', destination.name)
   context.set('req_source', cloudEvent.source)
