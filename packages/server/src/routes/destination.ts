@@ -49,7 +49,7 @@ function onComplete(context: Context, privateSettings: JSONArray = []) {
       state: stats.state,
       input: {
         mapping: stats.input?.mapping,
-        settings: redactSettings((stats.input?.settings as unknown) as JSONObject, privateSettings)
+        settings: redactSettings(stats.input?.settings as unknown as JSONObject, privateSettings)
       },
       output: stats.output
     })
@@ -168,7 +168,7 @@ function constructCloudError(
   eventTesterRequests: EventTesterRequest[],
   tracing: RequestTracing
 ): CloudEventResponse {
-  const statusCode = error?.status ?? error?.response?.statusCode ?? 500
+  const statusCode = error?.status ?? error?.response?.status ?? 500
   const message = error?.message ?? 'Unknown error'
 
   return {
