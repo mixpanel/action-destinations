@@ -5,7 +5,6 @@ import type { Payload } from './generated-types'
 const action: ActionDefinition<Settings, Payload> = {
   title: 'Track Event',
   description: 'Track an event for a known person.',
-  recommended: true,
   defaultSubscription: 'type = "track"',
   fields: {
     id: {

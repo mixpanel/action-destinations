@@ -6,7 +6,6 @@ import type { Payload } from './generated-types'
 const action: BrowserActionDefinition<Settings, AmplitudeClient, Payload> = {
   title: 'Session Plugin',
   description: 'Enables Amplitude Session tracking server-side through a client side enrichment pugin',
-  recommended: true,
   defaultSubscription: 'type = "track" or type = "identify" or type = "group" or type = "page" or type = "alias"',
   fields: {},
   lifecycleHook: 'enrichment',

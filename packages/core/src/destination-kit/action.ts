@@ -33,9 +33,6 @@ export interface ActionDefinition<Settings, Payload = any> {
   /** The display description of the action */
   description: string
 
-  /** Whether the action is recommended for quick setup */
-  recommended?: boolean
-
   /** An optional fql query that will be used to prepopulate the action when it is first set up */
   defaultSubscription?: string
 

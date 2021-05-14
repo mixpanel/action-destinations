@@ -222,7 +222,6 @@ function settingsToDefinition(
       hidden: options[option]?.hidden,
       // backwards compat for now
       defaultSubscription: meta.defaultSubscription ?? meta.schema?.defaultSubscription,
-      recommended: meta.recommended,
       fields: jsonSchemaToFields(meta.schema)
     }
   }
@@ -264,7 +263,6 @@ function getOptions(metadata: DestinationMetadata, destinationSchema: Destinatio
         slug: actionPayload.slug,
         schema: actionPayload.jsonSchema,
         defaultSubscription: actionPayload.defaultSubscription,
-        recommended: actionPayload.recommended,
         // TODO figure out if `settings` property is used anywhere
         settings: []
       }),
@@ -366,7 +364,6 @@ interface DestinationSchema {
 interface Action {
   slug: string
   hidden: boolean
-  recommended?: boolean
   defaultSubscription?: string
   jsonSchema: JSONSchema4
 }
@@ -393,7 +390,6 @@ function getJsonSchemas(
       actionPayloads.push({
         slug: actionSlug,
         hidden: action.hidden ?? false,
-        recommended: action.recommended,
         defaultSubscription: action.defaultSubscription,
         jsonSchema: {
           title: action.title,

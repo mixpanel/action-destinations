@@ -7,7 +7,6 @@ const action: BrowserActionDefinition<Settings, AmplitudeClient, Payload> = {
   title: 'Log Event',
   description:
     'Log an event with eventType and eventProperties. https://amplitude.github.io/Amplitude-JavaScript/#amplitudeclientlogevent',
-  recommended: true,
   fields: {
     eventName: {
       type: 'string',

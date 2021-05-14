@@ -6,7 +6,6 @@ import type { Payload } from './generated-types'
 const action: ActionDefinition<Settings, Payload> = {
   title: 'Create or Update Person',
   description: "Update a person in Customer.io or create them if they don't exist.",
-  recommended: true,
   defaultSubscription: 'type = "identify"',
   fields: {
     id: {

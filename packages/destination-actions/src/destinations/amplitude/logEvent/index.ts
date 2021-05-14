@@ -37,7 +37,6 @@ function getRevenueProperties(payload: EventRevenue): EventRevenue {
 const action: ActionDefinition<Settings, Payload> = {
   title: 'Log Event',
   description: 'Send an event to Amplitude.',
-  recommended: true,
   defaultSubscription: 'type = "track"',
   fields: {
     trackRevenuePerProduct: {
