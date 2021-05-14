@@ -40,7 +40,8 @@
     "@types/lodash": "^4.14.168",
     "@types/mustache": "^4.1.0",
     "@types/node": "^10.17.0",
-    "@types/prompts": "^2.0.10"
+    "@types/prompts": "^2.0.10",
+    "@types/to-title-case": "^1.0.0"
   },
   "dependencies": {
     "@oclif/command": "^1",
@@ -63,6 +64,7 @@
     "ora": "^5.4.0",
     "prompts": "^2.4.1",
     "slugify": "^1.5.0",
+    "to-title-case": "^1.0.0",
     "tsconfig-paths": "^3.9.0",
     "tslib": "^2"
   },

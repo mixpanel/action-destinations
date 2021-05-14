@@ -3,6 +3,7 @@ import chalk from 'chalk'
 import ora from 'ora'
 import path from 'path'
 import slugify from 'slugify'
+import toTitleCase from 'to-title-case'
 import { autoPrompt } from '../prompt'
 import { renderTemplates } from '../templates'
 import GenerateTypes from './generate/types'
@@ -46,14 +47,16 @@ export default class Init extends Command {
       {
         type: 'text',
         name: 'name',
-        message: 'Integration name:'
+        message: 'Integration name:',
+        format: (val) => toTitleCase(val)
       },
       {
         type: 'text',
         name: 'slug',
         // @ts-ignore the types are wrong
         initial: (prev) => slugify(flags.name || prev).toLowerCase(),
-        message: 'Integration slug:'
+        message: 'Integration slug:',
+        format: (val) => slugify(val).toLowerCase()
       },
       {
         type: 'select',

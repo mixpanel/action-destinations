@@ -2,7 +2,8 @@ import { Command, flags } from '@oclif/command'
 import chalk from 'chalk'
 import fs from 'fs-extra'
 import globby from 'globby'
-import { camelCase, capitalize } from 'lodash'
+import { camelCase } from 'lodash'
+import toTitleCase from 'to-title-case'
 import ora from 'ora'
 import path from 'path'
 import { autoPrompt } from 'src/prompt'
@@ -46,7 +47,8 @@ export default class GenerateAction extends Command {
         type: 'text',
         name: 'title',
         message: 'Action title:',
-        initial: capitalize(args.name)
+        initial: toTitleCase(args.name),
+        format: (val) => toTitleCase(val)
       },
       {
         type: 'select',
