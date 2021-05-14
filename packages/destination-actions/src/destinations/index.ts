@@ -5,6 +5,14 @@ import pipedrive from './pipedrive'
 import slack from './slack'
 import twilio from './twilio'
 
+/**
+ * To use register an integration in the `integrations` service,
+ * you'll need to add it to the `destinations` export (and corresponding types)
+ * as well as the `idToSlug` with the corresponding production id.
+ *
+ * To test in staging, the ids should match across environments. Typically this is handled by
+ * creating the destination in production and syncing those definitions to staging with `sprout`.
+ */
 export type ActionDestinationSlug = 'amplitude' | 'customerio' | 'pipedrive' | 'slack' | 'twilio'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
