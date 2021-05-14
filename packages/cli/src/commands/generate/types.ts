@@ -7,6 +7,8 @@ import path from 'path'
 import prettier from 'prettier'
 import { loadDestination } from '../../destinations'
 
+const pretterOptions = prettier.resolveConfig.sync(process.cwd())
+
 export default class GenerateTypes extends Command {
   static description = `Generates TypeScript definitions for an integration.`
 
@@ -68,10 +70,9 @@ export default class GenerateTypes extends Command {
 
 async function generateTypes(fields: Record<string, InputField> = {}, name: string) {
   const schema = fieldsToJsonSchema(fields)
-  const style = await prettier.resolveConfig(process.cwd())
 
   return compile(schema, name, {
     bannerComment: '// Generated file. DO NOT MODIFY IT BY HAND.',
-    style: style ?? undefined
+    style: pretterOptions ?? undefined
   })
 }

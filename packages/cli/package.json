@@ -34,6 +34,7 @@
   "devDependencies": {
     "@oclif/dev-cli": "^1",
     "@types/fs-extra": "^9.0.11",
+    "@types/jscodeshift": "^0.11.0",
     "@types/json-diff": "^0.5.1",
     "@types/json-schema": "^7.0.7",
     "@types/lodash": "^4.14.168",
@@ -53,6 +54,8 @@
     "execa": "^4.1.0",
     "fs-extra": "^9.1.0",
     "globby": "^11.0.3",
+    "jscodeshift": "^0.12.0",
+    "jscodeshift-add-imports": "^1.0.10",
     "json-diff": "^0.5.4",
     "json-schema-to-typescript": "^10.1.4",
     "lodash": "^4.17.20",

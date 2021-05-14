@@ -1,11 +1,13 @@
 import { Command, flags } from '@oclif/command'
 import chalk from 'chalk'
+import fs from 'fs-extra'
 import globby from 'globby'
 import { camelCase, capitalize } from 'lodash'
 import ora from 'ora'
 import path from 'path'
 import { autoPrompt } from 'src/prompt'
 import { renderTemplates } from '../../templates'
+import { addKeyToDefaultExport } from '../../codemods'
 import GenerateTypes from './types'
 
 export default class GenerateAction extends Command {
@@ -21,7 +23,7 @@ export default class GenerateAction extends Command {
   static flags = {
     help: flags.help({ char: 'h' }),
     force: flags.boolean({ char: 'f' }),
-    title: flags.boolean({ char: 't', description: 'the display name of the action' }),
+    title: flags.string({ char: 't', description: 'the display name of the action' }),
     directory: flags.string({ char: 'd', description: 'base directory to scaffold the action' })
   }
 
@@ -84,13 +86,26 @@ export default class GenerateAction extends Command {
       this.exit()
     }
 
-    // TODO get types working for actions again
+    // Update destination with action
+    const entryFile = require.resolve(path.relative(__dirname, path.join(process.cwd(), directory)))
+    try {
+      this.spinner.start(chalk`Updating destination definition`)
+      const destinationStr = fs.readFileSync(entryFile, 'utf8')
+      const updatedCode = addKeyToDefaultExport(destinationStr, 'actions', slug)
+      fs.writeFileSync(entryFile, updatedCode, 'utf8')
+      this.spinner.succeed()
+    } catch (err) {
+      this.spinner.fail(chalk`Failed to update your destination imports: ${err.message}`)
+      this.exit()
+    }
+
     try {
       this.spinner.start(chalk`Generating types for {magenta ${slug}} action`)
-      await GenerateTypes.run(['--path', directory])
+      await GenerateTypes.run(['--path', entryFile])
       this.spinner.succeed()
     } catch (err) {
       this.spinner.fail(chalk`Generating types for {magenta ${slug}} action: ${err.message}`)
+      this.exit()
     }
 
     this.log(chalk.green(`Done creating "${args.name}" 🎉`))
