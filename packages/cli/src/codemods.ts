@@ -50,8 +50,11 @@ export function addKeyToDefaultExport(code: string, property: string, variableNa
   // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-explicit-any
   const existingProperty = objectToModify.properties.find((props: any) => props.key.name === property)
   if (existingProperty) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    existingProperty.value.properties.push(newProperty)
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-explicit-any
+    if (!existingProperty.value.properties.find((props: any) => props.key.name === variableName)) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+      existingProperty.value.properties.push(newProperty)
+    }
   } else {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     objectToModify.properties.push(j.property('init', j.identifier(property), j.objectExpression([newProperty])))
