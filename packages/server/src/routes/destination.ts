@@ -138,7 +138,7 @@ function constructCloudSuccess(
     specversion: '1.0',
     type: 'com.segment.event.ack',
     time: new Date().toISOString(),
-    status: 201,
+    status: 200,
     data: {
       results: getSuccessData(result),
       debugRequests: eventTesterRequests,
