@@ -7,7 +7,7 @@ export type CampaignID = number
 /**
  * List of profile IDs to use as campaign recipients. If this is used, "Recipients" may not be used.
  */
-export type ProfileIDs = unknown[]
+export type ProfileIDs = string[]
 
 export interface Payload {
   id: CampaignID

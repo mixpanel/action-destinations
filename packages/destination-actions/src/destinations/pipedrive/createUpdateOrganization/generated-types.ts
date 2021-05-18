@@ -4,6 +4,9 @@
  * Identifier used to find existing organization in Pipedrive. Typically this is the name but it can also be a custom field value. Custom organization fields may be included by using the long hash keys of the custom fields. These look like "33595c732cd7a027c458ea115a48a7f8a254fa86".
  */
 export type OrganizationID = string
+/**
+ * Name of the organization
+ */
 export type OrganizationName = string
 /**
  * ID of the user who will be marked as the owner of this organization. Default is the user who ownes the API token.

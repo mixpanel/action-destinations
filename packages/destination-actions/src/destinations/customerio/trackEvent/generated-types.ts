@@ -4,6 +4,9 @@
  * ID of the person who triggered this event.
  */
 export type PersonID = string
+/**
+ * Name of the event
+ */
 export type EventName = string
 /**
  * Override event type. Ex. "page".

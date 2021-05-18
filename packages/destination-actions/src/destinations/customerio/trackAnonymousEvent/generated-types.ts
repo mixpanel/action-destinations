@@ -1,5 +1,8 @@
 // Generated file. DO NOT MODIFY IT BY HAND.
 
+/**
+ * Name of the event
+ */
 export type EventName = string
 
 export interface Payload {
