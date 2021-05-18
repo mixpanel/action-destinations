@@ -20,7 +20,7 @@
     "generate:types": "npx segment generate:types",
     "lint": "eslint '**/*.ts' --max-warnings=10",
     "start": "yarn build && yarn server start",
-    "test": "lerna run test",
+    "test": "lerna run test --stream",
     "typecheck": "lerna run typecheck"
   },
   "devDependencies": {
