@@ -18,6 +18,7 @@ const action: ActionDefinition<Settings, Payload> = {
     },
     name: {
       title: 'Event Name',
+      description: 'Name of the event',
       type: 'string',
       required: true,
       default: {

@@ -18,6 +18,7 @@ const action: ActionDefinition<Settings, Payload> = {
     },
     name: {
       title: 'Organization Name',
+      description: 'Name of the organization',
       type: 'string',
       required: true
     },

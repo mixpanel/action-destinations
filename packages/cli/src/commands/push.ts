@@ -5,6 +5,10 @@ import chalk from 'chalk'
 import { Dictionary, invert, pick, uniq } from 'lodash'
 import ControlPlaneService, {
   DestinationMetadata,
+  DestinationMetadataAction,
+  DestinationMetadataActionCreateInput,
+  DestinationMetadataActionFieldCreateInput,
+  DestinationMetadataActionsUpdateInput,
   DestinationMetadataOptions,
   DestinationMetadataUpdateInput
 } from '@segment/control-plane-service-client'
@@ -37,6 +41,8 @@ interface ActionDestinationMetadata {
   presets?: DestinationDefinition['presets']
   settings: JSONSchema4
 }
+
+type BaseActionInput = Omit<DestinationMetadataActionCreateInput, 'metadataId'>
 
 export default class Push extends Command {
   private spinner: ora.Ora = ora()
@@ -143,7 +149,76 @@ export default class Push extends Command {
     }
 
     await Promise.all(promises)
+
+    // Dual-write to new tables
+
+    const actions = await getDestinationMetadataActions(destinationIds)
+
+    const actionsToUpdate: DestinationMetadataActionsUpdateInput[] = []
+    const actionsToCreate: DestinationMetadataActionCreateInput[] = []
+
+    for (const metadata of metadatas) {
+      const schemaForDestination = schemasByDestination[metadata.id]
+      const existingActions = actions.filter((a) => a.metadataId === metadata.id)
+
+      for (const action of schemaForDestination.actions) {
+        // Note: this implies that changing the slug is a breaking change
+        const existingAction = existingActions.find((a) => a.slug === action.slug && a.platform === 'cloud')
+        const actionFields = jsonSchemaToFields(action.jsonSchema)
+
+        const fields: DestinationMetadataActionFieldCreateInput[] = Object.keys(actionFields).map((fieldKey) => {
+          const field = actionFields[fieldKey]
+          return {
+            type: convertType(field),
+            fieldKey,
+            label: field.title,
+            description: field.description,
+            defaultValue: field.default,
+            required: field.required ?? false,
+            multiple: field.type === 'array',
+            choices: field.type === 'boolean',
+            dynamic: field.autocomplete === true,
+            placeholder: '',
+            allowNull: Array.isArray(field.type) && field.type.includes('null')
+          }
+        })
+
+        const base: BaseActionInput = {
+          slug: action.slug,
+          name: action.jsonSchema.title ?? 'Unnamed Action',
+          description: action.jsonSchema.description ?? '',
+          platform: 'cloud',
+          fields
+        }
+
+        if (existingAction) {
+          actionsToUpdate.push({ ...base, actionId: existingAction.id })
+        } else {
+          actionsToCreate.push({ ...base, metadataId: metadata.id })
+        }
+      }
+    }
+
+    await Promise.all([
+      updateDestinationMetadataActions(actionsToUpdate),
+      createDestinationMetadataActions(actionsToCreate)
+    ])
   }
+}
+
+function convertType(
+  field: any
+): 'string' | 'text' | 'number' | 'integer' | 'datetime' | 'boolean' | 'password' | 'object' {
+  if (field.type === 'array') {
+    return field.items.type
+  }
+
+  // TODO: handle `type: ['string', 'number']` case
+  if (Array.isArray(field.type)) {
+    return field.type[0]
+  }
+
+  return field.type
 }
 
 function asJson(obj: unknown) {
@@ -326,6 +401,25 @@ async function getDestinationMetadatas(destinationIds: string[]): Promise<Destin
   return data.metadatas
 }
 
+async function getDestinationMetadataActions(destinationIds: string[]): Promise<DestinationMetadataAction[]> {
+  const { data, error } = await controlPlaneService.getDestinationMetadataActions(
+    {},
+    {
+      metadataIds: destinationIds
+    }
+  )
+
+  if (error) {
+    throw error
+  }
+
+  if (!data) {
+    throw new Error('Could not load actions')
+  }
+
+  return data.actions
+}
+
 async function updateDestinationMetadata(
   destinationId: string,
   input: DestinationMetadataUpdateInput
@@ -339,6 +433,7 @@ async function updateDestinationMetadata(
   )
 
   if (error) {
+    console.log(error)
     throw error
   }
 
@@ -347,6 +442,49 @@ async function updateDestinationMetadata(
   }
 
   return data.metadata
+}
+
+async function createDestinationMetadataActions(
+  input: DestinationMetadataActionCreateInput[]
+): Promise<DestinationMetadataAction[]> {
+  const { data, error } = await controlPlaneService.createDestinationMetadataActions(
+    {},
+    {
+      input
+    }
+  )
+
+  if (error) {
+    console.log(error)
+    throw error
+  }
+
+  if (!data) {
+    throw new Error('Could not create metadata actions')
+  }
+
+  return data.actions
+}
+
+async function updateDestinationMetadataActions(
+  input: DestinationMetadataActionsUpdateInput[]
+): Promise<DestinationMetadataAction[]> {
+  const { data, error } = await controlPlaneService.updateDestinationMetadataActions(
+    {},
+    {
+      input
+    }
+  )
+
+  if (error) {
+    throw error
+  }
+
+  if (!data) {
+    throw new Error('Could not update metadata actions')
+  }
+
+  return data.actions
 }
 
 interface SchemasByDestination {

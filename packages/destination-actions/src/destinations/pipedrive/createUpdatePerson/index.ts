@@ -43,6 +43,7 @@ const action: ActionDefinition<Settings, Payload> = {
     },
     name: {
       title: 'Person Name',
+      description: 'Name of the person',
       type: 'string',
       required: true
     },

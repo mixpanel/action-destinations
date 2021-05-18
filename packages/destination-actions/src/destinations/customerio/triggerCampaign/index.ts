@@ -57,7 +57,10 @@ const action: ActionDefinition<Settings, Payload> = {
     ids: {
       title: 'Profile IDs',
       description: 'List of profile IDs to use as campaign recipients. If this is used, "Recipients" may not be used.',
-      type: 'array'
+      type: 'array',
+      items: {
+        type: 'string'
+      }
     }
   },
 
