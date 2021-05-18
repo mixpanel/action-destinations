@@ -18,7 +18,7 @@ export async function loadScript(src: string, attributes?: Record<string, string
   }
 
   return new Promise((resolve, reject) => {
-    const script = global.window.document.createElement('script')
+    const script = window.document.createElement('script')
 
     script.type = 'text/javascript'
     script.src = src
@@ -41,7 +41,7 @@ export async function loadScript(src: string, attributes?: Record<string, string
       reject(new Error(`Failed to load ${src}`))
     }
 
-    const tag = global.window.document.getElementsByTagName('script')[0]
+    const tag = window.document.getElementsByTagName('script')[0]
     tag.parentElement?.insertBefore(script, tag)
   })
 }
