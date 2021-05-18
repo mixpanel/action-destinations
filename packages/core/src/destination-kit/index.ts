@@ -205,6 +205,11 @@ export class Destination<Settings = JSONObject> {
     } catch (error) {
       state = 'errored'
       results = [{ error }]
+
+      if (error.name === 'AggregateAjvError' || error.name === 'ValidationError') {
+        error.status = 400
+      }
+
       throw error
     } finally {
       const subscriptionEndedAt = time()
