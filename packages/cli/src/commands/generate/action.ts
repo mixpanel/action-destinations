@@ -6,9 +6,9 @@ import { camelCase } from 'lodash'
 import toTitleCase from 'to-title-case'
 import ora from 'ora'
 import path from 'path'
-import { autoPrompt } from 'src/prompt'
-import { renderTemplates } from '../../templates'
-import { addKeyToDefaultExport } from '../../codemods'
+import { autoPrompt } from 'src/lib/prompt'
+import { renderTemplates } from 'src/lib/templates'
+import { addKeyToDefaultExport } from 'src/lib/codemods'
 import GenerateTypes from './types'
 
 export default class GenerateAction extends Command {

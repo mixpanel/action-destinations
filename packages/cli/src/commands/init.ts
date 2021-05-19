@@ -4,8 +4,8 @@ import ora from 'ora'
 import path from 'path'
 import slugify from 'slugify'
 import toTitleCase from 'to-title-case'
-import { autoPrompt } from '../prompt'
-import { renderTemplates } from '../templates'
+import { autoPrompt } from '../lib/prompt'
+import { renderTemplates } from '../lib/templates'
 import GenerateTypes from './generate/types'
 
 export default class Init extends Command {

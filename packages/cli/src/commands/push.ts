@@ -15,7 +15,7 @@ import ControlPlaneService, {
 import { diffString } from 'json-diff'
 import type { JSONSchema4 } from 'json-schema'
 import ora from 'ora'
-import { prompt } from 'src/prompt'
+import { prompt } from 'src/lib/prompt'
 
 const controlPlaneService = new ControlPlaneService({
   name: 'control-plane-service',
