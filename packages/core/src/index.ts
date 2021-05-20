@@ -27,7 +27,7 @@ export type {
   DecoratedResponse
 } from './destination-kit'
 
-export type { AutocompleteResponse, AutocompleteItem, InputField, RequestExtension } from './destination-kit/types'
+export type { DynamicFieldResponse, DynamicFieldItem, InputField, RequestExtension } from './destination-kit/types'
 
 export type { JSONPrimitive, JSONValue, JSONObject, JSONArray, JSONLike, JSONLikeObject } from './json-object'
 

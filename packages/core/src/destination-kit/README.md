@@ -108,7 +108,7 @@ const action: ActionDefinition = {
 
   // The set of fields that support UI-triggered interaction with the partner API to fetch choices (using the authenticated account)
   // For example: fetching a list of Slack channels the user can select
-  autocompleteFields: {}
+  dynamicFields: {}
 
   // The set of fields that should be dynamically fetched based on the mapped payload
   // prior to executing the `perform` function.
@@ -141,12 +141,12 @@ Some notes on the cache implementation:
 
 The config object accepts the following fields (all fields are required unless otherwise noted):
 
-| Field      | Type                      | Description                                                                                                                                                                                                   |
-| ---------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ttl`      | `number`                  | Time, in seconds, that values are cached before they are expunged. E.g. `60` = 1 minute                                                                                                                       |
-| `key`      | `function(Data)`          | A callback function that receives the [Data](#the-data-object) object and should return a unique string that identifies the object fetched by the `value` callback for the given payload.                     |
-| `value`    | `function(RequestClient, Data)` | A callback function that receives the `fetch`-based request client and the [Data](#the-data-object) object and returns the value that should be associated with the key. |
-| `negative` | `boolean`                 | (Optional) Set this to `true` to cache negative values (null, undefined).                                                                                                                                     |
+| Field      | Type                            | Description                                                                                                                                                                               |
+| ---------- | ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ttl`      | `number`                        | Time, in seconds, that values are cached before they are expunged. E.g. `60` = 1 minute                                                                                                   |
+| `key`      | `function(Data)`                | A callback function that receives the [Data](#the-data-object) object and should return a unique string that identifies the object fetched by the `value` callback for the given payload. |
+| `value`    | `function(RequestClient, Data)` | A callback function that receives the `fetch`-based request client and the [Data](#the-data-object) object and returns the value that should be associated with the key.                  |
+| `negative` | `boolean`                       | (Optional) Set this to `true` to cache negative values (null, undefined).                                                                                                                 |
 
 ```ts
 const action = {

@@ -1,4 +1,4 @@
-import type { ActionDefinition, AutocompleteResponse, RequestFn } from '@segment/actions-core'
+import type { ActionDefinition, DynamicFieldResponse, RequestFn } from '@segment/actions-core'
 import type { Settings } from '../generated-types'
 import type { Payload } from './generated-types'
 
@@ -11,7 +11,7 @@ interface Campaign {
   name: string
 }
 
-const idAutocomplete: RequestFn<Settings, Payload, AutocompleteResponse> = async (request, { settings }) => {
+const idAutocomplete: RequestFn<Settings, Payload, DynamicFieldResponse> = async (request, { settings }) => {
   const response = await request<Campaigns>('https://beta-api.customer.io/v1/api/campaigns', {
     username: settings.siteId,
     password: settings.apiKey
@@ -39,7 +39,7 @@ const action: ActionDefinition<Settings, Payload> = {
       description: 'ID of the campaign to trigger.',
       type: 'number',
       required: true,
-      autocomplete: true
+      dynamic: true
     },
     data: {
       title: 'Data',
@@ -64,7 +64,7 @@ const action: ActionDefinition<Settings, Payload> = {
     }
   },
 
-  autocompleteFields: {
+  dynamicFields: {
     id: idAutocomplete
   },
 

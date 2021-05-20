@@ -2,16 +2,16 @@ import type { RequestOptions } from '../request-client'
 import type { JSONSchema4 } from 'json-schema'
 import type { ExecuteInput } from './step'
 
-export interface AutocompleteResponse {
+export interface DynamicFieldResponse {
   body: {
-    data: AutocompleteItem[]
+    data: DynamicFieldItem[]
     pagination: {
       nextPage?: string
     }
   }
 }
 
-export interface AutocompleteItem {
+export interface DynamicFieldItem {
   label: string
   value: string
 }

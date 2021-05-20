@@ -31,7 +31,7 @@ const controlPlaneService = new ControlPlaneService({
 type DefinitionJson = Omit<DestinationDefinition, 'actions' | 'extendRequest' | 'authentication'> & {
   authentication?: Omit<NonNullable<DestinationDefinition['authentication']>, 'testAuthentication'>
   actions: {
-    [slug: string]: Omit<ActionDefinition<unknown>, 'perform' | 'autocompleteFields' | 'cachedFields'>
+    [slug: string]: Omit<ActionDefinition<unknown>, 'perform' | 'dynamicFields' | 'cachedFields'>
   }
 }
 
@@ -177,7 +177,7 @@ export default class Push extends Command {
             required: field.required ?? false,
             multiple: field.type === 'array',
             choices: field.type === 'boolean',
-            dynamic: field.autocomplete === true,
+            dynamic: field.dynamic === true,
             placeholder: '',
             allowNull: Array.isArray(field.type) && field.type.includes('null')
           }
@@ -247,7 +247,7 @@ function definitionToJson(definition: DestinationDefinition) {
   const copy = JSON.parse(JSON.stringify(definition))
 
   for (const action of Object.keys(copy.actions)) {
-    delete copy.actions[action].autocompleteFields
+    delete copy.actions[action].dynamicFields
     delete copy.actions[action].cachedFields
     copy.actions[action].hidden = copy.actions[action].hidden ?? false
   }

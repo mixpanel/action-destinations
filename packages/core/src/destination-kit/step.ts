@@ -15,7 +15,7 @@ export interface ExecuteInput<Settings, Payload> {
   payload: Payload
   /** The ids from cached requests */
   cachedFields: { [key: string]: string | null | undefined }
-  /** The page used in autocomplete */
+  /** The page used in dynamic field requests */
   page?: string
 }
 

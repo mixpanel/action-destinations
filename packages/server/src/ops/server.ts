@@ -79,7 +79,7 @@ app.post(
     const actionDefinition = destinationDefinition.actions[action]
 
     try {
-      const result = await actionDefinition.executeAutocomplete(field, {
+      const result = await actionDefinition.executeDynamicField(field, {
         payload: mapping,
         settings,
         cachedFields: {},

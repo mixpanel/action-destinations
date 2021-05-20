@@ -11,7 +11,7 @@ import { fieldsToJsonSchema } from './fields-to-jsonschema'
 import { Response } from '../fetch'
 import { ExecuteInput, Step, StepResult, Steps } from './step'
 import type { ModifiedResponse } from '../types'
-import type { AutocompleteResponse, InputField, RequestExtension } from './types'
+import type { DynamicFieldResponse, InputField, RequestExtension } from './types'
 
 type MaybePromise<T> = T | Promise<T>
 type RequestClient = ReturnType<typeof createRequestClient>
@@ -52,11 +52,11 @@ export interface ActionDefinition<Settings, Payload = any> {
   fields: Record<string, InputField>
 
   /**
-   * Temporary way to "register" autocomplete fields.
+   * A way to "register" dynamic fields.
    * This is likely going to change as we productionalize the data model and definition object
    */
-  autocompleteFields?: {
-    [K in keyof Payload]?: RequestFn<Settings, Payload, AutocompleteResponse>
+  dynamicFields?: {
+    [K in keyof Payload]?: RequestFn<Settings, Payload, DynamicFieldResponse>
   }
 
   /**
@@ -252,7 +252,7 @@ class CachedRequest<Settings, Payload> extends Request<Settings, Payload> {
   }
 }
 
-interface ExecuteAutocompleteInput<Settings, Payload> {
+interface ExecuteDynamicFieldInput<Settings, Payload> {
   settings: Settings
   payload: Payload
   cachedFields: { [key: string]: string }
@@ -268,7 +268,7 @@ type ExecuteInputField = 'payload' | 'settings'
 export class Action<Settings, Payload extends JSONLikeObject> extends EventEmitter {
   readonly steps: Steps<Settings, Payload>
   private extendRequest: RequestExtension<Settings, Payload> | undefined
-  private autocompleteCache: { [key: string]: RequestFn<Settings, Payload> }
+  private dynamicFieldCache: { [key: string]: RequestFn<Settings, Payload> }
 
   constructor(definition: ActionDefinition<Settings, Payload>, extendRequest?: RequestExtension<Settings, Payload>) {
     super()
@@ -277,7 +277,7 @@ export class Action<Settings, Payload extends JSONLikeObject> extends EventEmitt
     const step = new MapInput<Settings, Payload>()
     this.steps.push(step)
 
-    this.autocompleteCache = {}
+    this.dynamicFieldCache = {}
 
     if (extendRequest) {
       // This must come before we load the definition because
@@ -301,15 +301,15 @@ export class Action<Settings, Payload extends JSONLikeObject> extends EventEmitt
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  executeAutocomplete(field: string, data: ExecuteAutocompleteInput<Settings, Payload>): any {
-    if (!this.autocompleteCache[field]) {
+  executeDynamicField(field: string, data: ExecuteDynamicFieldInput<Settings, Payload>): any {
+    if (!this.dynamicFieldCache[field]) {
       return {
         data: [],
         pagination: {}
       }
     }
 
-    const step = new Request<Settings, Payload>(this.extendRequest, this.autocompleteCache[field])
+    const step = new Request<Settings, Payload>(this.extendRequest, this.dynamicFieldCache[field])
 
     return step.executeStep(data)
   }
@@ -319,8 +319,8 @@ export class Action<Settings, Payload extends JSONLikeObject> extends EventEmitt
       this.validatePayload(definition.fields)
     }
 
-    Object.entries(definition.autocompleteFields ?? {}).forEach(([field, callback]) => {
-      this.autocomplete(field, callback as RequestFn<Settings, Payload>)
+    Object.entries(definition.dynamicFields ?? {}).forEach(([field, callback]) => {
+      this.dynamicField(field, callback as RequestFn<Settings, Payload>)
     })
 
     Object.entries(definition.cachedFields ?? {}).forEach(([field, cacheConfig]) => {
@@ -340,8 +340,8 @@ export class Action<Settings, Payload extends JSONLikeObject> extends EventEmitt
     this.steps.push(step)
   }
 
-  private autocomplete(field: string, callback: RequestFn<Settings, Payload>): void {
-    this.autocompleteCache[field] = callback
+  private dynamicField(field: string, callback: RequestFn<Settings, Payload>): void {
+    this.dynamicFieldCache[field] = callback
   }
 
   private request(requestFn: RequestFn<Settings, Payload>): void {

@@ -51,7 +51,7 @@ const action: ActionDefinition<Settings, Payload> = {
       title: 'Organization ID',
       description: 'ID of the organization this person will belong to.',
       type: 'number',
-      autocomplete: true
+      dynamic: true
     },
     email: {
       title: 'Email Address',
@@ -73,7 +73,7 @@ const action: ActionDefinition<Settings, Payload> = {
     }
   },
 
-  autocompleteFields: {
+  dynamicFields: {
     org_id: async (request, { page, settings }) => {
       const searchParams: Record<string, number> = {}
       if (typeof page === 'string') {
