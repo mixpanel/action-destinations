@@ -213,10 +213,10 @@ async function handleCloudEvent(
   try {
     const event = cloudEvent.data
     const results = await destination.onEvent(event, cloudEvent.settings, onComplete(context, privateSettings))
-    const eventTesterData = getEventTesterData(destination.responses)
+    const eventTesterData = await getEventTesterData(destination.responses)
     return constructCloudSuccess(cloudEvent, results, eventTesterData, { start })
   } catch (err) {
-    const eventTesterData = getEventTesterData(destination.responses)
+    const eventTesterData = await getEventTesterData(destination.responses)
     return constructCloudError(cloudEvent, err, eventTesterData, { start })
   }
 }

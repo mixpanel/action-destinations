@@ -21,12 +21,12 @@ export interface ResponseFromDestination {
   body: unknown
 }
 
-export default function getEventTesterData(responses: Response[]): EventTesterRequest[] {
+export default async function getEventTesterData(responses: Response[]): Promise<EventTesterRequest[]> {
   const requests: EventTesterRequest[] = []
 
   for (const response of responses) {
     requests.push({
-      request: summarizeRequest(response),
+      request: await summarizeRequest(response),
       response: summarizeResponse(response)
     })
   }
@@ -34,14 +34,15 @@ export default function getEventTesterData(responses: Response[]): EventTesterRe
   return requests
 }
 
-function summarizeRequest(response: Response): RequestToDestination {
-  const request = response.request
+async function summarizeRequest(response: Response): Promise<RequestToDestination> {
+  const request = response.request.clone()
+  const data = await request.text()
 
   return {
     url: request.url,
     method: request.method,
     headers: redactUnsafeRequestHeaders(request.headers),
-    body: request.body ?? ''
+    body: data ?? ''
   }
 }
 
