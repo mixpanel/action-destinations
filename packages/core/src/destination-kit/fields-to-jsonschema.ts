@@ -25,6 +25,7 @@ export function fieldsToJsonSchema(fields: Record<string, InputField> = {}): JSO
       title: field.label,
       description: field.description,
       type: schemaType,
+      format: field.format,
       default: field.default as JSONSchema4Type
     }
 
