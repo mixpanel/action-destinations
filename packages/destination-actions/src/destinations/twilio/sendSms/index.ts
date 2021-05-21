@@ -17,7 +17,7 @@ const action: ActionDefinition<Settings, Payload> = {
     Body: {
       label: 'Body',
       description: 'The message body',
-      type: 'string',
+      type: 'text',
       required: true
     }
   },

@@ -100,6 +100,7 @@ const ajv = new Ajv({
 
 // Extend with additional supported formats
 ajv.addFormat('password', () => true)
+ajv.addFormat('text', () => true)
 ajv.addFormat('date-like', (data: string) => {
   let date = dayjs(data)
 

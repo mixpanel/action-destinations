@@ -18,7 +18,7 @@ const action: ActionDefinition<Settings, Payload> = {
       required: true,
       description:
         "The text message to post to Slack. You can use [Slack's formatting syntax.](https://api.slack.com/reference/surfaces/formatting)",
-      type: 'string'
+      type: 'text'
     },
     channel: {
       label: 'Channel',

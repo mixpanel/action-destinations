@@ -34,6 +34,8 @@ export function fieldsToJsonSchema(fields: Record<string, InputField> = {}): JSO
       schema.tsType = 'string | number'
     } else if (field.type === 'password') {
       schema.format = 'password'
+    } else if (field.type === 'text') {
+      schema.format = 'text'
     }
 
     if (field.dynamic) {
