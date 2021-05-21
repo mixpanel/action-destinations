@@ -56,20 +56,28 @@ interface TestAuthSettings<Settings> {
 }
 
 interface Authentication<Settings> {
+  /** The authentication scheme */
   scheme: 'basic' | 'custom'
+  /** The fields related to authentication */
   fields: Record<string, InputField>
+  /** A function that validates the user's authentication inputs */
   testAuthentication: (request: RequestClient, input: TestAuthSettings<Settings>) => Promise<unknown> | unknown
 }
+
+/**
+ * Custom authentication scheme
+ * Typically used for "API Key" authentication.
+ */
 export interface CustomAuthentication<Settings> extends Authentication<Settings> {
-  /** Typically used for "API Key" authentication. */
   scheme: 'custom'
 }
 
+/**
+ * Basic authentication scheme
+ * @see {@link https://datatracker.ietf.org/doc/html/rfc7617}
+ */
 export interface BasicAuthentication<Settings> extends Authentication<Settings> {
   scheme: 'basic'
-  // TODO evalute requiring "username" and "password" fields
-  // and automatically handling the http auth stuff
-  // fields: Record<'username' | 'password', InputField>
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -222,9 +230,9 @@ export class Destination<Settings = JSONObject> {
         subscribe: subscription.subscribe,
         state,
         input: {
-          event: (input.event as unknown) as JSONLikeObject,
+          event: input.event as unknown as JSONLikeObject,
           mapping: input.mapping,
-          settings: (input.settings as unknown) as JSONLikeObject
+          settings: input.settings as unknown as JSONLikeObject
         },
         output: results
       })
@@ -272,6 +280,6 @@ export class Destination<Settings = JSONObject> {
 
   private getDestinationSettings(settings: JSONObject): Settings {
     const { subcription, subscriptions, ...otherSettings } = settings
-    return (otherSettings as unknown) as Settings
+    return otherSettings as unknown as Settings
   }
 }

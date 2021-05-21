@@ -8,7 +8,7 @@ const action: ActionDefinition<Settings, Payload> = {
   defaultSubscription: 'type = "track"',
   fields: {
     id: {
-      title: 'Person ID',
+      label: 'Person ID',
       description: 'ID of the person who triggered this event.',
       type: 'string',
       required: true,
@@ -17,7 +17,7 @@ const action: ActionDefinition<Settings, Payload> = {
       }
     },
     name: {
-      title: 'Event Name',
+      label: 'Event Name',
       description: 'Name of the event',
       type: 'string',
       required: true,
@@ -26,7 +26,7 @@ const action: ActionDefinition<Settings, Payload> = {
       }
     },
     type: {
-      title: 'Event Type',
+      label: 'Event Type',
       description: 'Override event type. Ex. "page".',
       type: 'string',
       default: {
@@ -34,7 +34,7 @@ const action: ActionDefinition<Settings, Payload> = {
       }
     },
     data: {
-      title: 'Data',
+      label: 'Data',
       description: 'Custom data to include with the event.',
       type: 'object',
       default: {

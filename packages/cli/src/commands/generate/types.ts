@@ -3,6 +3,7 @@ import { fieldsToJsonSchema, InputField } from '@segment/actions-core'
 import chokidar from 'chokidar'
 import fs from 'fs-extra'
 import globby from 'globby'
+import { JSONSchema4 } from 'json-schema'
 import { compile } from 'json-schema-to-typescript'
 import path from 'path'
 import prettier from 'prettier'
@@ -110,10 +111,33 @@ export default class GenerateTypes extends Command {
 }
 
 async function generateTypes(fields: Record<string, InputField> = {}, name: string) {
-  const schema = fieldsToJsonSchema(fields)
+  const schema = prepareSchema(fields)
 
   return compile(schema, name, {
     bannerComment: '// Generated file. DO NOT MODIFY IT BY HAND.',
     style: pretterOptions ?? undefined
   })
+}
+
+function prepareSchema(fields: Record<string, InputField>): JSONSchema4 {
+  let schema = fieldsToJsonSchema(fields)
+  // Remove titles so it produces cleaner output
+  schema = removeTitles(schema)
+  return schema
+}
+
+function removeTitles(schema: JSONSchema4) {
+  const copy = { ...schema }
+
+  delete copy.title
+
+  if (copy.type === 'object' && copy.properties) {
+    for (const [key, property] of Object.entries(copy.properties)) {
+      copy.properties[key] = removeTitles(property)
+    }
+  } else if (copy.type === 'array' && copy.items) {
+    copy.items = removeTitles(copy.items)
+  }
+
+  return copy
 }

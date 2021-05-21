@@ -9,7 +9,7 @@ const action: ActionDefinition<Settings, Payload> = {
   defaultSubscription: 'type = "identify"',
   fields: {
     id: {
-      title: 'Person ID',
+      label: 'Person ID',
       description: 'ID used to uniquely identify person in Customer.io.',
       type: 'string',
       required: true,
@@ -18,7 +18,7 @@ const action: ActionDefinition<Settings, Payload> = {
       }
     },
     email: {
-      title: 'Email Address',
+      label: 'Email Address',
       description: "Person's email address.",
       type: 'string',
       required: true,
@@ -27,7 +27,7 @@ const action: ActionDefinition<Settings, Payload> = {
       }
     },
     created_at: {
-      title: 'Created At',
+      label: 'Created At',
       description: 'Timestamp for when the person was created. Default is current date and time.',
       type: 'string',
       default: {
@@ -35,7 +35,7 @@ const action: ActionDefinition<Settings, Payload> = {
       }
     },
     custom_attributes: {
-      title: 'Custom Attributes',
+      label: 'Custom Attributes',
       description:
         'Optional custom attributes for this person. When updating a person, attributes are added and not removed.',
       type: 'object',

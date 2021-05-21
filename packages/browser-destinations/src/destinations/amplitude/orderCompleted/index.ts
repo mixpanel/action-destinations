@@ -12,8 +12,9 @@ function omit<T extends object, K extends string[]>(obj: T, keys: K) {
   }, {} as Record<string, unknown>) as Omit<T, keyof K>
 }
 
-interface AmplitudeEvent extends Omit<Payload, 'products' | 'trackRevenuePerProduct' | 'time'> {
+interface AmplitudeEvent extends Omit<Payload, 'session_id' | 'products' | 'trackRevenuePerProduct' | 'time'> {
   time?: number
+  session_id?: number
 }
 
 const revenueKeys = ['revenue', 'price', 'productId', 'quantity', 'revenueType']
@@ -48,7 +49,7 @@ const action: BrowserActionDefinition<Settings, AmplitudeClient, Payload> = {
   fields: {
     ...eventSchema,
     trackRevenuePerProduct: {
-      title: 'Track Revenue Per Product',
+      label: 'Track Revenue Per Product',
       description:
         'When enabled, track revenue with each product within the event. When disabled, track total revenue once for the event.',
       type: 'boolean',
@@ -56,41 +57,39 @@ const action: BrowserActionDefinition<Settings, AmplitudeClient, Payload> = {
       default: false
     },
     products: {
-      title: 'Products',
+      label: 'Products',
       description: 'The list of products purchased.',
-      type: 'array',
-      items: {
-        type: 'object',
-        properties: {
-          price: {
-            title: 'Price',
-            type: 'number',
-            description:
-              'The price of the item purchased. Required for revenue data if the revenue field is not sent. You can use negative values to indicate refunds.'
-          },
-          quantity: {
-            title: 'Quantity',
-            type: 'integer',
-            description: 'The quantity of the item purchased. Defaults to 1 if not specified.'
-          },
-          revenue: {
-            title: 'Revenue',
-            type: 'number',
-            description:
-              'Revenue = price * quantity. If you send all 3 fields of price, quantity, and revenue, then (price * quantity) will be used as the revenue value. You can use negative values to indicate refunds.'
-          },
-          productId: {
-            title: 'Product ID',
-            type: 'string',
-            description:
-              'An identifier for the item purchased. You must send a price and quantity or revenue with this field.'
-          },
-          revenueType: {
-            title: 'Revenue Type',
-            type: 'string',
-            description:
-              'The type of revenue for the item purchased. You must send a price and quantity or revenue with this field.'
-          }
+      type: 'object',
+      multiple: true,
+      properties: {
+        price: {
+          label: 'Price',
+          type: 'number',
+          description:
+            'The price of the item purchased. Required for revenue data if the revenue field is not sent. You can use negative values to indicate refunds.'
+        },
+        quantity: {
+          label: 'Quantity',
+          type: 'integer',
+          description: 'The quantity of the item purchased. Defaults to 1 if not specified.'
+        },
+        revenue: {
+          label: 'Revenue',
+          type: 'number',
+          description:
+            'Revenue = price * quantity. If you send all 3 fields of price, quantity, and revenue, then (price * quantity) will be used as the revenue value. You can use negative values to indicate refunds.'
+        },
+        productId: {
+          label: 'Product ID',
+          type: 'string',
+          description:
+            'An identifier for the item purchased. You must send a price and quantity or revenue with this field.'
+        },
+        revenueType: {
+          label: 'Revenue Type',
+          type: 'string',
+          description:
+            'The type of revenue for the item purchased. You must send a price and quantity or revenue with this field.'
         }
       },
       default: {

@@ -8,19 +8,19 @@ const destination: DestinationDefinition<Settings> = {
     scheme: 'basic',
     fields: {
       accountId: {
-        title: 'Account Id',
+        label: 'Account Id',
         description: 'Your Twilio Account Id',
         type: 'string',
         required: true
       },
       token: {
-        title: 'Token',
+        label: 'Token',
         description: 'Your Twilio Token.',
         type: 'string',
         required: true
       },
       phoneNumber: {
-        title: 'Phone Number',
+        label: 'Phone Number',
         description: 'Your Twilio Phone Number with Country Code.',
         type: 'string',
         required: true

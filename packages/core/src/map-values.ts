@@ -3,7 +3,8 @@
  * Creates an object with the same keys as the input object
  */
 export function mapValues<
-  Values extends Record<string, unknown>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  Values extends Record<string, any>,
   Obj extends Record<string, Values>,
   ValueKey extends keyof Values
 >(obj: Obj, key: ValueKey): { [K in keyof Obj]: Obj[K][ValueKey] } {

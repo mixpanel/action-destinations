@@ -9,13 +9,13 @@ const action: ActionDefinition<Settings, Payload> = {
   defaultSubscription: 'type = "track"',
   fields: {
     To: {
-      title: 'To',
+      label: 'To',
       description: 'The Phone Number to send a SMS to',
       type: 'string',
       required: true
     },
     Body: {
-      title: 'Body',
+      label: 'Body',
       description: 'The message body',
       type: 'string',
       required: true

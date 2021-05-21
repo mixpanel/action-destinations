@@ -32,7 +32,7 @@ const action: ActionDefinition<Settings, Payload> = {
   defaultSubscription: 'type = "identify"',
   fields: {
     identifier: {
-      title: 'Person ID',
+      label: 'Person ID',
       description:
         'Identifier used to find existing person in Pipedrive. Can be an email, name, phone number, or custom field value. Custom person fields may be included by using the long hash keys of the custom fields. These look like "33595c732cd7a027c458ea115a48a7f8a254fa86".',
       type: 'string',
@@ -42,32 +42,30 @@ const action: ActionDefinition<Settings, Payload> = {
       }
     },
     name: {
-      title: 'Person Name',
+      label: 'Person Name',
       description: 'Name of the person',
       type: 'string',
       required: true
     },
     org_id: {
-      title: 'Organization ID',
+      label: 'Organization ID',
       description: 'ID of the organization this person will belong to.',
       type: 'number',
       dynamic: true
     },
     email: {
-      title: 'Email Address',
+      label: 'Email Address',
       description: 'Email addresses for this person.',
-      type: 'array',
-      items: {
-        type: 'string'
-      }
+      type: 'string',
+      multiple: true
     },
     phone: {
-      title: 'Phone Number',
+      label: 'Phone Number',
       description: 'Phone number for the person.',
       type: 'string'
     },
     add_time: {
-      title: 'Created At',
+      label: 'Created At',
       description: 'If the person is created, use this timestamp as the creation timestamp. Format: YYY-MM-DD HH:MM:SS',
       type: 'string'
     }

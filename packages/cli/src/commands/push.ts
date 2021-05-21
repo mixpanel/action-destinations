@@ -1,5 +1,5 @@
 import { Command, flags } from '@oclif/command'
-import { DestinationDefinition, fieldsToJsonSchema, jsonSchemaToFields, ActionDefinition } from '@segment/actions-core'
+import { DestinationDefinition, fieldsToJsonSchema, jsonSchemaToFields } from '@segment/actions-core'
 import { idToSlug, destinations as actionDestinations } from '@segment/destination-actions'
 import chalk from 'chalk'
 import { Dictionary, invert, pick, uniq } from 'lodash'
@@ -27,20 +27,6 @@ const controlPlaneService = new ControlPlaneService({
     'skip-authz': '1'
   }
 })
-
-type DefinitionJson = Omit<DestinationDefinition, 'actions' | 'extendRequest' | 'authentication'> & {
-  authentication?: Omit<NonNullable<DestinationDefinition['authentication']>, 'testAuthentication'>
-  actions: {
-    [slug: string]: Omit<ActionDefinition<unknown>, 'perform' | 'dynamicFields' | 'cachedFields'>
-  }
-}
-
-interface ActionDestinationMetadata {
-  name: string
-  slug: string
-  presets?: DestinationDefinition['presets']
-  settings: JSONSchema4
-}
 
 type BaseActionInput = Omit<DestinationMetadataActionCreateInput, 'metadataId'>
 
@@ -111,14 +97,10 @@ export default class Push extends Command {
         asJson({ basicOptions, options })
       )
 
-      const oldDefinition = settingsToDefinition(metadata, schemaForDestination.definition)
       const newDefinition = definitionToJson(schemaForDestination.definition)
-      const definitionDiff = diffString(oldDefinition, newDefinition)
 
-      if (definitionDiff) {
-        this.spinner.warn(`Detected definition diff for ${chalk.bold(slug)}, please review:`)
-        this.log(`\n${definitionDiff}`)
-      } else if (settingsDiff) {
+      // TODO switch to table definition diffs instead of legacy format
+      if (settingsDiff) {
         this.spinner.warn(`Detected settings diff for ${chalk.bold(slug)}, please review:`)
         this.log(`\n${settingsDiff}`)
       } else if (flags.force) {
@@ -169,17 +151,18 @@ export default class Push extends Command {
         const fields: DestinationMetadataActionFieldCreateInput[] = Object.keys(actionFields).map((fieldKey) => {
           const field = actionFields[fieldKey]
           return {
-            type: convertType(field),
             fieldKey,
-            label: field.title,
+            type: field.type,
+            label: field.label,
             description: field.description,
             defaultValue: field.default,
             required: field.required ?? false,
-            multiple: field.type === 'array',
-            choices: field.type === 'boolean',
-            dynamic: field.dynamic === true,
-            placeholder: '',
-            allowNull: Array.isArray(field.type) && field.type.includes('null')
+            multiple: field.multiple ?? false,
+            // TODO implement
+            choices: null,
+            dynamic: field.dynamic ?? false,
+            placeholder: field.placeholder ?? '',
+            allowNull: field.allowNull ?? false
           }
         })
 
@@ -204,21 +187,6 @@ export default class Push extends Command {
       createDestinationMetadataActions(actionsToCreate)
     ])
   }
-}
-
-function convertType(
-  field: any
-): 'string' | 'text' | 'number' | 'integer' | 'datetime' | 'boolean' | 'password' | 'object' {
-  if (field.type === 'array') {
-    return field.items.type
-  }
-
-  // TODO: handle `type: ['string', 'number']` case
-  if (Array.isArray(field.type)) {
-    return field.type[0]
-  }
-
-  return field.type
 }
 
 function asJson(obj: unknown) {
@@ -253,56 +221,6 @@ function definitionToJson(definition: DestinationDefinition) {
   }
 
   return copy
-}
-
-function settingsToDefinition(
-  { basicOptions, options }: DestinationMetadata,
-  definition: DestinationDefinition
-): DefinitionJson {
-  const existingDefinition: DefinitionJson = {
-    name: definition.name,
-    actions: {}
-  }
-
-  // grab the destination-level definition from the `metadata` option
-  if (typeof options.metadata?.description === 'string') {
-    const meta = JSON.parse(options.metadata.description) as ActionDestinationMetadata
-
-    if (meta.presets) {
-      existingDefinition.presets = meta.presets
-    }
-
-    // pull out authentication-related fields from a JSON Schema-looking thing
-    const authFields = jsonSchemaToFields(meta?.settings)
-
-    if (Object.keys(authFields).length > 0) {
-      existingDefinition.authentication = {
-        scheme: definition.authentication?.scheme ?? 'custom',
-        fields: authFields
-      }
-    }
-  }
-
-  // find actions based on the naming scheme `action${slug}` in the `basicOptions`
-  const actionOptions = basicOptions.filter((option) => option.startsWith('action'))
-
-  for (const option of actionOptions) {
-    const slug = option.replace(/^action/, '')
-    const meta = JSON.parse(options[option]?.description ?? 'null')
-    if (!meta) continue
-
-    existingDefinition.actions[slug] = {
-      title: meta.schema?.title,
-      description: meta.schema?.description,
-      hidden: options[option]?.hidden,
-      // backwards compat for now
-      defaultSubscription: meta.defaultSubscription ?? meta.schema?.defaultSubscription,
-      fields: jsonSchemaToFields(meta.schema)
-    }
-  }
-
-  // Remove undefined values
-  return JSON.parse(JSON.stringify(existingDefinition))
 }
 
 function getBasicOptions(metadata: DestinationMetadata, options: DestinationMetadataOptions): string[] {

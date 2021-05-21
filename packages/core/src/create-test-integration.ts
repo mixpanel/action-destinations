@@ -47,7 +47,7 @@ class TestDestination<T> extends Destination<T> {
     if (useDefaultMappings) {
       const fields = this.definition.actions[action].fields
       const defaultMappings = mapValues(fields, 'default')
-      mapping = { ...defaultMappings, ...mapping }
+      mapping = { ...defaultMappings, ...mapping } as JSONObject
     }
 
     await super.executeAction(action, {

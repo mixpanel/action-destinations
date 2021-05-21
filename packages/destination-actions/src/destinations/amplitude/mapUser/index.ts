@@ -9,7 +9,7 @@ const action: ActionDefinition<Settings, Payload> = {
   defaultSubscription: 'type = "alias"',
   fields: {
     user_id: {
-      title: 'User ID',
+      label: 'User ID',
       type: 'string',
       description: 'The User ID to be associated',
       default: {
@@ -17,7 +17,7 @@ const action: ActionDefinition<Settings, Payload> = {
       }
     },
     global_user_id: {
-      title: 'Global User ID',
+      label: 'Global User ID',
       type: 'string',
       description: 'The global User ID to associate to',
       default: {

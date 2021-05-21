@@ -31,6 +31,7 @@ const action: BrowserActionDefinition<Settings, {}, Payload> = {
   defaultSubscription: 'type = "track" or type = "identify" or type = "group" or type = "page" or type = "alias"',
   fields: {
     sessionLength: {
+      label: 'Session Length',
       type: 'number',
       required: false,
       description: 'Time in milliseconds to be used before considering a session stale.'

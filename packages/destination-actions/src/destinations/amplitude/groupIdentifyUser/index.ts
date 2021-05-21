@@ -11,8 +11,9 @@ const action: ActionDefinition<Settings, Payload> = {
   defaultSubscription: 'type = "group"',
   fields: {
     user_id: {
-      title: 'User ID',
-      type: ['string', 'null'],
+      label: 'User ID',
+      type: 'string',
+      allowNull: true,
       description:
         'A UUID (unique user ID) specified by you. **Note:** If you send a request with a user ID that is not in the Amplitude system yet, then the user tied to that ID will not be marked new until their first event. Required unless device ID is present.',
       default: {
@@ -20,7 +21,7 @@ const action: ActionDefinition<Settings, Payload> = {
       }
     },
     device_id: {
-      title: 'Device ID',
+      label: 'Device ID',
       type: 'string',
       description:
         'A device specific identifier, such as the Identifier for Vendor (IDFV) on iOS. Required unless user ID is present.',
@@ -33,13 +34,13 @@ const action: ActionDefinition<Settings, Payload> = {
       }
     },
     insert_id: {
-      title: 'Insert ID',
+      label: 'Insert ID',
       type: 'string',
       description:
         'Amplitude will deduplicate subsequent events sent with this ID we have already seen before within the past 7 days. Amplitude recommends generating a UUID or using some combination of device ID, user ID, event type, event ID, and time.'
     },
     time: {
-      title: 'Timestamp',
+      label: 'Timestamp',
       type: 'string',
       description:
         'The timestamp of the event. If time is not sent with the event, it will be set to the request upload time.',
@@ -48,7 +49,7 @@ const action: ActionDefinition<Settings, Payload> = {
       }
     },
     group_properties: {
-      title: 'Group Properties',
+      label: 'Group Properties',
       type: 'object',
       description: 'Additional data tied to the group in Amplitude.',
       default: {
@@ -56,13 +57,13 @@ const action: ActionDefinition<Settings, Payload> = {
       }
     },
     group_type: {
-      title: 'Group Type',
+      label: 'Group Type',
       type: 'string',
       description: 'Type of the group',
       required: true
     },
     group_value: {
-      title: 'Group Value',
+      label: 'Group Value',
       type: 'string',
       description: 'Value of the group',
       required: true

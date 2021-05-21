@@ -9,19 +9,19 @@ const destination: DestinationDefinition<Settings> = {
     scheme: 'custom',
     fields: {
       domain: {
-        title: 'Domain',
+        label: 'Domain',
         description: 'Pipedrive domain. This is found in Pipedrive in Settings > Company settings > Company domain.',
         type: 'string',
-        required: true,
-        minLength: 1
+        // minLength: 1,
+        required: true
       },
       apiToken: {
-        title: 'API Token',
+        label: 'API Token',
         description:
           'Pipedrive API token. This is found in Pipedrive in Settings > Personal preferences > API > Your personal API token.',
         type: 'string',
-        required: true,
-        minLength: 20
+        // minLength: 20,
+        required: true
       }
     },
     testAuthentication: (request, { settings }) => {

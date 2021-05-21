@@ -13,6 +13,7 @@ export const destination: BrowserDestinationDefinition<Settings, AmplitudeClient
   authentication: {
     fields: {
       apiKey: {
+        label: 'API Key',
         type: 'string',
         required: true,
         description:

@@ -7,13 +7,13 @@ const destination: DestinationDefinition<Settings> = {
     scheme: 'basic',
     fields: {
       username: {
-        title: 'Username',
+        label: 'Username',
         description: 'Your {{name}} username',
         type: 'string',
         required: true
       },
       password: {
-        title: 'password',
+        label: 'password',
         description: 'Your {{name}} password.',
         type: 'string',
         required: true

@@ -47,8 +47,8 @@ beforeEach(async () => {
     url: 'https://intercom.com'
   })
 
-  const windowSpy = jest.spyOn(global, 'window', 'get')
-  windowSpy.mockImplementation(() => (jsd.window as unknown) as Window & typeof globalThis)
+  const windowSpy = jest.spyOn(window, 'window', 'get')
+  windowSpy.mockImplementation(() => jsd.window as unknown as Window & typeof globalThis)
 })
 
 test('can load intercom', async () => {

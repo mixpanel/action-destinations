@@ -7,32 +7,32 @@ const action: ActionDefinition<Settings, Payload> = {
   description: 'Post a message to a Slack channel.',
   fields: {
     url: {
-      title: 'Webhook URL',
+      label: 'Webhook URL',
       description: 'Slack webhook URL.',
       type: 'string',
       required: true,
       format: 'uri'
     },
     text: {
-      title: 'Message',
+      label: 'Message',
       required: true,
       description:
         "The text message to post to Slack. You can use [Slack's formatting syntax.](https://api.slack.com/reference/surfaces/formatting)",
       type: 'string'
     },
     channel: {
-      title: 'Channel',
+      label: 'Channel',
       description: 'Slack channel to post message to.',
       type: 'string'
     },
     username: {
-      title: 'User',
+      label: 'User',
       description: 'User name to post messages as.',
       type: 'string',
       default: 'Segment'
     },
     icon_url: {
-      title: 'Icon URL',
+      label: 'Icon URL',
       description: 'URL for user icon image.',
       type: 'string',
       default: 'https://logo.clearbit.com/segment.com'

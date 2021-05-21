@@ -10,6 +10,7 @@ export const destination: BrowserDestinationDefinition<Settings, Intercom_.Inter
   authentication: {
     fields: {
       app_id: {
+        label: 'Workspace ID',
         type: 'string',
         required: true,
         description:

@@ -56,13 +56,13 @@ const destination: DestinationDefinition<Settings> = {
     scheme: 'custom',
     fields: {
       apiKey: {
-        title: 'API Key',
+        label: 'API Key',
         description: 'Amplitude project API key. You can find this key in the "General" tab of your Amplitude project.',
         type: 'string',
         required: true
       },
       secretKey: {
-        title: 'Secret Key',
+        label: 'Secret Key',
         description:
           'Amplitude project secret key. You can find this key in the "General" tab of your Amplitude project.',
         type: 'string',

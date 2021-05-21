@@ -15,16 +15,16 @@ const destination: DestinationDefinition<Settings> = {
       siteId: {
         description:
           'Customer.io site ID. This can be found on your [API Credentials page](https://fly.customer.io/settings/api_credentials).',
-        minLength: 20,
-        title: 'Site ID',
+        // minLength: 20,
+        label: 'Site ID',
         type: 'string',
         required: true
       },
       apiKey: {
         description:
           'Customer.io API key. This can be found on your [API Credentials page](https://fly.customer.io/settings/api_credentials).',
-        minLength: 20,
-        title: 'API Key',
+        // minLength: 20,
+        label: 'API Key',
         type: 'string',
         required: true
       }

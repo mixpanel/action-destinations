@@ -9,7 +9,7 @@ const action: ActionDefinition<Settings, Payload> = {
   defaultSubscription: 'type = "track" and event = "Application Installed"',
   fields: {
     person_id: {
-      title: 'Person ID',
+      label: 'Person ID',
       description: 'ID of the person that this device belongs to.',
       type: 'string',
       required: true,
@@ -18,7 +18,7 @@ const action: ActionDefinition<Settings, Payload> = {
       }
     },
     device_id: {
-      title: 'Device ID',
+      label: 'Device ID',
       description: 'Unique ID for this device.',
       type: 'string',
       required: true,
@@ -27,17 +27,17 @@ const action: ActionDefinition<Settings, Payload> = {
       }
     },
     platform: {
-      title: 'Platform',
+      label: 'Platform',
       description: 'The device platform.',
       type: 'string',
       required: true,
-      enum: ['ios', 'android'],
+      // enum: ['ios', 'android'],
       default: {
         '@path': '$.context.device.type'
       }
     },
     last_used: {
-      title: 'Last Used',
+      label: 'Last Used',
       description: 'Timestamp for when the device was last used. Default is current date and time.',
       type: 'string',
       default: {

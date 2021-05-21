@@ -8,7 +8,7 @@ const action: ActionDefinition<Settings, Payload> = {
   defaultSubscription: 'type = "track"',
   fields: {
     name: {
-      title: 'Event Name',
+      label: 'Event Name',
       description: 'Name of the event',
       type: 'string',
       required: true,
@@ -17,7 +17,7 @@ const action: ActionDefinition<Settings, Payload> = {
       }
     },
     data: {
-      title: 'Data',
+      label: 'Data',
       description:
         'Custom data to include with the event. If "recipient", "from_address", or "reply_to" are sent, they will override settings on any campaigns triggered by this event. "recipient" is required if the event is used to trigger a campaign.',
       type: 'object',

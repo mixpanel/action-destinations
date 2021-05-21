@@ -102,7 +102,7 @@ performing the action (aka talking to the partner API). Actions will look like t
 
 ```ts
 const action: ActionDefinition = {
-  // The action-specific settings represented as JSON Schema
+  // The action-specific fields that can be configured by the customer
   // Ideally these fields will match what the partner API expects
   fields: {},
 

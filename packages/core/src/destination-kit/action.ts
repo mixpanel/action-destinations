@@ -1,6 +1,7 @@
 // @ts-ignore no types
 import { AggregateAjvError } from '@segment/ajv-human-errors'
 import Ajv from 'ajv'
+import dayjs from 'dayjs'
 import { EventEmitter } from 'events'
 import NodeCache from 'node-cache'
 import createRequestClient from '../create-request-client'
@@ -41,13 +42,6 @@ export interface ActionDefinition<Settings, Payload = any> {
 
   /**
    * The fields used to perform the action. These fields should match what the partner API expects.
-   *
-   * This is a set of JSON Schema properties right now.
-   * We may eventually auto-generate the JSON Schema from a definition object
-   * instead of requiring devs to build and modify JSON Schema directly.
-   *
-   * Plus, JSON Schema cannot fully represent our action or field definitions
-   * without many custom keywords.
    */
   fields: Record<string, InputField>
 
@@ -91,26 +85,43 @@ class MapInput<Settings, Payload extends JSONLikeObject> extends Step<Settings, 
   }
 }
 
+const ajv = new Ajv({
+  // Coerce types to be a bit more liberal.
+  coerceTypes: true,
+  // Return all validation errors, not just the first.
+  allErrors: true,
+  // Include reference to schema and data in error values.
+  verbose: true,
+  // Remove properties not defined the schema object
+  removeAdditional: true,
+  // Use a more parse-able format for JSON paths.
+  jsonPointers: true
+})
+
+// Extend with additional supported formats
+ajv.addFormat('password', () => true)
+ajv.addFormat('date-like', (data: string) => {
+  let date = dayjs(data)
+
+  if (String(Number(data)) === data) {
+    // parse as unix
+    if (data.length === 13) {
+      date = dayjs(Number(data))
+    }
+
+    date = dayjs.unix(Number(data))
+  }
+
+  return date.isValid()
+})
+
 export class Validate<Settings, Payload> extends Step<Settings, Payload> {
   field: ExecuteInputField
   validate: Ajv.ValidateFunction
 
   constructor(field: ExecuteInputField, schema: object) {
     super()
-
     this.field = field
-
-    const ajv = new Ajv({
-      // Coerce types to be a bit more liberal.
-      coerceTypes: true,
-      // Return all validation errors, not just the first.
-      allErrors: true,
-      // Include reference to schema and data in error values.
-      verbose: true,
-      // Use a more parse-able format for JSON paths.
-      jsonPointers: true
-    })
-
     this.validate = ajv.compile(schema)
   }
 

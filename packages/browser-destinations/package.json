@@ -53,6 +53,7 @@
     },
     "transformIgnorePatterns": [
       "/node_modules/(?!@segment/analytics-next).+\\.js$"
-    ]
+    ],
+    "forceExit": true
   }
 }

@@ -35,14 +35,14 @@ const action: ActionDefinition<Settings, Payload> = {
   description: 'Trigger a Customer.io broadcast campaign.',
   fields: {
     id: {
-      title: 'Campaign ID',
+      label: 'Campaign ID',
       description: 'ID of the campaign to trigger.',
       type: 'number',
       required: true,
       dynamic: true
     },
     data: {
-      title: 'Data',
+      label: 'Data',
       description: 'Custom Liquid merge data to include with the trigger.',
       type: 'object',
       default: {
@@ -50,17 +50,15 @@ const action: ActionDefinition<Settings, Payload> = {
       }
     },
     recipients: {
-      title: 'Recipients',
+      label: 'Recipients',
       description: 'Additional recipient conditions to filter recipients. If this is used, "IDs" may not be used.',
       type: 'object'
     },
     ids: {
-      title: 'Profile IDs',
+      label: 'Profile IDs',
       description: 'List of profile IDs to use as campaign recipients. If this is used, "Recipients" may not be used.',
-      type: 'array',
-      items: {
-        type: 'string'
-      }
+      type: 'string',
+      multiple: true
     }
   },
 
