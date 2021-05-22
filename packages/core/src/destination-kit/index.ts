@@ -1,12 +1,12 @@
 import { validate, parseFql } from '@segment/fab5-subscriptions'
 import { JSONSchema4 } from 'json-schema'
+import { CustomError } from 'ts-custom-error'
 import { Action, ActionDefinition, Validate, RequestFn } from './action'
 import { ExecuteInput, StepResult } from './step'
 import { time, duration } from '../time'
 import { JSONLikeObject, JSONObject } from '../json-object'
 import { SegmentEvent } from '../segment-event'
 import { fieldsToJsonSchema, jsonSchemaToFields } from './fields-to-jsonschema'
-import { UnsupportedActionError } from '../errors'
 import createRequestClient, { RequestClient } from '../create-request-client'
 import type { ModifiedResponse } from '../types'
 import type { InputField, RequestExtension } from './types'
@@ -14,6 +14,20 @@ import type { AllRequestOptions } from '../request-client'
 
 export type { ActionDefinition, ExecuteInput, RequestFn }
 export { fieldsToJsonSchema, jsonSchemaToFields }
+
+/** Internal error for signaling that the invoked action isn't implemented */
+class UnsupportedActionError extends CustomError {
+  ignored: boolean
+  status: string
+  retry: boolean
+
+  constructor(action: string) {
+    super(`"${action}" is not a supported cloud-mode action.`)
+    this.ignored = true
+    this.status = 'UNSUPPORTED_EVENT_TYPE'
+    this.retry = false
+  }
+}
 
 export interface SubscriptionStats {
   duration: number
