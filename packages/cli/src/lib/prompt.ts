@@ -18,7 +18,7 @@ export async function prompt<Answers = { [key: string]: any }>(
  * Given a set of parsed flags and questions, only prompt for answers that are missing
  */
 export async function autoPrompt<F extends flags.Output>(
-  flags: F,
+  flags: Partial<F> & { [key: string]: unknown },
   questions: prompts.PromptObject | Array<prompts.PromptObject>
 ) {
   if (!Array.isArray(questions)) {

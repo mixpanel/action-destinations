@@ -3,7 +3,11 @@ import { DestinationDefinition, fieldsToJsonSchema, jsonSchemaToFields } from '@
 import { idToSlug, destinations as actionDestinations } from '@segment/destination-actions'
 import chalk from 'chalk'
 import { Dictionary, invert, pick, uniq } from 'lodash'
-import ControlPlaneService, {
+import { diffString } from 'json-diff'
+import type { JSONSchema4 } from 'json-schema'
+import ora from 'ora'
+import {
+  controlPlaneService,
   DestinationMetadata,
   DestinationMetadataAction,
   DestinationMetadataActionCreateInput,
@@ -11,22 +15,10 @@ import ControlPlaneService, {
   DestinationMetadataActionsUpdateInput,
   DestinationMetadataOptions,
   DestinationMetadataUpdateInput
-} from '@segment/control-plane-service-client'
-import { diffString } from 'json-diff'
-import type { JSONSchema4 } from 'json-schema'
-import ora from 'ora'
+} from 'src/lib/control-plane-service'
 import { prompt } from 'src/lib/prompt'
 
-const controlPlaneService = new ControlPlaneService({
-  name: 'control-plane-service',
-  url: 'http://control-plane-service.segment.local',
-  userAgent: 'Segment (fab-5)',
-  timeout: 10000,
-  headers: {
-    // All calls from this script are system-to-system and shouldn't require authz checks
-    'skip-authz': '1'
-  }
-})
+const NOOP_CONTEXT = {}
 
 type BaseActionInput = Omit<DestinationMetadataActionCreateInput, 'metadataId'>
 
@@ -302,12 +294,9 @@ function getOptions(metadata: DestinationMetadata, destinationSchema: Destinatio
 }
 
 async function getDestinationMetadatas(destinationIds: string[]): Promise<DestinationMetadata[]> {
-  const { data, error } = await controlPlaneService.getAllDestinationMetadatas(
-    {},
-    {
-      byIds: destinationIds
-    }
-  )
+  const { data, error } = await controlPlaneService.getAllDestinationMetadatas(NOOP_CONTEXT, {
+    byIds: destinationIds
+  })
 
   if (error) {
     throw error
@@ -321,12 +310,9 @@ async function getDestinationMetadatas(destinationIds: string[]): Promise<Destin
 }
 
 async function getDestinationMetadataActions(destinationIds: string[]): Promise<DestinationMetadataAction[]> {
-  const { data, error } = await controlPlaneService.getDestinationMetadataActions(
-    {},
-    {
-      metadataIds: destinationIds
-    }
-  )
+  const { data, error } = await controlPlaneService.getDestinationMetadataActions(NOOP_CONTEXT, {
+    metadataIds: destinationIds
+  })
 
   if (error) {
     throw error
@@ -343,13 +329,10 @@ async function updateDestinationMetadata(
   destinationId: string,
   input: DestinationMetadataUpdateInput
 ): Promise<DestinationMetadata> {
-  const { data, error } = await controlPlaneService.updateDestinationMetadata(
-    {},
-    {
-      destinationId,
-      input
-    }
-  )
+  const { data, error } = await controlPlaneService.updateDestinationMetadata(NOOP_CONTEXT, {
+    destinationId,
+    input
+  })
 
   if (error) {
     console.log(error)
@@ -366,12 +349,9 @@ async function updateDestinationMetadata(
 async function createDestinationMetadataActions(
   input: DestinationMetadataActionCreateInput[]
 ): Promise<DestinationMetadataAction[]> {
-  const { data, error } = await controlPlaneService.createDestinationMetadataActions(
-    {},
-    {
-      input
-    }
-  )
+  const { data, error } = await controlPlaneService.createDestinationMetadataActions(NOOP_CONTEXT, {
+    input
+  })
 
   if (error) {
     console.log(error)
@@ -388,12 +368,9 @@ async function createDestinationMetadataActions(
 async function updateDestinationMetadataActions(
   input: DestinationMetadataActionsUpdateInput[]
 ): Promise<DestinationMetadataAction[]> {
-  const { data, error } = await controlPlaneService.updateDestinationMetadataActions(
-    {},
-    {
-      input
-    }
-  )
+  const { data, error } = await controlPlaneService.updateDestinationMetadataActions(NOOP_CONTEXT, {
+    input
+  })
 
   if (error) {
     throw error

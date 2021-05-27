@@ -46,6 +46,14 @@ interface PartnerActions<Settings, Payload extends JSONLikeObject> {
 export interface DestinationDefinition<Settings = unknown> {
   /** The name of the destination */
   name: string
+  /** A human-friendly description of the destination  */
+  description?: string
+  /**
+   * The url-friendly unique slug for the destination
+   * When provided, the `register` command will use this slug
+   * instead of generating one from the `name`
+   */
+  slug?: string
   /** An optional function to extend requests sent from the destination (including all actions) */
   extendRequest?: RequestExtension<Settings>
   /** Optional authentication configuration */
