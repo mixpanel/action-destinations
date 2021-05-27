@@ -1,7 +1,7 @@
 {
   "name": "@segment/destination-actions",
   "description": "Destination Actions engine and definitions.",
-  "version": "2.3.1",
+  "version": "2.3.2",
   "repository": {
     "type": "git",
     "url": "https://github.com/segmentio/fab-5-engine",
@@ -36,7 +36,7 @@
     "nock": "^13.0.11"
   },
   "dependencies": {
-    "@segment/actions-core": "^2.1.1",
+    "@segment/actions-core": "^2.1.2",
     "dayjs": "^1.10.3"
   },
   "jest": {

@@ -1,6 +1,6 @@
 {
   "name": "@segment/browser-destinations",
-  "version": "2.2.1",
+  "version": "2.2.2",
   "description": "Action based browser destinations",
   "author": "Netto Farah",
   "private": true,
@@ -15,7 +15,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@segment/actions-core": "^2.1.1",
+    "@segment/actions-core": "^2.1.2",
     "@segment/analytics-next": "^1.19.1",
     "@segment/fab5-subscriptions": "^2.0.1",
     "dayjs": "^1.10.3",
