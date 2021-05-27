@@ -58,14 +58,15 @@ export default class Push extends Command {
       }))
     })
 
-    if (!chosenSlugs) {
-      return
-    }
-
     const destinationIds: string[] = []
     for (const slug of chosenSlugs) {
       const id = slugToId[slug]
       destinationIds.push(id)
+    }
+
+    if (!destinationIds.length) {
+      this.warn(`You must select at least one destination. Exiting...`)
+      return
     }
 
     this.spinner.start(
