@@ -1,5 +1,5 @@
 import { Command, flags } from '@oclif/command'
-import { DestinationDefinition, fieldsToJsonSchema, jsonSchemaToFields } from '@segment/actions-core'
+import { DestinationDefinition, fieldsToJsonSchema } from '@segment/actions-core'
 import { idToSlug, destinations as actionDestinations } from '@segment/destination-actions'
 import chalk from 'chalk'
 import { Dictionary, invert, pick, uniq } from 'lodash'
@@ -136,13 +136,12 @@ export default class Push extends Command {
       const schemaForDestination = schemasByDestination[metadata.id]
       const existingActions = actions.filter((a) => a.metadataId === metadata.id)
 
-      for (const action of schemaForDestination.actions) {
+      for (const [slug, action] of Object.entries(schemaForDestination.definition.actions)) {
         // Note: this implies that changing the slug is a breaking change
-        const existingAction = existingActions.find((a) => a.slug === action.slug && a.platform === 'cloud')
-        const actionFields = jsonSchemaToFields(action.jsonSchema)
+        const existingAction = existingActions.find((a) => a.slug === slug && a.platform === 'cloud')
 
-        const fields: DestinationMetadataActionFieldCreateInput[] = Object.keys(actionFields).map((fieldKey) => {
-          const field = actionFields[fieldKey]
+        const fields: DestinationMetadataActionFieldCreateInput[] = Object.keys(action.fields).map((fieldKey) => {
+          const field = action.fields[fieldKey]
           return {
             fieldKey,
             type: field.type,
@@ -160,9 +159,9 @@ export default class Push extends Command {
         })
 
         const base: BaseActionInput = {
-          slug: action.slug,
-          name: action.jsonSchema.title ?? 'Unnamed Action',
-          description: action.jsonSchema.description ?? '',
+          slug,
+          name: action.title ?? 'Unnamed Action',
+          description: action.description ?? '',
           platform: 'cloud',
           fields
         }

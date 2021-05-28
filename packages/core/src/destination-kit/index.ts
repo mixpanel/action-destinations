@@ -6,14 +6,14 @@ import { ExecuteInput, StepResult } from './step'
 import { time, duration } from '../time'
 import { JSONLikeObject, JSONObject } from '../json-object'
 import { SegmentEvent } from '../segment-event'
-import { fieldsToJsonSchema, jsonSchemaToFields } from './fields-to-jsonschema'
+import { fieldsToJsonSchema } from './fields-to-jsonschema'
 import createRequestClient, { RequestClient } from '../create-request-client'
 import type { ModifiedResponse } from '../types'
 import type { InputField, RequestExtension } from './types'
 import type { AllRequestOptions } from '../request-client'
 
 export type { ActionDefinition, ExecuteInput, RequestFn }
-export { fieldsToJsonSchema, jsonSchemaToFields }
+export { fieldsToJsonSchema }
 
 /** Internal error for signaling that the invoked action isn't implemented */
 class UnsupportedActionError extends CustomError {

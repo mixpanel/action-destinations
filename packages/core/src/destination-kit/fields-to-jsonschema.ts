@@ -1,5 +1,5 @@
 import { JSONSchema4, JSONSchema4Type, JSONSchema4TypeName } from 'json-schema'
-import type { InputField, FieldValue, FieldTypeName } from './types'
+import type { InputField, FieldTypeName } from './types'
 
 function toJsonSchemaType(type: FieldTypeName): JSONSchema4TypeName | JSONSchema4TypeName[] {
   switch (type) {
@@ -82,38 +82,4 @@ export function fieldsToJsonSchema(fields: Record<string, InputField> = {}): JSO
     properties,
     required
   }
-}
-
-function extractType(schema: JSONSchema4): InputField['type'] {
-  if (schema.type === 'array') {
-    return (schema.items as JSONSchema4)?.type as InputField['type']
-  }
-
-  if (Array.isArray(schema.type)) {
-    return schema.type.find((t) => t !== 'null') as InputField['type']
-  } else {
-    return schema.type as InputField['type']
-  }
-}
-
-export function jsonSchemaToFields(schema: JSONSchema4 = {}): Record<string, InputField> {
-  const requiredFields = (schema.required as string[]) ?? []
-  const properties = schema.properties ?? {}
-  const fields: Record<string, InputField> = {}
-
-  for (const [key, property] of Object.entries(properties)) {
-    const field: InputField = {
-      label: property.title ?? '',
-      description: property.description ?? '',
-      default: property.default as FieldValue,
-      type: extractType(schema),
-      allowNull: Array.isArray(property.type) ? property.type.includes('null') : property.type === 'null',
-      multiple: schema.type === 'array',
-      required: requiredFields.includes(key)
-    }
-
-    fields[key] = field
-  }
-
-  return fields
 }

@@ -1,4 +1,4 @@
-export { Destination, fieldsToJsonSchema, jsonSchemaToFields } from './destination-kit'
+export { Destination, fieldsToJsonSchema } from './destination-kit'
 export { transform } from './mapping-kit'
 export { createTestEvent } from './create-test-event'
 export { createTestIntegration } from './create-test-integration'
