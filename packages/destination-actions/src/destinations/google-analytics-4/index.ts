@@ -2,23 +2,24 @@ import type { DestinationDefinition } from '@segment/actions-core'
 import type { Settings } from './generated-types'
 import purchase from './purchase'
 import addToCart from './addToCart'
+import pageView from './pageView'
 
 const destination: DestinationDefinition<Settings> = {
   name: 'Google Analytics 4',
   authentication: {
     scheme: 'custom',
     fields: {
-      apiSecret: {
-        label: 'API Secret',
-        description:
-          'An API SECRET generated in the Google Analytics UI, navigate to: Admin > Data Streams > choose your stream > Measurement Protocol > Create',
-        type: 'string',
-        required: true
-      },
       measurementId: {
         label: 'Measurement ID',
         description:
           'The measurement ID associated with a stream. Found in the Google Analytics UI under: Admin > Data Streams > choose your stream > Measurement ID',
+        type: 'string',
+        required: true
+      },
+      apiSecret: {
+        label: 'API Secret',
+        description:
+          'An API SECRET generated in the Google Analytics UI, navigate to: Admin > Data Streams > choose your stream > Measurement Protocol > Create',
         type: 'string',
         required: true
       }
@@ -39,7 +40,8 @@ const destination: DestinationDefinition<Settings> = {
   },
   actions: {
     purchase,
-    addToCart
+    addToCart,
+    pageView
   }
 }
 

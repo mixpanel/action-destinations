@@ -7,7 +7,7 @@ const apiSecret = 'b287432uhkjHIUEL'
 const measurementId = 'G-TESTTOKEN'
 
 describe('GA4', () => {
-  describe('Purchase', () => {
+  describe('Add to Cart', () => {
     it('should handle basic mapping overrides', async () => {
       nock('https://www.google-analytics.com/mp/collect')
         .post(`?measurement_id=${measurementId}&api_secret=${apiSecret}`)
