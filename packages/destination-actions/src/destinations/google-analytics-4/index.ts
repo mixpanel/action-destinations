@@ -3,6 +3,7 @@ import type { Settings } from './generated-types'
 import purchase from './purchase'
 import addToCart from './addToCart'
 import pageView from './pageView'
+import customEvent from './customEvent'
 
 const destination: DestinationDefinition<Settings> = {
   name: 'Google Analytics 4',
@@ -41,7 +42,8 @@ const destination: DestinationDefinition<Settings> = {
   actions: {
     purchase,
     addToCart,
-    pageView
+    pageView,
+    customEvent
   }
 }
 
