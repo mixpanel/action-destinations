@@ -1,14 +1,14 @@
 import type { ActionDefinition } from '@segment/actions-core'
+import { CartProductItem } from '../ga4-types'
 import type { Settings } from '../generated-types'
 import type { Payload } from './generated-types'
-import { CartProductItem } from '../ga4-types'
 
 const action: ActionDefinition<Settings, Payload> = {
-  title: 'Add to Cart',
-  description: 'Send product added events to GA4 to make the most of the ecommerce reports in Google Analytics',
-  defaultSubscription: 'type = "track" and event = "Product Added"',
+  title: 'Select Item',
+  description: 'Send select item events to GA4 to make the most of the ecommerce reports in Google Analytics',
+  defaultSubscription: 'type = "track" and event = "Product Clicked"',
   fields: {
-    clientId: {
+    client_id: {
       label: 'Client ID',
       description: 'Uniquely identifies a user instance of a web client.',
       type: 'string',
@@ -21,15 +21,15 @@ const action: ActionDefinition<Settings, Payload> = {
         }
       }
     },
-    currency: {
-      label: 'Currency',
-      type: 'string',
-      description: 'Currency of the purchase or items associated with the event, in 3-letter ISO 4217 format.'
+    item_list_name: {
+      label: 'Item List Name',
+      description: 'The name of the list in which the item was presented to the user.',
+      type: 'string'
     },
-    affiliation: {
-      label: 'Affiliation',
-      type: 'string',
-      description: 'Store or affiliation from which this transaction occurred (e.g. Google Store).'
+    item_list_id: {
+      label: 'Item List Id',
+      description: 'The ID of the list in which the item was presented to the user.',
+      type: 'string'
     },
     item_id: {
       label: 'Item ID',
@@ -43,20 +43,20 @@ const action: ActionDefinition<Settings, Payload> = {
         }
       }
     },
+    item_name: {
+      label: 'Name',
+      type: 'string',
+      description: 'Name of the product being purchased.',
+      default: {
+        '@path': '$.properties.name'
+      }
+    },
     category: {
       label: 'Category',
       type: 'string',
       description: 'Product category.',
       default: {
         '@path': '$.properties.category'
-      }
-    },
-    name: {
-      label: 'Name',
-      type: 'string',
-      description: 'Name of the product being purchased.',
-      default: {
-        '@path': '$.properties.name'
       }
     },
     brand: {
@@ -111,18 +111,16 @@ const action: ActionDefinition<Settings, Payload> = {
   perform: (request, { payload }) => {
     const googleItems: CartProductItem[] = []
 
-    if (payload.item_id || payload.name) {
+    if (payload.item_id || payload.item_name) {
       googleItems.push({
         item_id: payload.item_id,
-        item_name: payload.name,
+        item_name: payload.item_name,
         quantity: payload.quantity,
-        affiliation: payload.affiliation,
         coupon: payload.coupon,
         item_brand: payload.brand,
         item_category: payload.category,
         item_variant: payload.variant,
         price: payload.price,
-        currency: payload.currency,
         index: payload.position
       })
     }
@@ -130,14 +128,14 @@ const action: ActionDefinition<Settings, Payload> = {
     return request('https://www.google-analytics.com/mp/collect', {
       method: 'POST',
       json: {
-        client_id: payload.clientId,
+        client_id: payload.client_id,
         events: [
           {
-            name: 'add_to_cart',
+            name: 'select_item',
             params: {
-              currency: payload.currency,
               items: googleItems,
-              value: payload.price
+              item_list_name: payload.item_list_name,
+              item_list_id: payload.item_list_id
             }
           }
         ]

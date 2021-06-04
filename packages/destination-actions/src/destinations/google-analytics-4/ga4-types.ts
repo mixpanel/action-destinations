@@ -1,6 +1,6 @@
 export interface ProductItem {
-  item_id: string
-  item_name: string
+  item_id?: string
+  item_name?: string
   quantity?: number
   affiliation?: string
   coupon?: string
