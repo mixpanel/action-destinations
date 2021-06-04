@@ -1,17 +1,15 @@
-import type { ActionDefinition } from '@segment/actions-core'
-import type { Settings } from '../generated-types'
-import type { Payload } from './generated-types'
+import { ActionDefinition, IntegrationError } from '@segment/actions-core'
 import { CURRENCY_ISO_CODES } from '../constants'
 import { ProductItem } from '../ga4-types'
+import type { Settings } from '../generated-types'
+import type { Payload } from './generated-types'
 
-// https://segment.com/docs/connections/spec/ecommerce/v2/#order-completed
-// https://developers.google.com/analytics/devguides/collection/protocol/ga4/reference/events#purchase
 const action: ActionDefinition<Settings, Payload> = {
-  title: 'Purchase',
-  description: 'Send purchase events to GA4 to make the most of the ecommerce reports in Google Analytics',
-  defaultSubscription: 'type = "track" and event = "Order Completed"',
+  title: 'Begin Checkout',
+  description: 'Send begin checkout events to GA4 to make the most of the ecommerce reports in Google Analytics',
+  defaultSubscription: 'type = "track" and event = "Checkout Started"',
   fields: {
-    clientId: {
+    client_id: {
       label: 'Client ID',
       description: 'Uniquely identifies a user instance of a web client.',
       type: 'string',
@@ -36,18 +34,8 @@ const action: ActionDefinition<Settings, Payload> = {
       label: 'Currency',
       type: 'string',
       description: 'Currency of the purchase or items associated with the event, in 3-letter ISO 4217 format.',
-      required: true,
       default: {
         '@path': '$.properties.currency'
-      }
-    },
-    orderId: {
-      label: 'Order Id',
-      type: 'string',
-      description: 'The unique identifier of a transaction.',
-      required: true,
-      default: {
-        '@path': '$.properties.order_id'
       }
     },
     affiliation: {
@@ -116,33 +104,17 @@ const action: ActionDefinition<Settings, Payload> = {
         '@path': '$.properties.products'
       }
     },
-    shipping: {
-      label: 'Shipping',
-      type: 'number',
-      description: 'Shipping cost associated with the transaction.',
-      default: {
-        '@path': '$.properties.shipping'
-      }
-    },
-    tax: {
-      label: 'Tax',
-      type: 'number',
-      description: 'Total tax associated with the transaction.',
-      default: {
-        '@path': '$.properties.tax'
-      }
-    },
-    total: {
-      label: 'Total',
+    value: {
+      label: 'Value',
       type: 'number',
       description: 'The monetary value of the event, in units of the specified currency parameter.',
       default: {
-        '@path': '$.properties.total'
+        '@path': '$.properties.value'
       }
     }
   },
   perform: (request, { payload }) => {
-    if (!CURRENCY_ISO_CODES.includes(payload.currency)) {
+    if (payload.currency && !CURRENCY_ISO_CODES.includes(payload.currency)) {
       throw new Error(`${payload.currency} is not a valid currency code.`)
     }
 
@@ -151,22 +123,24 @@ const action: ActionDefinition<Settings, Payload> = {
     if (payload.products) {
       googleItems = payload.products.map((product) => {
         if (product.name === undefined || (product.product_id === undefined && product.sku === undefined)) {
-          throw new Error(
-            'One of product name or product id or product sku is required for product or impression data.'
+          throw new IntegrationError(
+            'One of product name or product id or product sku is required for product or impression data.',
+            'Misconfigured required field',
+            400
           )
         }
 
         return {
           item_id: product.product_id ? product.product_id : product.sku,
           item_name: product.name,
-          coupon: product.coupon,
+          quantity: product.quantity,
           affiliation: payload.affiliation,
+          coupon: product.coupon,
           item_brand: product.brand,
           item_category: product.category,
           item_variant: product.variant,
           price: product.price,
-          currency: payload.currency,
-          quantity: product.quantity
+          currency: payload.currency
         } as ProductItem
       })
     }
@@ -174,19 +148,15 @@ const action: ActionDefinition<Settings, Payload> = {
     return request('https://www.google-analytics.com/mp/collect', {
       method: 'POST',
       json: {
-        client_id: payload.clientId,
+        client_id: payload.client_id,
         events: [
           {
-            name: 'purchase',
+            name: 'begin_checkout',
             params: {
-              affiliation: payload.affiliation,
               coupon: payload.coupon,
               currency: payload.currency,
               items: googleItems,
-              transaction_id: payload.orderId,
-              shipping: payload.shipping,
-              value: payload.total,
-              tax: payload.tax
+              value: payload.value
             }
           }
         ]

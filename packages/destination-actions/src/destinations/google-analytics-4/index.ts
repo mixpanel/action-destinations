@@ -5,6 +5,7 @@ import addToCart from './addToCart'
 import pageView from './pageView'
 import customEvent from './customEvent'
 import selectItem from './selectItem'
+import beginCheckout from './beginCheckout'
 
 const destination: DestinationDefinition<Settings> = {
   name: 'Google Analytics 4',
@@ -45,7 +46,8 @@ const destination: DestinationDefinition<Settings> = {
     addToCart,
     pageView,
     customEvent,
-    selectItem
+    selectItem,
+    beginCheckout
   }
 }
 
