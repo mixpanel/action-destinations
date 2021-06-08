@@ -6,25 +6,13 @@ export interface Payload {
    */
   client_id: string
   /**
-   * The ID of the location.
+   * Currency of the purchase or items associated with the event, in 3-letter ISO 4217 format.
    */
-  location_id?: string
+  currency?: string
   /**
-   * The ID of a product promotion.
+   * The monetary value of the event, in units of the specified currency parameter.
    */
-  promotion_id?: string
-  /**
-   * The name of a product promotion.
-   */
-  promotion_name?: string
-  /**
-   * The name of a creative used in a promotional spot.
-   */
-  creative_name?: string
-  /**
-   * The name of a creative slot.
-   */
-  creative_slot?: string
+  value?: number
   /**
    * The list of products in the event.
    */
@@ -65,10 +53,6 @@ export interface Payload {
      * Variant of the product (e.g. Black).
      */
     item_variant?: string
-    /**
-     * The location associated with the event. If possible, set to the Google Place ID that corresponds to the associated item. Can also be overridden to a custom location ID string.
-     */
-    location_id?: string
     /**
      * Price of the product being purchased, in units of the specified currency parameter.
      */

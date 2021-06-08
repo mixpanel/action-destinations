@@ -7,6 +7,7 @@ import customEvent from './customEvent'
 import selectItem from './selectItem'
 import beginCheckout from './beginCheckout'
 import selectPromotion from './selectPromotion'
+import viewItem from './viewItem'
 
 const destination: DestinationDefinition<Settings> = {
   name: 'Google Analytics 4',
@@ -49,7 +50,8 @@ const destination: DestinationDefinition<Settings> = {
     customEvent,
     selectItem,
     beginCheckout,
-    selectPromotion
+    selectPromotion,
+    viewItem
   }
 }
 
