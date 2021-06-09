@@ -163,6 +163,7 @@ export default class Push extends Command {
           name: action.title ?? 'Unnamed Action',
           description: action.description ?? '',
           platform: 'cloud',
+          hidden: action.hidden ?? false,
           fields
         }
 
