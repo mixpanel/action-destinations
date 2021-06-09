@@ -38,33 +38,20 @@ const action: ActionDefinition<Settings, Payload> = {
         '@path': '$.properties.currency'
       }
     },
-    affiliation: {
-      label: 'Affiliation',
-      type: 'string',
-      description: 'Store or affiliation from which this transaction occurred (e.g. Google Store).',
-      default: {
-        '@path': '$.properties.affiliation'
-      }
-    },
     // Google does not have anything to map position, url and image url fields (Segment spec) to
     // so will ignore for now
-    products: {
+    items: {
       label: 'Products',
       description: 'The list of products purchased.',
       type: 'object',
       multiple: true,
       properties: {
-        product_id: {
+        item_id: {
           label: 'Product ID',
           type: 'string',
           description: 'Identifier for the product being purchased.'
         },
-        sku: {
-          label: 'SKU',
-          type: 'string',
-          description: 'Sku of the product being purchased.'
-        },
-        name: {
+        item_name: {
           label: 'Name',
           type: 'string',
           description: 'Name of the product being purchased.'
@@ -74,22 +61,32 @@ const action: ActionDefinition<Settings, Payload> = {
           type: 'integer',
           description: 'Item quantity.'
         },
+        affiliation: {
+          label: 'Affiliation',
+          type: 'string',
+          description: 'A product affiliation to designate a supplying company or brick and mortar store location.'
+        },
         coupon: {
           label: 'Coupon',
           type: 'string',
           description: 'Coupon code used for a purchase.'
         },
-        brand: {
+        discount: {
+          label: 'Discount',
+          type: 'number',
+          description: 'Monetary value of discount associated with a purchase.'
+        },
+        item_brand: {
           label: 'Brand',
           type: 'string',
           description: 'Brand associated with the product.'
         },
-        category: {
+        item_category: {
           label: 'Category',
           type: 'string',
           description: 'Product category.'
         },
-        variant: {
+        item_variant: {
           label: 'Variant',
           type: 'string',
           description: 'Variant of the product (e.g. Black).'
@@ -97,11 +94,13 @@ const action: ActionDefinition<Settings, Payload> = {
         price: {
           label: 'Price',
           type: 'number',
-          description: 'Price ($) of the product being purchased, in units of the specified currency parameter.'
+          description: 'Price of the product being purchased, in units of the specified currency parameter.'
+        },
+        currency: {
+          label: 'Currency',
+          type: 'string',
+          description: 'Currency of the purchase or items associated with the event, in 3-letter ISO 4217 format.'
         }
-      },
-      default: {
-        '@path': '$.properties.products'
       }
     },
     value: {
@@ -115,33 +114,26 @@ const action: ActionDefinition<Settings, Payload> = {
   },
   perform: (request, { payload }) => {
     if (payload.currency && !CURRENCY_ISO_CODES.includes(payload.currency)) {
-      throw new Error(`${payload.currency} is not a valid currency code.`)
+      throw new IntegrationError(`${payload.currency} is not a valid currency code.`, 'Incorrect value format', 400)
     }
 
     let googleItems: ProductItem[] = []
 
-    if (payload.products) {
-      googleItems = payload.products.map((product) => {
-        if (product.name === undefined || (product.product_id === undefined && product.sku === undefined)) {
+    if (payload.items) {
+      googleItems = payload.items.map((product) => {
+        if (product.item_name === undefined && product.item_id === undefined) {
           throw new IntegrationError(
-            'One of product name or product id or product sku is required for product or impression data.',
+            'One of product name or product id is required for product or impression data.',
             'Misconfigured required field',
             400
           )
         }
 
-        return {
-          item_id: product.product_id ? product.product_id : product.sku,
-          item_name: product.name,
-          quantity: product.quantity,
-          affiliation: payload.affiliation,
-          coupon: product.coupon,
-          item_brand: product.brand,
-          item_category: product.category,
-          item_variant: product.variant,
-          price: product.price,
-          currency: payload.currency
-        } as ProductItem
+        if (product.currency && !CURRENCY_ISO_CODES.includes(product.currency)) {
+          throw new IntegrationError(`${product.currency} is not a valid currency code.`, 'Incorrect value format', 400)
+        }
+
+        return product as ProductItem
       })
     }
 

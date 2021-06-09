@@ -14,49 +14,53 @@ export interface Payload {
    */
   currency?: string
   /**
-   * Store or affiliation from which this transaction occurred (e.g. Google Store).
-   */
-  affiliation?: string
-  /**
    * The list of products purchased.
    */
-  products?: {
+  items?: {
     /**
      * Identifier for the product being purchased.
      */
-    product_id?: string
-    /**
-     * Sku of the product being purchased.
-     */
-    sku?: string
+    item_id?: string
     /**
      * Name of the product being purchased.
      */
-    name?: string
+    item_name?: string
     /**
      * Item quantity.
      */
     quantity?: number
     /**
+     * A product affiliation to designate a supplying company or brick and mortar store location.
+     */
+    affiliation?: string
+    /**
      * Coupon code used for a purchase.
      */
     coupon?: string
     /**
+     * Monetary value of discount associated with a purchase.
+     */
+    discount?: number
+    /**
      * Brand associated with the product.
      */
-    brand?: string
+    item_brand?: string
     /**
      * Product category.
      */
-    category?: string
+    item_category?: string
     /**
      * Variant of the product (e.g. Black).
      */
-    variant?: string
+    item_variant?: string
     /**
-     * Price ($) of the product being purchased, in units of the specified currency parameter.
+     * Price of the product being purchased, in units of the specified currency parameter.
      */
     price?: number
+    /**
+     * Currency of the purchase or items associated with the event, in 3-letter ISO 4217 format.
+     */
+    currency?: string
   }[]
   /**
    * The monetary value of the event, in units of the specified currency parameter.

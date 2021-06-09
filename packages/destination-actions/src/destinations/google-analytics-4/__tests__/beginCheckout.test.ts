@@ -26,7 +26,19 @@ describe('GA4', () => {
           tax: 2,
           discount: 2.5,
           coupon: 'hasbros',
-          currency: 'USD'
+          currency: 'USD',
+          products: [
+            {
+              product_id: '507f1f77bcf86cd799439011',
+              sku: '45790-32',
+              name: 'Monopoly: 3rd Edition',
+              price: 19,
+              quantity: 1,
+              category: 'Games',
+              url: 'https://www.example.com/product/path',
+              image_url: 'https://www.example.com/product/path.jpg'
+            }
+          ]
         }
       })
       const responses = await testDestination.testAction('beginCheckout', {
@@ -47,7 +59,17 @@ describe('GA4', () => {
           },
           value: {
             '@path': '$.properties.revenue'
-          }
+          },
+          items: [
+            {
+              item_name: {
+                '@path': `$.properties.products.0.name`
+              },
+              item_category: {
+                '@path': `$.properties.products.0.category`
+              }
+            }
+          ]
         },
         useDefaultMappings: false
       })
@@ -69,7 +91,7 @@ describe('GA4', () => {
             `)
 
       expect(responses[0].options.body).toMatchInlineSnapshot(
-        `"{\\"client_id\\":\\"anon-567890\\",\\"events\\":[{\\"name\\":\\"begin_checkout\\",\\"params\\":{\\"coupon\\":\\"hasbros\\",\\"currency\\":\\"USD\\",\\"items\\":[],\\"value\\":25}}]}"`
+        `"{\\"client_id\\":\\"anon-567890\\",\\"events\\":[{\\"name\\":\\"begin_checkout\\",\\"params\\":{\\"coupon\\":\\"hasbros\\",\\"currency\\":\\"USD\\",\\"items\\":[{\\"item_name\\":\\"Monopoly: 3rd Edition\\",\\"item_category\\":\\"Games\\"}],\\"value\\":25}}]}"`
       )
     })
 
@@ -113,7 +135,7 @@ describe('GA4', () => {
       }
     })
 
-    it('should throw an error for products missing name, sku and id', async () => {
+    it('should throw an error for products missing name and id', async () => {
       nock('https://www.google-analytics.com/mp/collect')
         .post(`?measurement_id=${measurementId}&api_secret=${apiSecret}`)
         .reply(201, {})
@@ -144,13 +166,29 @@ describe('GA4', () => {
             apiSecret,
             measurementId
           },
+          mapping: {
+            client_id: {
+              '@path': '$.anonymousId'
+            },
+            currency: {
+              '@path': '$.properties.currency'
+            },
+            value: {
+              '@path': '$.properties.value'
+            },
+            items: [
+              {
+                item_brand: {
+                  '@path': `$.properties.brand`
+                }
+              }
+            ]
+          },
           useDefaultMappings: true
         })
         fail('the test should have thrown an error')
       } catch (e) {
-        expect(e.message).toBe(
-          'One of product name or product id or product sku is required for product or impression data.'
-        )
+        expect(e.message).toBe('One of product name or product id is required for product or impression data.')
       }
     })
 
@@ -213,7 +251,7 @@ describe('GA4', () => {
               `)
 
       expect(responses[0].options.body).toMatchInlineSnapshot(
-        `"{\\"client_id\\":\\"3456fff\\",\\"events\\":[{\\"name\\":\\"begin_checkout\\",\\"params\\":{\\"coupon\\":\\"hasbros\\",\\"currency\\":\\"USD\\",\\"items\\":[{\\"item_id\\":\\"507f1f77bcf86cd799439011\\",\\"item_name\\":\\"Monopoly: 3rd Edition\\",\\"quantity\\":1,\\"affiliation\\":\\"Google Store\\",\\"item_category\\":\\"Games\\",\\"price\\":19,\\"currency\\":\\"USD\\"}],\\"value\\":30}}]}"`
+        `"{\\"client_id\\":\\"3456fff\\",\\"events\\":[{\\"name\\":\\"begin_checkout\\",\\"params\\":{\\"coupon\\":\\"hasbros\\",\\"currency\\":\\"USD\\",\\"items\\":[],\\"value\\":30}}]}"`
       )
     })
   })

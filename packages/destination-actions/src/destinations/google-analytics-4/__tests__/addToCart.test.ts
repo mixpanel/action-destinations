@@ -40,15 +40,43 @@ describe('GA4', () => {
           measurementId
         },
         mapping: {
-          clientId: {
+          client_id: {
             '@path': '$.anonymousId'
           },
           coupon: {
             '@path': '$.properties.coupon'
           },
-          price: {
+          value: {
             '@path': '$.properties.price'
-          }
+          },
+          items: [
+            {
+              item_name: {
+                '@path': `$.properties.name`
+              },
+              item_id: {
+                '@path': `$.properties.product_id`
+              },
+              quantity: {
+                '@path': `$.properties.quantity`
+              },
+              coupon: {
+                '@path': `$.properties.coupon`
+              },
+              item_brand: {
+                '@path': `$.properties..brand`
+              },
+              item_category: {
+                '@path': `$.properties.category`
+              },
+              item_variant: {
+                '@path': `$.properties.variant`
+              },
+              price: {
+                '@path': `$.properties.price`
+              }
+            }
+          ]
         },
         useDefaultMappings: true
       })
@@ -70,8 +98,84 @@ describe('GA4', () => {
         `)
 
       expect(responses[0].options.body).toMatchInlineSnapshot(
-        `"{\\"client_id\\":\\"anon-567890\\",\\"events\\":[{\\"name\\":\\"add_to_cart\\",\\"params\\":{\\"items\\":[{\\"item_id\\":\\"507f1f77bcf86cd799439011\\",\\"item_name\\":\\"Monopoly: 3rd Edition\\",\\"quantity\\":1,\\"coupon\\":\\"MAYDEALS\\",\\"item_brand\\":\\"Hasbro\\",\\"item_category\\":\\"Games\\",\\"item_variant\\":\\"200 pieces\\",\\"price\\":18.99,\\"index\\":3}],\\"value\\":18.99}}]}"`
+        `"{\\"client_id\\":\\"anon-567890\\",\\"events\\":[{\\"name\\":\\"add_to_cart\\",\\"params\\":{\\"items\\":[{\\"item_name\\":\\"Monopoly: 3rd Edition\\",\\"item_id\\":\\"507f1f77bcf86cd799439011\\",\\"quantity\\":1,\\"coupon\\":\\"MAYDEALS\\",\\"item_brand\\":\\"Hasbro\\",\\"item_category\\":\\"Games\\",\\"item_variant\\":\\"200 pieces\\",\\"price\\":18.99}],\\"value\\":18.99}}]}"`
       )
+    })
+
+    it('should throw an error when product name and id are missing', async () => {
+      nock('https://www.google-analytics.com/mp/collect')
+        .post(`?measurement_id=${measurementId}&api_secret=${apiSecret}`)
+        .reply(201, {})
+      const event = createTestEvent({
+        event: 'Product Added',
+        userId: '3456fff',
+        anonymousId: 'anon-567890',
+        type: 'track',
+        properties: {
+          category: 'Games',
+          brand: 'Hasbro',
+          variant: '200 pieces',
+          price: 18.99,
+          quantity: 1,
+          coupon: 'MAYDEALS',
+          position: 3,
+          url: 'https://www.example.com/product/path',
+          image_url: 'https://www.example.com/product/path.jpg'
+        }
+      })
+
+      try {
+        await testDestination.testAction('addToCart', {
+          event,
+          settings: {
+            apiSecret,
+            measurementId
+          },
+          mapping: {
+            client_id: {
+              '@path': '$.anonymousId'
+            },
+            coupon: {
+              '@path': '$.properties.coupon'
+            },
+            value: {
+              '@path': '$.properties.price'
+            },
+            items: [
+              {
+                item_name: {
+                  '@path': `$.properties.name`
+                },
+                item_id: {
+                  '@path': `$.properties.product_id`
+                },
+                quantity: {
+                  '@path': `$.properties.quantity`
+                },
+                coupon: {
+                  '@path': `$.properties.coupon`
+                },
+                item_brand: {
+                  '@path': `$.properties..brand`
+                },
+                item_category: {
+                  '@path': `$.properties.category`
+                },
+                item_variant: {
+                  '@path': `$.properties.variant`
+                },
+                price: {
+                  '@path': `$.properties.price`
+                }
+              }
+            ]
+          },
+          useDefaultMappings: true
+        })
+        fail('the test should have thrown an error')
+      } catch (e) {
+        expect(e.message).toBe('One of product name or product id is required for product or impression data.')
+      }
     })
 
     it('should handle default mappings', async () => {
@@ -125,7 +229,7 @@ describe('GA4', () => {
           `)
 
       expect(responses[0].options.body).toMatchInlineSnapshot(
-        `"{\\"client_id\\":\\"3456fff\\",\\"events\\":[{\\"name\\":\\"add_to_cart\\",\\"params\\":{\\"items\\":[{\\"item_id\\":\\"507f1f77bcf86cd799439011\\",\\"item_name\\":\\"Monopoly: 3rd Edition\\",\\"quantity\\":1,\\"coupon\\":\\"MAYDEALS\\",\\"item_brand\\":\\"Hasbro\\",\\"item_category\\":\\"Games\\",\\"item_variant\\":\\"200 pieces\\",\\"price\\":18.99,\\"index\\":3}],\\"value\\":18.99}}]}"`
+        `"{\\"client_id\\":\\"3456fff\\",\\"events\\":[{\\"name\\":\\"add_to_cart\\",\\"params\\":{\\"items\\":[]}}]}"`
       )
     })
   })

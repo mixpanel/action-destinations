@@ -1,4 +1,6 @@
-import type { ActionDefinition } from '@segment/actions-core'
+import { ActionDefinition, IntegrationError } from '@segment/actions-core'
+import { CURRENCY_ISO_CODES } from '../constants'
+import { ProductItem } from '../ga4-types'
 import type { Settings } from '../generated-types'
 import type { Payload } from './generated-types'
 
@@ -25,26 +27,6 @@ const action: ActionDefinition<Settings, Payload> = {
       type: 'string',
       description: 'The ID of the location.'
     },
-    promotion_id: {
-      label: 'Promotion ID',
-      type: 'string',
-      description: 'The ID of a product promotion.'
-    },
-    promotion_name: {
-      label: 'Promotion Name',
-      type: 'string',
-      description: 'The name of a product promotion.'
-    },
-    creative_name: {
-      label: 'Creative Name',
-      type: 'string',
-      description: 'The name of a creative used in a promotional spot.'
-    },
-    creative_slot: {
-      label: 'Creative Slot',
-      type: 'string',
-      description: 'The name of a creative slot.'
-    },
     items: {
       label: 'Products',
       description: 'The list of products in the event.',
@@ -66,6 +48,16 @@ const action: ActionDefinition<Settings, Payload> = {
           type: 'integer',
           description: 'Item quantity.'
         },
+        promotion_id: {
+          label: 'Promotion ID',
+          type: 'string',
+          description: 'The ID of a product promotion.'
+        },
+        promotion_name: {
+          label: 'Promotion Name',
+          type: 'string',
+          description: 'The name of a product promotion.'
+        },
         affiliation: {
           label: 'Affiliation',
           type: 'string',
@@ -75,6 +67,16 @@ const action: ActionDefinition<Settings, Payload> = {
           label: 'Coupon',
           type: 'string',
           description: 'Coupon code used for a purchase.'
+        },
+        creative_name: {
+          label: 'Creative Name',
+          type: 'string',
+          description: 'The name of a creative used in a promotional spot.'
+        },
+        creative_slot: {
+          label: 'Creative Slot',
+          type: 'string',
+          description: 'The name of a creative slot.'
         },
         discount: {
           label: 'Discount',
@@ -116,6 +118,34 @@ const action: ActionDefinition<Settings, Payload> = {
     }
   },
   perform: (request, { payload }) => {
+    let googleItems: ProductItem[] = []
+
+    if (payload.items) {
+      googleItems = payload.items.map((product) => {
+        if (product.item_name === undefined && product.item_id === undefined) {
+          throw new IntegrationError(
+            'One of product name or product id is required for product or impression data.',
+            'Misconfigured required field',
+            400
+          )
+        }
+
+        if (product.currency && !CURRENCY_ISO_CODES.includes(product.currency)) {
+          throw new IntegrationError(`${product.currency} is not a valid currency code.`, 'Incorrect value format', 400)
+        }
+
+        if (product.promotion_id === undefined && product.promotion_name === undefined) {
+          throw new IntegrationError(
+            'One of promotion name or promotion id is required.',
+            'Misconfigured required field',
+            400
+          )
+        }
+
+        return product as ProductItem
+      })
+    }
+
     return request('https://www.google-analytics.com/mp/collect', {
       method: 'POST',
       json: {
@@ -125,11 +155,7 @@ const action: ActionDefinition<Settings, Payload> = {
             name: 'select_promotion',
             params: {
               location_id: payload.location_id,
-              promotion_id: payload.promotion_id,
-              promotion_name: payload.promotion_name,
-              creative_name: payload.creative_name,
-              creative_slot: payload.creative_slot,
-              items: payload.items
+              items: googleItems
             }
           }
         ]

@@ -1,4 +1,5 @@
-import type { ActionDefinition } from '@segment/actions-core'
+import { ActionDefinition, IntegrationError } from '@segment/actions-core'
+import { CURRENCY_ISO_CODES } from '../constants'
 import { CartProductItem } from '../ga4-types'
 import type { Settings } from '../generated-types'
 import type { Payload } from './generated-types'
@@ -31,97 +32,103 @@ const action: ActionDefinition<Settings, Payload> = {
       description: 'The ID of the list in which the item was presented to the user.',
       type: 'string'
     },
-    item_id: {
-      label: 'Item ID',
-      description: 'The product identifier (i.e. a unique id or SKU).',
-      type: 'string',
-      default: {
-        '@if': {
-          exists: { '@path': '$.properties.product_id' },
-          then: { '@path': '$.properties.product_id' },
-          else: { '@path': '$.properties.sku' }
+    items: {
+      label: 'Products',
+      description: 'The list of products in the event.',
+      type: 'object',
+      multiple: true,
+      properties: {
+        item_id: {
+          label: 'Product ID',
+          type: 'string',
+          description: 'Identifier for the product being purchased.'
+        },
+        item_name: {
+          label: 'Name',
+          type: 'string',
+          description: 'Name of the product being purchased.'
+        },
+        quantity: {
+          label: 'Quantity',
+          type: 'integer',
+          description: 'Item quantity.'
+        },
+        affiliation: {
+          label: 'Affiliation',
+          type: 'string',
+          description: 'A product affiliation to designate a supplying company or brick and mortar store location.'
+        },
+        coupon: {
+          label: 'Coupon',
+          type: 'string',
+          description: 'Coupon code used for a purchase.'
+        },
+        discount: {
+          label: 'Discount',
+          type: 'number',
+          description: 'Monetary value of discount associated with a purchase.'
+        },
+        index: {
+          label: 'Index',
+          type: 'integer',
+          description: 'The index of the item in a list.'
+        },
+        item_brand: {
+          label: 'Brand',
+          type: 'string',
+          description: 'Brand associated with the product.'
+        },
+        item_category: {
+          label: 'Category',
+          type: 'string',
+          description: 'Category of the product.'
+        },
+        item_list_name: {
+          label: 'Item List Name',
+          type: 'string',
+          description: 'The name of the list in which the item was presented to the user.'
+        },
+        item_list_id: {
+          label: 'Item List Name',
+          type: 'string',
+          description: 'The ID of the list in which the item was presented to the user.'
+        },
+        item_variant: {
+          label: 'Variant',
+          type: 'string',
+          description: 'Variant of the product (e.g. Black).'
+        },
+        price: {
+          label: 'Price',
+          type: 'number',
+          description: 'Price of the product being purchased, in units of the specified currency parameter.'
+        },
+        currency: {
+          label: 'Currency',
+          type: 'string',
+          description: 'Currency of the purchase or items associated with the event, in 3-letter ISO 4217 format.'
         }
-      }
-    },
-    item_name: {
-      label: 'Name',
-      type: 'string',
-      description: 'Name of the product being purchased.',
-      default: {
-        '@path': '$.properties.name'
-      }
-    },
-    category: {
-      label: 'Category',
-      type: 'string',
-      description: 'Product category.',
-      default: {
-        '@path': '$.properties.category'
-      }
-    },
-    brand: {
-      label: 'Brand',
-      type: 'string',
-      description: 'Brand associated with the product.',
-      default: {
-        '@path': '$.properties.brand'
-      }
-    },
-    variant: {
-      label: 'Variant',
-      type: 'string',
-      description: 'Variant of the product (e.g. Black).',
-      default: {
-        '@path': '$.properties.variant'
-      }
-    },
-    price: {
-      label: 'Price',
-      type: 'number',
-      description: 'Price ($) of the product being purchased, in units of the specified currency parameter.',
-      default: {
-        '@path': '$.properties.price'
-      }
-    },
-    quantity: {
-      label: 'Quantity',
-      type: 'integer',
-      description: 'Item quantity.',
-      default: {
-        '@path': '$.properties.quantity'
-      }
-    },
-    coupon: {
-      label: 'Coupon',
-      type: 'string',
-      description: 'Coupon code used for a purchase.',
-      default: {
-        '@path': '$.properties.coupon'
-      }
-    },
-    position: {
-      label: 'Position',
-      type: 'number',
-      description: 'Position in the product list (ex. 3).',
-      default: {
-        '@path': '$.properties.position'
       }
     }
   },
   perform: (request, { payload }) => {
-    const googleItems: CartProductItem[] = []
+    let googleItems: CartProductItem[] = []
 
-    if (payload.item_id || payload.item_name) {
-      googleItems.push({
-        item_id: payload.item_id,
-        item_name: payload.item_name,
-        quantity: payload.quantity,
-        coupon: payload.coupon,
-        item_brand: payload.brand,
-        item_category: payload.category,
-        item_variant: payload.variant,
-        price: payload.price,
-        index: payload.position
+    if (payload.items) {
+      googleItems = payload.items.map((product) => {
+        if (product.item_name === undefined && product.item_id === undefined) {
+          throw new IntegrationError(
+            'One of product name or product id is required for product or impression data.',
+            'Misconfigured required field',
+            400
+          )
+        }
+
+        if (product.currency && !CURRENCY_ISO_CODES.includes(product.currency)) {
+          throw new IntegrationError(`${product.currency} is not a valid currency code.`, 'Incorrect value format', 400)
+        }
+
+        return product as CartProductItem
       })
     }
 

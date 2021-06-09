@@ -4,7 +4,11 @@ export interface Payload {
   /**
    * Uniquely identifies a user instance of a web client.
    */
-  clientId: string
+  client_id: string
+  /**
+   * Store or affiliation from which this transaction occurred (e.g. Google Store).
+   */
+  affiliation?: string
   /**
    * Coupon code used for a purchase.
    */
@@ -14,54 +18,62 @@ export interface Payload {
    */
   currency: string
   /**
-   * The unique identifier of a transaction.
-   */
-  orderId: string
-  /**
-   * Store or affiliation from which this transaction occurred (e.g. Google Store).
-   */
-  affiliation?: string
-  /**
    * The list of products purchased.
    */
-  products?: {
+  items?: {
     /**
      * Identifier for the product being purchased.
      */
-    product_id?: string
-    /**
-     * Sku of the product being purchased.
-     */
-    sku?: string
+    item_id?: string
     /**
      * Name of the product being purchased.
      */
-    name?: string
+    item_name?: string
     /**
      * Item quantity.
      */
     quantity?: number
     /**
+     * Store or affiliation from which this transaction occurred (e.g. Google Store).
+     */
+    affiliation?: string
+    /**
      * Coupon code used for a purchase.
      */
     coupon?: string
     /**
+     * Monetary value of discount associated with a purchase.
+     */
+    discount?: number
+    /**
      * Brand associated with the product.
      */
-    brand?: string
+    item_brand?: string
     /**
      * Product category.
      */
-    category?: string
+    item_category?: string
     /**
      * Variant of the product (e.g. Black).
      */
-    variant?: string
+    item_variant?: string
     /**
-     * Price ($) of the product being purchased, in units of the specified currency parameter.
+     * Total tax associated with the transaction.
+     */
+    tax?: number
+    /**
+     * Price of the product being purchased, in units of the specified currency parameter.
      */
     price?: number
+    /**
+     * Currency of the purchase or items associated with the event, in 3-letter ISO 4217 format.
+     */
+    currency?: string
   }[]
+  /**
+   * The unique identifier of a transaction.
+   */
+  transaction_id: string
   /**
    * Shipping cost associated with the transaction.
    */
@@ -73,5 +85,5 @@ export interface Payload {
   /**
    * The monetary value of the event, in units of the specified currency parameter.
    */
-  total?: number
+  value?: number
 }

@@ -58,7 +58,7 @@ describe('GA4', () => {
               `)
 
       expect(responses[0].options.body).toMatchInlineSnapshot(
-        `"{\\"client_id\\":\\"3456fff\\",\\"events\\":[{\\"name\\":\\"select_promotion\\",\\"params\\":{\\"location_id\\":\\"promo_1\\"}}]}"`
+        `"{\\"client_id\\":\\"3456fff\\",\\"events\\":[{\\"name\\":\\"select_promotion\\",\\"params\\":{\\"location_id\\":\\"promo_1\\",\\"items\\":[]}}]}"`
       )
     })
 
@@ -109,18 +109,6 @@ describe('GA4', () => {
           location_id: {
             '@path': '$.properties.promotion_id'
           },
-          promotion_id: {
-            '@path': '$.properties.promotion_id'
-          },
-          promotion_name: {
-            '@path': '$.properties.promotion_id'
-          },
-          creative_name: {
-            '@path': '$.properties.name'
-          },
-          creative_slot: {
-            '@path': '$.properties.creative'
-          },
           items: {
             '@path': '$.properties.items'
           }
@@ -145,8 +133,187 @@ describe('GA4', () => {
               `)
 
       expect(responses[0].options.body).toMatchInlineSnapshot(
-        `"{\\"client_id\\":\\"3456fff\\",\\"events\\":[{\\"name\\":\\"select_promotion\\",\\"params\\":{\\"location_id\\":\\"promo_1\\",\\"promotion_id\\":\\"promo_1\\",\\"promotion_name\\":\\"promo_1\\",\\"creative_name\\":\\"75% store-wide shoe sale\\",\\"creative_slot\\":\\"top_banner_2\\",\\"items\\":[{\\"item_id\\":\\"SKU_12345\\",\\"item_name\\":\\"jeggings\\",\\"coupon\\":\\"SUMMER_FUN\\",\\"discount\\":2.22,\\"location_id\\":\\"L_12345\\",\\"affiliation\\":\\"Google Store\\",\\"item_brand\\":\\"Gucci\\",\\"item_category\\":\\"pants\\",\\"item_variant\\":\\"Black\\",\\"price\\":9.99,\\"currency\\":\\"USD\\"}]}}]}"`
+        `"{\\"client_id\\":\\"3456fff\\",\\"events\\":[{\\"name\\":\\"select_promotion\\",\\"params\\":{\\"location_id\\":\\"promo_1\\",\\"items\\":[{\\"item_id\\":\\"SKU_12345\\",\\"item_name\\":\\"jeggings\\",\\"coupon\\":\\"SUMMER_FUN\\",\\"discount\\":2.22,\\"promotion_id\\":\\"P_12345\\",\\"promotion_name\\":\\"Summer Sale\\",\\"creative_slot\\":\\"featured_app_1\\",\\"location_id\\":\\"L_12345\\",\\"affiliation\\":\\"Google Store\\",\\"item_brand\\":\\"Gucci\\",\\"item_category\\":\\"pants\\",\\"item_variant\\":\\"Black\\",\\"price\\":9.99,\\"currency\\":\\"USD\\"}]}}]}"`
       )
+    })
+
+    it('should throw error when product name and id is missing', async () => {
+      nock('https://www.google-analytics.com/mp/collect')
+        .post(`?measurement_id=${measurementId}&api_secret=${apiSecret}`)
+        .reply(201, {})
+      const event = createTestEvent({
+        event: 'Promotion Clicked',
+        userId: '3456fff',
+        anonymousId: 'anon-567890',
+        type: 'track',
+        properties: {
+          promotion_id: 'promo_1',
+          creative: 'top_banner_2',
+          name: '75% store-wide shoe sale',
+          position: 'home_banner_top',
+          items: [
+            {
+              coupon: 'SUMMER_FUN',
+              discount: 2.22,
+              promotion_id: 'P_12345',
+              promotion_name: 'Summer Sale',
+              creative_slot: 'featured_app_1',
+              location_id: 'L_12345',
+              affiliation: 'Google Store',
+              item_brand: 'Gucci',
+              item_category: 'pants',
+              item_variant: 'Black',
+              price: 9.99,
+              currency: 'USD'
+            }
+          ]
+        }
+      })
+
+      try {
+        await testDestination.testAction('selectPromotion', {
+          event,
+          settings: {
+            apiSecret,
+            measurementId
+          },
+          mapping: {
+            clientId: {
+              '@path': '$.anonymousId'
+            },
+            location_id: {
+              '@path': '$.properties.promotion_id'
+            },
+            items: {
+              '@path': '$.properties.items'
+            }
+          },
+          useDefaultMappings: true
+        })
+        fail('the test should have thrown an error')
+      } catch (e) {
+        expect(e.message).toBe('One of product name or product id is required for product or impression data.')
+      }
+    })
+
+    it('should throw error when promotion name and id is missing', async () => {
+      nock('https://www.google-analytics.com/mp/collect')
+        .post(`?measurement_id=${measurementId}&api_secret=${apiSecret}`)
+        .reply(201, {})
+      const event = createTestEvent({
+        event: 'Promotion Clicked',
+        userId: '3456fff',
+        anonymousId: 'anon-567890',
+        type: 'track',
+        properties: {
+          promotion_id: 'promo_1',
+          creative: 'top_banner_2',
+          name: '75% store-wide shoe sale',
+          position: 'home_banner_top',
+          items: [
+            {
+              item_id: 'SKU_12345',
+              item_name: 'jeggings',
+              coupon: 'SUMMER_FUN',
+              discount: 2.22,
+              creative_slot: 'featured_app_1',
+              location_id: 'L_12345',
+              affiliation: 'Google Store',
+              item_brand: 'Gucci',
+              item_category: 'pants',
+              item_variant: 'Black',
+              price: 9.99,
+              currency: 'USD'
+            }
+          ]
+        }
+      })
+
+      try {
+        await testDestination.testAction('selectPromotion', {
+          event,
+          settings: {
+            apiSecret,
+            measurementId
+          },
+          mapping: {
+            clientId: {
+              '@path': '$.anonymousId'
+            },
+            location_id: {
+              '@path': '$.properties.promotion_id'
+            },
+            items: {
+              '@path': '$.properties.items'
+            }
+          },
+          useDefaultMappings: true
+        })
+        fail('the test should have thrown an error')
+      } catch (e) {
+        expect(e.message).toBe('One of promotion name or promotion id is required.')
+      }
+    })
+
+    it('should throw error when item currency is invalid', async () => {
+      nock('https://www.google-analytics.com/mp/collect')
+        .post(`?measurement_id=${measurementId}&api_secret=${apiSecret}`)
+        .reply(201, {})
+      const event = createTestEvent({
+        event: 'Promotion Clicked',
+        userId: '3456fff',
+        anonymousId: 'anon-567890',
+        type: 'track',
+        properties: {
+          promotion_id: 'promo_1',
+          creative: 'top_banner_2',
+          name: '75% store-wide shoe sale',
+          position: 'home_banner_top',
+          items: [
+            {
+              item_id: 'SKU_12345',
+              item_name: 'jeggings',
+              coupon: 'SUMMER_FUN',
+              discount: 2.22,
+              promotion_id: 'P_12345',
+              promotion_name: 'Summer Sale',
+              creative_slot: 'featured_app_1',
+              location_id: 'L_12345',
+              affiliation: 'Google Store',
+              item_brand: 'Gucci',
+              item_category: 'pants',
+              item_variant: 'Black',
+              price: 9.99,
+              currency: 'US4D'
+            }
+          ]
+        }
+      })
+
+      try {
+        await testDestination.testAction('selectPromotion', {
+          event,
+          settings: {
+            apiSecret,
+            measurementId
+          },
+          mapping: {
+            clientId: {
+              '@path': '$.anonymousId'
+            },
+            location_id: {
+              '@path': '$.properties.promotion_id'
+            },
+            items: {
+              '@path': '$.properties.items'
+            }
+          },
+          useDefaultMappings: true
+        })
+        fail('the test should have thrown an error')
+      } catch (e) {
+        expect(e.message).toBe('US4D is not a valid currency code.')
+      }
     })
   })
 })

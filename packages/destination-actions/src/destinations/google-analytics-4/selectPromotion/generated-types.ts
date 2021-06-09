@@ -10,22 +10,6 @@ export interface Payload {
    */
   location_id?: string
   /**
-   * The ID of a product promotion.
-   */
-  promotion_id?: string
-  /**
-   * The name of a product promotion.
-   */
-  promotion_name?: string
-  /**
-   * The name of a creative used in a promotional spot.
-   */
-  creative_name?: string
-  /**
-   * The name of a creative slot.
-   */
-  creative_slot?: string
-  /**
    * The list of products in the event.
    */
   items?: {
@@ -42,6 +26,14 @@ export interface Payload {
      */
     quantity?: number
     /**
+     * The ID of a product promotion.
+     */
+    promotion_id?: string
+    /**
+     * The name of a product promotion.
+     */
+    promotion_name?: string
+    /**
      * A product affiliation to designate a supplying company or brick and mortar store location.
      */
     affiliation?: string
@@ -49,6 +41,14 @@ export interface Payload {
      * Coupon code used for a purchase.
      */
     coupon?: string
+    /**
+     * The name of a creative used in a promotional spot.
+     */
+    creative_name?: string
+    /**
+     * The name of a creative slot.
+     */
+    creative_slot?: string
     /**
      * Monetary value of discount associated with a purchase.
      */
