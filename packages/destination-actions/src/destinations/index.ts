@@ -5,6 +5,7 @@ import pipedrive from './pipedrive'
 import slack from './slack'
 import twilio from './twilio'
 import googleAnalytics4 from './google-analytics-4'
+import googleEnhancedConversions from './google-enhanced-conversions'
 
 /**
  * To use register an integration in the `integrations` service,
@@ -14,7 +15,14 @@ import googleAnalytics4 from './google-analytics-4'
  * To test in staging, the ids should match across environments. Typically this is handled by
  * creating the destination in production and syncing those definitions to staging with `sprout`.
  */
-export type ActionDestinationSlug = 'amplitude' | 'customerio' | 'pipedrive' | 'slack' | 'twilio' | 'google-analytics-4'
+export type ActionDestinationSlug =
+  | 'amplitude'
+  | 'customerio'
+  | 'pipedrive'
+  | 'slack'
+  | 'twilio'
+  | 'google-analytics-4'
+  | 'google-enhanced-conversions'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const destinations: Record<ActionDestinationSlug, DestinationDefinition<any>> = {
@@ -23,7 +31,8 @@ export const destinations: Record<ActionDestinationSlug, DestinationDefinition<a
   pipedrive,
   slack,
   twilio,
-  'google-analytics-4': googleAnalytics4
+  'google-analytics-4': googleAnalytics4,
+  'google-enhanced-conversions': googleEnhancedConversions
 }
 
 export const idToSlug: Record<string, string> = {
@@ -32,7 +41,8 @@ export const idToSlug: Record<string, string> = {
   '5f7dd8191ad74f868ab1fc48': 'pipedrive',
   '5f7dd8e302173ff732db5cc4': 'slack',
   '602efa1f249b9a5e2bf8a813': 'twilio',
-  '60ad61f9ff47a16b8fb7b5d9': 'google-analytics-4'
+  '60ad61f9ff47a16b8fb7b5d9': 'google-analytics-4',
+  '60ae8b97dcb6cc52d5d0d5ab': 'google-enhanced-conversions'
 }
 
 /** Attempts to load a destination definition from a given file path */
