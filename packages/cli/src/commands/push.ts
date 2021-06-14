@@ -14,7 +14,9 @@ import {
   DestinationMetadataActionFieldCreateInput,
   DestinationMetadataActionsUpdateInput,
   DestinationMetadataOptions,
-  DestinationMetadataUpdateInput
+  DestinationMetadataUpdateInput,
+  DestinationSubscriptionPresetFields,
+  DestinationSubscriptionPresetInput
 } from 'src/lib/control-plane-service'
 import { prompt } from 'src/lib/prompt'
 
@@ -65,7 +67,10 @@ export default class Push extends Command {
       `Fetching existing definitions for ${chosenSlugs.map((slug) => chalk.greenBright(slug)).join(', ')}...`
     )
     const schemasByDestination = getJsonSchemas(actionDestinations, destinationIds, slugToId)
-    const metadatas = await getDestinationMetadatas(destinationIds)
+    const [metadatas, actions] = await Promise.all([
+      getDestinationMetadatas(destinationIds),
+      getDestinationMetadataActions(destinationIds)
+    ])
 
     if (metadatas.length !== Object.keys(schemasByDestination).length) {
       this.spinner.fail()
@@ -74,7 +79,6 @@ export default class Push extends Command {
 
     this.spinner.stop()
 
-    const promises = []
     for (const metadata of metadatas) {
       const schemaForDestination = schemasByDestination[metadata.id]
       const slug = schemaForDestination.slug
@@ -98,7 +102,7 @@ export default class Push extends Command {
         this.log(`\n${settingsDiff}`)
       } else if (flags.force) {
         this.spinner.warn(`No change detected for ${chalk.bold(slug)}. Using force, please review:`)
-        this.log(`\n${newDefinition}`)
+        this.log(`\n${JSON.stringify(newDefinition, null, 2)}`)
       } else {
         this.spinner.info(`No change for ${chalk.bold(slug)}. Skipping.`)
         continue
@@ -115,27 +119,11 @@ export default class Push extends Command {
         continue
       }
 
-      promises.push(
-        updateDestinationMetadata(metadata.id, {
-          basicOptions,
-          options
-        })
-      )
-    }
-
-    await Promise.all(promises)
-
-    // Dual-write to new tables
-
-    const actions = await getDestinationMetadataActions(destinationIds)
-
-    const actionsToUpdate: DestinationMetadataActionsUpdateInput[] = []
-    const actionsToCreate: DestinationMetadataActionCreateInput[] = []
-
-    for (const metadata of metadatas) {
-      const schemaForDestination = schemasByDestination[metadata.id]
+      const actionsToUpdate: DestinationMetadataActionsUpdateInput[] = []
+      const actionsToCreate: DestinationMetadataActionCreateInput[] = []
       const existingActions = actions.filter((a) => a.metadataId === metadata.id)
 
+      // Dual-write to new tables
       for (const [slug, action] of Object.entries(schemaForDestination.definition.actions)) {
         // Note: this implies that changing the slug is a breaking change
         const existingAction = existingActions.find((a) => a.slug === slug && a.platform === 'cloud')
@@ -164,6 +152,7 @@ export default class Push extends Command {
           description: action.description ?? '',
           platform: 'cloud',
           hidden: action.hidden ?? false,
+          defaultTrigger: action.defaultSubscription,
           fields
         }
 
@@ -173,12 +162,34 @@ export default class Push extends Command {
           actionsToCreate.push({ ...base, metadataId: metadata.id })
         }
       }
-    }
 
-    await Promise.all([
-      updateDestinationMetadataActions(actionsToUpdate),
-      createDestinationMetadataActions(actionsToCreate)
-    ])
+      await Promise.all([
+        updateDestinationMetadata(metadata.id, {
+          basicOptions,
+          options
+        }),
+        updateDestinationMetadataActions(actionsToUpdate),
+        createDestinationMetadataActions(actionsToCreate)
+      ])
+
+      const allActions = await getDestinationMetadataActions([metadata.id])
+      const presets: DestinationSubscriptionPresetInput[] = []
+
+      for (const preset of schemaForDestination.definition.presets ?? []) {
+        const associatedAction = allActions.find((a) => a.slug === preset.partnerAction)
+        if (!associatedAction) continue
+
+        presets.push({
+          actionId: associatedAction.id,
+          name: preset.name ?? associatedAction.name,
+          trigger: preset.subscribe,
+          fields: (preset.mapping as DestinationSubscriptionPresetFields) ?? {}
+        })
+      }
+
+      // We have to wait to do this until after the associated actions are created (otherwise it may fail)
+      await setSubscriptionPresets(metadata.id, presets)
+    }
   }
 }
 
@@ -344,6 +355,24 @@ async function updateDestinationMetadata(
   }
 
   return data.metadata
+}
+
+async function setSubscriptionPresets(metadataId: string, presets: DestinationSubscriptionPresetInput[]) {
+  const { data, error } = await controlPlaneService.setDestinationSubscriptionPresets(NOOP_CONTEXT, {
+    metadataId,
+    presets
+  })
+
+  if (error) {
+    console.log(error)
+    throw error
+  }
+
+  if (!data) {
+    throw new Error('Could not set subscription presets')
+  }
+
+  return data.presets
 }
 
 async function createDestinationMetadataActions(
