@@ -23,6 +23,9 @@ export type {
   AuthenticationScheme,
   BasicAuthentication,
   CustomAuthentication,
+  OAuth2Authentication,
+  OAuth2ClientCredentials,
+  RefreshAccessTokenResult,
   RequestFn,
   DecoratedResponse
 } from './destination-kit'

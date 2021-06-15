@@ -10,6 +10,7 @@ import createRequestClient, { RequestClient } from '../create-request-client'
 import type { ModifiedResponse } from '../types'
 import type { InputField, RequestExtension } from './types'
 import type { AllRequestOptions } from '../request-client'
+import { IntegrationError } from '../errors'
 
 export type { ActionDefinition, ExecuteInput, RequestFn }
 export { fieldsToJsonSchema }
@@ -58,17 +59,31 @@ export interface Subscription {
   mapping?: JSONObject
 }
 
-interface TestAuthSettings<Settings> {
+export interface OAuth2ClientCredentials {
+  /** Publicly exposed string that is used by the partner API to identify the application, also used to build authorization URLs that are presented to users */
+  clientId: string
+  /** Used to authenticate the identity of the application to the partner API when the application requests to access a user’s account, must be kept private between the application and the API. */
+  clientSecret: string
+}
+
+export interface RefreshAccessTokenResult {
+  /** OAuth2 access token that was recently acquired */
+  accessToken: string
+  /** Provide in case the partner API also updates the refresh token when requesting a fresh access token */
+  refreshToken?: string
+}
+
+interface AuthSettings<Settings> {
   settings: Settings
 }
 
 interface Authentication<Settings> {
   /** The authentication scheme */
-  scheme: 'basic' | 'custom'
+  scheme: 'basic' | 'custom' | 'oauth2'
   /** The fields related to authentication */
   fields: Record<string, InputField>
   /** A function that validates the user's authentication inputs */
-  testAuthentication: (request: RequestClient, input: TestAuthSettings<Settings>) => Promise<unknown> | unknown
+  testAuthentication: (request: RequestClient, input: AuthSettings<Settings>) => Promise<unknown> | unknown
 }
 
 /**
@@ -87,8 +102,26 @@ export interface BasicAuthentication<Settings> extends Authentication<Settings> 
   scheme: 'basic'
 }
 
+/**
+ * OAuth2 authentication scheme
+ */
+export interface OAuth2Authentication<Settings> extends Authentication<Settings> {
+  scheme: 'oauth2'
+  /** A function that is used to refresh the access token
+   * @todo look into merging input and oauthConfig so we can keep all the request functions with the same method signature (2 arguments)
+   */
+  refreshAccessToken?: (
+    request: RequestClient,
+    input: AuthSettings<Settings>,
+    oauthConfig: OAuth2ClientCredentials
+  ) => Promise<RefreshAccessTokenResult> | undefined
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type AuthenticationScheme<Settings = any> = BasicAuthentication<Settings> | CustomAuthentication<Settings>
+export type AuthenticationScheme<Settings = any> =
+  | BasicAuthentication<Settings>
+  | CustomAuthentication<Settings>
+  | OAuth2Authentication<Settings>
 
 interface EventInput<Settings> {
   readonly event: SegmentEvent
@@ -149,6 +182,29 @@ export class Destination<Settings = JSONObject> {
     } catch (error) {
       throw new Error('Credentials are invalid')
     }
+  }
+
+  refreshAccessToken(
+    settings: Settings,
+    oauthClientCredentials: OAuth2ClientCredentials
+  ): Promise<RefreshAccessTokenResult> | undefined {
+    if (this.authentication?.scheme !== 'oauth2') {
+      throw new IntegrationError(
+        'refreshAccessToken is only valid with oauth2 authentication scheme',
+        'NotImplemented',
+        501
+      )
+    }
+    // TODO: clean up context/extendRequest so we don't have to send information that is not needed (payload & cachedFields)
+    const context: ExecuteInput<Settings, {}> = { settings, payload: {}, cachedFields: {} }
+    const options = this.extendRequest?.(context) ?? {}
+    const requestClient = createRequestClient(options)
+
+    if (!this.authentication?.refreshAccessToken) {
+      return undefined
+    }
+
+    return this.authentication.refreshAccessToken(requestClient, { settings }, oauthClientCredentials)
   }
 
   private partnerAction(slug: string, definition: ActionDefinition<Settings>): Destination<Settings> {

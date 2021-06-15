@@ -8,7 +8,10 @@ export type {
   SubscriptionStats,
   AuthenticationScheme,
   BasicAuthentication,
-  CustomAuthentication
+  CustomAuthentication,
+  OAuth2Authentication,
+  OAuth2ClientCredentials,
+  RefreshAccessTokenResult
 } from '@segment/actions-core'
 
 export type { SegmentEvent } from '@segment/actions-core'
