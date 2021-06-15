@@ -200,7 +200,7 @@ export class Destination<Settings = JSONObject> {
     let results: StepResult[] | null = null
 
     try {
-      if (typeof subscription.subscribe !== 'string') {
+      if (!subscription.subscribe || typeof subscription.subscribe !== 'string') {
         state = 'skipped'
         results = [{ output: 'invalid subscription' }]
         return results
