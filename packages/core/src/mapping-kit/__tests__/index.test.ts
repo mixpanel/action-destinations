@@ -101,32 +101,6 @@ describe('@if', () => {
     )
     expect(output).toStrictEqual(2)
   })
-
-  test('true', () => {
-    let output = transform(
-      {
-        '@if': {
-          true: { '@path': '$.b' },
-          then: 1,
-          else: 2
-        }
-      },
-      payload
-    )
-    expect(output).toStrictEqual(1)
-
-    output = transform(
-      {
-        '@if': {
-          true: { '@path': '$.c' },
-          then: 1,
-          else: 2
-        }
-      },
-      payload
-    )
-    expect(output).toStrictEqual(2)
-  })
 })
 
 describe('@path', () => {

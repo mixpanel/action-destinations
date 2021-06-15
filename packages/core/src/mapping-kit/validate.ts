@@ -203,7 +203,6 @@ directive('@if', (v, stack) => {
     v,
     {
       exists: { optional: validateDirectiveOrRaw },
-      true: { optional: validateDirectiveOrRaw },
       then: { optional: validateDirectiveOrRaw },
       else: { optional: validateDirectiveOrRaw }
     },

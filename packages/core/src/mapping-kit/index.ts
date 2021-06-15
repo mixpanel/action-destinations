@@ -51,17 +51,14 @@ registerDirective('@if', (opts, payload) => {
   let condition = false
 
   if (!isObject(opts)) {
-    throw new Error('@if requires an object with one of: "exists", "true"')
+    throw new Error('@if requires an object with an "exists" key')
   }
 
   if (opts.exists !== undefined) {
     const value = resolve(opts.exists, payload)
     condition = value !== undefined && value !== null
-  } else if (opts.true !== undefined) {
-    const value = resolve(opts.true, payload)
-    condition = value !== null && value !== undefined && value.toString().toLowerCase() === 'true'
   } else {
-    throw new Error('@if requires one of: exists, true')
+    throw new Error('@if requires an "exists" key')
   }
 
   if (condition && opts.then !== undefined) {

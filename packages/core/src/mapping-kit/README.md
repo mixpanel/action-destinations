@@ -318,9 +318,6 @@ The supported conditional values are:
 - "exists": If the given value is not undefined or null, the @if directive resolves to the "then"
   value. Otherwise, the "else" value is used.
 
-- "true": If the given value resolves to `true` or "true" (case-insensitive), the "then" value is
-  used. Otherwise, the "else" value is used.
-
 ```json
 Input:
 
@@ -346,26 +343,6 @@ Mappings:
     "exists": { "@path": "$.nope" },
     "then": "yep",
     "else": "nope"
-  }
-}
-=>
-"nope"
-
-{
-  "@if": {
-    "true": { "@path": "$.b" },
-    "then": "yep",
-    "else": "nope"
-  }
-}
-=>
-"yep"
-
-{
-  "@if": {
-    "true": { "@path": "$.doesnt.exist" },
-    "then": 1,
-    "else": 2
   }
 }
 =>

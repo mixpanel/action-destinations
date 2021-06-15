@@ -71,7 +71,6 @@ export type FieldValue = string | number | boolean | object | Directive
 export interface IfDirective {
   '@if': {
     exists?: FieldValue
-    true?: FieldValue
     then: FieldValue
     else?: FieldValue
   }
