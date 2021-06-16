@@ -1,10 +1,9 @@
 import { Command, flags } from '@oclif/command'
-import { DestinationDefinition, fieldsToJsonSchema } from '@segment/actions-core'
+import { DestinationDefinition } from '@segment/actions-core'
 import { idToSlug, destinations as actionDestinations } from '@segment/destination-actions'
 import chalk from 'chalk'
-import { Dictionary, invert, pick, uniq } from 'lodash'
+import { Dictionary, invert, uniq, pick, omit } from 'lodash'
 import { diffString } from 'json-diff'
-import type { JSONSchema4 } from 'json-schema'
 import ora from 'ora'
 import {
   controlPlaneService,
@@ -87,46 +86,13 @@ export default class Push extends Command {
       this.log(`${chalk.bold.whiteBright(slug)}`)
       this.spinner.start(`Generating diff for ${chalk.bold(slug)}...`)
 
-      const options = getOptions(metadata, schemaForDestination)
-      const basicOptions = getBasicOptions(metadata, options)
-      const settingsDiff = diffString(
-        asJson(pick(metadata, ['basicOptions', 'options'])),
-        asJson({ basicOptions, options })
-      )
-
-      const newDefinition = definitionToJson(schemaForDestination.definition)
-
-      // TODO switch to table definition diffs instead of legacy format
-      if (settingsDiff) {
-        this.spinner.warn(`Detected settings diff for ${chalk.bold(slug)}, please review:`)
-        this.log(`\n${settingsDiff}`)
-      } else if (flags.force) {
-        this.spinner.warn(`No change detected for ${chalk.bold(slug)}. Using force, please review:`)
-        this.log(`\n${JSON.stringify(newDefinition, null, 2)}`)
-      } else {
-        this.spinner.info(`No change for ${chalk.bold(slug)}. Skipping.`)
-        continue
-      }
-
-      const { shouldContinue } = await prompt({
-        type: 'confirm',
-        name: 'shouldContinue',
-        message: `Publish change for ${slug}?`,
-        initial: false
-      })
-
-      if (!shouldContinue) {
-        continue
-      }
-
       const actionsToUpdate: DestinationMetadataActionsUpdateInput[] = []
       const actionsToCreate: DestinationMetadataActionCreateInput[] = []
       const existingActions = actions.filter((a) => a.metadataId === metadata.id)
 
-      // Dual-write to new tables
-      for (const [slug, action] of Object.entries(schemaForDestination.definition.actions)) {
+      for (const [actionKey, action] of Object.entries(schemaForDestination.actions)) {
         // Note: this implies that changing the slug is a breaking change
-        const existingAction = existingActions.find((a) => a.slug === slug && a.platform === 'cloud')
+        const existingAction = existingActions.find((a) => a.slug === actionKey && a.platform === 'cloud')
 
         const fields: DestinationMetadataActionFieldCreateInput[] = Object.keys(action.fields).map((fieldKey) => {
           const field = action.fields[fieldKey]
@@ -147,12 +113,12 @@ export default class Push extends Command {
         })
 
         const base: BaseActionInput = {
-          slug,
+          slug: actionKey,
           name: action.title ?? 'Unnamed Action',
           description: action.description ?? '',
           platform: 'cloud',
           hidden: action.hidden ?? false,
-          defaultTrigger: action.defaultSubscription,
+          defaultTrigger: action.defaultSubscription ?? null,
           fields
         }
 
@@ -161,6 +127,57 @@ export default class Push extends Command {
         } else {
           actionsToCreate.push({ ...base, metadataId: metadata.id })
         }
+      }
+
+      const options = getOptions(metadata, schemaForDestination)
+      const basicOptions = getBasicOptions(metadata, options)
+      const diff = diffString(
+        asJson({
+          basicOptions: metadata.basicOptions,
+          options: pick(metadata.options, Object.keys(options)),
+          actions: existingActions.map((action) => ({
+            ...omit(action, ['id', 'metadataId', 'createdAt', 'updatedAt']),
+            fields: action.fields?.map((field) =>
+              omit(field, ['id', 'metadataActionId', 'sortOrder', 'createdAt', 'updatedAt'])
+            )
+          }))
+        }),
+        asJson({
+          basicOptions,
+          options,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          actions: ([] as Array<DestinationMetadataActionCreateInput | DestinationMetadataActionsUpdateInput>)
+            .concat(actionsToUpdate, actionsToCreate)
+            .map((action) => ({
+              ...omit(action, ['id', 'actionId']),
+              fields: action.fields?.map((field) =>
+                omit(field, ['id', 'metadataActionId', 'sortOrder', 'createdAt', 'updatedAt'])
+              )
+            }))
+        })
+      )
+
+      if (diff) {
+        this.spinner.warn(`Detected changes for ${chalk.bold(slug)}, please review:`)
+        this.log(`\n${diff}`)
+      } else if (flags.force) {
+        const newDefinition = definitionToJson(schemaForDestination)
+        this.spinner.warn(`No change detected for ${chalk.bold(slug)}. Using force, please review:`)
+        this.log(`\n${JSON.stringify(newDefinition, null, 2)}`)
+      } else {
+        this.spinner.info(`No change for ${chalk.bold(slug)}. Skipping.`)
+        continue
+      }
+
+      const { shouldContinue } = await prompt({
+        type: 'confirm',
+        name: 'shouldContinue',
+        message: `Publish change for ${slug}?`,
+        initial: false
+      })
+
+      if (!shouldContinue) {
+        continue
       }
 
       await Promise.all([
@@ -175,7 +192,7 @@ export default class Push extends Command {
       const allActions = await getDestinationMetadataActions([metadata.id])
       const presets: DestinationSubscriptionPresetInput[] = []
 
-      for (const preset of schemaForDestination.definition.presets ?? []) {
+      for (const preset of schemaForDestination.presets ?? []) {
         const associatedAction = allActions.find((a) => a.slug === preset.partnerAction)
         if (!associatedAction) continue
 
@@ -194,24 +211,7 @@ export default class Push extends Command {
 }
 
 function asJson(obj: unknown) {
-  if (typeof obj !== 'object' || Array.isArray(obj) || obj === null) {
-    return obj
-  }
-
-  const newObj: Record<string, unknown> = { ...obj }
-  for (const key of Object.keys(newObj)) {
-    let value = newObj[key]
-    if (typeof value === 'string') {
-      try {
-        value = JSON.parse(value)
-      } catch (_err) {
-        // do nothing
-      }
-    }
-    newObj[key] = asJson(value)
-  }
-
-  return newObj
+  return JSON.parse(JSON.stringify(obj))
 }
 
 function definitionToJson(definition: DestinationDefinition) {
@@ -234,66 +234,35 @@ function getBasicOptions(metadata: DestinationMetadata, options: DestinationMeta
 function getOptions(metadata: DestinationMetadata, destinationSchema: DestinationSchema): DestinationMetadataOptions {
   const options: DestinationMetadataOptions = { ...metadata.options }
 
-  // We store the destination-level JSON Schema in an option with key `metadata`
-  options.metadata = {
-    default: '',
-    description: JSON.stringify({
-      name: destinationSchema.name,
-      slug: destinationSchema.slug,
-      presets: destinationSchema.definition.presets,
-      settings: destinationSchema.jsonSchema
-    }),
-    encrypt: false,
-    hidden: true,
-    label: `Destination Metadata`,
-    private: true,
-    scope: 'event_destination',
-    type: 'string',
-    validators: []
-  }
-
-  // We store each action-level JSON Schema in separate options
-  for (const actionPayload of destinationSchema.actions) {
-    options[`action${actionPayload.slug}`] = {
+  // We store all the subscriptions in this legacy field (this will go away when we switch reads to the new tables)
+  if (!options.subscriptions) {
+    options.subscriptions = {
       default: '',
-      description: JSON.stringify({
-        slug: actionPayload.slug,
-        schema: actionPayload.jsonSchema,
-        defaultSubscription: actionPayload.defaultSubscription,
-        // TODO figure out if `settings` property is used anywhere
-        settings: []
-      }),
-      encrypt: false,
-      hidden: actionPayload.hidden,
-      label: `Action Metadata: ${actionPayload.slug}`,
-      private: true,
-      scope: 'event_destination',
-      type: 'string',
-      validators: []
-    }
-  }
-
-  const requiredProperties = (destinationSchema.jsonSchema?.required as string[]) ?? []
-  const properties = destinationSchema.jsonSchema?.properties ?? {}
-  for (const name in properties) {
-    const property = properties[name]
-
-    if (typeof property === 'boolean') {
-      continue
-    }
-
-    const validators: string[][] = []
-
-    if (requiredProperties.includes(name)) {
-      validators.push(['required', `The ${name} property is required.`])
-    }
-
-    options[name] = {
-      default: '',
-      description: property.description,
+      description: '[{"subscribe":{"type":"track"},"partnerAction":"postToChannel","mapping":{...}}]',
+      label: 'Subscriptions',
       encrypt: false,
       hidden: false,
-      label: property.title,
+      private: false,
+      scope: 'event_destination',
+      type: 'string',
+      validators: [['required', 'The subscriptions setting is required.']]
+    }
+  }
+
+  for (const [fieldKey, schema] of Object.entries(destinationSchema.authentication?.fields ?? {})) {
+    const validators: string[][] = []
+
+    if (schema.required) {
+      validators.push(['required', `The ${fieldKey} property is required.`])
+    }
+
+    options[fieldKey] = {
+      // Authentication-related fields don't support defaults yet
+      default: '',
+      description: schema.description,
+      encrypt: false,
+      hidden: false,
+      label: schema.label,
       private: true,
       scope: 'event_destination',
       type: 'string',
@@ -378,6 +347,8 @@ async function setSubscriptionPresets(metadataId: string, presets: DestinationSu
 async function createDestinationMetadataActions(
   input: DestinationMetadataActionCreateInput[]
 ): Promise<DestinationMetadataAction[]> {
+  if (!input.length) return []
+
   const { data, error } = await controlPlaneService.createDestinationMetadataActions(NOOP_CONTEXT, {
     input
   })
@@ -397,6 +368,8 @@ async function createDestinationMetadataActions(
 async function updateDestinationMetadataActions(
   input: DestinationMetadataActionsUpdateInput[]
 ): Promise<DestinationMetadataAction[]> {
+  if (!input.length) return []
+
   const { data, error } = await controlPlaneService.updateDestinationMetadataActions(NOOP_CONTEXT, {
     input
   })
@@ -416,19 +389,8 @@ interface SchemasByDestination {
   [destinationId: string]: DestinationSchema
 }
 
-interface DestinationSchema {
-  name: string
+interface DestinationSchema extends DestinationDefinition {
   slug: string
-  jsonSchema: JSONSchema4 | undefined
-  actions: Action[]
-  definition: DestinationDefinition
-}
-
-interface Action {
-  slug: string
-  hidden: boolean
-  defaultSubscription?: string
-  jsonSchema: JSONSchema4
 }
 
 function getJsonSchemas(
@@ -444,32 +406,11 @@ function getJsonSchemas(
       continue
     }
 
-    const actionPayloads: Action[] = []
-    const destination = destinations[destinationSlug]
-
-    const actions = destination.actions
-    for (const actionSlug in actions) {
-      const action = actions[actionSlug]
-      actionPayloads.push({
-        slug: actionSlug,
-        hidden: action.hidden ?? false,
-        defaultSubscription: action.defaultSubscription,
-        jsonSchema: {
-          title: action.title,
-          description: action.description,
-          // For parity with what is happening today
-          defaultSubscription: action.defaultSubscription,
-          ...fieldsToJsonSchema(action.fields)
-        }
-      })
-    }
+    const definition = destinations[destinationSlug]
 
     schemasByDestination[destinationId] = {
-      name: destination.name,
-      slug: destinationSlug,
-      jsonSchema: fieldsToJsonSchema(destination.authentication?.fields),
-      actions: actionPayloads,
-      definition: destination
+      ...definition,
+      slug: destinationSlug
     }
   }
 

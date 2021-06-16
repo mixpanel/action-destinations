@@ -10,7 +10,6 @@ import {
   DestinationMetadataOptions
 } from 'src/lib/control-plane-service'
 import { autoPrompt } from 'src/lib/prompt'
-import { fieldsToJsonSchema } from '@segment/actions-core'
 
 const NOOP_CONTEXT = {}
 
@@ -94,22 +93,6 @@ export default class Register extends Command {
     // We store the destination-level JSON Schema in an option with key `metadata`
     // Currently this is needed to render the UI views for action destinations
     const initialOptions: DestinationMetadataOptions = {
-      // This setting is required for the UI to work until we switch off the legacy "data model"
-      metadata: {
-        label: 'Destination Metadata',
-        description: JSON.stringify({
-          name: destination.name,
-          slug: selectedDestination.name,
-          presets: destination.presets ?? [],
-          settings: fieldsToJsonSchema(destination.authentication?.fields)
-        }),
-        type: 'string',
-        scope: 'event_destination',
-        private: true,
-        encrypt: false,
-        hidden: true
-      },
-
       // This setting is required until we switch off the legacy "data model"
       subscriptions: {
         label: 'subscriptions',
