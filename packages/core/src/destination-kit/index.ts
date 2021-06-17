@@ -1,4 +1,4 @@
-import { validate, parseFql } from '@segment/fab5-subscriptions'
+import { validate, parseFql, ErrorCondition } from '@segment/fab5-subscriptions'
 import { JSONSchema4 } from 'json-schema'
 import { Action, ActionDefinition, Validate, RequestFn } from './action'
 import { ExecuteInput, StepResult } from './step'
@@ -262,7 +262,15 @@ export class Destination<Settings = JSONObject> {
         return results
       }
 
-      const isSubscribed = validate(parseFql(subscription.subscribe), event)
+      const parsedSubscription = parseFql(subscription.subscribe)
+
+      if ((parsedSubscription as ErrorCondition).error) {
+        state = 'skipped'
+        results = [{ output: `invalid subscription : ${(parsedSubscription as ErrorCondition).error.message}` }]
+        return results
+      }
+
+      const isSubscribed = validate(parsedSubscription, event)
       if (!isSubscribed) {
         state = 'skipped'
         results = [{ output: 'not subscribed' }]

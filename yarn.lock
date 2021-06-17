@@ -2262,10 +2262,10 @@
     "@types/node-statsd" "^0.1.2"
     node-statsd "^0.1.1"
 
-"@segment/fab5-subscriptions@^2.0.1":
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/@segment/fab5-subscriptions/-/fab5-subscriptions-2.0.1.tgz#41e870a33517a209231312f3148e70799b188b23"
-  integrity sha512-2Cvr8XH/CB9WDwbdb5q8R3YzAoU2NzqHiBqfijXJ+z6ovXiu+7fmixgeK/D7mbPzA+7LvVx1pvFGPgpO5iPuNQ==
+"@segment/fab5-subscriptions@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@segment/fab5-subscriptions/-/fab5-subscriptions-3.0.0.tgz#817959743769989a7308603fb73601d73b2f6437"
+  integrity sha512-dt4tR37/00+ufIALDmXw9DOCgFuD8jqCdzjXpukJOjIbg3UG1IZMPM+X8BVtH+xgCHk4x7Qii81gDqtNN7g86w==
   dependencies:
     "@segment/fql" "^1.9.1"
 

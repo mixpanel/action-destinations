@@ -77,6 +77,22 @@ describe('destination kit', () => {
       expect(res).toEqual([{ output: 'invalid subscription' }])
     })
 
+    test('should return invalid subscription with details when sending an invalid subscribe', async () => {
+      const destinationTest = new Destination(destinationCustomAuth)
+      const testEvent: SegmentEvent = { type: 'track' }
+      const testSettings = { subscription: { subscribe: 'typo', partnerAction: 'customEvent' } }
+      const res = await destinationTest.onEvent(testEvent, testSettings)
+      expect(res).toEqual([{ output: "invalid subscription : Cannot read property 'type' of undefined" }])
+    })
+
+    test('should return `not subscribed` when providing an empty event', async () => {
+      const destinationTest = new Destination(destinationCustomAuth)
+      const testSettings = { subscription: { subscribe: 'type = "track"', partnerAction: 'customEvent' } }
+      // @ts-ignore needed for replicating empty event at runtime
+      const res = await destinationTest.onEvent({}, testSettings)
+      expect(res).toEqual([{ output: 'not subscribed' }])
+    })
+
     test('should succeed if provided with a valid event & settings', async () => {
       const destinationTest = new Destination(destinationCustomAuth)
       const testEvent: SegmentEvent = {
