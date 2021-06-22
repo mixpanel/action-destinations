@@ -41,8 +41,12 @@ export default class Init extends Command {
     }
   ]
 
+  parseFlags() {
+    return this.parse(Init)
+  }
+
   async run() {
-    const { args, flags } = this.parse(Init)
+    const { args, flags } = this.parseFlags()
     const answers = await autoPrompt(flags, [
       {
         type: 'text',
@@ -69,6 +73,11 @@ export default class Init extends Command {
             value: 'custom-auth'
           },
           {
+            title: 'Browser Destination',
+            description: 'Creates an Analytics JS compatible Destination.',
+            value: 'browser'
+          },
+          {
             title: 'Basic Auth',
             description: 'Integrations that use Basic Auth: https://tools.ietf.org/html/rfc7617',
             value: 'basic-auth'
@@ -82,9 +91,14 @@ export default class Init extends Command {
       }
     ])
 
-    const { directory, name, slug, template } = answers
+    const { name, slug, template } = answers
     if (!name || !slug || !template) {
       this.exit()
+    }
+
+    let directory = answers.directory
+    if (template === 'browser' && directory === Init.flags.directory.default) {
+      directory = './packages/browser-destinations/src/destinations'
     }
 
     // For now, include the slug in the path, but when we support external repos, we'll have to change this

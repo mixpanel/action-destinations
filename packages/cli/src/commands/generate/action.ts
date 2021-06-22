@@ -17,8 +17,8 @@ export default class GenerateAction extends Command {
   static description = `Scaffolds a new integration action.`
 
   static examples = [
-    `$ segment generate:action ACTION`,
-    `$ segment generate:action postToChannel --directory ./destinations/slack`
+    `$ segment generate:action ACTION <browser|server>`,
+    `$ segment generate:action postToChannel server --directory=./destinations/slack`
   ]
 
   static flags = {
@@ -28,19 +28,34 @@ export default class GenerateAction extends Command {
     directory: flags.string({ char: 'd', description: 'base directory to scaffold the action' })
   }
 
-  static args = [{ name: 'name', description: 'the action name', required: true }]
+  static args = [
+    { name: 'name', description: 'the action name', required: true },
+    { name: 'type', description: 'the type of action (browser, server)', required: true, default: 'server' }
+  ]
 
-  async run() {
-    const { args, flags } = this.parse(GenerateAction)
 
-    // TODO make this configurable
-    const integrationsGlob = './packages/destination-actions/src/destinations/*'
-    const integrationDirs = await globby(integrationsGlob, {
+  async integrationDirs(glob: string) {
+    const integrationDirs = await globby(glob, {
       expandDirectories: false,
       onlyDirectories: true,
       gitignore: true,
       ignore: ['node_modules']
     })
+
+    return integrationDirs
+  }
+
+  parseArgs() {
+    return this.parse(GenerateAction)
+  }
+
+  async run() {
+    const { args, flags } = this.parseArgs()
+    let integrationsGlob = './packages/destination-actions/src/destinations/*'
+    if (args.type === 'browser') {
+      integrationsGlob = './packages/browser-destinations/src/destinations/*'
+    }
+    const integrationDirs = await this.integrationDirs(integrationsGlob)
 
     const answers = await autoPrompt(flags, [
       {
@@ -68,7 +83,11 @@ export default class GenerateAction extends Command {
     const directory = answers.directory || './'
     const relativePath = path.join(directory, slug)
     const targetDirectory = path.join(process.cwd(), relativePath)
-    const templatePath = path.join(__dirname, '../../../templates/actions/empty-action')
+
+    let templatePath = path.join(__dirname, '../../../templates/actions/empty-action')
+    if (args.type === 'browser') {
+      templatePath = path.join(__dirname, '../../../templates/actions/empty-browser-action')
+    }
 
     try {
       this.spinner.start(`Creating ${chalk.bold(args.name)}`)
@@ -97,8 +116,13 @@ export default class GenerateAction extends Command {
       fs.writeFileSync(entryFile, updatedCode, 'utf8')
       this.spinner.succeed()
     } catch (err) {
-      this.spinner.fail(chalk`Failed to update your destination imports: ${err.message}`)
-      this.exit()
+      // we can't update browser destination default exports normally due
+      // to the default export being a function call
+
+      if (args.type === 'server') {
+        this.spinner.fail(chalk`Failed to update your destination imports: ${err.message}`)
+        this.exit()
+      }
     }
 
     try {
