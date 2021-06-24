@@ -2,7 +2,7 @@ import { Command, flags } from '@oclif/command'
 import { DestinationDefinition } from '@segment/actions-core'
 import { idToSlug, destinations as actionDestinations } from '@segment/destination-actions'
 import chalk from 'chalk'
-import { Dictionary, invert, uniq, pick, omit } from 'lodash'
+import { Dictionary, invert, uniq, pick, omit, sortBy } from 'lodash'
 import { diffString } from 'json-diff'
 import ora from 'ora'
 import {
@@ -135,25 +135,31 @@ export default class Push extends Command {
         asJson({
           basicOptions: metadata.basicOptions,
           options: pick(metadata.options, Object.keys(options)),
-          actions: existingActions.map((action) => ({
-            ...omit(action, ['id', 'metadataId', 'createdAt', 'updatedAt']),
-            fields: action.fields?.map((field) =>
-              omit(field, ['id', 'metadataActionId', 'sortOrder', 'createdAt', 'updatedAt'])
-            )
-          }))
+          actions: sortBy(
+            existingActions.map((action) => ({
+              ...omit(action, ['id', 'metadataId', 'createdAt', 'updatedAt']),
+              fields: action.fields?.map((field) =>
+                omit(field, ['id', 'metadataActionId', 'sortOrder', 'createdAt', 'updatedAt'])
+              )
+            })),
+            ['name']
+          )
         }),
         asJson({
           basicOptions,
           options,
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          actions: ([] as Array<DestinationMetadataActionCreateInput | DestinationMetadataActionsUpdateInput>)
-            .concat(actionsToUpdate, actionsToCreate)
-            .map((action) => ({
-              ...omit(action, ['id', 'actionId']),
-              fields: action.fields?.map((field) =>
-                omit(field, ['id', 'metadataActionId', 'sortOrder', 'createdAt', 'updatedAt'])
-              )
-            }))
+          actions: sortBy(
+            ([] as Array<DestinationMetadataActionCreateInput | DestinationMetadataActionsUpdateInput>)
+              .concat(actionsToUpdate, actionsToCreate)
+              .map((action) => ({
+                ...omit(action, ['id', 'actionId']),
+                fields: action.fields?.map((field) =>
+                  omit(field, ['id', 'metadataActionId', 'sortOrder', 'createdAt', 'updatedAt'])
+                )
+              })),
+            ['name']
+          )
         })
       )
 

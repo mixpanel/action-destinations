@@ -31,8 +31,10 @@ const idAutocomplete: RequestFn<Settings, Payload, DynamicFieldResponse> = async
 }
 
 const action: ActionDefinition<Settings, Payload> = {
-  title: 'Trigger Broadcast',
+  title: 'Trigger Broadcast Campaign',
   description: 'Trigger a Customer.io broadcast campaign.',
+  // Hide so we can delete later. No customers currently using it.
+  hidden: true,
   fields: {
     id: {
       label: 'Campaign ID',
