@@ -70,6 +70,10 @@ export interface ActionDefinition<Settings, Payload = any> {
   perform: RequestFn<Settings, Payload>
 }
 
+function jsonClone<T>(obj: T): T {
+  return JSON.parse(JSON.stringify(obj))
+}
+
 class MapInput<Settings, Payload extends JSONLikeObject> extends Step<Settings, Payload> {
   executeStep(data: ExecuteInput<Settings, Payload>): Promise<string> {
     // Transforms the initial payload (event) + action settings (from `subscriptions[0].mapping`)
@@ -78,7 +82,7 @@ class MapInput<Settings, Payload extends JSONLikeObject> extends Step<Settings, 
       // Technically we can't know whether or not `transform` returns the exact shape of Payload here, hence the casting
       // It will be validated in subsequent steps
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      data.payload = transform(data.mapping, data.payload as any) as Payload
+      data.payload = transform(jsonClone(data.mapping), data.payload as any) as Payload
     }
 
     return Promise.resolve('MapInput completed')
