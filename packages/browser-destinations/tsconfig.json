@@ -9,6 +9,7 @@
       "@segment/actions-core/*": ["../core/src/*"]
     }
   },
+  "allowJs": true,
   "include": ["src", "test"],
   "exclude": ["webpack.config.js"]
 }

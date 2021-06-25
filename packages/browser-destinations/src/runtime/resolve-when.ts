@@ -1,4 +1,4 @@
-export async function resolveWhen(condition: () => boolean): Promise<void> {
+export async function resolveWhen(condition: () => boolean, timeout?: number): Promise<void> {
   return new Promise((resolve, _reject) => {
     if (condition()) {
       resolve()
@@ -12,7 +12,7 @@ export async function resolveWhen(condition: () => boolean): Promise<void> {
         } else {
           check()
         }
-      })
+      }, timeout)
 
     check()
   })

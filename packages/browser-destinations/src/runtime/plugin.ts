@@ -34,7 +34,11 @@ export function generatePlugins<S, C>(
         return isSubscribed
       })
 
-      const invocations = validSubs.map(async (sub) => {
+      // the transform function mutates the `mapping` object in the original subscription for some reason
+      // we do not want that to happen on the web though
+      const clonedSubs = JSON.parse(JSON.stringify(validSubs)) as Subscription[]
+
+      const invocations = clonedSubs.map(async (sub) => {
         const actionSlug = sub.partnerAction
         if (actionSlug !== key) {
           return

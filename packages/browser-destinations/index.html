@@ -12,20 +12,21 @@
     }
 
     const umdLibraryNames = {
-      'amplitude-pluginsDestination': JSON.stringify([{
-        name: 'foo',
-        partnerAction: 'sessionId',
-        enabled: true,
-        mapping: {}
-      }]),
-      'intercomDestination': JSON.stringify([
-      ])
+      'amplitude-pluginsDestination': JSON.stringify([
+        {
+          name: 'foo',
+          partnerAction: 'sessionId',
+          enabled: true,
+          mapping: {}
+        }
+      ]),
+      intercomDestination: JSON.stringify([])
     }
 
     for (const libraryName of Object.keys(umdLibraryNames)) {
       getPlugins(libraryName, { subscriptions: umdLibraryNames[libraryName] })
-        .then(plugins => console.log(libraryName, plugins))
-        .catch(error => console.warn(error))
+        .then((plugins) => console.log(libraryName, plugins))
+        .catch((error) => console.warn(error))
     }
   </script>
   <div>Loaded</div>
