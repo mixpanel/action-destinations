@@ -8,6 +8,7 @@ import { compile } from 'json-schema-to-typescript'
 import path from 'path'
 import prettier from 'prettier'
 import { loadDestination } from '../../lib/destinations'
+import { OAUTH_GENERATE_TYPES, OAUTH_SCHEME, RESERVED_FIELD_NAMES } from '../../constants'
 
 const pretterOptions = prettier.resolveConfig.sync(process.cwd())
 
@@ -95,7 +96,19 @@ export default class GenerateTypes extends Command {
 
     const stats = fs.statSync(file)
     const parentDir = stats.isDirectory() ? file : path.dirname(file)
-    const types = await generateTypes(destination.authentication?.fields, 'Settings')
+    let authFields = destination.authentication?.fields
+    if (authFields) {
+      for (const key in authFields) {
+        if (RESERVED_FIELD_NAMES.includes(key.toLowerCase())) {
+          throw new Error(`Field definition in destination ${destination.name} is using a reserved name: ${key}`)
+        }
+      }
+    }
+
+    if (destination.authentication?.scheme === OAUTH_SCHEME) {
+      authFields = Object.assign({ ...OAUTH_GENERATE_TYPES }, { ...authFields })
+    }
+    const types = await generateTypes(authFields, 'Settings')
     fs.writeFileSync(path.join(parentDir, './generated-types.ts'), types)
 
     // TODO how to load directory structure consistently?

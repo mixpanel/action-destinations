@@ -4,7 +4,7 @@ import * as path from 'path'
 import * as prompt from '../lib/prompt'
 import * as rimraf from 'rimraf'
 
-describe('cli init', () => {
+describe('cli init command', () => {
   const testDir = path.join('.', 'testResults')
   beforeAll(() => {
     if (!fs.existsSync(testDir)) {
@@ -27,7 +27,6 @@ describe('cli init', () => {
     .stdout()
     .command(['init'])
     .it('should scaffold an action with basic auth scheme', (ctx) => {
-      console.log(ctx.stdout)
       expect(ctx.stdout).toContain('Done creating "test basic"')
       const scaffoldedAction = fs.readFileSync(path.join(testDir, 'test-basic', 'index.ts'), 'utf8')
       expect(scaffoldedAction).toContain("scheme: 'basic'")
@@ -40,7 +39,6 @@ describe('cli init', () => {
     .stdout()
     .command(['init'])
     .it('should scaffold an action with custom auth scheme', (ctx) => {
-      console.log(ctx.stdout)
       expect(ctx.stdout).toContain('Done creating "test custom auth"')
       const scaffoldedAction = fs.readFileSync(path.join(testDir, 'test-custom-auth', 'index.ts'), 'utf8')
       expect(scaffoldedAction).toContain("scheme: 'custom'")
@@ -53,9 +51,20 @@ describe('cli init', () => {
     .stdout()
     .command(['init'])
     .it('should scaffold a minimal action', (ctx) => {
-      console.log(ctx.stdout)
       expect(ctx.stdout).toContain('Done creating "test minimal"')
       const scaffoldedAction = fs.readFileSync(path.join(testDir, 'test-minimal', 'index.ts'), 'utf8')
       expect(scaffoldedAction).toContain("name: 'test minimal'")
+    })
+
+  test
+    .stub(prompt, 'autoPrompt', () => {
+      return { directory: testDir, name: 'test oauth', slug: 'test-oauth', template: 'oauth2-auth' }
+    })
+    .stdout()
+    .command(['init'])
+    .it('should scaffold a oauth2 action', (ctx) => {
+      expect(ctx.stdout).toContain('Done creating "test oauth"')
+      const scaffoldedAction = fs.readFileSync(path.join(testDir, 'test-oauth', 'index.ts'), 'utf8')
+      expect(scaffoldedAction).toContain("scheme: 'oauth2'")
     })
 })

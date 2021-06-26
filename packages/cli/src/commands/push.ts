@@ -18,6 +18,7 @@ import {
   DestinationSubscriptionPresetInput
 } from 'src/lib/control-plane-service'
 import { prompt } from 'src/lib/prompt'
+import { OAUTH_OPTIONS, OAUTH_SCHEME, RESERVED_FIELD_NAMES } from '../constants'
 
 const NOOP_CONTEXT = {}
 
@@ -133,8 +134,8 @@ export default class Push extends Command {
       const basicOptions = getBasicOptions(metadata, options)
       const diff = diffString(
         asJson({
-          basicOptions: metadata.basicOptions,
-          options: pick(metadata.options, Object.keys(options)),
+          basicOptions: filterOAuth(metadata.basicOptions),
+          options: pick(metadata.options, filterOAuth(Object.keys(options))),
           actions: sortBy(
             existingActions.map((action) => ({
               ...omit(action, ['id', 'metadataId', 'createdAt', 'updatedAt']),
@@ -146,8 +147,8 @@ export default class Push extends Command {
           )
         }),
         asJson({
-          basicOptions,
-          options,
+          basicOptions: filterOAuth(basicOptions),
+          options: pick(options, filterOAuth(Object.keys(options))),
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           actions: sortBy(
             ([] as Array<DestinationMetadataActionCreateInput | DestinationMetadataActionsUpdateInput>)
@@ -216,6 +217,10 @@ export default class Push extends Command {
   }
 }
 
+function filterOAuth(optionList: string[]) {
+  return optionList.filter((item) => item !== 'oauth')
+}
+
 function asJson(obj: unknown) {
   return JSON.parse(JSON.stringify(obj))
 }
@@ -237,7 +242,11 @@ function getBasicOptions(metadata: DestinationMetadata, options: DestinationMeta
   return uniq([...metadata.basicOptions, ...Object.keys(options)])
 }
 
-function getOptions(metadata: DestinationMetadata, destinationSchema: DestinationSchema): DestinationMetadataOptions {
+// Note: exporting for testing purposes only
+export function getOptions(
+  metadata: DestinationMetadata,
+  destinationSchema: DestinationSchema
+): DestinationMetadataOptions {
   const options: DestinationMetadataOptions = { ...metadata.options }
 
   // We store all the subscriptions in this legacy field (this will go away when we switch reads to the new tables)
@@ -258,6 +267,10 @@ function getOptions(metadata: DestinationMetadata, destinationSchema: Destinatio
   for (const [fieldKey, schema] of Object.entries(destinationSchema.authentication?.fields ?? {})) {
     const validators: string[][] = []
 
+    if (RESERVED_FIELD_NAMES.includes(fieldKey.toLowerCase())) {
+      throw new Error(`Schema contains a field definition that uses a reserved name: ${fieldKey}`)
+    }
+
     if (schema.required) {
       validators.push(['required', `The ${fieldKey} property is required.`])
     }
@@ -273,6 +286,11 @@ function getOptions(metadata: DestinationMetadata, destinationSchema: Destinatio
       scope: 'event_destination',
       type: 'string',
       validators
+    }
+
+    // Add oauth settings
+    if (destinationSchema.authentication?.scheme === OAUTH_SCHEME) {
+      options['oauth'] = OAUTH_OPTIONS
     }
   }
 
@@ -395,7 +413,7 @@ interface SchemasByDestination {
   [destinationId: string]: DestinationSchema
 }
 
-interface DestinationSchema extends DestinationDefinition {
+export interface DestinationSchema extends DestinationDefinition {
   slug: string
 }
 

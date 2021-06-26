@@ -90,6 +90,7 @@
   "jest": {
     "preset": "ts-jest",
     "testEnvironment": "node",
+    "testRegex": "((\\.|/)(test))\\.(tsx?|json)$",
     "modulePathIgnorePatterns": [
       "<rootDir>/dist/"
     ],

@@ -29,7 +29,7 @@ export default class Init extends Command {
     slug: flags.string({ char: 's', description: 'url-friendly slug of the integration' }),
     template: flags.enum({
       char: 't',
-      options: ['basic-auth', 'custom-auth', 'minimal'],
+      options: ['basic-auth', 'custom-auth', 'oauth2-auth', 'minimal'],
       description: 'the template to use to scaffold your integration'
     })
   }
@@ -81,6 +81,11 @@ export default class Init extends Command {
             title: 'Basic Auth',
             description: 'Integrations that use Basic Auth: https://tools.ietf.org/html/rfc7617',
             value: 'basic-auth'
+          },
+          {
+            title: 'OAuth2 Auth',
+            description: 'Use for APIs that support OAuth2.',
+            value: 'oauth2-auth'
           },
           {
             title: 'Minimal',
