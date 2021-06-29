@@ -1,5 +1,5 @@
-import { DestinationSchema } from 'src/commands/push'
-import { DestinationMetadata } from 'src/lib/control-plane-service'
+import type { DestinationSchema } from '../commands/push'
+import type { DestinationMetadata } from '../lib/control-plane-service'
 
 export const expectedDestinationMetadataOptions = {
   apiSecret: {

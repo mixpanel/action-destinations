@@ -1,6 +1,6 @@
 import { DestinationDefinition } from '@segment/actions-core'
 import path from 'path'
-import { clearRequireCache } from 'src/lib/require-cache'
+import { clearRequireCache } from './require-cache'
 
 /** Attempts to load a destination definition from a given file path */
 export async function loadDestination(filePath: string): Promise<null | DestinationDefinition> {

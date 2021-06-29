@@ -6,9 +6,9 @@ import { camelCase } from 'lodash'
 import toTitleCase from 'to-title-case'
 import ora from 'ora'
 import path from 'path'
-import { autoPrompt } from 'src/lib/prompt'
-import { renderTemplates } from 'src/lib/templates'
-import { addKeyToDefaultExport } from 'src/lib/codemods'
+import { autoPrompt } from '../../lib/prompt'
+import { renderTemplates } from '../../lib/templates'
+import { addKeyToDefaultExport } from '../../lib/codemods'
 import GenerateTypes from './types'
 
 export default class GenerateAction extends Command {
@@ -32,7 +32,6 @@ export default class GenerateAction extends Command {
     { name: 'name', description: 'the action name', required: true },
     { name: 'type', description: 'the type of action (browser, server)', required: true, default: 'server' }
   ]
-
 
   async integrationDirs(glob: string) {
     const integrationDirs = await globby(glob, {

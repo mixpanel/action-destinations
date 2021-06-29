@@ -3,13 +3,10 @@ import globby from 'globby'
 import ora from 'ora'
 import path from 'path'
 import slugify from 'slugify'
-import { loadDestination } from 'src/lib/destinations'
-import {
-  controlPlaneService,
-  CreateDestinationMetadataInput,
-  DestinationMetadataOptions
-} from 'src/lib/control-plane-service'
-import { autoPrompt } from 'src/lib/prompt'
+import { loadDestination } from '../lib/destinations'
+import { controlPlaneService } from '../lib/control-plane-service'
+import type { CreateDestinationMetadataInput, DestinationMetadataOptions } from '../lib/control-plane-service'
+import { autoPrompt } from '../lib/prompt'
 
 const NOOP_CONTEXT = {}
 

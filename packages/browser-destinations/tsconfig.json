@@ -3,13 +3,13 @@
   "compilerOptions": {
     "module": "esnext",
     "removeComments": false,
+    "allowJs": true,
     "baseUrl": ".",
     "paths": {
       "@segment/actions-core": ["../core/src"],
       "@segment/actions-core/*": ["../core/src/*"]
     }
   },
-  "allowJs": true,
   "include": ["src", "test"],
   "exclude": ["webpack.config.js"]
 }

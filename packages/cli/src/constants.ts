@@ -1,4 +1,4 @@
-import { DestinationMetadataOption } from 'src/lib/control-plane-service'
+import type { DestinationMetadataOption } from './lib/control-plane-service'
 
 export const RESERVED_FIELD_NAMES = [
   'oauth',

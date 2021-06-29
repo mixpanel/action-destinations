@@ -1,12 +1,13 @@
 import { Command, flags } from '@oclif/command'
-import { DestinationDefinition } from '@segment/actions-core'
+import type { DestinationDefinition } from '@segment/actions-core'
 import { idToSlug, destinations as actionDestinations } from '@segment/destination-actions'
 import chalk from 'chalk'
-import { Dictionary, invert, uniq, pick, omit, sortBy } from 'lodash'
+import { invert, uniq, pick, omit, sortBy } from 'lodash'
+import type { Dictionary } from 'lodash'
 import { diffString } from 'json-diff'
 import ora from 'ora'
-import {
-  controlPlaneService,
+import { controlPlaneService } from '../lib/control-plane-service'
+import type {
   DestinationMetadata,
   DestinationMetadataAction,
   DestinationMetadataActionCreateInput,
@@ -16,8 +17,8 @@ import {
   DestinationMetadataUpdateInput,
   DestinationSubscriptionPresetFields,
   DestinationSubscriptionPresetInput
-} from 'src/lib/control-plane-service'
-import { prompt } from 'src/lib/prompt'
+} from '../lib/control-plane-service'
+import { prompt } from '../lib/prompt'
 import { OAUTH_OPTIONS, OAUTH_SCHEME, RESERVED_FIELD_NAMES } from '../constants'
 
 const NOOP_CONTEXT = {}
