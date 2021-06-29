@@ -4,6 +4,8 @@ import { transform } from '@segment/actions-core/mapping-kit'
 import { parseFql, validate } from '@segment/fab5-subscriptions'
 import { ActionInput, BrowserDestinationDefinition, Subscription } from '../lib/browser-destinations'
 
+type MaybePromise<T> = T | Promise<T>
+
 export function generatePlugins<S, C>(
   def: BrowserDestinationDefinition<S, C>,
   settings: S,
@@ -23,42 +25,32 @@ export function generatePlugins<S, C>(
 
   // Only load the actions that have active subscriptions
   const parsedSubs: Subscription[] = typeof subscriptions === 'string' ? JSON.parse(subscriptions) : subscriptions
-  const actionsToLoad = parsedSubs.filter((s) => s.enabled).map((s) => s.partnerAction)
 
   return Object.entries(def.actions).reduce((acc, [key, action]) => {
-    if (!actionsToLoad.includes(key)) return acc
+    // Grab all the subscriptions that invoke this action
+    const actionSubscriptions = parsedSubs.filter((s) => s.enabled && s.partnerAction === key)
+    if (actionSubscriptions.length === 0) return acc
 
     async function evaluate(ctx: Context): Promise<Context> {
-      const validSubs = parsedSubs.filter((subscription) => {
-        const isSubscribed = validate(parseFql(subscription.subscribe), ctx.event)
-        return isSubscribed
-      })
+      const invocations: Array<MaybePromise<unknown>> = []
 
-      // the transform function mutates the `mapping` object in the original subscription for some reason
-      // we do not want that to happen on the web though
-      const clonedSubs = JSON.parse(JSON.stringify(validSubs)) as Subscription[]
+      for (const sub of actionSubscriptions) {
+        const isSubscribed = validate(parseFql(sub.subscribe), ctx.event)
+        if (!isSubscribed) continue
 
-      const invocations = clonedSubs.map(async (sub) => {
-        const actionSlug = sub.partnerAction
-        if (actionSlug !== key) {
-          return
-        }
+        const mapping = (sub.mapping ?? {}) as JSONObject
+        const payload = transform(mapping, ctx.event as unknown as JSONObject)
 
         const input: ActionInput<S, unknown> = {
-          payload: ctx.event,
-          mapping: (sub.mapping ?? {}) as JSONObject,
-          cachedFields: {},
+          payload,
+          mapping,
           settings,
           analytics,
           context: ctx
         }
 
-        if (sub.mapping) {
-          input.payload = transform(sub.mapping, input.payload as JSONObject)
-        }
-
-        return action.perform(client, input)
-      })
+        invocations.push(action.perform(client, input))
+      }
 
       await Promise.all(invocations)
       // TODO: some sort of error handling

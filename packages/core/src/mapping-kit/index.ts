@@ -119,9 +119,14 @@ export function transform(mapping: JSONLikeObject, payload: JSONObject = {}): JS
   // throws if the mapping config is invalid
   validate(mapping)
 
-  let resolved = resolve(mapping, payload)
-  resolved = removeUndefined(resolved)
+  const cloned = cloneJson(mapping)
+  const resolved = resolve(cloned, payload)
+  const cleaned = removeUndefined(resolved)
 
   // Cast because we know there are no `undefined` values anymore
-  return resolved as JSONObject
+  return cleaned as JSONObject
+}
+
+function cloneJson<T>(obj: T): T {
+  return JSON.parse(JSON.stringify(obj))
 }
