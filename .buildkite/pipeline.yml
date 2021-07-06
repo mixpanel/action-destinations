@@ -1,6 +1,6 @@
 env:
   SEGMENT_CONTEXTS: 'snyk,npm,aws-credentials'
-  SEGMENT_BUILDKITE_IMAGE: 'buildkite-agent-node12'
+  SEGMENT_BUILDKITE_IMAGE: 'buildkite-agent-node14'
 
 steps:
   - label: '🐳 Test & Build'

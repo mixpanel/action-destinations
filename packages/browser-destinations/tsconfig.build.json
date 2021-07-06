@@ -3,7 +3,7 @@
   "compilerOptions": {
     "outDir": "dist",
     "importHelpers": true,
-    "lib": ["es2018", "dom"]
+    "lib": ["es2020", "dom"]
   },
   "exclude": ["**/__tests__/**/*.ts"],
   "include": ["src"]

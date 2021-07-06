@@ -1,6 +1,6 @@
 # Our internal Node base image that's automatically kept update to date with security patches
 # https://github.com/segmentio/images/blob/master/segment/node
-FROM 528451384384.dkr.ecr.us-west-2.amazonaws.com/segment-node:10.20
+FROM 528451384384.dkr.ecr.us-west-2.amazonaws.com/segment-node:14.16 as build
 
 # Install packages required for compiling native bindings
 RUN apk update && apk upgrade
@@ -17,7 +17,7 @@ RUN npm rebuild bcrypt --build-from-source
 
 # Use a multi stage build so that the packages required for
 # compiling native bindings aren't in the final image
-FROM 528451384384.dkr.ecr.us-west-2.amazonaws.com/segment-node:10.20
+FROM 528451384384.dkr.ecr.us-west-2.amazonaws.com/segment-node:14.16
 
 RUN apk --update add curl
 

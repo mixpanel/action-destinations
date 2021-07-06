@@ -9,7 +9,7 @@
   },
   "main": "dist/src/app.js",
   "engines": {
-    "node": ">=10.20"
+    "node": ">=14.16"
   },
   "engineStrict": true,
   "private": true,
@@ -31,7 +31,7 @@
     "@types/jest": "^26.0.23",
     "@types/lodash": "^4.14.168",
     "@types/module-alias": "^2.0.0",
-    "@types/node": "^10.17.0",
+    "@types/node": "^14.0.0",
     "@types/test-listen": "^1.1.0",
     "@types/whatwg-mimetype": "^2.1.0",
     "got": "^10.0.0",
