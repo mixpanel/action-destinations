@@ -9,6 +9,8 @@ import beginCheckout from './beginCheckout'
 import selectPromotion from './selectPromotion'
 import viewItem from './viewItem'
 
+import viewPromotion from './viewPromotion'
+
 const destination: DestinationDefinition<Settings> = {
   name: 'Google Analytics 4',
   authentication: {
@@ -51,7 +53,8 @@ const destination: DestinationDefinition<Settings> = {
     selectItem,
     beginCheckout,
     selectPromotion,
-    viewItem
+    viewItem,
+    viewPromotion
   }
 }
 
