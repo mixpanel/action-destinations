@@ -51,7 +51,7 @@ const presets: DestinationDefinition['presets'] = [
 ]
 
 const destination: DestinationDefinition<Settings> = {
-  name: 'Amplitude',
+  name: 'Amplitude (Actions)',
   authentication: {
     scheme: 'custom',
     fields: {

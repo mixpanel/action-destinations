@@ -106,7 +106,7 @@ describe('ajs-integration', () => {
     expect(ajs.queue.plugins.map((p) => ({ name: p.name, type: p.type }))).toMatchInlineSnapshot(`
       Array [
         Object {
-          "name": "Amplitude Browser Plugins sessionId",
+          "name": "Amplitude (Actions) sessionId",
           "type": "enrichment",
         },
       ]

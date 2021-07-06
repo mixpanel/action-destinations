@@ -4,7 +4,7 @@ import { browserDestination } from '../../runtime/shim'
 import sessionId from './sessionId'
 
 export const destination: BrowserDestinationDefinition<Settings, {}> = {
-  name: 'Amplitude Browser Plugins',
+  name: 'Amplitude (Actions)',
   actions: {
     sessionId
   },
