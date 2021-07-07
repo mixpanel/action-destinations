@@ -39,6 +39,17 @@ autodeploy:
   stage:
     branch: staging
 
+security-groups:
+  from-config:
+    - "DEFAULT_SECURITY_GROUP"
+    - "CONTROL_PLANE_CROSS_REGION"
+
+config-providers:
+  - name: "tfe-stage"
+    type: "terraform"
+    options:
+      environment: "segment-infra/stage"
+
 config:
   production:
     AWS_REGION: us-west-2
@@ -57,6 +68,10 @@ config:
     DATADOG_AGENT_ADDR: '172.17.42.1:8125'
     SENTRY_DSN: https://e1f53320787f46a28883db55c7e73c71@o19879.ingest.sentry.io/5510102
     STATS_PREFIX: fab-5-ops
+    CONTROL_PLANE_CROSS_REGION: "sg-0f5db0fed73ba7910"
+    DEFAULT_SECURITY_GROUP:
+      provider: "tfe-stage"
+      key: "security_groups"
 
   dev:
     <<: *stage_config
