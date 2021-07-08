@@ -76,6 +76,11 @@ registerStringDirective('@template', (template: string, payload) => {
   return render(template, payload)
 })
 
+// Literal should be used in place of 'empty' template strings as they will not resolve correctly
+registerDirective('@literal', (value) => {
+  return value
+})
+
 /**
  * Resolves a mapping value/object by applying the input payload based on directives
  * *WARNING* This function mutates `mapping` when an object

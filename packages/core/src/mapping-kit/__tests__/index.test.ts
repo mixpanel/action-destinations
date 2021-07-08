@@ -23,6 +23,12 @@ describe('validations', () => {
     expect(() => {
       transform({ a: 1, b: { '@path': '$.foo.bar' } })
     }).not.toThrow()
+    expect(() => {
+      transform({ '@literal': '123' })
+    }).not.toThrow()
+    expect(() => {
+      transform({ '@literal': false })
+    }).not.toThrow()
   })
 
   test('invalid', () => {
@@ -31,6 +37,9 @@ describe('validations', () => {
     }).toThrow()
     expect(() => {
       transform({ oops: { '@merge': [{}, 123] } })
+    }).toThrow()
+    expect(() => {
+      transform({ '@template': false }, {})
     }).toThrow()
     // Further validation tests are in validate.test.js
   })
