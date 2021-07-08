@@ -14,8 +14,8 @@ export default class Init extends Command {
   static description = `Scaffolds a new integration with a template. This does not register or deploy the integration.`
 
   static examples = [
-    `$ segment init my-integration`,
-    `$ segment init my-integration --directory packages/destination-actions --template basic-auth`
+    `$ ./bin/run init my-integration`,
+    `$ ./bin/run init my-integration --directory packages/destination-actions --template basic-auth`
   ]
 
   static flags = {

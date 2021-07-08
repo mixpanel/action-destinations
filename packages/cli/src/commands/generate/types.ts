@@ -16,8 +16,8 @@ export default class GenerateTypes extends Command {
   static description = `Generates TypeScript definitions for an integration.`
 
   static examples = [
-    `$ segment generate:types`,
-    `$ segment generate:types --path ./packages/*/src/destinations/*/index.ts`
+    `$ ./bin/run generate:types`,
+    `$ ./bin/run generate:types --path ./packages/*/src/destinations/*/index.ts`
   ]
 
   // Allow variable length args (to work with tools like lint-staged)

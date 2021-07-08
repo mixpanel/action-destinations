@@ -30,7 +30,7 @@ export default class Push extends Command {
 
   static description = `Introspects your integration definition to build and upload your integration to Segment. Requires \`robo stage.ssh\` or \`robo prod.ssh\`.`
 
-  static examples = [`$ segment push`]
+  static examples = [`$ ./bin/run push`]
 
   static flags = {
     help: flags.help({ char: 'h' }),

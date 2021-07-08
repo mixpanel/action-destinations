@@ -17,8 +17,8 @@ export default class GenerateAction extends Command {
   static description = `Scaffolds a new integration action.`
 
   static examples = [
-    `$ segment generate:action ACTION <browser|server>`,
-    `$ segment generate:action postToChannel server --directory=./destinations/slack`
+    `$ ./bin/run generate:action ACTION <browser|server>`,
+    `$ ./bin/run generate:action postToChannel server --directory=./destinations/slack`
   ]
 
   static flags = {

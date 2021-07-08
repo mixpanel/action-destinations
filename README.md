@@ -150,11 +150,11 @@ Everytime the definition for destinations or actions changes, run the following 
 
 ```sh
 $ robo sshuttle
-$ npx segment push
+$ ./bin/run push
 #  If the above commands worked without any issues, continue
 $ robo prod.ssh
 $ goto fab-5-engine && yarn install
-$ npx segment push
+$ ./bin/run push
 ```
 
 ## Deploying

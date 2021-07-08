@@ -15,7 +15,7 @@ export default class Register extends Command {
 
   static description = `Creates a new integration on Segment.`
 
-  static examples = [`$ segment register`]
+  static examples = [`$ ./bin/run register`]
 
   static flags = {
     help: flags.help({ char: 'h' })
