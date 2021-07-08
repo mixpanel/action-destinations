@@ -10,7 +10,7 @@ labels:
 container:
   image: fab-5-engine
   repository: 528451384384.dkr.ecr.us-west-2.amazonaws.com
-  cmd: ['./scripts/run.sh']
+  cmd: ["./scripts/run.sh"]
 
 expose:
   - name: http
@@ -49,6 +49,10 @@ config-providers:
     type: "terraform"
     options:
       environment: "segment-infra/stage"
+  - name: "tfe-prod"
+    type: "terraform"
+    options:
+      environment: "segment/production"
 
 config:
   production:
@@ -56,16 +60,20 @@ config:
     NODE_ENV: production
     PORT: 3000
     UV_THREADPOOL_SIZE: 128
-    DATADOG_AGENT_ADDR: '172.17.42.1:8125'
+    DATADOG_AGENT_ADDR: "172.17.42.1:8125"
     SENTRY_DSN: https://e1f53320787f46a28883db55c7e73c71@o19879.ingest.sentry.io/5510102
     STATS_PREFIX: fab-5-ops
+    DEFAULT_SECURITY_GROUP:
+      provider: "tfe-prod"
+      key: "security_groups"
+    CONTROL_PLANE_CROSS_REGION: "sg-0d4dfca64523eb4b1"
 
   stage: &stage_config
     AWS_REGION: us-west-2
     NODE_ENV: stage
     PORT: 3000
     UV_THREADPOOL_SIZE: 128
-    DATADOG_AGENT_ADDR: '172.17.42.1:8125'
+    DATADOG_AGENT_ADDR: "172.17.42.1:8125"
     SENTRY_DSN: https://e1f53320787f46a28883db55c7e73c71@o19879.ingest.sentry.io/5510102
     STATS_PREFIX: fab-5-ops
     CONTROL_PLANE_CROSS_REGION: "sg-0f5db0fed73ba7910"
