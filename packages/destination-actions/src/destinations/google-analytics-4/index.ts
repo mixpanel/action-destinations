@@ -8,6 +8,7 @@ import selectItem from './selectItem'
 import beginCheckout from './beginCheckout'
 import selectPromotion from './selectPromotion'
 import viewItem from './viewItem'
+import search from './search'
 import viewItemList from './viewItemList'
 import signUp from './signUp'
 import viewPromotion from './viewPromotion'
@@ -55,6 +56,7 @@ const destination: DestinationDefinition<Settings> = {
     beginCheckout,
     selectPromotion,
     viewItem,
+    search,
     viewItemList,
     signUp,
     viewPromotion,
