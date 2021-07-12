@@ -38,6 +38,13 @@ export default class GenerateTypes extends Command {
   async run() {
     const { flags } = this.parse(GenerateTypes)
 
+    // `generate:types` requires typescript support to parse TypeScript source files
+    // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-unsafe-call
+    require('ts-node').register({
+      emit: false,
+      transpileOnly: true
+    })
+
     const globs = flags.path || ['./packages/*/src/destinations/*/index.ts']
     const files = await globby(globs, {
       expandDirectories: false,
