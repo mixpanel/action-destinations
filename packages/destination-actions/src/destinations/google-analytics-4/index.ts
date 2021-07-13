@@ -18,6 +18,7 @@ import generateLead from './generateLead'
 import addToWishlist from './addToWishlist'
 import addPaymentInfo from './addPaymentInfo'
 import refund from './refund'
+import removeFromCart from './removeFromCart'
 
 const destination: DestinationDefinition<Settings> = {
   name: 'Google Analytics 4',
@@ -62,6 +63,7 @@ const destination: DestinationDefinition<Settings> = {
     beginCheckout,
     selectPromotion,
     viewItem,
+    removeFromCart,
     viewCart,
     search,
     viewItemList,
