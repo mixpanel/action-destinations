@@ -16,6 +16,7 @@ import viewCart from './viewCart'
 import login from './login'
 import generateLead from './generateLead'
 import addToWishlist from './addToWishlist'
+import addPaymentInfo from './addPaymentInfo'
 import refund from './refund'
 
 const destination: DestinationDefinition<Settings> = {
@@ -66,6 +67,7 @@ const destination: DestinationDefinition<Settings> = {
     viewItemList,
     signUp,
     viewPromotion,
+    addPaymentInfo,
     refund,
     login,
     generateLead,
