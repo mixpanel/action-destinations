@@ -14,6 +14,8 @@ import signUp from './signUp'
 import viewPromotion from './viewPromotion'
 import viewCart from './viewCart'
 
+import addToWishlist from './addToWishlist'
+
 const destination: DestinationDefinition<Settings> = {
   name: 'Google Analytics 4',
   authentication: {
@@ -62,6 +64,7 @@ const destination: DestinationDefinition<Settings> = {
     viewItemList,
     signUp,
     viewPromotion,
+    addToWishlist
   }
 }
 
