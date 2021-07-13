@@ -13,7 +13,7 @@ import viewItemList from './viewItemList'
 import signUp from './signUp'
 import viewPromotion from './viewPromotion'
 import viewCart from './viewCart'
-
+import generateLead from './generateLead'
 import addToWishlist from './addToWishlist'
 
 const destination: DestinationDefinition<Settings> = {
@@ -64,6 +64,7 @@ const destination: DestinationDefinition<Settings> = {
     viewItemList,
     signUp,
     viewPromotion,
+    generateLead,
     addToWishlist
   }
 }
