@@ -8,7 +8,14 @@ export const RESERVED_FIELD_NAMES = [
   'acccess_token',
   'refresh-token',
   'refresh_token',
-  'token_type'
+  'token_type',
+  'apikey',
+  'apisecret',
+  'clientsecret',
+  'password',
+  'secretkey',
+  'secret',
+  'securitytoken'
 ]
 
 export const OAUTH_SCHEME = 'oauth2'

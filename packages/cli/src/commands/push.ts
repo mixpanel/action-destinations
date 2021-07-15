@@ -268,7 +268,10 @@ export function getOptions(
   for (const [fieldKey, schema] of Object.entries(destinationSchema.authentication?.fields ?? {})) {
     const validators: string[][] = []
 
-    if (RESERVED_FIELD_NAMES.includes(fieldKey.toLowerCase())) {
+    if (
+      RESERVED_FIELD_NAMES.includes(fieldKey.toLowerCase()) &&
+      destinationSchema.authentication?.scheme === OAUTH_SCHEME
+    ) {
       throw new Error(`Schema contains a field definition that uses a reserved name: ${fieldKey}`)
     }
 
@@ -288,11 +291,11 @@ export function getOptions(
       type: 'string',
       validators
     }
+  }
 
-    // Add oauth settings
-    if (destinationSchema.authentication?.scheme === OAUTH_SCHEME) {
-      options['oauth'] = OAUTH_OPTIONS
-    }
+  // Add oauth settings
+  if (destinationSchema.authentication?.scheme === OAUTH_SCHEME) {
+    options['oauth'] = OAUTH_OPTIONS
   }
 
   return options

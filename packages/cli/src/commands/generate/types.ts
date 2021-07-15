@@ -104,7 +104,7 @@ export default class GenerateTypes extends Command {
     const stats = fs.statSync(file)
     const parentDir = stats.isDirectory() ? file : path.dirname(file)
     let authFields = destination.authentication?.fields
-    if (authFields) {
+    if (authFields && destination.authentication?.scheme === OAUTH_SCHEME) {
       for (const key in authFields) {
         if (RESERVED_FIELD_NAMES.includes(key.toLowerCase())) {
           throw new Error(`Field definition in destination ${destination.name} is using a reserved name: ${key}`)

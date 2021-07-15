@@ -2,17 +2,17 @@ import type { DestinationSchema } from '../commands/push'
 import type { DestinationMetadata } from '../lib/control-plane-service'
 
 export const expectedDestinationMetadataOptions = {
-  apiSecret: {
+  customKey: {
     default: '',
     description:
       'An API SECRET generated in the Google Analytics UI, navigate to: Admin > Data Streams > choose your stream > Measurement Protocol > Create',
     encrypt: false,
     hidden: false,
-    label: 'API Secret',
+    label: 'API Key',
     private: true,
     scope: 'event_destination',
     type: 'string',
-    validators: [['required', 'The apiSecret property is required.']]
+    validators: [['required', 'The customKey property is required.']]
   },
   metadata: {
     type: 'string',
@@ -108,15 +108,15 @@ export const destinationMetadata: DestinationMetadata = {
   unbundleByDefault: false,
   browserUnbundlingPublic: true,
   options: {
-    apiSecret: {
+    customKey: {
       type: 'string',
       default: '',
       private: true,
       encrypt: false,
       hidden: false,
       scope: 'event_destination',
-      label: 'API Secret',
-      description: 'API Secret description',
+      label: 'API Key',
+      description: 'API Key description',
       validators: []
     },
     metadata: {
@@ -143,7 +143,7 @@ export const destinationMetadata: DestinationMetadata = {
       validators: []
     }
   },
-  basicOptions: ['subscriptions', 'metadata', 'apiSecret'],
+  basicOptions: ['subscriptions', 'metadata', 'customKey'],
   advancedOptions: [],
   developerCenterMetadata: {},
   partnerSettings: {},
@@ -157,8 +157,8 @@ export const destinationSchema: DestinationSchema = {
   authentication: {
     scheme: 'oauth2',
     fields: {
-      apiSecret: {
-        label: 'API Secret',
+      customKey: {
+        label: 'API Key',
         description:
           'An API SECRET generated in the Google Analytics UI, navigate to: Admin > Data Streams > choose your stream > Measurement Protocol > Create',
         type: 'string',
