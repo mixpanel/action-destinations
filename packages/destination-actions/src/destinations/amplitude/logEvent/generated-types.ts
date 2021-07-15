@@ -18,7 +18,7 @@ export interface Payload {
    */
   event_type: string
   /**
-   * The start time of the session, necessary if you want to associate events with a particular system.
+   * The start time of the session, necessary if you want to associate events with a particular system. To use automatic Amplitude session tracking in browsers, enable Analytics 2.0 on your connected source.
    */
   session_id?: string | number
   /**
