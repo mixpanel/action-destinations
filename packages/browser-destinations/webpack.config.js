@@ -3,9 +3,13 @@ const globby = require('globby')
 const TerserPlugin = require('terser-webpack-plugin')
 const CompressionPlugin = require('compression-webpack-plugin')
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+const webpack = require('webpack')
 
 const files = globby.sync('./src/destinations/*/index.ts')
 const isProd = process.env.NODE_ENV === 'production'
+const assetPath =
+  process.env.ASSET_ENV === 'production' ? 'https://cdn.segment.com/next-integrations/actions/' :
+  (process.env.ASSET_ENV === 'stage' ? 'https://cdn.segment.build/next-integrations/actions/' : undefined)
 
 const entries = files.reduce((acc, current) => {
   const [_dot, _src, _destinations, destination, ..._rest] = current.split('/')
@@ -15,7 +19,10 @@ const entries = files.reduce((acc, current) => {
   }
 }, {})
 
-const plugins = isProd ? [new CompressionPlugin()] : []
+const plugins = [new webpack.DefinePlugin({'process.env.ASSET_ENV': JSON.stringify(process.env.ASSET_ENV)})]
+if (isProd) {
+  plugins.push(new CompressionPlugin())
+}
 
 if (process.env.ANALYZE) {
   plugins.push(new BundleAnalyzerPlugin({
@@ -29,7 +36,7 @@ module.exports = {
   devtool: 'source-map',
   output: {
     path: path.resolve(__dirname, 'dist/web'),
-    publicPath: isProd ? 'https://ajs-next-integrations.s3-us-west-2.amazonaws.com/fab-5/' : undefined,
+    publicPath: assetPath,
     library: '[name]Destination',
     libraryTarget: 'umd',
     libraryExport: 'default'
