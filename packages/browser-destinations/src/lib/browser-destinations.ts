@@ -7,7 +7,7 @@ import type {
   JSONLikeObject
 } from '@segment/actions-core'
 
-export type ActionInput<Settings, Payload> = Omit<ExecuteInput<Settings, Payload>, 'cachedFields'> & {
+export type ActionInput<Settings, Payload> = ExecuteInput<Settings, Payload> & {
   analytics: Analytics
   context: Context
 }

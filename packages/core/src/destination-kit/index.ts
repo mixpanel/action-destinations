@@ -163,7 +163,7 @@ export class Destination<Settings = JSONObject> {
   }
 
   async testAuthentication(settings: Settings): Promise<void> {
-    const context: ExecuteInput<Settings, {}> = { settings, payload: {}, cachedFields: {} }
+    const context: ExecuteInput<Settings, {}> = { settings, payload: {} }
 
     if (this.settingsSchema) {
       const step = new Validate('settings', this.settingsSchema)
@@ -195,8 +195,8 @@ export class Destination<Settings = JSONObject> {
         501
       )
     }
-    // TODO: clean up context/extendRequest so we don't have to send information that is not needed (payload & cachedFields)
-    const context: ExecuteInput<Settings, {}> = { settings, payload: {}, cachedFields: {} }
+    // TODO: clean up context/extendRequest so we don't have to send information that is not needed (payload)
+    const context: ExecuteInput<Settings, {}> = { settings, payload: {} }
     const options = this.extendRequest?.(context) ?? {}
     const requestClient = createRequestClient(options)
 
@@ -231,7 +231,6 @@ export class Destination<Settings = JSONObject> {
     }
 
     return action.execute({
-      cachedFields: {},
       mapping,
       payload: event,
       settings

@@ -13,8 +13,6 @@ export interface ExecuteInput<Settings, Payload> {
   readonly settings: Settings
   /** The transformed input data, based on `mapping` + `event` */
   payload: Payload
-  /** The ids from cached requests */
-  cachedFields: { [key: string]: string | null | undefined }
   /** The page used in dynamic field requests */
   page?: string
 }

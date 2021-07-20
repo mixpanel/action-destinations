@@ -20,8 +20,7 @@ test('can append a field', () => {
     state: 'done',
     input: {
       payload: {},
-      settings: {},
-      cachedFields: {}
+      settings: {}
     },
     output: []
   }

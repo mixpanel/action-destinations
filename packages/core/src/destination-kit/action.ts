@@ -3,9 +3,7 @@ import { AggregateAjvError } from '@segment/ajv-human-errors'
 import Ajv from 'ajv'
 import dayjs from 'dayjs'
 import { EventEmitter } from 'events'
-import NodeCache from 'node-cache'
 import createRequestClient from '../create-request-client'
-import { get } from '../get'
 import { JSONLikeObject, JSONObject } from '../json-object'
 import { transform } from '../mapping-kit'
 import { fieldsToJsonSchema } from './fields-to-jsonschema'
@@ -51,19 +49,6 @@ export interface ActionDefinition<Settings, Payload = any> {
    */
   dynamicFields?: {
     [K in keyof Payload]?: RequestFn<Settings, Payload, DynamicFieldResponse>
-  }
-
-  /**
-   * Register fields that should be executed, cached and provided
-   * to the action's `perform` function
-   */
-  cachedFields?: {
-    [field: string]: {
-      key: (data: ExecuteInput<Settings, Payload>) => string
-      ttl: number
-      value: RequestFn<Settings, Payload>
-      negative?: boolean
-    }
   }
 
   /** The operation to perform when this action is triggered */
@@ -198,76 +183,9 @@ class Request<Settings, Payload> extends Step<Settings, Payload> {
   }
 }
 
-interface CachedRequestConfig<Settings, Payload> {
-  key: (data: ExecuteInput<Settings, Payload>) => string
-  value: RequestFn<Settings, Payload>
-  as: string
-  ttl: number
-  negative?: boolean
-}
-
-// CachedRequest is like Request but cached. Next question.
-class CachedRequest<Settings, Payload> extends Request<Settings, Payload> {
-  keyFn: Function
-  valueFn: Function
-  as: string
-  negative: boolean
-  cache: NodeCache
-
-  constructor(
-    extension: RequestExtension<Settings, Payload> | undefined,
-    config: CachedRequestConfig<Settings, Payload>
-  ) {
-    super(extension)
-
-    this.keyFn = config.key
-    this.valueFn = config.value
-    this.as = config.as
-    this.negative = config.negative || false
-
-    this.cache = new NodeCache({
-      stdTTL: config.ttl,
-      maxKeys: 1000
-    })
-  }
-
-  async executeStep(data: ExecuteInput<Settings, Payload>): Promise<string> {
-    const k = this.keyFn(data)
-    let v = this.cache.get<string>(k)
-
-    if (v !== undefined) {
-      data.cachedFields[this.as] = v
-      return 'cache hit'
-    }
-
-    const request = this.createRequestClient(data)
-
-    try {
-      v = await this.valueFn(request, data)
-    } catch (e) {
-      if (get(e, 'response.status') === 404) {
-        v = undefined
-      } else {
-        throw e
-      }
-    }
-
-    // Only cache if value is not negative *or* negative option is set. Negative caching is off by
-    // default because the common cases are: A) auth token generation, which should never be
-    // negative, and B) create-or-update patterns, where the resource should exist after the first
-    // negative value.
-    if ((v !== null && v !== undefined) || this.negative) {
-      this.cache.set(k, v)
-    }
-
-    return 'cache miss'
-  }
-}
-
 interface ExecuteDynamicFieldInput<Settings, Payload> {
   settings: Settings
   payload: Payload
-  cachedFields: { [key: string]: string }
   page?: string
 }
 
@@ -335,13 +253,6 @@ export class Action<Settings, Payload extends JSONLikeObject> extends EventEmitt
       this.dynamicField(field, callback as RequestFn<Settings, Payload>)
     })
 
-    Object.entries(definition.cachedFields ?? {}).forEach(([field, cacheConfig]) => {
-      this.cachedRequest({
-        ...cacheConfig,
-        as: field
-      })
-    })
-
     if (definition.perform) {
       this.request(definition.perform)
     }
@@ -359,11 +270,6 @@ export class Action<Settings, Payload extends JSONLikeObject> extends EventEmitt
   private request(requestFn: RequestFn<Settings, Payload>): void {
     const step = new Request<Settings, Payload>(this.extendRequest, requestFn)
     step.on('response', (response) => this.emit('response', response))
-    this.steps.push(step)
-  }
-
-  private cachedRequest(config: CachedRequestConfig<Settings, Payload>): void {
-    const step = new CachedRequest(this.extendRequest, config)
     this.steps.push(step)
   }
 }

@@ -82,7 +82,6 @@ app.post(
       const result = await actionDefinition.executeDynamicField(field, {
         payload: mapping,
         settings,
-        cachedFields: {},
         page
       })
 
@@ -171,8 +170,7 @@ app.post(
       const results = await actionDefinition.execute({
         settings,
         payload: event,
-        mapping,
-        cachedFields: {}
+        mapping
       })
 
       const response = results[results.length - 1]?.output ?? ''

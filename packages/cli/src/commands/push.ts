@@ -232,7 +232,6 @@ function definitionToJson(definition: DestinationDefinition) {
 
   for (const action of Object.keys(copy.actions)) {
     delete copy.actions[action].dynamicFields
-    delete copy.actions[action].cachedFields
     copy.actions[action].hidden = copy.actions[action].hidden ?? false
   }
 
