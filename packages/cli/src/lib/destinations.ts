@@ -2,7 +2,10 @@ import { DestinationDefinition } from '@segment/actions-core'
 import path from 'path'
 import { clearRequireCache } from './require-cache'
 
-/** Attempts to load a destination definition from a given file path */
+/**
+ * Attempts to load a destination definition from a given file path
+ * Note: this requires ts-node when loading .ts files
+ */
 export async function loadDestination(filePath: string): Promise<null | DestinationDefinition> {
   const importPath = path.isAbsolute(filePath) ? filePath : path.join(process.cwd(), filePath)
 

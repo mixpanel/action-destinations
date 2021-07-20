@@ -24,6 +24,12 @@ export default class Register extends Command {
   async run() {
     const { flags } = this.parse(Register)
 
+    // `register` requires typescript support to parse TypeScript source files
+    // This is needed if we don't want to require developers compile the project first.
+    // Note: we aren't using transpileOnly because we do want this to fail if there are type errors.
+    // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-unsafe-call
+    require('ts-node').register({ emit: false })
+
     // TODO support a command flag for this
     const integrationsGlob = './packages/destination-actions/src/destinations/*'
     const integrationDirs = await globby(integrationsGlob, {
