@@ -60,8 +60,8 @@ export default class Push extends Command {
     }
 
     if (!destinationIds.length) {
-      this.warn(`You must select at least one destination. Exiting...`)
-      return
+      this.warn(`You must select at least one destination. Exiting.`)
+      this.exit()
     }
 
     this.spinner.start(

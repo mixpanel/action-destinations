@@ -2,11 +2,12 @@ import { Command, flags } from '@oclif/command'
 import globby from 'globby'
 import ora from 'ora'
 import path from 'path'
+import os from 'os'
 import slugify from 'slugify'
 import { loadDestination } from '../lib/destinations'
 import { controlPlaneService } from '../lib/control-plane-service'
 import type { CreateDestinationMetadataInput, DestinationMetadataOptions } from '../lib/control-plane-service'
-import { autoPrompt } from '../lib/prompt'
+import { autoPrompt, prompt } from '../lib/prompt'
 
 const NOOP_CONTEXT = {}
 
@@ -28,7 +29,7 @@ export default class Register extends Command {
     // This is needed if we don't want to require developers compile the project first.
     // Note: we aren't using transpileOnly because we do want this to fail if there are type errors.
     // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-unsafe-call
-    require('ts-node').register({ emit: false })
+    require('ts-node').register({ emit: false, transpileOnly: true })
 
     // TODO support a command flag for this
     const integrationsGlob = './packages/destination-actions/src/destinations/*'
@@ -54,7 +55,7 @@ export default class Register extends Command {
 
     if (!selectedDestination) {
       this.warn('You must choose a destination. Exiting.')
-      return
+      this.exit()
     }
 
     this.spinner.start(`Introspecting definition`)
@@ -63,7 +64,7 @@ export default class Register extends Command {
     if (!destination) {
       this.spinner.fail()
       this.warn('No destination definition found. Exiting.')
-      return
+      this.exit()
     } else {
       this.spinner.succeed()
     }
@@ -73,23 +74,11 @@ export default class Register extends Command {
 
     if (destination.slug && destination.slug !== slug) {
       this.warn(`Your destination slug does not meet the requirements. Try \`${slug}\` instead`)
-      return
+      this.exit()
     }
 
     // Ensure we don't already have a destination with this slug...
-    this.spinner.start(`Checking availability for ${slug}`)
-    const { data, error } = await controlPlaneService.getDestinationMetadataBySlug(NOOP_CONTEXT, { slug })
-    if (error?.statusCode === 404) {
-      this.spinner.succeed()
-    } else if (error) {
-      this.spinner.fail()
-      this.error(`Error checking availablity for ${slug}: ${error.message}`)
-    } else if (data?.metadata) {
-      this.spinner.fail()
-      this.error(
-        `There is already a destination registered for ${slug} named "${data.metadata.name}" that was created ${data.metadata.createdAt}.`
-      )
-    }
+    await this.isDestinationSlugAvailable(slug)
 
     this.spinner.start(`Preparing destination definition`)
 
@@ -131,17 +120,29 @@ export default class Register extends Command {
     }
 
     this.spinner.succeed()
-    this.log(`Here is the JSON you need to use to create your destination in Partner Portal:`)
-    this.log(JSON.stringify(definition, null, 2))
 
-    // TODO actually create the destination
-    // const { data, error } = await controlPlaneService.createDestinationMetadata(NOOP_CONTEXT, {
-    //   input: {
-    //     options: metadata.options,
-    //   }
-    // })
+    this.log(`Please review the definition before continuing:`)
+    this.log(`\n${JSON.stringify(definition, null, 2)}`)
 
-    return
+    // Loosely verify that we are on the production workbench
+    const hostname = os.hostname()
+    if (!hostname.startsWith('workbench-') || !hostname.includes('-production-')) {
+      this.warn(`You must be logged into a production workbench to register your destination. Exiting.`)
+      this.exit()
+    }
+
+    const { shouldContinue } = await prompt({
+      type: 'confirm',
+      name: 'shouldContinue',
+      message: `Do you want to register "${name}"?`,
+      initial: false
+    })
+
+    if (!shouldContinue) {
+      this.log('Exiting without registering.')
+    }
+
+    await this.createDestinationMetadata(definition)
   }
 
   async catch(error: unknown) {
@@ -149,5 +150,37 @@ export default class Register extends Command {
       this.spinner.fail()
     }
     throw error
+  }
+
+  private async isDestinationSlugAvailable(slug: string): Promise<boolean> {
+    this.spinner.start(`Checking availability for ${slug}`)
+
+    const { error } = await controlPlaneService.getDestinationMetadataBySlug(NOOP_CONTEXT, { slug })
+    if (error?.statusCode === 404) {
+      this.spinner.succeed()
+      return true
+    } else if (error) {
+      this.spinner.fail()
+      this.error(`Error checking availablity for ${slug}: ${error.message}`)
+    } else {
+      this.spinner.warn()
+      this.warn(`There is already a destination with the slug "${slug}". Exiting.`)
+      this.exit()
+    }
+  }
+
+  private async createDestinationMetadata(input: CreateDestinationMetadataInput['input']): Promise<void> {
+    this.spinner.start(`Registering ${input.name}`)
+
+    const { data, error } = await controlPlaneService.createDestinationMetadata(NOOP_CONTEXT, { input })
+
+    if (data?.metadata) {
+      this.spinner.succeed()
+      this.log(`Successfully registered destination with id:`)
+      this.log(`\n${data.metadata.id}`)
+    } else {
+      this.spinner.fail()
+      this.error(`Error registering destination: ${error?.message}`)
+    }
   }
 }
