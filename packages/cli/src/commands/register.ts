@@ -6,7 +6,7 @@ import os from 'os'
 import slugify from 'slugify'
 import { loadDestination } from '../lib/destinations'
 import { controlPlaneService } from '../lib/control-plane-service'
-import type { CreateDestinationMetadataInput, DestinationMetadataOptions } from '../lib/control-plane-service'
+import type { CreateDestinationMetadataInput } from '../lib/control-plane-service'
 import { autoPrompt, prompt } from '../lib/prompt'
 
 const NOOP_CONTEXT = {}
@@ -90,21 +90,6 @@ export default class Register extends Command {
 
     this.spinner.start(`Preparing destination definition`)
 
-    // We store the destination-level JSON Schema in an option with key `metadata`
-    // Currently this is needed to render the UI views for action destinations
-    const initialOptions: DestinationMetadataOptions = {
-      // This setting is required until we switch off the legacy "data model"
-      subscriptions: {
-        label: 'subscriptions',
-        type: 'string',
-        scope: 'event_destination',
-        private: false,
-        encrypt: false,
-        hidden: false,
-        validators: [['required', `The subscriptions property is required.`]]
-      }
-    }
-
     const definition: CreateDestinationMetadataInput['input'] = {
       name,
       slug,
@@ -119,12 +104,14 @@ export default class Register extends Command {
         group: true
       },
       platforms: {
+        // TODO derive from the actions' `platform` property
         browser: false,
         mobile: false,
+        // TODO derive from the actions' `platform` property
         server: true
       },
-      options: initialOptions,
-      basicOptions: Object.keys(initialOptions)
+      options: {},
+      basicOptions: []
     }
 
     this.spinner.succeed()

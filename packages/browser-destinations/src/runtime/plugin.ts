@@ -9,7 +9,7 @@ type MaybePromise<T> = T | Promise<T>
 export function generatePlugins<S, C>(
   def: BrowserDestinationDefinition<S, C>,
   settings: S,
-  subscriptions: string | Subscription[]
+  subscriptions: Subscription[]
 ): Plugin[] {
   let client: C
   let analytics: Analytics
@@ -23,12 +23,9 @@ export function generatePlugins<S, C>(
     analytics = analyticsInstance
   }
 
-  // Only load the actions that have active subscriptions
-  const parsedSubs: Subscription[] = typeof subscriptions === 'string' ? JSON.parse(subscriptions) : subscriptions
-
   return Object.entries(def.actions).reduce((acc, [key, action]) => {
-    // Grab all the subscriptions that invoke this action
-    const actionSubscriptions = parsedSubs.filter((s) => s.enabled && s.partnerAction === key)
+    // Grab all the enabled subscriptions that invoke this action
+    const actionSubscriptions = subscriptions.filter((s) => s.enabled && s.partnerAction === key)
     if (actionSubscriptions.length === 0) return acc
 
     async function evaluate(ctx: Context): Promise<Context> {

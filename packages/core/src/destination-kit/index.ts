@@ -331,14 +331,14 @@ export class Destination<Settings = JSONObject> {
   }
 
   private getSubscriptions(settings: JSONObject): Subscription[] {
+    // Support receiving:
+    // - a single subscription (e.g. via a Centrifuge job)
+    // - a list of subscriptions (e.g. via Event Tester or local testing)
     const { subscription, subscriptions } = settings
-    let parsedSubscriptions
+    let parsedSubscriptions: unknown
 
-    // To support event tester we need to parse and validate multiple subscriptions from the settings
     if (subscription) {
       parsedSubscriptions = [subscription]
-    } else if (typeof subscriptions === 'string') {
-      parsedSubscriptions = JSON.parse(subscriptions)
     } else if (Array.isArray(subscriptions)) {
       parsedSubscriptions = subscriptions
     } else {

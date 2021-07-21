@@ -7,6 +7,6 @@ export function browserDestination<S, C>(definition: BrowserDestinationDefinitio
       /* webpackMode: "lazy-once" */
       './plugin'
     )
-    return plugin.generatePlugins(definition, settings, settings?.subscriptions || [])
+    return plugin.generatePlugins(definition, settings, settings.subscriptions || [])
   }
 }

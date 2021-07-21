@@ -101,14 +101,14 @@ curl --request POST \
 
 ## Configuring
 
-Action destinations are configured using a single Destination setting (`subscriptions`) that should contain a JSON blob of all subscriptions for the destination. The format should look like this:
+Action destinations are configured using 1 or more Destination Subscriptions. Each subscription should look like this:
 
 ```js
 [
   {
     "subscribe": "<fql query>",
     "partnerAction": "<actionSlug>",
-
+    "enabled": true,
     // See ./packages/core/src/mapping-kit/README.md for documentation. The keys in this object should match the `action.fields`
     "mapping": { ... }
   }
@@ -122,6 +122,7 @@ Here's a full example:
   {
     "subscribe": "type = 'track'",
     "partnerAction": "postToChannel",
+    "enabled": true,
     "mapping": {
       "text": {
         "@template": "Tracked! event={{event}}, {{properties.text}}"
@@ -133,6 +134,7 @@ Here's a full example:
   {
     "subscribe": "type = 'identify'",
     "partnerAction": "postToChannel",
+    "enabled": true,
     "mapping": {
       "text": {
         "@template": "User identified! email={{email}}"

@@ -13,29 +13,6 @@ export const expectedDestinationMetadataOptions = {
     scope: 'event_destination',
     type: 'string',
     validators: [['required', 'The customKey property is required.']]
-  },
-  metadata: {
-    type: 'string',
-    default: '',
-    private: true,
-    encrypt: false,
-    hidden: true,
-    scope: 'event_destination',
-    label: 'Destination Metadata',
-    description:
-      '{"name":"Test Action","slug":"test-action","settings":{"$schema":"http://json-schema.org/schema#","type":"object","additionalProperties":false,"properties":{"apiSecret":{"title":"API Secret","description":"API Secret description","type":"string"}},"required":["apiSecret"]}}',
-    validators: []
-  },
-  subscriptions: {
-    type: 'string',
-    default: '',
-    private: false,
-    encrypt: false,
-    hidden: false,
-    scope: 'event_destination',
-    label: 'subscriptions',
-    description: '\\[{"subscribe":{"type":"track"},"partnerAction":"postToChannel","mapping":{...}}]',
-    validators: []
   }
 }
 
@@ -118,32 +95,9 @@ export const destinationMetadata: DestinationMetadata = {
       label: 'API Key',
       description: 'API Key description',
       validators: []
-    },
-    metadata: {
-      type: 'string',
-      default: '',
-      private: true,
-      encrypt: false,
-      hidden: true,
-      scope: 'event_destination',
-      label: 'Destination Metadata',
-      description:
-        '{"name":"Test Action","slug":"test-action","settings":{"$schema":"http://json-schema.org/schema#","type":"object","additionalProperties":false,"properties":{"apiSecret":{"title":"API Secret","description":"API Secret description","type":"string"}},"required":["apiSecret"]}}',
-      validators: []
-    },
-    subscriptions: {
-      type: 'string',
-      default: '',
-      private: false,
-      encrypt: false,
-      hidden: false,
-      scope: 'event_destination',
-      label: 'subscriptions',
-      description: '\\[{"subscribe":{"type":"track"},"partnerAction":"postToChannel","mapping":{...}}]',
-      validators: []
     }
   },
-  basicOptions: ['subscriptions', 'metadata', 'customKey'],
+  basicOptions: ['customKey'],
   advancedOptions: [],
   developerCenterMetadata: {},
   partnerSettings: {},

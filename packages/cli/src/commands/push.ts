@@ -249,21 +249,6 @@ export function getOptions(
 ): DestinationMetadataOptions {
   const options: DestinationMetadataOptions = { ...metadata.options }
 
-  // We store all the subscriptions in this legacy field (this will go away when we switch reads to the new tables)
-  if (!options.subscriptions) {
-    options.subscriptions = {
-      default: '',
-      description: '[{"subscribe":{"type":"track"},"partnerAction":"postToChannel","mapping":{...}}]',
-      label: 'Subscriptions',
-      encrypt: false,
-      hidden: false,
-      private: false,
-      scope: 'event_destination',
-      type: 'string',
-      validators: [['required', 'The subscriptions setting is required.']]
-    }
-  }
-
   for (const [fieldKey, schema] of Object.entries(destinationSchema.authentication?.fields ?? {})) {
     const validators: string[][] = []
 
