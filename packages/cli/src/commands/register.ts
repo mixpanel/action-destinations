@@ -135,7 +135,7 @@ export default class Register extends Command {
     // Loosely verify that we are on the production workbench, unless explicitly targeting stage
     const hostname = os.hostname()
     const isWorkbench = hostname.startsWith('workbench-') && hostname.includes(`-${flags.env}-`)
-    if (isWorkbench && flags.env !== 'stage') {
+    if (!isWorkbench && flags.env !== 'stage') {
       this.warn(`You must be logged into the ${flags.env} workbench to register your destination. Exiting.`)
       this.exit()
     }
