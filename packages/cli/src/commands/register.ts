@@ -19,7 +19,15 @@ export default class Register extends Command {
   static examples = [`$ ./bin/run register`]
 
   static flags = {
-    help: flags.help({ char: 'h' })
+    help: flags.help({ char: 'h' }),
+    env: flags.enum({
+      char: 'e',
+      description: 'Create the destination in a specific environment',
+      options: ['production', 'stage'],
+      default: 'production',
+      // We don't want to show this in `--help`
+      hidden: true
+    })
   }
 
   async run() {
@@ -124,10 +132,11 @@ export default class Register extends Command {
     this.log(`Please review the definition before continuing:`)
     this.log(`\n${JSON.stringify(definition, null, 2)}`)
 
-    // Loosely verify that we are on the production workbench
+    // Loosely verify that we are on the production workbench, unless explicitly targeting stage
     const hostname = os.hostname()
-    if (!hostname.startsWith('workbench-') || !hostname.includes('-production-')) {
-      this.warn(`You must be logged into a production workbench to register your destination. Exiting.`)
+    const isWorkbench = hostname.startsWith('workbench-') && hostname.includes(`-${flags.env}-`)
+    if (isWorkbench && flags.env !== 'stage') {
+      this.warn(`You must be logged into the ${flags.env} workbench to register your destination. Exiting.`)
       this.exit()
     }
 
