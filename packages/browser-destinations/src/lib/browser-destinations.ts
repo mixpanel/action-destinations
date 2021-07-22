@@ -17,6 +17,8 @@ export interface BrowserActionDefinition<Settings, Client, Payload = any>
   extends Omit<ActionDefinition<Settings, Payload>, 'perform'> {
   perform: (client: Client, data: ActionInput<Settings, Payload>) => Promise<unknown> | unknown
 
+  platform: 'web'
+
   /** Which step in the Analytics.js lifecycle this action should run */
   lifecycleHook?: Plugin['type']
 }

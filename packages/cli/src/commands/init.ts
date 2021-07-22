@@ -2,9 +2,9 @@ import { Command, flags } from '@oclif/command'
 import chalk from 'chalk'
 import ora from 'ora'
 import path from 'path'
-import slugify from 'slugify'
 import toTitleCase from 'to-title-case'
 import { autoPrompt } from '../lib/prompt'
+import { generateSlug } from '../lib/slugs'
 import { renderTemplates } from '../lib/templates'
 import GenerateTypes from './generate/types'
 
@@ -58,9 +58,9 @@ export default class Init extends Command {
         type: 'text',
         name: 'slug',
         // @ts-ignore the types are wrong
-        initial: (prev) => slugify(flags.name || prev).toLowerCase(),
+        initial: (prev) => generateSlug(flags.name || prev),
         message: 'Integration slug:',
-        format: (val) => slugify(val).toLowerCase()
+        format: (val) => generateSlug(val)
       },
       {
         type: 'select',

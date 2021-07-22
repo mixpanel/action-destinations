@@ -3,6 +3,8 @@ import type { Settings } from './generated-types'
 
 const destination: DestinationDefinition<Settings> = {
   name: '{{name}}',
+  slug: '{{slug}}',
+
   authentication: {
     scheme: 'custom',
     fields: {},
@@ -10,6 +12,7 @@ const destination: DestinationDefinition<Settings> = {
       // Return a request that tests/validates the user's authentication fields here
     }
   },
+
   actions: {}
 }
 

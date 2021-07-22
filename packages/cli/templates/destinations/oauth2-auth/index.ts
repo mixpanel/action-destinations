@@ -3,6 +3,8 @@ import type { Settings } from './generated-types'
 
 const destination: DestinationDefinition<Settings> = {
   name: '{{name}}',
+  slug: '{{slug}}',
+
   authentication: {
     scheme: 'oauth2',
     fields: {},
@@ -24,6 +26,7 @@ const destination: DestinationDefinition<Settings> = {
       return { accessToken: res.body.access_token }
     }
   },
+
   extendRequest({ settings }) {
     return {
       headers: {
@@ -31,6 +34,7 @@ const destination: DestinationDefinition<Settings> = {
       }
     }
   },
+
   actions: {}
 }
 

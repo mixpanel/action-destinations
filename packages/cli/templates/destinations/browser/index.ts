@@ -6,17 +6,20 @@ import { loadScript } from '../../runtime/load-script'
 // Switch from unknown to the partner SDK client types
 export const destination: BrowserDestinationDefinition<Settings, unknown> = {
   name: '{{name}}',
+  slug: '{{slug}}',
 
   authentication: {
     fields: {
       // Add any Segment destination settings required here
     }
   },
-  actions: {},
-  initialize: async({ settings, analytics }) => {
+
+  initialize: async ({ settings, analytics }) => {
     await loadScript('<path_to_partner_script>')
     // initialize client code here
-  }
+  },
+
+  actions: {}
 }
 
 export default browserDestination(destination)

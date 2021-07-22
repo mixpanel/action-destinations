@@ -7,6 +7,7 @@ const action: BrowserActionDefinition<Settings, Intercom_.IntercomStatic, Payloa
   title: 'Show',
   description:
     'This will show the Messenger. If there are no new conversations, it will open to the Messenger Home. If there are, it will open with the message list.',
+  platform: 'web',
   fields: {},
   perform: (intercom) => {
     return intercom('show')

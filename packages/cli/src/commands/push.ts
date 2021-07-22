@@ -121,7 +121,7 @@ export default class Push extends Command {
           slug: actionKey,
           name: action.title ?? 'Unnamed Action',
           description: action.description ?? '',
-          platform: 'cloud',
+          platform: action.platform ?? 'cloud',
           hidden: action.hidden ?? false,
           defaultTrigger: action.defaultSubscription ?? null,
           fields

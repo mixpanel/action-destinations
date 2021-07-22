@@ -32,6 +32,12 @@ export interface ActionDefinition<Settings, Payload = any> {
   /** The display description of the action */
   description: string
 
+  /**
+   * The target platform for the action
+   * @default 'cloud'
+   */
+  platform?: 'cloud' | 'web'
+
   /** An optional fql query that will be used to prepopulate the action when it is first set up */
   defaultSubscription?: string
 

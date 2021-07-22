@@ -7,6 +7,7 @@ import * as FullStory from '@fullstory/browser'
 const action: BrowserActionDefinition<Settings, typeof FullStory, Payload> = {
   title: 'Set User Vars',
   description: 'Sets user identity variables',
+  platform: 'web',
   defaultSubscription: "type = 'identify'",
   fields: {
     displayName: {

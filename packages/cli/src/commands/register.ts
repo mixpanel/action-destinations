@@ -3,11 +3,11 @@ import globby from 'globby'
 import ora from 'ora'
 import path from 'path'
 import os from 'os'
-import slugify from 'slugify'
 import { loadDestination } from '../lib/destinations'
 import { controlPlaneService } from '../lib/control-plane-service'
 import type { CreateDestinationMetadataInput } from '../lib/control-plane-service'
 import { autoPrompt, prompt } from '../lib/prompt'
+import { generateSlug } from '../lib/slugs'
 
 const NOOP_CONTEXT = {}
 
@@ -77,8 +77,8 @@ export default class Register extends Command {
       this.spinner.succeed()
     }
 
-    const name = `Actions ${destination.name}`
-    const slug = slugify(destination.slug ?? name).toLowerCase()
+    const name = destination.name.includes('Actions') ? destination.name : `${destination.name} (Actions)`
+    const slug = generateSlug(destination.slug ?? name)
 
     if (destination.slug && destination.slug !== slug) {
       this.warn(`Your destination slug does not meet the requirements. Try \`${slug}\` instead`)
@@ -90,11 +90,15 @@ export default class Register extends Command {
 
     this.spinner.start(`Preparing destination definition`)
 
+    const actions = Object.values(destination.actions)
+    const hasBrowserActions = actions.some((action) => action.platform === 'web')
+    const hasCloudActions = actions.some((action) => !action.platform || action.platform === 'cloud')
+
     const definition: CreateDestinationMetadataInput['input'] = {
       name,
       slug,
       type: 'action_destination',
-      description: destination.description ?? '',
+      description: destination.description ?? `${name}`,
       status: 'PRIVATE_BUILDING',
       methods: {
         pageview: true,
@@ -104,11 +108,9 @@ export default class Register extends Command {
         group: true
       },
       platforms: {
-        // TODO derive from the actions' `platform` property
-        browser: false,
-        mobile: false,
-        // TODO derive from the actions' `platform` property
-        server: true
+        browser: hasBrowserActions,
+        server: hasCloudActions,
+        mobile: false
       },
       options: {},
       basicOptions: []

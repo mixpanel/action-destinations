@@ -6,6 +6,7 @@ import * as FullStory from '@fullstory/browser'
 const action: BrowserActionDefinition<Settings, typeof FullStory, Payload> = {
   title: 'Event',
   description: 'Track events',
+  platform: 'web',
   defaultSubscription: 'type = "track"',
   fields: {
     name: {
