@@ -20,6 +20,7 @@ export default class Register extends Command {
 
   static flags = {
     help: flags.help({ char: 'h' }),
+    path: flags.string({ char: 'p', description: 'Path to the destination to register.' }),
     env: flags.enum({
       char: 'e',
       description: 'Create the destination in a specific environment',
@@ -33,41 +34,41 @@ export default class Register extends Command {
   async run() {
     const { flags } = this.parse(Register)
 
-    // `register` requires typescript support to parse TypeScript source files
-    // This is needed if we don't want to require developers compile the project first.
-    // Note: we aren't using transpileOnly because we do want this to fail if there are type errors.
-    // eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-unsafe-call
-    require('ts-node').register({ emit: false, transpileOnly: true })
-
-    // TODO support a command flag for this
-    const integrationsGlob = './packages/destination-actions/src/destinations/*'
-    const integrationDirs = await globby(integrationsGlob, {
-      expandDirectories: false,
-      onlyDirectories: true,
-      gitignore: true,
-      ignore: ['node_modules']
-    })
-
-    const { selectedDestination } = await autoPrompt<{ selectedDestination: { path: string; name: string } }>(flags, {
-      type: 'select',
-      name: 'selectedDestination',
-      message: 'Which integration?',
-      choices: integrationDirs.map((integrationPath) => {
-        const [name] = integrationPath.split(path.sep).reverse()
-        return {
-          title: name,
-          value: { path: integrationPath, name }
-        }
+    let destinationPath = flags.path
+    if (!destinationPath) {
+      const integrationsGlob = './packages/destination-actions/src/destinations/*'
+      const integrationDirs = await globby(integrationsGlob, {
+        expandDirectories: false,
+        onlyDirectories: true,
+        gitignore: true,
+        ignore: ['node_modules']
       })
-    })
 
-    if (!selectedDestination) {
-      this.warn('You must choose a destination. Exiting.')
+      const { selectedDestination } = await autoPrompt<{ selectedDestination: { path: string; name: string } }>(flags, {
+        type: 'select',
+        name: 'selectedDestination',
+        message: 'Which integration?',
+        choices: integrationDirs.map((integrationPath) => {
+          const [name] = integrationPath.split(path.sep).reverse()
+          return {
+            title: name,
+            value: { path: integrationPath, name }
+          }
+        })
+      })
+
+      if (selectedDestination) {
+        destinationPath = selectedDestination.path
+      }
+    }
+
+    if (!destinationPath) {
+      this.warn('You must select a destination. Exiting.')
       this.exit()
     }
 
     this.spinner.start(`Introspecting definition`)
-    const destination = await loadDestination(selectedDestination.path)
+    const destination = await loadDestination(destinationPath)
 
     if (!destination) {
       this.spinner.fail()
