@@ -58,7 +58,7 @@ export default class Init extends Command {
         type: 'text',
         name: 'slug',
         // @ts-ignore the types are wrong
-        initial: (prev) => generateSlug(flags.name || prev),
+        initial: (prev) => generateSlug(`actions-${flags.name || prev}`),
         message: 'Integration slug:',
         format: (val) => generateSlug(val)
       },
