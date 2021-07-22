@@ -6,22 +6,25 @@ import { invert, uniq, pick, omit, sortBy } from 'lodash'
 import type { Dictionary } from 'lodash'
 import { diffString } from 'json-diff'
 import ora from 'ora'
-import { controlPlaneService } from '../lib/control-plane-service'
 import type {
   DestinationMetadata,
-  DestinationMetadataAction,
   DestinationMetadataActionCreateInput,
   DestinationMetadataActionFieldCreateInput,
   DestinationMetadataActionsUpdateInput,
   DestinationMetadataOptions,
-  DestinationMetadataUpdateInput,
   DestinationSubscriptionPresetFields,
   DestinationSubscriptionPresetInput
 } from '../lib/control-plane-service'
 import { prompt } from '../lib/prompt'
 import { OAUTH_OPTIONS, OAUTH_SCHEME, RESERVED_FIELD_NAMES } from '../constants'
-
-const NOOP_CONTEXT = {}
+import {
+  getDestinationMetadatas,
+  getDestinationMetadataActions,
+  updateDestinationMetadata,
+  updateDestinationMetadataActions,
+  createDestinationMetadataActions,
+  setSubscriptionPresets
+} from '../lib/control-plane-client'
 
 type BaseActionInput = Omit<DestinationMetadataActionCreateInput, 'metadataId'>
 
@@ -283,118 +286,6 @@ export function getOptions(
   }
 
   return options
-}
-
-async function getDestinationMetadatas(destinationIds: string[]): Promise<DestinationMetadata[]> {
-  const { data, error } = await controlPlaneService.getAllDestinationMetadatas(NOOP_CONTEXT, {
-    byIds: destinationIds
-  })
-
-  if (error) {
-    throw error
-  }
-
-  if (!data) {
-    throw new Error('Could not load metadatas')
-  }
-
-  return data.metadatas
-}
-
-async function getDestinationMetadataActions(destinationIds: string[]): Promise<DestinationMetadataAction[]> {
-  const { data, error } = await controlPlaneService.getDestinationMetadataActions(NOOP_CONTEXT, {
-    metadataIds: destinationIds
-  })
-
-  if (error) {
-    throw error
-  }
-
-  if (!data) {
-    throw new Error('Could not load actions')
-  }
-
-  return data.actions
-}
-
-async function updateDestinationMetadata(
-  destinationId: string,
-  input: DestinationMetadataUpdateInput
-): Promise<DestinationMetadata> {
-  const { data, error } = await controlPlaneService.updateDestinationMetadata(NOOP_CONTEXT, {
-    destinationId,
-    input
-  })
-
-  if (error) {
-    console.log(error)
-    throw error
-  }
-
-  if (!data) {
-    throw new Error('Could not update metadata')
-  }
-
-  return data.metadata
-}
-
-async function setSubscriptionPresets(metadataId: string, presets: DestinationSubscriptionPresetInput[]) {
-  const { data, error } = await controlPlaneService.setDestinationSubscriptionPresets(NOOP_CONTEXT, {
-    metadataId,
-    presets
-  })
-
-  if (error) {
-    console.log(error)
-    throw error
-  }
-
-  if (!data) {
-    throw new Error('Could not set subscription presets')
-  }
-
-  return data.presets
-}
-
-async function createDestinationMetadataActions(
-  input: DestinationMetadataActionCreateInput[]
-): Promise<DestinationMetadataAction[]> {
-  if (!input.length) return []
-
-  const { data, error } = await controlPlaneService.createDestinationMetadataActions(NOOP_CONTEXT, {
-    input
-  })
-
-  if (error) {
-    console.log(error)
-    throw error
-  }
-
-  if (!data) {
-    throw new Error('Could not create metadata actions')
-  }
-
-  return data.actions
-}
-
-async function updateDestinationMetadataActions(
-  input: DestinationMetadataActionsUpdateInput[]
-): Promise<DestinationMetadataAction[]> {
-  if (!input.length) return []
-
-  const { data, error } = await controlPlaneService.updateDestinationMetadataActions(NOOP_CONTEXT, {
-    input
-  })
-
-  if (error) {
-    throw error
-  }
-
-  if (!data) {
-    throw new Error('Could not update metadata actions')
-  }
-
-  return data.actions
 }
 
 interface SchemasByDestination {

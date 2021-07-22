@@ -45,6 +45,13 @@ export const idToSlug: Record<string, string> = {
   '60ae8b97dcb6cc52d5d0d5ab': 'google-enhanced-conversions'
 }
 
+export const browserDestinationsIdToSlug: Record<string, string> = {
+  '5f7dd6d21ad74f3842b1fc47': 'amplitude',
+  // Change these IDs when destination definitions are created for the following items
+  fullstory: 'fullstory',
+  intercom: 'intercom'
+}
+
 /** Attempts to load a destination definition from a given file path */
 export async function getDestinationLazy(slug: string): Promise<null | DestinationDefinition> {
   const destination = await import(`./${slug}`).then((mod) => mod.default)
