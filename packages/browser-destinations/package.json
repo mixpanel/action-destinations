@@ -18,6 +18,7 @@
     "demo": "concurrently \"serve\" \"webpack -c webpack.config.js --watch\""
   },
   "dependencies": {
+    "@braze/web-sdk": "^3.3.0",
     "@fullstory/browser": "^1.4.9",
     "@segment/actions-core": "^2.3.1",
     "@segment/analytics-next": "^1.19.1",
