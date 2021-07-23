@@ -1,5 +1,21 @@
 import type { RequestOptions } from '../request-client'
-import type { ExecuteInput } from './step'
+import type { JSONObject } from '../json-object'
+
+export interface Result {
+  output?: JSONObject | string | null | undefined
+  error?: JSONObject | null
+}
+
+export interface ExecuteInput<Settings, Payload> {
+  /** The subscription mapping definition */
+  readonly mapping?: JSONObject
+  /** The global destination settings */
+  readonly settings: Settings
+  /** The transformed input data, based on `mapping` + `event` */
+  payload: Payload
+  /** The page used in dynamic field requests */
+  page?: string
+}
 
 export interface DynamicFieldResponse {
   body: {

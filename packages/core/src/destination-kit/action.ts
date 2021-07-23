@@ -1,16 +1,14 @@
-// @ts-ignore no types
-import { AggregateAjvError } from '@segment/ajv-human-errors'
-import Ajv from 'ajv'
-import dayjs from 'dayjs'
 import { EventEmitter } from 'events'
 import createRequestClient from '../create-request-client'
 import { JSONLikeObject, JSONObject } from '../json-object'
 import { transform } from '../mapping-kit'
 import { fieldsToJsonSchema } from './fields-to-jsonschema'
 import { Response } from '../fetch'
-import { ExecuteInput, Step, StepResult, Steps } from './step'
 import type { ModifiedResponse } from '../types'
-import type { DynamicFieldResponse, InputField, RequestExtension } from './types'
+import type { DynamicFieldResponse, InputField, RequestExtension, ExecuteInput, Result } from './types'
+import type { NormalizedOptions } from '../request-client'
+import type { JSONSchema4 } from 'json-schema'
+import { validateSchema } from '../schema-validation'
 
 type MaybePromise<T> = T | Promise<T>
 type RequestClient = ReturnType<typeof createRequestClient>
@@ -61,221 +59,123 @@ export interface ActionDefinition<Settings, Payload = any> {
   perform: RequestFn<Settings, Payload>
 }
 
-class MapInput<Settings, Payload extends JSONLikeObject> extends Step<Settings, Payload> {
-  executeStep(data: ExecuteInput<Settings, Payload>): Promise<string> {
-    // Transforms the initial payload (event) + action settings (from `subscriptions[0].mapping`)
-    // into input data that the action can use to talk to partner apis
-    if (data.mapping) {
-      // Technically we can't know whether or not `transform` returns the exact shape of Payload here, hence the casting
-      // It will be validated in subsequent steps
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      data.payload = transform(data.mapping, data.payload as any) as Payload
-    }
-
-    return Promise.resolve('MapInput completed')
-  }
-}
-
-const ajv = new Ajv({
-  // Coerce types to be a bit more liberal.
-  coerceTypes: true,
-  // Return all validation errors, not just the first.
-  allErrors: true,
-  // Include reference to schema and data in error values.
-  verbose: true,
-  // Remove properties not defined the schema object
-  removeAdditional: true,
-  // Use a more parse-able format for JSON paths.
-  jsonPointers: true
-})
-
-// Extend with additional supported formats
-ajv.addFormat('password', () => true)
-ajv.addFormat('text', () => true)
-ajv.addFormat('date-like', (data: string) => {
-  let date = dayjs(data)
-
-  if (String(Number(data)) === data) {
-    // parse as unix
-    if (data.length === 13) {
-      date = dayjs(Number(data))
-    }
-
-    date = dayjs.unix(Number(data))
-  }
-
-  return date.isValid()
-})
-
-export class Validate<Settings, Payload> extends Step<Settings, Payload> {
-  field: ExecuteInputField
-  validate: Ajv.ValidateFunction
-
-  constructor(field: ExecuteInputField, schema: object) {
-    super()
-    this.field = field
-    this.validate = ajv.compile(schema)
-  }
-
-  executeStep(data: ExecuteInput<Settings, Payload>): Promise<string> {
-    if (!this.validate(data[this.field])) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      throw new AggregateAjvError(this.validate.errors)
-    }
-
-    return Promise.resolve('Validate completed')
-  }
-}
-
-/**
- * Request handles delivering a payload to an external API. It uses the `fetch` API under the hood.
- *
- * The callback should be able to return the raw request instead of needing to do `return response.data` etc.
- */
-class Request<Settings, Payload> extends Step<Settings, Payload> {
-  requestFn: RequestFn<Settings, Payload> | undefined
-  extendRequest: RequestExtension<Settings, Payload> | undefined
-
-  constructor(
-    extendRequest: RequestExtension<Settings, Payload> | undefined,
-    requestFn?: RequestFn<Settings, Payload>
-  ) {
-    super()
-    this.extendRequest = extendRequest
-    this.requestFn = requestFn
-  }
-
-  async executeStep(data: ExecuteInput<Settings, Payload>): Promise<JSONObject | string | null | undefined> {
-    if (!this.requestFn) {
-      return ''
-    }
-
-    const requestClient = this.createRequestClient(data)
-
-    const response = await this.requestFn(requestClient, data)
-
-    /**
-     * Try to use the parsed response `.data` or `.content` string
-     * @see {@link ../middleware/after-response/prepare-response.ts}
-     */
-    if (response instanceof Response) {
-      return ((response as ModifiedResponse).data as JSONObject) ?? (response as ModifiedResponse).content
-    }
-
-    // otherwise, we don't really know what this is, so return as-is
-    return response
-  }
-
-  protected createRequestClient(data: ExecuteInput<Settings, Payload>): RequestClient {
-    // TODO turn `extendRequest` into a beforeRequest hook
-    const options = this.extendRequest?.(data) ?? {}
-    const client = createRequestClient(options, {
-      afterResponse: [
-        // Keep track of the request(s) associated with a response
-        (request, options, response) => {
-          // TODO figure out the types here...
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const modifiedResponse: any = response
-          modifiedResponse.request = request
-          modifiedResponse.options = options
-
-          this.emit('response', modifiedResponse)
-
-          return modifiedResponse
-        }
-      ]
-    })
-    return client
-  }
-}
-
 interface ExecuteDynamicFieldInput<Settings, Payload> {
   settings: Settings
   payload: Payload
   page?: string
 }
 
-type ExecuteInputField = 'payload' | 'settings'
-
 /**
  * Action is the beginning step for all partner actions. Entrypoints always start with the
  * MapAndValidateInput step.
  */
 export class Action<Settings, Payload extends JSONLikeObject> extends EventEmitter {
-  readonly steps: Steps<Settings, Payload>
+  readonly definition: ActionDefinition<Settings, Payload>
+  readonly destinationName: string
+  readonly schema?: JSONSchema4
   private extendRequest: RequestExtension<Settings, Payload> | undefined
-  private dynamicFieldCache: { [key: string]: RequestFn<Settings, Payload> }
 
-  constructor(definition: ActionDefinition<Settings, Payload>, extendRequest?: RequestExtension<Settings, Payload>) {
+  constructor(
+    destinationName: string,
+    definition: ActionDefinition<Settings, Payload>,
+    extendRequest?: RequestExtension<Settings, Payload>
+  ) {
     super()
+    this.definition = definition
+    this.destinationName = destinationName
+    this.extendRequest = extendRequest
 
-    this.steps = new Steps()
-    const step = new MapInput<Settings, Payload>()
-    this.steps.push(step)
-
-    this.dynamicFieldCache = {}
-
-    if (extendRequest) {
-      // This must come before we load the definition because
-      // it instantiates "steps" with whatever request extensions
-      // are defined at that moment in time
-      this.extendRequest = extendRequest
+    // Generate json schema based on the field definitions
+    if (Object.keys(definition.fields ?? {}).length) {
+      this.schema = fieldsToJsonSchema(definition.fields)
     }
-
-    this.loadDefinition(definition)
   }
 
-  async execute(data: ExecuteInput<Settings, Payload>): Promise<StepResult[]> {
-    const results = await this.steps.execute(data)
+  async execute(bundle: { data: unknown; settings: Settings; mapping: JSONObject }): Promise<Result[]> {
+    // TODO cleanup results... not sure it's even used
+    const results: Result[] = []
 
-    const finalResult = results[results.length - 1]
-    if (finalResult.error) {
-      throw finalResult.error
+    // Resolve/transform the mapping with the input data
+    const payload = transform(bundle.mapping, bundle.data) as Payload
+    results.push({ output: 'Mappings resolved' })
+
+    // Validate the resolved payload against the schema
+    if (this.schema) {
+      validateSchema(payload, this.schema, `${this.destinationName}:${this.definition.title}`)
+      results.push({ output: 'Payload validated' })
     }
+
+    // Construct the data bundle to send to an action
+    const dataBundle = {
+      rawData: bundle.data,
+      rawMapping: bundle.mapping,
+      settings: bundle.settings,
+      payload
+    }
+
+    // Construct the request client and perform the action
+    const output = await this.performRequest(this.definition.perform, dataBundle)
+    results.push({ output: output as JSONObject })
 
     return results
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  executeDynamicField(field: string, data: ExecuteDynamicFieldInput<Settings, Payload>): any {
-    if (!this.dynamicFieldCache[field]) {
+  executeDynamicField(field: string, data: ExecuteDynamicFieldInput<Settings, Payload>): unknown {
+    const fn = this.definition.dynamicFields?.[field]
+    if (typeof fn !== 'function') {
       return {
         data: [],
         pagination: {}
       }
     }
 
-    const step = new Request<Settings, Payload>(this.extendRequest, this.dynamicFieldCache[field])
-
-    return step.executeStep(data)
+    return this.performRequest(fn, data)
   }
 
-  private loadDefinition(definition: ActionDefinition<Settings, Payload>): void {
-    if (definition.fields) {
-      this.validatePayload(definition.fields)
-    }
+  /**
+   * Perform a request using the definition's request client
+   * the given request function
+   * and given data bundle
+   */
+  private async performRequest(
+    requestFn: RequestFn<Settings, Payload>,
+    data: ExecuteInput<Settings, Payload>
+  ): Promise<unknown> {
+    const requestClient = this.createRequestClient(data)
+    const response = await requestFn(requestClient, data)
+    return this.parseResponse(response)
+  }
 
-    Object.entries(definition.dynamicFields ?? {}).forEach(([field, callback]) => {
-      this.dynamicField(field, callback as RequestFn<Settings, Payload>)
+  private createRequestClient(data: ExecuteInput<Settings, Payload>): RequestClient {
+    // TODO turn `extendRequest` into a beforeRequest hook
+    const options = this.extendRequest?.(data) ?? {}
+    return createRequestClient(options, {
+      afterResponse: [this.afterResponse.bind(this)]
     })
+  }
 
-    if (definition.perform) {
-      this.request(definition.perform)
+  // Keep track of the request(s) associated with a response
+  private afterResponse(request: Request, options: NormalizedOptions, response: Response) {
+    // TODO figure out the types here...
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const modifiedResponse: any = response
+    modifiedResponse.request = request
+    modifiedResponse.options = options
+
+    this.emit('response', modifiedResponse)
+    return modifiedResponse
+  }
+
+  private parseResponse(response: unknown): unknown {
+    /**
+     * Try to use the parsed response `.data` or `.content` string
+     * @see {@link ../middleware/after-response/prepare-response.ts}
+     */
+    if (response instanceof Response) {
+      return (response as ModifiedResponse).data ?? (response as ModifiedResponse).content
     }
-  }
 
-  private validatePayload(fields: Record<string, InputField>): void {
-    const step = new Validate('payload', fieldsToJsonSchema(fields))
-    this.steps.push(step)
-  }
-
-  private dynamicField(field: string, callback: RequestFn<Settings, Payload>): void {
-    this.dynamicFieldCache[field] = callback
-  }
-
-  private request(requestFn: RequestFn<Settings, Payload>): void {
-    const step = new Request<Settings, Payload>(this.extendRequest, requestFn)
-    step.on('response', (response) => this.emit('response', response))
-    this.steps.push(step)
+    // otherwise, we don't really know what this is, so return as-is
+    return response
   }
 }

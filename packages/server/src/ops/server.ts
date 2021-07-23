@@ -79,7 +79,8 @@ app.post(
     const actionDefinition = destinationDefinition.actions[action]
 
     try {
-      const result = await actionDefinition.executeDynamicField(field, {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const result: any = await actionDefinition.executeDynamicField(field, {
         payload: mapping,
         settings,
         page
@@ -169,7 +170,7 @@ app.post(
     try {
       const results = await actionDefinition.execute({
         settings,
-        payload: event,
+        data: event,
         mapping
       })
 

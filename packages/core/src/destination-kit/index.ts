@@ -1,16 +1,16 @@
 import { validate, parseFql, ErrorCondition } from '@segment/fab5-subscriptions'
-import { JSONSchema4 } from 'json-schema'
-import { Action, ActionDefinition, Validate, RequestFn } from './action'
-import { ExecuteInput, StepResult } from './step'
+import type { JSONSchema4 } from 'json-schema'
+import { Action, ActionDefinition, RequestFn } from './action'
 import { time, duration } from '../time'
-import { JSONLikeObject, JSONObject } from '../json-object'
-import { SegmentEvent } from '../segment-event'
 import { fieldsToJsonSchema } from './fields-to-jsonschema'
 import createRequestClient, { RequestClient } from '../create-request-client'
-import type { ModifiedResponse } from '../types'
-import type { InputField, RequestExtension } from './types'
-import type { AllRequestOptions } from '../request-client'
 import { IntegrationError } from '../errors'
+import { validateSchema } from '../schema-validation'
+import type { JSONLikeObject, JSONObject } from '../json-object'
+import type { SegmentEvent } from '../segment-event'
+import type { ModifiedResponse } from '../types'
+import type { InputField, RequestExtension, ExecuteInput, Result } from './types'
+import type { AllRequestOptions } from '../request-client'
 
 export type { ActionDefinition, ExecuteInput, RequestFn }
 export { fieldsToJsonSchema }
@@ -22,7 +22,7 @@ export interface SubscriptionStats {
   subscribe: string
   state: string
   input: JSONLikeObject
-  output: StepResult[] | null
+  output: Result[] | null
 }
 
 interface PartnerActions<Settings, Payload extends JSONLikeObject> {
@@ -166,8 +166,7 @@ export class Destination<Settings = JSONObject> {
     const context: ExecuteInput<Settings, {}> = { settings, payload: {} }
 
     if (this.settingsSchema) {
-      const step = new Validate('settings', this.settingsSchema)
-      await step.executeStep(context)
+      validateSchema(settings, this.settingsSchema, `${this.name}:settings`)
     }
 
     if (!this.authentication?.testAuthentication) {
@@ -208,7 +207,7 @@ export class Destination<Settings = JSONObject> {
   }
 
   private partnerAction(slug: string, definition: ActionDefinition<Settings>): Destination<Settings> {
-    const action = new Action<Settings, {}>(definition, this.extendRequest)
+    const action = new Action<Settings, {}>(this.name, definition, this.extendRequest)
 
     action.on('response', (response) => {
       if (response) {
@@ -221,10 +220,7 @@ export class Destination<Settings = JSONObject> {
     return this
   }
 
-  protected executeAction(
-    actionSlug: string,
-    { event, mapping, settings }: EventInput<Settings>
-  ): Promise<StepResult[]> {
+  protected executeAction(actionSlug: string, { event, mapping, settings }: EventInput<Settings>): Promise<Result[]> {
     const action = this.actions[actionSlug]
     if (!action) {
       return Promise.resolve([])
@@ -232,7 +228,7 @@ export class Destination<Settings = JSONObject> {
 
     return action.execute({
       mapping,
-      payload: event,
+      data: event,
       settings
     })
   }
@@ -242,7 +238,7 @@ export class Destination<Settings = JSONObject> {
     event: SegmentEvent,
     settings: Settings,
     onComplete?: (stats: SubscriptionStats) => void
-  ): Promise<StepResult[]> {
+  ): Promise<Result[]> {
     const subscriptionStartedAt = time()
     const actionSlug = subscription.partnerAction
     const input = {
@@ -252,7 +248,7 @@ export class Destination<Settings = JSONObject> {
     }
 
     let state = 'pending'
-    let results: StepResult[] | null = null
+    let results: Result[] | null = null
 
     try {
       if (!subscription.subscribe || typeof subscription.subscribe !== 'string') {
@@ -317,7 +313,7 @@ export class Destination<Settings = JSONObject> {
     event: SegmentEvent,
     settings: JSONObject,
     onComplete?: (stats: SubscriptionStats) => void
-  ): Promise<StepResult[]> {
+  ): Promise<Result[]> {
     const subscriptions = this.getSubscriptions(settings)
     const destinationSettings = this.getDestinationSettings(settings)
 
@@ -327,7 +323,7 @@ export class Destination<Settings = JSONObject> {
 
     const results = await Promise.all(promises)
 
-    return ([] as StepResult[]).concat(...results)
+    return ([] as Result[]).concat(...results)
   }
 
   private getSubscriptions(settings: JSONObject): Subscription[] {

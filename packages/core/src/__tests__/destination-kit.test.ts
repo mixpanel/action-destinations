@@ -114,11 +114,7 @@ describe('destination kit', () => {
       }
 
       const res = await destinationTest.onEvent(testEvent, testSettings)
-      expect(res).toEqual([
-        { output: 'MapInput completed', error: null },
-        { output: 'Validate completed', error: null },
-        { output: 'this is a test', error: null }
-      ])
+      expect(res).toEqual([{ output: 'Mappings resolved' }, { output: 'this is a test' }])
     })
   })
 

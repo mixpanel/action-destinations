@@ -48,11 +48,9 @@ describe('validations', () => {
 describe('payload validations', () => {
   test('invalid type', () => {
     expect(() => {
-      // @ts-expect-error
       transform({ a: 1 }, 123)
     }).toThrowError()
     expect(() => {
-      // @ts-expect-error
       transform({ a: 1 }, [])
     }).toThrowError()
   })
