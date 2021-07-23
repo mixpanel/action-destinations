@@ -61,6 +61,7 @@ Output:
   - [@if](#if)
   - [@path](#path)
   - [@template](#template)
+  - [@literal](#literal)
 
 <!-- tocstop -->
 
@@ -430,4 +431,16 @@ Mappings:
 { "@template": "Hello, {{traits.fullName}}!" } => "Hello, !"
 
 { "@template": "{{traits.name}} ({{userId}})" } => "Mr.Rogers (abc123)"
+```
+
+### @literal
+
+The @literal directive resolves to the value with no modification. This is needed primarily to work around literal values being interpreted incorrectly as invalid templates.
+
+```json
+Input:
+n/a
+
+Mappings:
+{ "@literal": true } => true
 ```
