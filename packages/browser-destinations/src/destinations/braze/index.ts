@@ -1,11 +1,9 @@
 import type { Settings } from './generated-types'
 import type { BrowserDestinationDefinition } from '../../lib/browser-destinations'
 import { browserDestination } from '../../runtime/shim'
-import { loadScript } from '../../runtime/load-script'
-import appboy from '@braze/web-sdk'
 
 // Switch from unknown to the partner SDK client types
-export const destination: BrowserDestinationDefinition<Settings, typeof appboy> = {
+export const destination: BrowserDestinationDefinition<Settings, unknown> = {
   name: 'Braze Web Mode',
   slug: 'actions-braze-web',
 
@@ -28,8 +26,7 @@ export const destination: BrowserDestinationDefinition<Settings, typeof appboy> 
   },
 
   initialize: async () => {
-    await loadScript('<path_to_partner_script>')
-    return appboy
+    // return appboy
   },
 
   actions: {}
