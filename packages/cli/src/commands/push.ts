@@ -44,6 +44,7 @@ export default class Push extends Command {
 
   async run() {
     const { flags } = this.parse(Push)
+
     const slugToId = invert(idToSlug)
     const availableSlugs = Object.keys(slugToId)
     const { chosenSlugs } = await prompt<{ chosenSlugs: string[] }>({
@@ -134,12 +135,23 @@ export default class Push extends Command {
         }
       }
 
+      const hasBrowserActions = Object.values(schemaForDestination.actions).some((action) => action.platform === 'web')
+      const hasCloudActions = Object.values(schemaForDestination.actions).some(
+        (action) => !action.platform || action.platform === 'cloud'
+      )
+      const platforms = {
+        browser: hasBrowserActions || hasCloudActions,
+        server: hasCloudActions,
+        mobile: false
+      }
+
       const options = getOptions(metadata, schemaForDestination)
       const basicOptions = getBasicOptions(metadata, options)
       const diff = diffString(
         asJson({
           basicOptions: filterOAuth(metadata.basicOptions),
           options: pick(metadata.options, filterOAuth(Object.keys(options))),
+          platforms: metadata.platforms,
           actions: sortBy(
             existingActions.map((action) => ({
               ...omit(action, ['id', 'metadataId', 'createdAt', 'updatedAt']),
@@ -153,6 +165,7 @@ export default class Push extends Command {
         asJson({
           basicOptions: filterOAuth(basicOptions),
           options: pick(options, filterOAuth(Object.keys(options))),
+          platforms,
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           actions: sortBy(
             ([] as Array<DestinationMetadataActionCreateInput | DestinationMetadataActionsUpdateInput>)
@@ -194,7 +207,8 @@ export default class Push extends Command {
       await Promise.all([
         updateDestinationMetadata(metadata.id, {
           basicOptions,
-          options
+          options,
+          platforms
         }),
         updateDestinationMetadataActions(actionsToUpdate),
         createDestinationMetadataActions(actionsToCreate)

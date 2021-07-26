@@ -1,5 +1,6 @@
 import { Destination, DestinationDefinition } from '@segment/actions-core'
 import amplitude from './amplitude'
+import braze from './braze'
 import customerio from './customerio'
 import pipedrive from './pipedrive'
 import slack from './slack'
@@ -8,25 +9,17 @@ import googleAnalytics4 from './google-analytics-4'
 import googleEnhancedConversions from './google-enhanced-conversions'
 
 /**
- * To use register an integration in the `integrations` service,
- * you'll need to add it to the `destinations` export (and corresponding types)
+ * To register an integration in the `integrations` service
+ * you'll need to add it to the `destinations` export
  * as well as the `idToSlug` with the corresponding production id.
  *
- * To test in staging, the ids should match across environments. Typically this is handled by
- * creating the destination in production and syncing those definitions to staging with `sprout`.
+ * To test in staging, the ids should match across environments.
+ * It is recommended that you register/create destination definitions
+ * in production and sync them into staging via `sprout`.
  */
-export type ActionDestinationSlug =
-  | 'amplitude'
-  | 'customerio'
-  | 'pipedrive'
-  | 'slack'
-  | 'twilio'
-  | 'google-analytics-4'
-  | 'google-enhanced-conversions'
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const destinations: Record<ActionDestinationSlug, DestinationDefinition<any>> = {
+export const destinations = {
   amplitude,
+  braze,
   customerio,
   pipedrive,
   slack,
@@ -35,14 +28,17 @@ export const destinations: Record<ActionDestinationSlug, DestinationDefinition<a
   'google-enhanced-conversions': googleEnhancedConversions
 }
 
-export const idToSlug: Record<string, string> = {
+export type ActionDestinationSlug = keyof typeof destinations
+
+export const idToSlug: Record<string, ActionDestinationSlug> = {
   '5f7dd6d21ad74f3842b1fc47': 'amplitude',
   '5f7dd78fe27ce7ff2b8bfa37': 'customerio',
   '5f7dd8191ad74f868ab1fc48': 'pipedrive',
   '5f7dd8e302173ff732db5cc4': 'slack',
   '602efa1f249b9a5e2bf8a813': 'twilio',
   '60ad61f9ff47a16b8fb7b5d9': 'google-analytics-4',
-  '60ae8b97dcb6cc52d5d0d5ab': 'google-enhanced-conversions'
+  '60ae8b97dcb6cc52d5d0d5ab': 'google-enhanced-conversions',
+  '60f9d0d048950c356be2e4da': 'braze'
 }
 
 export const browserDestinationsIdToSlug: Record<string, string> = {
@@ -71,7 +67,8 @@ export async function getDestinationBySlug(slug: string): Promise<Destination> {
     throw new Error('Destination not found')
   }
 
-  return new Destination(destination)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return new Destination(destination as DestinationDefinition<any>)
 }
 
 export async function getDestinationByIdOrSlug(idOrSlug: string): Promise<Destination> {
