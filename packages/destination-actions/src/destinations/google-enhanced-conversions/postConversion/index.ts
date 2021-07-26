@@ -236,6 +236,14 @@ type DataValues = Record<string, string | string[] | number | undefined>
  */
 function cleanData(data: DataValues) {
   return pickBy(data, function (value) {
+    if (Array.isArray(value)) {
+      // remove empty entries
+      const filtered = value.filter((item) => item)
+      if (filtered.length === 0) {
+        return
+      }
+      return filtered
+    }
     return value
   })
 }
