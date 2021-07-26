@@ -1,5 +1,6 @@
 import type { DestinationDefinition } from '@segment/actions-core'
 import type { Settings } from './generated-types'
+import updateUserProfile from './updateUserProfile'
 
 const destination: DestinationDefinition<Settings> = {
   name: 'Braze Cloud Mode',
@@ -27,7 +28,16 @@ const destination: DestinationDefinition<Settings> = {
       // TODO explore docs for side-effect free way to handle this
     }
   },
-  actions: {}
+  extendRequest({ settings }) {
+    return {
+      headers: {
+        Authorization: `Bearer ${settings.api_key}`
+      }
+    }
+  },
+  actions: {
+    updateUserProfile
+  }
 }
 
 export default destination

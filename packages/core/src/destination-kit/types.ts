@@ -1,6 +1,8 @@
 import type { RequestOptions } from '../request-client'
 import type { JSONObject } from '../json-object'
 
+export type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>
+
 export interface Result {
   output?: JSONObject | string | null | undefined
   error?: JSONObject | null
@@ -60,7 +62,7 @@ export interface InputField {
    * Note: this part of the schema is not persisted outside the code
    * but is used for validation and typedefs
    */
-  properties?: Record<string, InputField>
+  properties?: Record<string, Optional<InputField, 'description'>>
   /**
    * Format option to specify more nuanced 'string' types
    * @see {@link https://github.com/ajv-validator/ajv/tree/v6#formats}
