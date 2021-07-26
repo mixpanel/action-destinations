@@ -311,7 +311,8 @@ export interface DestinationSchema extends DestinationDefinition {
 }
 
 function getJsonSchemas(
-  destinations: Record<string, DestinationDefinition<unknown>>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  destinations: Record<string, DestinationDefinition<any>>,
   destinationIds: string[],
   slugToId: Dictionary<string>
 ): SchemasByDestination {
