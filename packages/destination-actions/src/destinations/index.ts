@@ -49,7 +49,7 @@ export const browserDestinationsIdToSlug: Record<string, string> = {
 }
 
 /** Attempts to load a destination definition from a given file path */
-export async function getDestinationLazy(slug: string): Promise<null | DestinationDefinition> {
+async function getDestinationLazy(slug: string): Promise<null | DestinationDefinition> {
   const destination = await import(`./${slug}`).then((mod) => mod.default)
 
   // Loose validation on a destination definition
@@ -60,18 +60,18 @@ export async function getDestinationLazy(slug: string): Promise<null | Destinati
   return destination
 }
 
-export async function getDestinationBySlug(slug: string): Promise<Destination> {
+async function getDestinationBySlug(slug: string): Promise<Destination | null> {
   const destination = destinations[slug as ActionDestinationSlug] ?? (await getDestinationLazy(slug))
 
   if (!destination) {
-    throw new Error('Destination not found')
+    return null
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return new Destination(destination as DestinationDefinition<any>)
 }
 
-export async function getDestinationByIdOrSlug(idOrSlug: string): Promise<Destination> {
+export async function getDestinationByIdOrSlug(idOrSlug: string): Promise<Destination | null> {
   const slug = idToSlug[idOrSlug] ?? idOrSlug
   return getDestinationBySlug(slug)
 }

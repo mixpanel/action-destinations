@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { IncomingHttpHeaders } from 'http'
-import { HttpError, UnprocessableEntity } from 'http-errors'
+import { HttpError, NotFound, UnprocessableEntity } from 'http-errors'
 import MIMEType from 'whatwg-mimetype'
 import Context from '@/lib/context'
 import { redactSettings } from '@/lib/redact'
@@ -64,6 +64,9 @@ async function handleHttp(context: Context, req: Request): Promise<unknown> {
 
   // Try to map the id param to a slug, or treat it as the slug (easier local testing)
   const destination = await getDestinationByIdOrSlug(idOrSlug)
+  if (!destination) {
+    throw new NotFound(`Destination with id "${idOrSlug}" not found`)
+  }
 
   const results = await destination.onEvent(event, settings, onComplete(context, privateSettings))
   return results
@@ -206,6 +209,9 @@ async function handleCloudEvent(
 ): Promise<CloudEventResponse> {
   const start = new Date()
   const destination = await getDestinationByIdOrSlug(destinationId)
+  if (!destination) {
+    throw new NotFound(`Destination with id "${destinationId}" not found`)
+  }
 
   context.set('req_destination', destination.name)
   context.set('req_source', cloudEvent.source)
