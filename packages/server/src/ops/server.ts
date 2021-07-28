@@ -8,7 +8,7 @@ import errorHandler from '@/middleware/error-handler'
 import { startServer } from '@/boot'
 import { PORT } from '@/config'
 import asyncHandler from '@/lib/async-handler'
-import { getDestinationByIdOrSlug } from '@segment/destination-actions'
+import { getDestinationById } from '@segment/destination-actions'
 import { controlPlaneService } from '@/services/control-plane-service'
 import Context from '@/lib/context'
 
@@ -56,8 +56,9 @@ async function fetchDestinationSettings(
 app.post(
   '/autocomplete',
   asyncHandler(async (req, res) => {
-    const { destinationId, destinationSlug, metadataId, action, field, mapping, page } = req.body
+    const { destinationId, metadataId, action, field, mapping, page } = req.body
 
+    ow(metadataId, ow.string)
     ow(field, ow.string)
     ow(mapping, ow.optional.object)
     ow(page, ow.optional.string)
@@ -71,7 +72,7 @@ app.post(
     ow(settings, ow.optional.object)
 
     // fallback to slug when metadataId is not provided
-    const destinationDefinition = await getDestinationByIdOrSlug(metadataId ?? destinationSlug)
+    const destinationDefinition = await getDestinationById(metadataId)
     if (!destinationDefinition) {
       res.status(200).json({ data: [], pagination: {} })
       return
@@ -109,15 +110,16 @@ app.post(
 app.post(
   '/test-credentials',
   asyncHandler(async (req, res) => {
-    const { destination, metadataId, settings } = req.body
+    const { metadataId, settings } = req.body
 
+    ow(metadataId, ow.string)
     ow(settings, ow.object)
 
     // fallback to slug when metadataId is not provided
-    const destinationDefinition = await getDestinationByIdOrSlug(metadataId ?? destination)
+    const destinationDefinition = await getDestinationById(metadataId)
 
     if (!destinationDefinition) {
-      res.status(404).json({ ok: false, error: `No destination found by ${metadataId ?? destination}` })
+      res.status(404).json({ ok: false, error: `No destination found by ${metadataId}` })
       return
     }
 
@@ -156,11 +158,10 @@ app.post(
 app.post(
   '/test-action',
   asyncHandler(async (req, res) => {
-    const { destinationId, destinationSlug, metadataId, action, event, mapping } = req.body
+    const { destinationId, metadataId, action, event, mapping } = req.body
 
     ow(destinationId, ow.optional.string)
-    ow(metadataId, ow.optional.string)
-    ow(destinationSlug, ow.string)
+    ow(metadataId, ow.string)
     ow(event, ow.object)
     ow(mapping, ow.object)
 
@@ -172,11 +173,11 @@ app.post(
 
     ow(settings, ow.optional.object)
 
-    const destinationDefinition = await getDestinationByIdOrSlug(metadataId ?? destinationSlug)
+    const destinationDefinition = await getDestinationById(metadataId)
     if (!destinationDefinition) {
       res.status(404).json({
         ok: false,
-        response: `No destination found by ${metadataId ?? destinationSlug}`
+        response: `No destination found by ${metadataId}`
       })
       return
     }

@@ -75,3 +75,8 @@ export async function getDestinationByIdOrSlug(idOrSlug: string): Promise<Destin
   const slug = idToSlug[idOrSlug] ?? idOrSlug
   return getDestinationBySlug(slug)
 }
+
+export async function getDestinationById(id: string): Promise<Destination | null> {
+  const slug = idToSlug[id]
+  return getDestinationBySlug(slug)
+}
