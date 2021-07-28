@@ -3,6 +3,8 @@ import type { JSONObject } from '@segment/actions-core'
 import { transform } from '@segment/actions-core/mapping-kit'
 import { parseFql, validate } from '@segment/fab5-subscriptions'
 import { ActionInput, BrowserDestinationDefinition, Subscription } from '../lib/browser-destinations'
+import { loadScript } from './load-script'
+import { resolveWhen } from './resolve-when'
 
 type MaybePromise<T> = T | Promise<T>
 
@@ -19,7 +21,7 @@ export function generatePlugins<S, C>(
       return
     }
 
-    client = await def.initialize({ settings, analytics: analyticsInstance })
+    client = await def.initialize({ settings, analytics: analyticsInstance }, { loadScript, resolveWhen })
     analytics = analyticsInstance
   }
 

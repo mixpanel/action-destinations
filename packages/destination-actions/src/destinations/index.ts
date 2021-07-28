@@ -43,6 +43,7 @@ export const idToSlug: Record<string, ActionDestinationSlug> = {
 
 export const browserDestinationsIdToSlug: Record<string, string> = {
   '5f7dd6d21ad74f3842b1fc47': 'amplitude',
+  '60fb01aec459242d3b6f20c1': 'braze',
   // Change these IDs when destination definitions are created for the following items
   fullstory: 'fullstory',
   intercom: 'intercom'

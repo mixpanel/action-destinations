@@ -1,7 +1,5 @@
 import * as FullStory from '@fullstory/browser'
-import { loadScript } from '../../runtime/load-script'
 import type { BrowserDestinationDefinition } from '../../lib/browser-destinations'
-import { resolveWhen } from '../../runtime/resolve-when'
 import { browserDestination } from '../../runtime/shim'
 import event from './event'
 import type { Settings } from './generated-types'
@@ -24,10 +22,12 @@ export const destination: BrowserDestinationDefinition<Settings, typeof FullStor
     event,
     setUserVars
   },
-  initialize: async ({ settings }) => {
+  initialize: async ({ settings }, dependencies) => {
     initScript({ debug: false, org: settings.orgId })
-    await loadScript('https://edge.fullstory.com/s/fs.js')
-    await resolveWhen(() => Object.prototype.hasOwnProperty.call(window, 'FS'), 100)
+    if (dependencies) {
+      await dependencies.loadScript('https://edge.fullstory.com/s/fs.js')
+      await dependencies.resolveWhen(() => Object.prototype.hasOwnProperty.call(window, 'FS'), 100)
+    }
     return FullStory
   }
 }

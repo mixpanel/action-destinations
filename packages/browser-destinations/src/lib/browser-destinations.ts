@@ -23,10 +23,15 @@ export interface BrowserActionDefinition<Settings, Client, Payload = any>
   lifecycleHook?: Plugin['type']
 }
 
+export interface BrowserDestinationDependencies {
+  loadScript: (src: string, attributes?: Record<string, string>) => Promise<HTMLScriptElement>
+  resolveWhen: (condition: () => boolean, timeout?: number) => Promise<void>
+}
+
 export type InitializeOptions<Settings> = { settings: Settings; analytics: Analytics }
 export interface BrowserDestinationDefinition<Settings, Client>
   extends Omit<DestinationDefinition<Settings>, 'actions' | 'authentication'> {
-  initialize: (options: InitializeOptions<Settings>) => Promise<Client>
+  initialize: (options: InitializeOptions<Settings>, dependencies?: BrowserDestinationDependencies) => Promise<Client>
 
   authentication?: Omit<CustomAuthentication<Settings>, 'testAuthentication' | 'scheme'>
 
