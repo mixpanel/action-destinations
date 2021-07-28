@@ -1,5 +1,6 @@
 import type { RequestOptions } from '../request-client'
 import type { JSONObject } from '../json-object'
+import { AuthTokens } from './parse-settings'
 
 export type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>
 
@@ -17,6 +18,8 @@ export interface ExecuteInput<Settings, Payload> {
   payload: Payload
   /** The page used in dynamic field requests */
   page?: string
+  /** The data needed in OAuth requests */
+  readonly auth?: AuthTokens
 }
 
 export interface DynamicFieldResponse {

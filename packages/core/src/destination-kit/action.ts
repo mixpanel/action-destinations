@@ -9,6 +9,7 @@ import type { DynamicFieldResponse, InputField, RequestExtension, ExecuteInput, 
 import type { NormalizedOptions } from '../request-client'
 import type { JSONSchema4 } from 'json-schema'
 import { validateSchema } from '../schema-validation'
+import { AuthTokens } from './parse-settings'
 
 type MaybePromise<T> = T | Promise<T>
 type RequestClient = ReturnType<typeof createRequestClient>
@@ -91,7 +92,12 @@ export class Action<Settings, Payload extends JSONLikeObject> extends EventEmitt
     }
   }
 
-  async execute(bundle: { data: unknown; settings: Settings; mapping: JSONObject }): Promise<Result[]> {
+  async execute(bundle: {
+    data: unknown
+    settings: Settings
+    mapping: JSONObject
+    auth: AuthTokens | undefined
+  }): Promise<Result[]> {
     // TODO cleanup results... not sure it's even used
     const results: Result[] = []
 
@@ -110,7 +116,8 @@ export class Action<Settings, Payload extends JSONLikeObject> extends EventEmitt
       rawData: bundle.data,
       rawMapping: bundle.mapping,
       settings: bundle.settings,
-      payload
+      payload,
+      auth: bundle.auth
     }
 
     // Construct the request client and perform the action

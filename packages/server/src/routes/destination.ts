@@ -68,7 +68,7 @@ async function handleHttp(context: Context, req: Request): Promise<unknown> {
     throw new NotFound(`Destination with id "${idOrSlug}" not found`)
   }
 
-  const results = await destination.onEvent(event, settings, onComplete(context, privateSettings))
+  const results = await destination.onEvent(event, settings, { onComplete: onComplete(context, privateSettings) })
   return results
 }
 
@@ -218,7 +218,9 @@ async function handleCloudEvent(
 
   try {
     const event = cloudEvent.data
-    const results = await destination.onEvent(event, cloudEvent.settings, onComplete(context, privateSettings))
+    const results = await destination.onEvent(event, cloudEvent.settings, {
+      onComplete: onComplete(context, privateSettings)
+    })
     const eventTesterData = await getEventTesterData(destination.responses)
     return constructCloudSuccess(cloudEvent, results, eventTesterData, { start })
   } catch (err) {

@@ -11,6 +11,7 @@ import asyncHandler from '@/lib/async-handler'
 import { getDestinationById } from '@segment/destination-actions'
 import { controlPlaneService } from '@/services/control-plane-service'
 import Context from '@/lib/context'
+import { getAuthData, JSONObject } from '@segment/actions-core'
 
 const app = express()
 
@@ -188,11 +189,13 @@ app.post(
 
     const actionDefinition = destinationDefinition.actions[action]
 
+    const auth = getAuthData(settings as JSONObject)
     try {
       const results = await actionDefinition.execute({
         settings,
         data: event,
-        mapping
+        mapping,
+        auth
       })
 
       const response = results[results.length - 1]?.output ?? ''

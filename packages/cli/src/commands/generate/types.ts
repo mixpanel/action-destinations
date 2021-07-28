@@ -8,7 +8,7 @@ import { compile } from 'json-schema-to-typescript'
 import path from 'path'
 import prettier from 'prettier'
 import { loadDestination } from '../../lib/destinations'
-import { OAUTH_GENERATE_TYPES, OAUTH_SCHEME, RESERVED_FIELD_NAMES } from '../../constants'
+import { OAUTH_SCHEME, RESERVED_FIELD_NAMES } from '../../constants'
 
 const pretterOptions = prettier.resolveConfig.sync(process.cwd())
 
@@ -96,7 +96,7 @@ export default class GenerateTypes extends Command {
 
     const stats = fs.statSync(file)
     const parentDir = stats.isDirectory() ? file : path.dirname(file)
-    let authFields = destination.authentication?.fields
+    const authFields = destination.authentication?.fields
     if (authFields && destination.authentication?.scheme === OAUTH_SCHEME) {
       for (const key in authFields) {
         if (RESERVED_FIELD_NAMES.includes(key.toLowerCase())) {
@@ -105,9 +105,6 @@ export default class GenerateTypes extends Command {
       }
     }
 
-    if (destination.authentication?.scheme === OAUTH_SCHEME) {
-      authFields = Object.assign({ ...OAUTH_GENERATE_TYPES }, { ...authFields })
-    }
     const types = await generateTypes(authFields, 'Settings')
     fs.writeFileSync(path.join(parentDir, './generated-types.ts'), types)
 

@@ -1,4 +1,4 @@
-import { DestinationDefinition, InvalidAuthenticationError } from '@segment/actions-core'
+import { DestinationDefinition } from '@segment/actions-core'
 import type { Settings } from './generated-types'
 import postConversion from './postConversion'
 
@@ -37,17 +37,13 @@ const destination: DestinationDefinition<Settings> = {
       */
       return true
     },
-    refreshAccessToken: async (request, { settings }, oauthConfig) => {
-      if (!settings.refreshToken) {
-        throw new InvalidAuthenticationError('Refresh token is not available')
-      }
-
+    refreshAccessToken: async (request, { auth }) => {
       const res = await request<RefreshTokenResponse>('https://www.googleapis.com/oauth2/v4/token', {
         method: 'POST',
         body: new URLSearchParams({
-          refresh_token: settings.refreshToken,
-          client_id: oauthConfig.clientId,
-          client_secret: oauthConfig.clientSecret,
+          refresh_token: auth.refreshToken,
+          client_id: auth.clientId,
+          client_secret: auth.clientSecret,
           grant_type: 'refresh_token'
         })
       })
@@ -55,10 +51,10 @@ const destination: DestinationDefinition<Settings> = {
       return { accessToken: res.data.access_token }
     }
   },
-  extendRequest({ settings }) {
+  extendRequest({ settings, auth }) {
     return {
       headers: {
-        authorization: `Bearer ${settings.accessToken}`
+        authorization: `Bearer ${auth?.accessToken}`
       },
       searchParams: {
         conversion_tracking_id: settings.conversionTrackingId

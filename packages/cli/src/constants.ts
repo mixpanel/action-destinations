@@ -72,18 +72,3 @@ export const OAUTH_OPTIONS: DestinationMetadataOption = {
     }
   ]
 }
-
-export const OAUTH_GENERATE_TYPES = {
-  accessToken: {
-    label: 'Access Token',
-    type: 'string',
-    required: true,
-    description: 'Token issued by the partner API after verifying the identity of the user account'
-  },
-  refreshToken: {
-    label: 'Refresh Token',
-    type: 'string',
-    description:
-      'Token provided by the partner API that can be used to request a fresh access token from the authorization server'
-  }
-}

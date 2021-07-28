@@ -2,18 +2,22 @@ import { validate, parseFql, ErrorCondition } from '@segment/fab5-subscriptions'
 import type { JSONSchema4 } from 'json-schema'
 import { Action, ActionDefinition, RequestFn } from './action'
 import { time, duration } from '../time'
+import { JSONLikeObject, JSONObject } from '../json-object'
+import { SegmentEvent } from '../segment-event'
 import { fieldsToJsonSchema } from './fields-to-jsonschema'
 import createRequestClient, { RequestClient } from '../create-request-client'
-import { IntegrationError } from '../errors'
 import { validateSchema } from '../schema-validation'
-import type { JSONLikeObject, JSONObject } from '../json-object'
-import type { SegmentEvent } from '../segment-event'
 import type { ModifiedResponse } from '../types'
 import type { InputField, RequestExtension, ExecuteInput, Result } from './types'
 import type { AllRequestOptions } from '../request-client'
+import { IntegrationError, InvalidAuthenticationError } from '../errors'
+import { AuthTokens, getAuthData, getOAuth2Data, updateOAuthSettings } from './parse-settings'
 
 export type { ActionDefinition, ExecuteInput, RequestFn }
 export { fieldsToJsonSchema }
+
+const RETRY_ATTEMPTS = 2
+const OAUTH2_SCHEME = 'oauth2'
 
 export interface SubscriptionStats {
   duration: number
@@ -59,7 +63,7 @@ export interface Subscription {
   mapping?: JSONObject
 }
 
-export interface OAuth2ClientCredentials {
+export interface OAuth2ClientCredentials extends AuthTokens {
   /** Publicly exposed string that is used by the partner API to identify the application, also used to build authorization URLs that are presented to users */
   clientId: string
   /** Used to authenticate the identity of the application to the partner API when the application requests to access a user’s account, must be kept private between the application and the API. */
@@ -75,6 +79,12 @@ export interface RefreshAccessTokenResult {
 
 interface AuthSettings<Settings> {
   settings: Settings
+  auth: AuthTokens
+}
+
+interface RefreshAuthSettings<Settings> {
+  settings: Settings
+  auth: OAuth2ClientCredentials
 }
 
 interface Authentication<Settings> {
@@ -112,9 +122,8 @@ export interface OAuth2Authentication<Settings> extends Authentication<Settings>
    */
   refreshAccessToken?: (
     request: RequestClient,
-    input: AuthSettings<Settings>,
-    oauthConfig: OAuth2ClientCredentials
-  ) => Promise<RefreshAccessTokenResult> | undefined
+    input: RefreshAuthSettings<Settings>
+  ) => Promise<RefreshAccessTokenResult>
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -127,6 +136,8 @@ interface EventInput<Settings> {
   readonly event: SegmentEvent
   readonly mapping: JSONObject
   readonly settings: Settings
+  /** Authentication-related data based on the destination's authentication.fields definition and authentication scheme */
+  readonly auth?: AuthTokens
 }
 
 export interface DecoratedResponse extends ModifiedResponse {
@@ -163,7 +174,11 @@ export class Destination<Settings = JSONObject> {
   }
 
   async testAuthentication(settings: Settings): Promise<void> {
-    const context: ExecuteInput<Settings, {}> = { settings, payload: {} }
+    const destinationSettings = this.getDestinationSettings(settings as unknown as JSONObject)
+    const auth = getAuthData(settings as unknown as JSONObject)
+    const data = { settings: destinationSettings, auth }
+
+    const context: ExecuteInput<Settings, {}> = { settings: destinationSettings, payload: {}, auth }
 
     if (this.settingsSchema) {
       validateSchema(settings, this.settingsSchema, `${this.name}:settings`)
@@ -177,7 +192,7 @@ export class Destination<Settings = JSONObject> {
     const requestClient = createRequestClient(options)
 
     try {
-      await this.authentication.testAuthentication(requestClient, { settings })
+      await this.authentication.testAuthentication(requestClient, data)
     } catch (error) {
       throw new Error('Credentials are invalid')
     }
@@ -185,17 +200,22 @@ export class Destination<Settings = JSONObject> {
 
   refreshAccessToken(
     settings: Settings,
-    oauthClientCredentials: OAuth2ClientCredentials
+    oauthData: OAuth2ClientCredentials
   ): Promise<RefreshAccessTokenResult> | undefined {
-    if (this.authentication?.scheme !== 'oauth2') {
+    if (this.authentication?.scheme !== OAUTH2_SCHEME) {
       throw new IntegrationError(
         'refreshAccessToken is only valid with oauth2 authentication scheme',
         'NotImplemented',
         501
       )
     }
-    // TODO: clean up context/extendRequest so we don't have to send information that is not needed (payload)
-    const context: ExecuteInput<Settings, {}> = { settings, payload: {} }
+
+    // TODO: clean up context/extendRequest so we don't have to send information that is not needed (payload & cachedFields)
+    const context: ExecuteInput<Settings, {}> = {
+      settings,
+      payload: {},
+      auth: getAuthData(settings as unknown as JSONObject)
+    }
     const options = this.extendRequest?.(context) ?? {}
     const requestClient = createRequestClient(options)
 
@@ -203,7 +223,7 @@ export class Destination<Settings = JSONObject> {
       return undefined
     }
 
-    return this.authentication.refreshAccessToken(requestClient, { settings }, oauthClientCredentials)
+    return this.authentication.refreshAccessToken(requestClient, { settings, auth: oauthData })
   }
 
   private partnerAction(slug: string, definition: ActionDefinition<Settings>): Destination<Settings> {
@@ -220,7 +240,10 @@ export class Destination<Settings = JSONObject> {
     return this
   }
 
-  protected executeAction(actionSlug: string, { event, mapping, settings }: EventInput<Settings>): Promise<Result[]> {
+  protected executeAction(
+    actionSlug: string,
+    { event, mapping, settings, auth }: EventInput<Settings>
+  ): Promise<Result[]> {
     const action = this.actions[actionSlug]
     if (!action) {
       return Promise.resolve([])
@@ -229,7 +252,8 @@ export class Destination<Settings = JSONObject> {
     return action.execute({
       mapping,
       data: event,
-      settings
+      settings,
+      auth
     })
   }
 
@@ -237,6 +261,7 @@ export class Destination<Settings = JSONObject> {
     subscription: Subscription,
     event: SegmentEvent,
     settings: Settings,
+    auth: AuthTokens,
     onComplete?: (stats: SubscriptionStats) => void
   ): Promise<Result[]> {
     const subscriptionStartedAt = time()
@@ -244,7 +269,8 @@ export class Destination<Settings = JSONObject> {
     const input = {
       event,
       mapping: subscription.mapping || {},
-      settings
+      settings,
+      auth
     }
 
     let state = 'pending'
@@ -312,17 +338,48 @@ export class Destination<Settings = JSONObject> {
   public async onEvent(
     event: SegmentEvent,
     settings: JSONObject,
+    options?: {
+      onTokenRefresh?: (tokens: RefreshAccessTokenResult) => void
+      onComplete?: (stats: SubscriptionStats) => void
+    }
+  ): Promise<Result[]> {
+    for (let i = 0; i < RETRY_ATTEMPTS; i++) {
+      try {
+        return await this.onEventInternal(event, settings, options?.onComplete)
+      } catch (error) {
+        const statusCode = error?.status ?? error?.response?.status ?? 500
+        // Throw original error if it is unrelated to invalid access tokens and not an oauth2 scheme
+        if (!(statusCode === 401 && this.authentication?.scheme === OAUTH2_SCHEME)) {
+          throw error
+        }
+
+        const destinationSettings = this.getDestinationSettings(settings)
+        const oauthSettings = getOAuth2Data(settings)
+        const newTokens = await this.refreshAccessToken(destinationSettings, oauthSettings)
+        if (!newTokens) {
+          throw new InvalidAuthenticationError('Failed to refresh access token')
+        }
+        settings = updateOAuthSettings(settings, newTokens)
+        options?.onTokenRefresh?.(newTokens)
+      }
+    }
+
+    throw new InvalidAuthenticationError()
+  }
+
+  private async onEventInternal(
+    event: SegmentEvent,
+    settings: JSONObject,
     onComplete?: (stats: SubscriptionStats) => void
   ): Promise<Result[]> {
     const subscriptions = this.getSubscriptions(settings)
     const destinationSettings = this.getDestinationSettings(settings)
+    const authData = getAuthData(settings)
 
     const promises = subscriptions.map((subscription) =>
-      this.onSubscription(subscription, event, destinationSettings, onComplete)
+      this.onSubscription(subscription, event, destinationSettings, authData, onComplete)
     )
-
     const results = await Promise.all(promises)
-
     return ([] as Result[]).concat(...results)
   }
 
@@ -345,7 +402,7 @@ export class Destination<Settings = JSONObject> {
   }
 
   private getDestinationSettings(settings: JSONObject): Settings {
-    const { subcription, subscriptions, ...otherSettings } = settings
+    const { subcription, subscriptions, oauth, ...otherSettings } = settings
     return otherSettings as unknown as Settings
   }
 }
