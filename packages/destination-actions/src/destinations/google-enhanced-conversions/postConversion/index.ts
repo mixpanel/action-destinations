@@ -8,9 +8,9 @@ import {
   formatLastName,
   formatPhone,
   formatStreet,
-  formatRegion
+  formatRegion,
+  cleanData
 } from './formatter'
-import { pickBy } from 'lodash'
 
 const action: ActionDefinition<Settings, Payload> = {
   title: 'Post Conversion',
@@ -224,28 +224,6 @@ const action: ActionDefinition<Settings, Payload> = {
       }
     })
   }
-}
-
-/**
- * Acceptable data types for k:v pairs.
- */
-type DataValues = Record<string, string | string[] | number | undefined>
-
-/**
- * Removes all k:v pairs where the value is falsy.
- */
-function cleanData(data: DataValues) {
-  return pickBy(data, function (value) {
-    if (Array.isArray(value)) {
-      // remove empty entries
-      const filtered = value.filter((item) => item)
-      if (filtered.length === 0) {
-        return
-      }
-      return filtered
-    }
-    return value
-  })
 }
 
 export default action

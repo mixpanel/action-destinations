@@ -1,6 +1,34 @@
 import { createHash } from 'crypto'
 
 /**
+ * Acceptable data types for k:v pairs.
+ */
+type DataValues = Record<string, string | string[] | number | undefined>
+
+/**
+ * Removes all k:v pairs where the value is falsy.
+ */
+export function cleanData(data: DataValues): { [key: string]: unknown } {
+  if (data == null) {
+    return {}
+  }
+  const obj: { [key: string]: unknown } = {}
+  for (const key in data) {
+    const value = data[key]
+    if (Array.isArray(value)) {
+      // remove empty entries
+      const filtered = value.filter((item) => item)
+      if (filtered.length !== 0) {
+        obj[key] = filtered
+      }
+    } else if (value) {
+      obj[key] = value
+    }
+  }
+  return obj
+}
+
+/**
  * Convert emails to lower case, remove all spaces, and remove all "." before the "@".
  */
 export function formatEmail(email: string): string {
