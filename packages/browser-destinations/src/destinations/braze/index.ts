@@ -29,7 +29,9 @@ export const destination: BrowserDestinationDefinition<Settings, unknown> = {
     // return appboy
   },
 
-  actions: {}
+  actions: {
+    // logUser
+  }
 }
 
 export default browserDestination(destination)
