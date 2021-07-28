@@ -7,16 +7,18 @@
     "url": "https://github.com/segmentio/fab-5-engine",
     "directory": "packages/core"
   },
-  "main": "dist/cjs/index.js",
-  "module": "dist/esm/index.js",
+  "main": "dist/cjs",
+  "module": "dist/esm",
   "exports": {
     ".": {
       "require": "./dist/cjs/index.js",
-      "default": "./dist/esm/index.js"
+      "import": "./dist/esm/index.js",
+      "default": "./dist/cjs/index.js"
     },
-    "./": {
-      "require": "./dist/cjs/",
-      "default": "./dist/esm/"
+    "./mapping-kit": {
+      "require": "./dist/cjs/mapping-kit/index.js",
+      "import": "./dist/esm/mapping-kit/index.js",
+      "default": "./dist/cjs/mapping-kit/index.js"
     }
   },
   "types": "dist/esm/index.d.ts",

@@ -3,7 +3,6 @@
   "compilerOptions": {
     "module": "esnext",
     "removeComments": false,
-    "allowJs": true,
     "baseUrl": ".",
     "paths": {
       "@segment/actions-core": ["../core/src"],

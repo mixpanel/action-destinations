@@ -41,14 +41,6 @@ export const idToSlug: Record<string, ActionDestinationSlug> = {
   '60f9d0d048950c356be2e4da': 'braze'
 }
 
-export const browserDestinationsIdToSlug: Record<string, string> = {
-  '5f7dd6d21ad74f3842b1fc47': 'amplitude',
-  '60fb01aec459242d3b6f20c1': 'braze',
-  // Change these IDs when destination definitions are created for the following items
-  fullstory: 'fullstory',
-  intercom: 'intercom'
-}
-
 /** Attempts to load a destination definition from a given file path */
 async function getDestinationLazy(slug: string): Promise<null | DestinationDefinition> {
   const destination = await import(`./${slug}`).then((mod) => mod.default)

@@ -1,8 +1,7 @@
 import { Command, flags } from '@oclif/command'
 import execa from 'execa'
 import chalk from 'chalk'
-import { browserDestinationsIdToSlug as idToSlug } from '@segment/destination-actions'
-import { invert } from 'lodash'
+import { destinations, ActionDestinationSlug } from '@segment/browser-destinations'
 import ora from 'ora'
 import type { RemotePlugin } from '../lib/control-plane-service'
 import { prompt } from '../lib/prompt'
@@ -26,23 +25,15 @@ export default class PushBrowserDestinations extends Command {
   static args = []
 
   async run() {
-    const slugToId = invert(idToSlug)
-    const availableSlugs = Object.keys(slugToId)
-    const { chosenSlugs } = await prompt<{ chosenSlugs: string[] }>({
+    const { destinationIds } = await prompt<{ destinationIds: string[] }>({
       type: 'multiselect',
-      name: 'chosenSlugs',
+      name: 'destinationIds',
       message: 'Browser Destinations:',
-      choices: availableSlugs.map((s) => ({
-        title: s,
-        value: s
+      choices: Object.entries(destinations).map(([id, definition]) => ({
+        title: definition.name,
+        value: id
       }))
     })
-
-    const destinationIds: string[] = []
-    for (const slug of chosenSlugs) {
-      const id = slugToId[slug]
-      destinationIds.push(id)
-    }
 
     if (!destinationIds.length) {
       this.warn(`You must select at least one destination. Exiting...`)
@@ -50,14 +41,20 @@ export default class PushBrowserDestinations extends Command {
     }
 
     this.spinner.start(
-      `Fetching existing definitions for ${chosenSlugs.map((slug) => chalk.greenBright(slug)).join(', ')}...`
+      `Fetching existing definitions for ${destinationIds
+        .map((id) => chalk.greenBright(destinations[id as ActionDestinationSlug].name))
+        .join(', ')}...`
     )
     const [metadatas] = await Promise.all([getDestinationMetadatas(destinationIds)])
     this.spinner.stop()
 
     const notFound = destinationIds.filter((destId) => !metadatas.map((m) => m.id).includes(destId))
     if (notFound.length) {
-      this.log(`Could not find destination definitions for ${notFound.map((id) => idToSlug[id])}.`)
+      this.log(
+        `Could not find destination definitions for ${notFound.map(
+          (id) => destinations[id as ActionDestinationSlug].name
+        )}.`
+      )
     }
 
     const remotePlugins: RemotePlugin[] = await getRemotePluginByDestinationIds(destinationIds)
@@ -71,9 +68,9 @@ export default class PushBrowserDestinations extends Command {
         persistedPlugins = await persistRemotePlugin(metadata, plugins)
       } catch (e) {
         this.error(e)
+      } finally {
+        this.spinner.stop()
       }
-
-      this.spinner.stop()
 
       this.log(`Plugin ${persistedPlugins.map((p) => p.name)} stored in control plane`)
     }
@@ -81,18 +78,19 @@ export default class PushBrowserDestinations extends Command {
     try {
       this.spinner.start(`Building libraries`)
       await build()
-      this.spinner.stop()
     } catch (e) {
       this.error(e)
+    } finally {
+      this.spinner.stop()
     }
 
     try {
       this.spinner.start(`Syncing all plugins to s3`)
-      await syncToS3(chosenSlugs)
+      await syncToS3()
       this.spinner.stop()
-
       this.log(`Plugins synced to s3`)
     } catch (e) {
+      this.spinner.stop()
       this.error(e)
     }
   }
@@ -107,20 +105,15 @@ async function build(): Promise<string> {
   return execa.commandSync('lerna run build-web').stdout
 }
 
-async function syncToS3(slugs: string[]): Promise<string> {
-  if (slugs.length) {
-    const includes = slugs.map((s) => `--include ${s}*`).join(' ')
-    const options = `-- --exclude * ${includes}`
+async function syncToS3(): Promise<string> {
+  if (process.env.NODE_ENV === 'production') {
+    const command = `lerna run deploy-prod`
+    return execa.commandSync(command).stdout
+  }
 
-    if (process.env.NODE_ENV === 'production') {
-      const command = `lerna run deploy-prod ${options}`
-      return execa.commandSync(command).stdout
-    }
-
-    if (process.env.NODE_ENV === 'stage') {
-      const command = `lerna run deploy-stage ${options}`
-      return execa.commandSync(command).stdout
-    }
+  if (process.env.NODE_ENV === 'stage') {
+    const command = `lerna run deploy-stage`
+    return execa.commandSync(command).stdout
   }
 
   return 'Nothing to upload.'
