@@ -29,6 +29,16 @@ app.use(core)
 
 app.use(express.json())
 
+async function getDestinationMetadata(context: Context, authorization: string, id: string) {
+  const { error, data } = await controlPlaneService.getDestinationMetadataById({ authorization }, { id }, { context })
+
+  if (error) {
+    throw error
+  }
+
+  return data?.metadata
+}
+
 async function fetchDestinationSettings(
   context: Context,
   authorization: string,
@@ -116,11 +126,23 @@ app.post(
     ow(metadataId, ow.string)
     ow(settings, ow.object)
 
-    // fallback to slug when metadataId is not provided
-    const destinationDefinition = await getDestinationById(metadataId)
+    const [destinationDefinition, metadata] = await Promise.all([
+      getDestinationById(metadataId),
+      getDestinationMetadata(req.context, req.headers.authorization as string, metadataId)
+    ])
 
+    // The destination definition doesn't exist in Segment's db
+    if (!metadata) {
+      res.status(404).json({ ok: false, error: `No destination metadata found for ${metadataId}` })
+      return
+    }
+
+    // The destination definition isn't directly available to this repo (or it's a browser destination)
+    // so there is no testAuthentication method to invoke.
+    // Ideally this would check the definition (or some persisted property in the db) to see if it has testable authentication
+    // in order to do that we would need the server to be aware of all action definitions
     if (!destinationDefinition) {
-      res.status(404).json({ ok: false, error: `No destination found by ${metadataId}` })
+      res.status(200).json({ ok: true })
       return
     }
 
