@@ -3,6 +3,7 @@ import type { BrowserDestinationDefinition } from '../../lib/browser-destination
 import { browserDestination } from '../../runtime/shim'
 import { initScript } from './init-script'
 import type appboy from '@braze/web-sdk'
+import logCustomEvent from './logCustomEvent'
 
 declare global {
   interface Window {
@@ -96,7 +97,7 @@ export const destination: BrowserDestinationDefinition<Settings, typeof appboy> 
   },
 
   actions: {
-    // logUser
+    logCustomEvent
   }
 }
 

@@ -1,7 +1,7 @@
 import { Command, flags } from '@oclif/command'
 import execa from 'execa'
 import chalk from 'chalk'
-import { destinations, ActionDestinationSlug } from '@segment/browser-destinations'
+import { destinations } from '@segment/browser-destinations'
 import ora from 'ora'
 import type { RemotePlugin } from '../lib/control-plane-service'
 import { prompt } from '../lib/prompt'
@@ -30,7 +30,7 @@ export default class PushBrowserDestinations extends Command {
       name: 'destinationIds',
       message: 'Browser Destinations:',
       choices: Object.entries(destinations).map(([id, definition]) => ({
-        title: definition.name,
+        title: definition.definition.name,
         value: id
       }))
     })
@@ -42,22 +42,28 @@ export default class PushBrowserDestinations extends Command {
 
     this.spinner.start(
       `Fetching existing definitions for ${destinationIds
-        .map((id) => chalk.greenBright(destinations[id as ActionDestinationSlug].name))
+        .map((id) => chalk.greenBright(destinations[id].definition.name))
         .join(', ')}...`
     )
-    const [metadatas] = await Promise.all([getDestinationMetadatas(destinationIds)])
+    const metadatas = await getDestinationMetadatas(destinationIds)
+
     this.spinner.stop()
 
     const notFound = destinationIds.filter((destId) => !metadatas.map((m) => m.id).includes(destId))
     if (notFound.length) {
-      this.log(
-        `Could not find destination definitions for ${notFound.map(
-          (id) => destinations[id as ActionDestinationSlug].name
-        )}.`
-      )
+      this.log(`Could not find destination definitions for ${notFound.map((id) => destinations[id].definition.name)}.`)
     }
 
     const remotePlugins: RemotePlugin[] = await getRemotePluginByDestinationIds(destinationIds)
+
+    try {
+      this.spinner.start(`Building libraries`)
+      await build()
+    } catch (e) {
+      this.error(e)
+    } finally {
+      this.spinner.stop()
+    }
 
     for (const metadata of metadatas) {
       this.spinner.start('Persisting remote plugins...')
@@ -73,15 +79,6 @@ export default class PushBrowserDestinations extends Command {
       }
 
       this.log(`Plugin ${persistedPlugins.map((p) => p.name)} stored in control plane`)
-    }
-
-    try {
-      this.spinner.start(`Building libraries`)
-      await build()
-    } catch (e) {
-      this.error(e)
-    } finally {
-      this.spinner.stop()
     }
 
     try {

@@ -1,4 +1,4 @@
-import { uniq } from 'lodash'
+import { destinations as browserDestinations } from '@segment/browser-destinations'
 import { ASSET_PATH } from '../config'
 import {
   controlPlaneService,
@@ -11,7 +11,6 @@ import {
   RemotePlugin,
   RemotePluginCreateInput
 } from '../lib/control-plane-service'
-import { webBundles } from './web-bundles'
 
 const NOOP_CONTEXT = {}
 
@@ -147,12 +146,14 @@ export async function persistRemotePlugin(
   metadata: DestinationMetadata,
   remotePlugins: RemotePlugin[]
 ): Promise<RemotePlugin[]> {
+  const metadataBundle = browserDestinations[metadata.id].path
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+  const [bundleName, _index] = metadataBundle.split('/').slice(-2)
+
   const responses = []
-  const bundles = uniq(webBundles().map((b) => b.split('.')[0]))
 
   if (remotePlugins.length) {
     for (const remotePlugin of remotePlugins) {
-      const bundleName = bundles.find((b) => b.includes(metadata.slug))
       const url = remotePlugin.url ?? `${ASSET_PATH}/${bundleName}.js` ?? `${ASSET_PATH}/${metadata.slug}.js`
 
       if (!url) {
@@ -178,7 +179,6 @@ export async function persistRemotePlugin(
       responses.push(response.data.remotePlugin)
     }
   } else {
-    const bundleName = bundles.find((b) => b.includes(metadata.slug))
     const url = `${ASSET_PATH}/${bundleName}.js` ?? `${ASSET_PATH}/${metadata.slug}.js`
 
     if (!url) {
