@@ -7,6 +7,7 @@ import slack from './slack'
 import twilio from './twilio'
 import googleAnalytics4 from './google-analytics-4'
 import googleEnhancedConversions from './google-enhanced-conversions'
+import personasMessagingSendgrid from './personas-messaging-sendgrid'
 
 /**
  * To register an integration in the `integrations` service
@@ -25,7 +26,8 @@ export const destinations = {
   slack,
   twilio,
   'google-analytics-4': googleAnalytics4,
-  'google-enhanced-conversions': googleEnhancedConversions
+  'google-enhanced-conversions': googleEnhancedConversions,
+  'personas-messaging-sendgrid': personasMessagingSendgrid
 }
 
 export type ActionDestinationSlug = keyof typeof destinations
@@ -38,6 +40,7 @@ export const idToSlug: Record<string, ActionDestinationSlug> = {
   '602efa1f249b9a5e2bf8a813': 'twilio',
   '60ad61f9ff47a16b8fb7b5d9': 'google-analytics-4',
   '60ae8b97dcb6cc52d5d0d5ab': 'google-enhanced-conversions',
+  '6101bf0e15772f7e12407fa9': 'personas-messaging-sendgrid',
   '60f9d0d048950c356be2e4da': 'braze'
 }
 
