@@ -102,6 +102,13 @@ export default class Push extends Command {
 
         const fields: DestinationMetadataActionFieldCreateInput[] = Object.keys(action.fields).map((fieldKey) => {
           const field = action.fields[fieldKey]
+
+          if (action.platform === 'web' && field.dynamic) {
+            this.error(
+              `The field key "${fieldKey}" is configured to be a "dynamic" field. Web actions do not support dynamic fields.`
+            )
+          }
+
           return {
             fieldKey,
             type: field.type,

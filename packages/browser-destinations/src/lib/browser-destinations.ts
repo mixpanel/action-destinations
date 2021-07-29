@@ -14,9 +14,14 @@ export type ActionInput<Settings, Payload> = ExecuteInput<Settings, Payload> & {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface BrowserActionDefinition<Settings, Client, Payload = any>
-  extends Omit<ActionDefinition<Settings, Payload>, 'perform'> {
+  extends Omit<ActionDefinition<Settings, Payload>, 'perform' | 'dynamicFields'> {
+  /** The operation to perform when this action is triggered */
   perform: (client: Client, data: ActionInput<Settings, Payload>) => Promise<unknown> | unknown
 
+  /**
+   * The target platform for the action
+   * @default 'web'
+   */
   platform: 'web'
 
   /** Which step in the Analytics.js lifecycle this action should run */
