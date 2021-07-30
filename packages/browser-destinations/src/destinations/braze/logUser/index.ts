@@ -37,19 +37,17 @@ const action: BrowserActionDefinition<Settings, typeof appboy, Payload> = {
         key: {
           label: 'Key',
           type: 'string',
-          allowNull: true
+          required: true
         },
         latitude: {
           label: 'Latitude',
           type: 'number',
-          required: true,
-          allowNull: true
+          required: true
         },
         longitude: {
           label: 'Longitude',
           type: 'number',
-          required: true,
-          allowNull: true
+          required: true
         }
       }
     },
@@ -182,7 +180,7 @@ const action: BrowserActionDefinition<Settings, typeof appboy, Payload> = {
     if (payload.custom_attributes !== undefined) {
       Object.entries(payload.custom_attributes).forEach(([key, value]) => {
         if (!known_traits.includes(key)) {
-          client.getUser().setCustomUserAttribute(key, value)
+          client.getUser().setCustomUserAttribute(key, value as string | number | boolean | Date | string[] | null)
         }
       })
     }
