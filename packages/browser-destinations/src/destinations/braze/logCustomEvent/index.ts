@@ -6,6 +6,7 @@ import type appboy from '@braze/web-sdk'
 const action: BrowserActionDefinition<Settings, typeof appboy, Payload> = {
   title: 'Log Custom Event',
   description: 'Reports that the current user performed a custom named event.',
+  defaultSubscription: 'type = "track"',
   platform: 'web',
   fields: {
     eventName: {

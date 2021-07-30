@@ -188,7 +188,7 @@ export async function persistRemotePlugin(
     const remotePluginInput: RemotePluginCreateInput = {
       metadataId: metadata.id,
       name: `${metadata.name}`,
-      libraryName: `${metadata.slug}-pluginsDestination`,
+      libraryName: `${bundleName}Destination`,
       url
     }
 
@@ -197,7 +197,7 @@ export async function persistRemotePlugin(
     })
 
     if (!response || !response.data) {
-      throw new Error(`Could not save remote plugin ${metadata.slug}-pluginsDestination`)
+      throw new Error(`Could not save remote plugin ${bundleName}Destination`)
     }
 
     if (response.error) {
