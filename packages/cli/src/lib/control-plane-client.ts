@@ -1,5 +1,3 @@
-import { destinations as browserDestinations } from '@segment/browser-destinations'
-import { ASSET_PATH } from '../config'
 import {
   controlPlaneService,
   DestinationMetadata,
@@ -8,8 +6,7 @@ import {
   DestinationMetadataActionsUpdateInput,
   DestinationMetadataUpdateInput,
   DestinationSubscriptionPresetInput,
-  RemotePlugin,
-  RemotePluginCreateInput
+  RemotePlugin
 } from '../lib/control-plane-service'
 
 const NOOP_CONTEXT = {}
@@ -141,71 +138,39 @@ export async function getRemotePluginByDestinationIds(metadataIds: string[]): Pr
   return data.remotePlugins
 }
 
-// TODO(@juliofarah) this UPSERT strategy must be moved to control plane service;
-export async function persistRemotePlugin(
-  metadata: DestinationMetadata,
-  remotePlugins: RemotePlugin[]
-): Promise<RemotePlugin[]> {
-  const metadataBundle = browserDestinations[metadata.id].path
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-  const [bundleName, _index] = metadataBundle.split('/').slice(-2)
-
-  const responses = []
-
-  if (remotePlugins.length) {
-    for (const remotePlugin of remotePlugins) {
-      const url = remotePlugin.url ?? `${ASSET_PATH}/${bundleName}.js` ?? `${ASSET_PATH}/${metadata.slug}.js`
-
-      if (!url) {
-        throw new Error('Error building plugin URL')
-      }
-
-      const response = await controlPlaneService.updateRemotePlugin(NOOP_CONTEXT, {
-        metadataId: metadata.id,
-        name: remotePlugin.name,
-        input: {
-          url
-        }
-      })
-
-      if (!response || !response.data) {
-        throw new Error(`Could not save remote plugin ${remotePlugin?.name ?? ''}`)
-      }
-
-      if (response.error) {
-        throw response.error
-      }
-
-      responses.push(response.data.remotePlugin)
+export async function updateRemotePlugin(plugin: RemotePlugin): Promise<RemotePlugin> {
+  const { data, error } = await controlPlaneService.updateRemotePlugin(NOOP_CONTEXT, {
+    metadataId: plugin.metadataId,
+    name: plugin.name,
+    input: {
+      url: plugin.url,
+      libraryName: plugin.libraryName
     }
-  } else {
-    const url = `${ASSET_PATH}/${bundleName}.js` ?? `${ASSET_PATH}/${metadata.slug}.js`
+  })
 
-    if (!url) {
-      throw new Error('Error building plugin URL')
-    }
-
-    const remotePluginInput: RemotePluginCreateInput = {
-      metadataId: metadata.id,
-      name: `${metadata.name}`,
-      libraryName: `${bundleName}Destination`,
-      url
-    }
-
-    const response = await controlPlaneService.createRemotePlugin(NOOP_CONTEXT, {
-      input: remotePluginInput
-    })
-
-    if (!response || !response.data) {
-      throw new Error(`Could not save remote plugin ${bundleName}Destination`)
-    }
-
-    if (response.error) {
-      throw response.error
-    }
-
-    responses.push(response.data.remotePlugin)
+  if (error) {
+    throw error
   }
 
-  return responses
+  if (!data) {
+    throw new Error('could not update remote plugin')
+  }
+
+  return data.remotePlugin
+}
+
+export async function createRemotePlugin(plugin: RemotePlugin): Promise<RemotePlugin> {
+  const { data, error } = await controlPlaneService.createRemotePlugin(NOOP_CONTEXT, {
+    input: plugin
+  })
+
+  if (error) {
+    throw error
+  }
+
+  if (!data) {
+    throw new Error('could not create remote plugin')
+  }
+
+  return data.remotePlugin
 }

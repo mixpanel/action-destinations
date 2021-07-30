@@ -4,7 +4,7 @@ import { HttpError, NotFound, UnprocessableEntity } from 'http-errors'
 import MIMEType from 'whatwg-mimetype'
 import Context from '@/lib/context'
 import { redactSettings } from '@/lib/redact'
-import { getDestinationByIdOrSlug } from '@segment/destination-actions'
+import { getDestinationByIdOrKey } from '@segment/destination-actions'
 import type { JSONArray, JSONObject, SubscriptionStats, SegmentEvent } from '@segment/actions-core'
 import getEventTesterData, { EventTesterRequest, RequestToDestination, ResponseFromDestination } from './event-tester'
 import { constructTrace, Span } from './tracing'
@@ -57,15 +57,15 @@ function onComplete(context: Context, privateSettings: JSONArray = []) {
 }
 
 async function handleHttp(context: Context, req: Request): Promise<unknown> {
-  const idOrSlug = req.params.destinationId
+  const idOrPathKey = req.params.destinationId
   const event = req.body as SegmentEvent
   const settings = parseJsonHeader(req.headers, 'centrifuge-settings') as JSONObject
   const privateSettings = parseJsonHeader(req.headers, 'centrifuge-private-settings') as JSONArray
 
-  // Try to map the id param to a slug, or treat it as the slug (easier local testing)
-  const destination = await getDestinationByIdOrSlug(idOrSlug)
+  // Try to get the destination by id, or treat it as the path (easier local testing)
+  const destination = await getDestinationByIdOrKey(idOrPathKey)
   if (!destination) {
-    throw new NotFound(`Destination with id "${idOrSlug}" not found`)
+    throw new NotFound(`Destination with id "${idOrPathKey}" not found`)
   }
 
   const results = await destination.onEvent(event, settings, { onComplete: onComplete(context, privateSettings) })
@@ -208,7 +208,7 @@ async function handleCloudEvent(
   privateSettings?: JSONArray
 ): Promise<CloudEventResponse> {
   const start = new Date()
-  const destination = await getDestinationByIdOrSlug(destinationId)
+  const destination = await getDestinationByIdOrKey(destinationId)
   if (!destination) {
     throw new NotFound(`Destination with id "${destinationId}" not found`)
   }

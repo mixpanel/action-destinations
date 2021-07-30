@@ -1,9 +1,9 @@
 import { Command, flags } from '@oclif/command'
-import type { DestinationDefinition } from '@segment/actions-core'
-import { idToSlug, destinations as actionDestinations } from '@segment/destination-actions'
+import type { DestinationDefinition as CloudDestinationDefinition } from '@segment/actions-core'
+import { manifest as cloudManifest } from '@segment/destination-actions'
+import { manifest as browserManifest, BrowserDestinationDefinition } from '@segment/browser-destinations'
 import chalk from 'chalk'
-import { invert, uniq, pick, omit, sortBy } from 'lodash'
-import type { Dictionary } from 'lodash'
+import { uniq, pick, omit, sortBy } from 'lodash'
 import { diffString } from 'json-diff'
 import ora from 'ora'
 import type {
@@ -26,7 +26,13 @@ import {
   setSubscriptionPresets
 } from '../lib/control-plane-client'
 
+export type DestinationDefinition = CloudDestinationDefinition<any> | BrowserDestinationDefinition<any, any>
 type BaseActionInput = Omit<DestinationMetadataActionCreateInput, 'metadataId'>
+
+const manifest = {
+  ...cloudManifest,
+  ...browserManifest
+}
 
 export default class Push extends Command {
   private spinner: ora.Ora = ora()
@@ -45,39 +51,33 @@ export default class Push extends Command {
   async run() {
     const { flags } = this.parse(Push)
 
-    const slugToId = invert(idToSlug)
-    const availableSlugs = Object.keys(slugToId)
-    const { chosenSlugs } = await prompt<{ chosenSlugs: string[] }>({
+    const { metadataIds } = await prompt<{ metadataIds: string[] }>({
       type: 'multiselect',
-      name: 'chosenSlugs',
-      message: 'Integrations:',
-      choices: availableSlugs.map((s) => ({
-        title: s,
-        value: s
+      name: 'metadataIds',
+      message: 'Pick the definitions you would like to push to Segment:',
+      choices: sortBy(Object.entries(manifest), '[1].definition.name').map(([metadataId, entry]) => ({
+        title: entry.definition.name,
+        value: metadataId
       }))
     })
 
-    const destinationIds: string[] = []
-    for (const slug of chosenSlugs) {
-      const id = slugToId[slug]
-      destinationIds.push(id)
-    }
-
-    if (!destinationIds.length) {
+    if (!metadataIds.length) {
       this.warn(`You must select at least one destination. Exiting.`)
       this.exit()
     }
 
     this.spinner.start(
-      `Fetching existing definitions for ${chosenSlugs.map((slug) => chalk.greenBright(slug)).join(', ')}...`
+      `Fetching existing definitions for ${metadataIds
+        .map((id) => chalk.greenBright(manifest[id].definition.name))
+        .join(', ')}...`
     )
-    const schemasByDestination = getJsonSchemas(actionDestinations, destinationIds, slugToId)
+
     const [metadatas, actions] = await Promise.all([
-      getDestinationMetadatas(destinationIds),
-      getDestinationMetadataActions(destinationIds)
+      getDestinationMetadatas(metadataIds),
+      getDestinationMetadataActions(metadataIds)
     ])
 
-    if (metadatas.length !== Object.keys(schemasByDestination).length) {
+    if (metadatas.length !== Object.keys(metadataIds).length) {
       this.spinner.fail()
       throw new Error('Number of metadatas must match number of schemas')
     }
@@ -85,8 +85,9 @@ export default class Push extends Command {
     this.spinner.stop()
 
     for (const metadata of metadatas) {
-      const schemaForDestination = schemasByDestination[metadata.id]
-      const slug = schemaForDestination.slug
+      const entry = manifest[metadata.id]
+      const definition = entry.definition as DestinationDefinition
+      const slug = definition.slug || entry.directory
 
       this.log('')
       this.log(`${chalk.bold.whiteBright(slug)}`)
@@ -96,9 +97,11 @@ export default class Push extends Command {
       const actionsToCreate: DestinationMetadataActionCreateInput[] = []
       const existingActions = actions.filter((a) => a.metadataId === metadata.id)
 
-      for (const [actionKey, action] of Object.entries(schemaForDestination.actions)) {
+      for (const [actionKey, action] of Object.entries(definition.actions)) {
+        const platform = action.platform ?? 'cloud'
+
         // Note: this implies that changing the slug is a breaking change
-        const existingAction = existingActions.find((a) => a.slug === actionKey && a.platform === 'cloud')
+        const existingAction = existingActions.find((a) => a.slug === actionKey && a.platform === platform)
 
         const fields: DestinationMetadataActionFieldCreateInput[] = Object.keys(action.fields).map((fieldKey) => {
           const field = action.fields[fieldKey]
@@ -129,7 +132,7 @@ export default class Push extends Command {
           slug: actionKey,
           name: action.title ?? 'Unnamed Action',
           description: action.description ?? '',
-          platform: action.platform ?? 'cloud',
+          platform,
           hidden: action.hidden ?? false,
           defaultTrigger: action.defaultSubscription ?? null,
           fields
@@ -142,8 +145,8 @@ export default class Push extends Command {
         }
       }
 
-      const hasBrowserActions = Object.values(schemaForDestination.actions).some((action) => action.platform === 'web')
-      const hasCloudActions = Object.values(schemaForDestination.actions).some(
+      const hasBrowserActions = Object.values(definition.actions).some((action) => action.platform === 'web')
+      const hasCloudActions = Object.values(definition.actions).some(
         (action) => !action.platform || action.platform === 'cloud'
       )
       const platforms = {
@@ -152,7 +155,7 @@ export default class Push extends Command {
         mobile: false
       }
 
-      const options = getOptions(metadata, schemaForDestination)
+      const options = getOptions(metadata, definition)
       const basicOptions = getBasicOptions(metadata, options)
       const diff = diffString(
         asJson({
@@ -178,7 +181,7 @@ export default class Push extends Command {
             ([] as Array<DestinationMetadataActionCreateInput | DestinationMetadataActionsUpdateInput>)
               .concat(actionsToUpdate, actionsToCreate)
               .map((action) => ({
-                ...omit(action, ['id', 'actionId']),
+                ...omit(action, ['id', 'actionId', 'metadataId']),
                 fields: action.fields?.map((field) =>
                   omit(field, ['id', 'metadataActionId', 'sortOrder', 'createdAt', 'updatedAt'])
                 )
@@ -192,7 +195,7 @@ export default class Push extends Command {
         this.spinner.warn(`Detected changes for ${chalk.bold(slug)}, please review:`)
         this.log(`\n${diff}`)
       } else if (flags.force) {
-        const newDefinition = definitionToJson(schemaForDestination)
+        const newDefinition = definitionToJson(definition)
         this.spinner.warn(`No change detected for ${chalk.bold(slug)}. Using force, please review:`)
         this.log(`\n${JSON.stringify(newDefinition, null, 2)}`)
       } else {
@@ -224,7 +227,7 @@ export default class Push extends Command {
       const allActions = await getDestinationMetadataActions([metadata.id])
       const presets: DestinationSubscriptionPresetInput[] = []
 
-      for (const preset of schemaForDestination.presets ?? []) {
+      for (const preset of definition.presets ?? []) {
         const associatedAction = allActions.find((a) => a.slug === preset.partnerAction)
         if (!associatedAction) continue
 
@@ -269,17 +272,14 @@ function getBasicOptions(metadata: DestinationMetadata, options: DestinationMeta
 // Note: exporting for testing purposes only
 export function getOptions(
   metadata: DestinationMetadata,
-  destinationSchema: DestinationSchema
+  definition: DestinationDefinition
 ): DestinationMetadataOptions {
   const options: DestinationMetadataOptions = { ...metadata.options }
 
-  for (const [fieldKey, schema] of Object.entries(destinationSchema.authentication?.fields ?? {})) {
+  for (const [fieldKey, schema] of Object.entries(definition.authentication?.fields ?? {})) {
     const validators: string[][] = []
 
-    if (
-      RESERVED_FIELD_NAMES.includes(fieldKey.toLowerCase()) &&
-      destinationSchema.authentication?.scheme === OAUTH_SCHEME
-    ) {
+    if (RESERVED_FIELD_NAMES.includes(fieldKey.toLowerCase()) && hasOauthAuthentication(definition)) {
       throw new Error(`Schema contains a field definition that uses a reserved name: ${fieldKey}`)
     }
 
@@ -302,42 +302,17 @@ export function getOptions(
   }
 
   // Add oauth settings
-  if (destinationSchema.authentication?.scheme === OAUTH_SCHEME) {
+  if (hasOauthAuthentication(definition)) {
     options['oauth'] = OAUTH_OPTIONS
   }
 
   return options
 }
 
-interface SchemasByDestination {
-  [destinationId: string]: DestinationSchema
-}
-
-export interface DestinationSchema extends DestinationDefinition {
-  slug: string
-}
-
-function getJsonSchemas(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  destinations: Record<string, DestinationDefinition<any>>,
-  destinationIds: string[],
-  slugToId: Dictionary<string>
-): SchemasByDestination {
-  const schemasByDestination: SchemasByDestination = {}
-
-  for (const destinationSlug in destinations) {
-    const destinationId = slugToId[destinationSlug]
-    if (!destinationIds.includes(destinationId)) {
-      continue
-    }
-
-    const definition = destinations[destinationSlug]
-
-    schemasByDestination[destinationId] = {
-      ...definition,
-      slug: destinationSlug
-    }
-  }
-
-  return schemasByDestination
+function hasOauthAuthentication(definition: DestinationDefinition): boolean {
+  return (
+    !!definition.authentication &&
+    'scheme' in definition.authentication &&
+    definition.authentication.scheme === OAUTH_SCHEME
+  )
 }

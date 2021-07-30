@@ -1,14 +1,16 @@
 import { Command, flags } from '@oclif/command'
 import execa from 'execa'
 import chalk from 'chalk'
-import { destinations } from '@segment/browser-destinations'
+import { manifest } from '@segment/browser-destinations'
 import ora from 'ora'
+import { ASSET_PATH } from '../config'
 import type { RemotePlugin } from '../lib/control-plane-service'
 import { prompt } from '../lib/prompt'
 import {
   getDestinationMetadatas,
   getRemotePluginByDestinationIds,
-  persistRemotePlugin
+  createRemotePlugin,
+  updateRemotePlugin
 } from '../lib/control-plane-client'
 
 export default class PushBrowserDestinations extends Command {
@@ -29,8 +31,8 @@ export default class PushBrowserDestinations extends Command {
       type: 'multiselect',
       name: 'destinationIds',
       message: 'Browser Destinations:',
-      choices: Object.entries(destinations).map(([id, definition]) => ({
-        title: definition.definition.name,
+      choices: Object.entries(manifest).map(([id, entry]) => ({
+        title: entry.definition.name,
         value: id
       }))
     })
@@ -42,7 +44,7 @@ export default class PushBrowserDestinations extends Command {
 
     this.spinner.start(
       `Fetching existing definitions for ${destinationIds
-        .map((id) => chalk.greenBright(destinations[id].definition.name))
+        .map((id) => chalk.greenBright(manifest[id].definition.name))
         .join(', ')}...`
     )
     const metadatas = await getDestinationMetadatas(destinationIds)
@@ -51,7 +53,7 @@ export default class PushBrowserDestinations extends Command {
 
     const notFound = destinationIds.filter((destId) => !metadatas.map((m) => m.id).includes(destId))
     if (notFound.length) {
-      this.log(`Could not find destination definitions for ${notFound.map((id) => destinations[id].definition.name)}.`)
+      this.log(`Could not find destination definitions for ${notFound.map((id) => manifest[id].definition.name)}.`)
     }
 
     const remotePlugins: RemotePlugin[] = await getRemotePluginByDestinationIds(destinationIds)
@@ -66,19 +68,29 @@ export default class PushBrowserDestinations extends Command {
     }
 
     for (const metadata of metadatas) {
-      this.spinner.start('Persisting remote plugins...')
-      const plugins: RemotePlugin[] = remotePlugins.filter((p) => p.metadataId === metadata.id)
+      this.spinner.start(`Saving remote plugin for ${metadata.name}`)
+      const entry = manifest[metadata.id]
 
-      let persistedPlugins = []
-      try {
-        persistedPlugins = await persistRemotePlugin(metadata, plugins)
-      } catch (e) {
-        this.error(e)
-      } finally {
-        this.spinner.stop()
+      const input = {
+        metadataId: metadata.id,
+        name: metadata.name,
+        // This MUST match the way webpack exports the libraryName in the umd bundle
+        // TODO make this more automatic for consistency
+        libraryName: `${entry.directory}Destination`,
+        url: `${ASSET_PATH}/${entry.directory}.js`
       }
 
-      this.log(`Plugin ${persistedPlugins.map((p) => p.name)} stored in control plane`)
+      // We expect that each definition produces a single Remote Plugin bundle
+      // `name` + `metadataId` are guaranteed to be unique
+      const existingPlugin = remotePlugins.find((p) => p.metadataId === metadata.id && p.name === metadata.name)
+
+      if (existingPlugin) {
+        await updateRemotePlugin(input)
+      } else {
+        await createRemotePlugin(input)
+      }
+
+      this.spinner.succeed(`Saved remote plugin for ${metadata.name}`)
     }
 
     try {

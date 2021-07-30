@@ -1,4 +1,4 @@
-import type { DestinationSchema } from '../commands/push'
+import type { DestinationDefinition } from '../commands/push'
 import type { DestinationMetadata } from '../lib/control-plane-service'
 
 export const expectedDestinationMetadataOptions = {
@@ -106,7 +106,7 @@ export const destinationMetadata: DestinationMetadata = {
   multiInstanceSupportedVersion: 'UNSUPPORTED'
 }
 
-export const destinationSchema: DestinationSchema = {
+export const destinationSchema: DestinationDefinition = {
   name: 'Test Slug',
   authentication: {
     scheme: 'oauth2',
@@ -119,7 +119,7 @@ export const destinationSchema: DestinationSchema = {
         required: true
       }
     },
-    testAuthentication: (_request) => {
+    testAuthentication: () => {
       // Return a request that tests/validates the user's credentials here
     }
   },
@@ -157,7 +157,7 @@ export const destinationSchema: DestinationSchema = {
           }
         }
       },
-      perform: (_request) => {
+      perform: () => {
         return
       }
     }
