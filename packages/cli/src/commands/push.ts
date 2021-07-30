@@ -3,7 +3,7 @@ import type { DestinationDefinition as CloudDestinationDefinition } from '@segme
 import { manifest as cloudManifest } from '@segment/destination-actions'
 import { manifest as browserManifest, BrowserDestinationDefinition } from '@segment/browser-destinations'
 import chalk from 'chalk'
-import { uniq, pick, omit, sortBy } from 'lodash'
+import { uniq, pick, omit, sortBy, mergeWith } from 'lodash'
 import { diffString } from 'json-diff'
 import ora from 'ora'
 import type {
@@ -29,10 +29,27 @@ import {
 export type DestinationDefinition = CloudDestinationDefinition<any> | BrowserDestinationDefinition<any, any>
 type BaseActionInput = Omit<DestinationMetadataActionCreateInput, 'metadataId'>
 
-const manifest = {
-  ...cloudManifest,
-  ...browserManifest
-}
+// Right now it's possible for browser destinations and cloud destinations to have the same
+// metadataId. This is because we currently rely on a separate directory for all web actions.
+// So here we need to intelligently merge them until we explore colocating all actions with a single
+// definition file.
+const manifest = mergeWith({}, cloudManifest, browserManifest, (objValue, srcValue) => {
+  if (Object.keys(objValue?.definition?.actions ?? {}).length === 0) {
+    return
+  }
+
+  for (const [actionKey, action] of Object.entries(srcValue.definition?.actions ?? {})) {
+    if (actionKey in objValue.definition.actions) {
+      throw new Error(
+        `Could not merge browser + cloud actions because there is already an action with the same key "${actionKey}"`
+      )
+    }
+
+    objValue.definition.actions[actionKey] = action
+  }
+
+  return objValue
+})
 
 export default class Push extends Command {
   private spinner: ora.Ora = ora()
@@ -87,7 +104,7 @@ export default class Push extends Command {
     for (const metadata of metadatas) {
       const entry = manifest[metadata.id]
       const definition = entry.definition as DestinationDefinition
-      const slug = definition.slug || entry.directory
+      const slug = metadata.slug
 
       this.log('')
       this.log(`${chalk.bold.whiteBright(slug)}`)
