@@ -8,8 +8,11 @@ const webpack = require('webpack')
 const files = globby.sync('./src/destinations/*/index.ts')
 const isProd = process.env.NODE_ENV === 'production'
 const assetPath =
-  process.env.ASSET_ENV === 'production' ? 'https://cdn.segment.com/next-integrations/actions/' :
-  (process.env.ASSET_ENV === 'stage' ? 'https://cdn.segment.build/next-integrations/actions/' : undefined)
+  process.env.ASSET_ENV === 'production'
+    ? 'https://cdn.segment.com/next-integrations/actions/'
+    : process.env.ASSET_ENV === 'stage'
+    ? 'https://cdn.segment.build/next-integrations/actions/'
+    : undefined
 
 const entries = files.reduce((acc, current) => {
   const [_dot, _src, _destinations, destination, ..._rest] = current.split('/')
@@ -19,15 +22,17 @@ const entries = files.reduce((acc, current) => {
   }
 }, {})
 
-const plugins = [new webpack.DefinePlugin({'process.env.ASSET_ENV': JSON.stringify(process.env.ASSET_ENV)})]
+const plugins = [new webpack.DefinePlugin({ 'process.env.ASSET_ENV': JSON.stringify(process.env.ASSET_ENV) })]
 if (isProd) {
   plugins.push(new CompressionPlugin())
 }
 
 if (process.env.ANALYZE) {
-  plugins.push(new BundleAnalyzerPlugin({
-    defaultSizes: 'stat'
-  }))
+  plugins.push(
+    new BundleAnalyzerPlugin({
+      defaultSizes: 'stat'
+    })
+  )
 }
 
 module.exports = {
@@ -60,7 +65,7 @@ module.exports = {
     modules: [
       // use current node_modules directory first (e.g. for tslib)
       path.resolve(__dirname, 'node_modules'),
-      'node_modules',
+      'node_modules'
     ],
     extensions: ['.ts', '.js'],
     fallback: {
@@ -68,7 +73,9 @@ module.exports = {
     }
   },
   devServer: {
-    contentBase: path.resolve(__dirname, 'build')
+    contentBase: path.resolve(__dirname),
+    liveReload: true,
+    port: 9000
   },
   performance: {
     hints: 'warning'
