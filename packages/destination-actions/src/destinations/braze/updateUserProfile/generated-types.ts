@@ -99,4 +99,41 @@ export interface Payload {
    * The user's push subscription preference: “opted_in” (explicitly registered to receive push messages), “unsubscribed” (explicitly opted out of push messages), and “subscribed” (neither opted in nor out).
    */
   push_subscribe?: string
+  /**
+   * Array of objects with app_id and token string. You may optionally provide a device_id for the device this token is associated with, e.g., [{"app_id": App Identifier, "token": "abcd", "device_id": "optional_field_value"}]. If a device_id is not provided, one will be randomly generated.
+   */
+  push_tokens?: {
+    /**
+     * The app identifier for the push token.
+     */
+    app_id: string
+    /**
+     * The push token.
+     */
+    token: string
+    /**
+     * Identifier for the device associated with this token
+     */
+    device_id?: string
+  }[]
+  /**
+   * The user’s time zone name from IANA Time Zone Database  (e.g., “America/New_York” or “Eastern Time (US & Canada)”). Only valid time zone values will be set.
+   */
+  time_zone?: string
+  /**
+   * Hash containing any of id (integer), screen_name (string, Twitter handle), followers_count (integer), friends_count (integer), statuses_count (integer).
+   */
+  twitter?: {
+    id?: string
+    screen_name?: string
+    followers_count?: number
+    friends_count?: number
+    statuses_count?: number
+  }
+  /**
+   * Hash of custom attributes to send to Braze
+   */
+  custom_attributes?: {
+    [k: string]: unknown
+  }
 }

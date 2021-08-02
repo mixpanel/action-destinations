@@ -226,8 +226,75 @@ const action: ActionDefinition<Settings, Payload> = {
       label: 'Push Subscribe',
       description: `The user's push subscription preference: “opted_in” (explicitly registered to receive push messages), “unsubscribed” (explicitly opted out of push messages), and “subscribed” (neither opted in nor out).`,
       type: 'string'
+    },
+    push_tokens: {
+      label: 'Push Tokens',
+      description:
+        'Array of objects with app_id and token string. You may optionally provide a device_id for the device this token is associated with, e.g., [{"app_id": App Identifier, "token": "abcd", "device_id": "optional_field_value"}]. If a device_id is not provided, one will be randomly generated.',
+      type: 'object',
+      multiple: true,
+      properties: {
+        app_id: {
+          label: 'App ID',
+          description: 'The app identifier for the push token.',
+          type: 'string',
+          required: true
+        },
+        token: {
+          label: 'Token',
+          description: 'The push token.',
+          type: 'string',
+          required: true
+        },
+        device_id: {
+          label: 'Device ID',
+          description: 'Identifier for the device associated with this token',
+          type: 'string'
+        }
+      }
+    },
+    time_zone: {
+      label: 'Time zone',
+      description:
+        'The user’s time zone name from IANA Time Zone Database  (e.g., “America/New_York” or “Eastern Time (US & Canada)”). Only valid time zone values will be set.',
+      type: 'string'
+    },
+    twitter: {
+      label: 'Twitter Attribution Data',
+      description:
+        'Hash containing any of id (integer), screen_name (string, Twitter handle), followers_count (integer), friends_count (integer), statuses_count (integer).',
+      type: 'object',
+      properties: {
+        id: {
+          label: 'Twitter ID',
+          type: 'string'
+        },
+        screen_name: {
+          label: 'Twitter Handle',
+          type: 'string'
+        },
+        followers_count: {
+          label: 'Number of Followers',
+          type: 'integer'
+        },
+        friends_count: {
+          label: 'Number of Friends',
+          type: 'integer'
+        },
+        statuses_count: {
+          label: 'Number of Statuses',
+          type: 'integer'
+        }
+      }
+    },
+    custom_attributes: {
+      label: 'Custom Attributes',
+      description: 'Hash of custom attributes to send to Braze',
+      type: 'object',
+      default: {
+        '@path': '$.traits'
+      }
     }
-    // TODO implement `push_tokens`, `time_zone`, `twitter` and `custom_attributes`
   },
 
   perform: (request, { settings, payload }) => {
@@ -246,6 +313,8 @@ const action: ActionDefinition<Settings, Payload> = {
       json: {
         attributes: [
           {
+            // Spread custom attributes in a way that doesn't override reserved properties
+            ...payload.custom_attributes,
             braze_id,
             external_id,
             user_alias,
@@ -272,7 +341,10 @@ const action: ActionDefinition<Settings, Payload> = {
             last_name: payload.last_name,
             marked_email_as_spam_at: toISO8601(payload.marked_email_as_spam_at),
             phone: payload.phone,
-            push_subscribe: payload.push_subscribe
+            push_subscribe: payload.push_subscribe,
+            push_tokens: payload.push_tokens,
+            time_zone: payload.time_zone,
+            twitter: payload.twitter
           }
         ]
       }
