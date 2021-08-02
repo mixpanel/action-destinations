@@ -14,7 +14,7 @@
     "core": "yarn workspace @segment/actions-core",
     "server": "yarn workspace @segment/actions-server",
     "bootstrap": "lerna bootstrap",
-    "build": "./bin/run generate:types && lerna run build --stream",
+    "build": "./bin/run generate:types && lerna run build --stream --ignore @segment/actions-cli",
     "dev": "yarn server dev",
     "dev:ops": "yarn server dev:ops",
     "types": "./bin/run generate:types",

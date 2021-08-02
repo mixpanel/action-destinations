@@ -37,9 +37,11 @@
     "nock": "^13.0.11"
   },
   "dependencies": {
-    "@segment/actions-core": "^3.0.0",
     "dayjs": "^1.10.3",
     "mustache": "^4.2.0"
+  },
+  "optionalDependencies": {
+    "@segment/actions-core": "^3.0.0"
   },
   "jest": {
     "preset": "ts-jest",

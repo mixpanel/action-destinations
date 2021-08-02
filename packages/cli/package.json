@@ -55,9 +55,7 @@
     "@oclif/config": "^1",
     "@oclif/errors": "^1",
     "@oclif/plugin-help": "^3",
-    "@segment/actions-core": "^3.0.0",
     "@segment/browser-destinations": "^3.0.0",
-    "@segment/control-plane-service-client": "ssh://git@github.com:segmentio/control-plane-service-js-client#master",
     "@segment/destination-actions": "^3.0.0",
     "chalk": "^4.1.1",
     "chokidar": "^3.5.1",
@@ -77,6 +75,10 @@
     "to-title-case": "^1.0.0",
     "tsconfig-paths": "^3.9.0",
     "tslib": "^2"
+  },
+  "optionalDependencies": {
+    "@segment/actions-core": "^3.0.0",
+    "@segment/control-plane-service-client": "ssh://git@github.com:segmentio/control-plane-service-js-client#master"
   },
   "oclif": {
     "commands": "./dist/commands",
