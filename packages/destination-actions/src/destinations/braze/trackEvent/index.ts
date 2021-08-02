@@ -94,7 +94,7 @@ const action: ActionDefinition<Settings, Payload> = {
       )
     }
 
-    return request(`${settings.endpoint}`, {
+    return request(`${settings.endpoint}/users/track`, {
       method: 'post',
       json: {
         events: [
