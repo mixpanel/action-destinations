@@ -5,6 +5,7 @@ import updateUserProfile from './updateUserProfile'
 const destination: DestinationDefinition<Settings> = {
   name: 'Braze Cloud Mode',
   slug: 'actions-braze-cloud',
+  mode: 'cloud',
   description: 'Send events server-side to the Braze REST API.',
   authentication: {
     scheme: 'custom',

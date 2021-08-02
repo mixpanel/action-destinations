@@ -15,22 +15,20 @@ declare global {
 export const destination: BrowserDestinationDefinition<Settings, typeof appboy> = {
   name: 'Braze Web Mode',
   slug: 'actions-braze-web',
-
-  authentication: {
-    fields: {
-      api_key: {
-        description: 'Created under Developer Console in the Braze Dashboard.',
-        label: 'API Key',
-        type: 'string',
-        required: true
-      },
-      endpoint: {
-        description: 'Your Braze SDK endpoint. [See more details](https://www.braze.com/docs/api/basics/#endpoints).',
-        label: 'SDK Endpoint',
-        type: 'string',
-        format: 'uri',
-        required: true
-      }
+  mode: 'device',
+  settings: {
+    api_key: {
+      description: 'Created under Developer Console in the Braze Dashboard.',
+      label: 'API Key',
+      type: 'string',
+      required: true
+    },
+    endpoint: {
+      description: 'Your Braze SDK endpoint. [See more details](https://www.braze.com/docs/api/basics/#endpoints).',
+      label: 'SDK Endpoint',
+      type: 'string',
+      format: 'uri',
+      required: true
     }
   },
 
@@ -60,7 +58,7 @@ export const destination: BrowserDestinationDefinition<Settings, typeof appboy> 
       baseUrl: settings.endpoint
     }
 
-    await dependencies?.loadScript('https://js.appboycdn.com/web-sdk/3.3/service-worker.js')
+    await dependencies.loadScript('https://js.appboycdn.com/web-sdk/3.3/service-worker.js')
     const initialized = appboy.initialize(settings.api_key, config)
     if (!initialized) {
       throw new Error('Failed to initialize AppBoy')

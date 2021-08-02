@@ -17,6 +17,7 @@ interface UserInfoResponse {
 
 const destination: DestinationDefinition<Settings> = {
   name: 'Actions Google Enhanced Conversions',
+  mode: 'cloud',
   authentication: {
     scheme: 'oauth2',
     fields: {

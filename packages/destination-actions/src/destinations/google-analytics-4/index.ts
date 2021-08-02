@@ -22,6 +22,7 @@ import removeFromCart from './removeFromCart'
 
 const destination: DestinationDefinition<Settings> = {
   name: 'Google Analytics 4',
+  mode: 'cloud',
   authentication: {
     scheme: 'custom',
     fields: {

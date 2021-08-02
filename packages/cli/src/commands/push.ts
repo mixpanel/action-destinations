@@ -16,7 +16,7 @@ import type {
   DestinationSubscriptionPresetInput
 } from '../lib/control-plane-service'
 import { prompt } from '../lib/prompt'
-import { OAUTH_OPTIONS, OAUTH_SCHEME, RESERVED_FIELD_NAMES } from '../constants'
+import { OAUTH_OPTIONS, RESERVED_FIELD_NAMES } from '../constants'
 import {
   getDestinationMetadatas,
   getDestinationMetadataActions,
@@ -25,8 +25,8 @@ import {
   createDestinationMetadataActions,
   setSubscriptionPresets
 } from '../lib/control-plane-client'
+import { DestinationDefinition, hasOauthAuthentication } from '../lib/destinations'
 
-export type DestinationDefinition = CloudDestinationDefinition<any> | BrowserDestinationDefinition<any, any>
 type BaseActionInput = Omit<DestinationMetadataActionCreateInput, 'metadataId'>
 
 // Right now it's possible for browser destinations and cloud destinations to have the same
@@ -293,7 +293,12 @@ export function getOptions(
 ): DestinationMetadataOptions {
   const options: DestinationMetadataOptions = { ...metadata.options }
 
-  for (const [fieldKey, schema] of Object.entries(definition.authentication?.fields ?? {})) {
+  const settings = {
+    ...(definition as BrowserDestinationDefinition).settings,
+    ...(definition as CloudDestinationDefinition).authentication?.fields
+  }
+
+  for (const [fieldKey, schema] of Object.entries(settings)) {
     const validators: string[][] = []
 
     if (RESERVED_FIELD_NAMES.includes(fieldKey.toLowerCase()) && hasOauthAuthentication(definition)) {
@@ -311,6 +316,7 @@ export function getOptions(
       encrypt: false,
       hidden: false,
       label: schema.label,
+      // TODO fix this for device destinations or allow developers to specify
       private: true,
       scope: 'event_destination',
       type: 'string',
@@ -324,12 +330,4 @@ export function getOptions(
   }
 
   return options
-}
-
-function hasOauthAuthentication(definition: DestinationDefinition): boolean {
-  return (
-    !!definition.authentication &&
-    'scheme' in definition.authentication &&
-    definition.authentication.scheme === OAUTH_SCHEME
-  )
 }

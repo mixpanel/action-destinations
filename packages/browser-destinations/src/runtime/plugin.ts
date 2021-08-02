@@ -13,16 +13,18 @@ export function generatePlugins<S, C>(
   settings: S,
   subscriptions: Subscription[]
 ): Plugin[] {
+  let hasInitialized = false
   let client: C
   let analytics: Analytics
 
   const load: Plugin['load'] = async (_ctx, analyticsInstance) => {
-    if (client !== undefined) {
+    if (hasInitialized) {
       return
     }
 
-    client = await def.initialize({ settings, analytics: analyticsInstance }, { loadScript, resolveWhen })
     analytics = analyticsInstance
+    client = await def.initialize?.({ settings, analytics }, { loadScript, resolveWhen })
+    hasInitialized = true
   }
 
   return Object.entries(def.actions).reduce((acc, [key, action]) => {
@@ -62,7 +64,7 @@ export function generatePlugins<S, C>(
       version: '0.1.0',
       ready: Promise.resolve,
 
-      isLoaded: () => client !== undefined,
+      isLoaded: () => hasInitialized,
       load,
 
       track: evaluate,

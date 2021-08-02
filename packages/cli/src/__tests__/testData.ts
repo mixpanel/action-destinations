@@ -1,4 +1,4 @@
-import type { DestinationDefinition } from '../commands/push'
+import type { DestinationDefinition } from '../lib/destinations'
 import type { DestinationMetadata } from '../lib/control-plane-service'
 
 export const expectedDestinationMetadataOptions = {
@@ -108,6 +108,7 @@ export const destinationMetadata: DestinationMetadata = {
 
 export const destinationSchema: DestinationDefinition = {
   name: 'Test Slug',
+  mode: 'cloud',
   authentication: {
     scheme: 'oauth2',
     fields: {

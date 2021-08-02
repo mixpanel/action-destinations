@@ -1,6 +1,6 @@
 import { validate, parseFql, ErrorCondition } from '@segment/fab5-subscriptions'
 import type { JSONSchema4 } from 'json-schema'
-import { Action, ActionDefinition, RequestFn } from './action'
+import { Action, ActionDefinition, BaseActionDefinition, RequestFn } from './action'
 import { time, duration } from '../time'
 import { JSONLikeObject, JSONObject } from '../json-object'
 import { SegmentEvent } from '../segment-event'
@@ -13,7 +13,7 @@ import type { AllRequestOptions } from '../request-client'
 import { IntegrationError, InvalidAuthenticationError } from '../errors'
 import { AuthTokens, getAuthData, getOAuth2Data, updateOAuthSettings } from './parse-settings'
 
-export type { ActionDefinition, ExecuteInput, RequestFn }
+export type { BaseActionDefinition, ActionDefinition, ExecuteInput, RequestFn }
 export { fieldsToJsonSchema }
 
 const RETRY_ATTEMPTS = 2
@@ -33,27 +33,45 @@ interface PartnerActions<Settings, Payload extends JSONLikeObject> {
   [key: string]: Action<Settings, Payload>
 }
 
-export interface DestinationDefinition<Settings = unknown> {
+export interface BaseDefinition {
   /** The name of the destination */
   name: string
+
+  /**
+   * The mode of the destination
+   * 'cloud' mode is made up of actions that run server-side, but can also have device-mode enrichment actions
+   * 'device' mode is made up of actions that run in the browser
+   */
+  mode: 'cloud' | 'device'
+
   /** A human-friendly description of the destination  */
   description?: string
+
   /**
    * The url-friendly unique slug for the destination
    * When provided, the `register` command will use this slug
    * instead of generating one from the `name`
    */
   slug?: string
-  /** An optional function to extend requests sent from the destination (including all actions) */
-  extendRequest?: RequestExtension<Settings>
-  /** Optional authentication configuration */
-  authentication?: AuthenticationScheme<Settings>
+
   /** Actions */
-  actions: {
-    [key: string]: ActionDefinition<Settings>
-  }
+  actions: Record<string, BaseActionDefinition>
+
   /** Subscription presets automatically applied in quick setup */
   presets?: Subscription[]
+}
+
+export interface DestinationDefinition<Settings = unknown> extends BaseDefinition {
+  mode: 'cloud'
+
+  /** Actions */
+  actions: Record<string, ActionDefinition<Settings>>
+
+  /** An optional function to extend requests sent from the destination (including all actions) */
+  extendRequest?: RequestExtension<Settings>
+
+  /** Optional authentication configuration */
+  authentication?: AuthenticationScheme<Settings>
 }
 
 export interface Subscription {

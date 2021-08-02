@@ -1,6 +1,10 @@
-import { DestinationDefinition } from '@segment/actions-core'
+import type { DestinationDefinition as CloudDestinationDefinition } from '@segment/actions-core'
+import type { BrowserDestinationDefinition } from '@segment/browser-destinations'
 import path from 'path'
 import { clearRequireCache } from './require-cache'
+import { OAUTH_SCHEME } from '../constants'
+
+export type DestinationDefinition = CloudDestinationDefinition | BrowserDestinationDefinition
 
 /**
  * Attempts to load a destination definition from a given file path
@@ -23,5 +27,14 @@ export async function loadDestination(filePath: string): Promise<null | Destinat
     return null
   }
 
-  return destination as DestinationDefinition
+  return destination
+}
+
+export function hasOauthAuthentication(definition: DestinationDefinition): boolean {
+  return (
+    'authentication' in definition &&
+    !!definition.authentication &&
+    'scheme' in definition.authentication &&
+    definition.authentication.scheme === OAUTH_SCHEME
+  )
 }

@@ -21,10 +21,7 @@ export type RequestFn<Settings, Payload, Return = any> = (
 ) => MaybePromise<Return>
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export interface ActionDefinition<Settings, Payload = any> {
-  /** The unique identifier for the action, e.g. `postToChannel` */
-  // key: string
-
+export interface BaseActionDefinition {
   /** The display title of the action */
   title: string
 
@@ -47,7 +44,10 @@ export interface ActionDefinition<Settings, Payload = any> {
    * The fields used to perform the action. These fields should match what the partner API expects.
    */
   fields: Record<string, InputField>
+}
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export interface ActionDefinition<Settings, Payload = any> extends BaseActionDefinition {
   /**
    * A way to "register" dynamic fields.
    * This is likely going to change as we productionalize the data model and definition object

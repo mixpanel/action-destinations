@@ -5,6 +5,7 @@ import sessionId from './sessionId'
 
 export const destination: BrowserDestinationDefinition<Settings, {}> = {
   name: 'Amplitude (Actions)',
+  mode: 'device',
   actions: {
     sessionId
   },

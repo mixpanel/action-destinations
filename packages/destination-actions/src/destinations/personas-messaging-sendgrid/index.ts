@@ -4,6 +4,7 @@ import sendEmail from './sendEmail'
 
 const destination: DestinationDefinition<Settings> = {
   name: 'Personas Messaging Sendgrid',
+  mode: 'cloud',
   description: 'This is a personas specific action to send an email',
   authentication: {
     scheme: 'custom',

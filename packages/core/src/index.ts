@@ -16,7 +16,9 @@ export type { RequestOptions } from './request-client'
 export { default as fetch, Request, Response, Headers } from './fetch'
 
 export type {
+  BaseActionDefinition,
   ActionDefinition,
+  BaseDefinition,
   DestinationDefinition,
   ExecuteInput,
   Subscription,
