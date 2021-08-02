@@ -83,7 +83,7 @@ app.post(
     ow(settings, ow.optional.object)
 
     // fallback to slug when metadataId is not provided
-    const destinationDefinition = await getDestinationById(metadataId)
+    const destinationDefinition = getDestinationById(metadataId)
     if (!destinationDefinition) {
       res.status(200).json({ data: [], pagination: {} })
       return
@@ -196,7 +196,7 @@ app.post(
 
     ow(settings, ow.optional.object)
 
-    const destinationDefinition = await getDestinationById(metadataId)
+    const destinationDefinition = getDestinationById(metadataId)
     if (!destinationDefinition) {
       res.status(404).json({
         ok: false,
