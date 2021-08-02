@@ -1,6 +1,7 @@
 import type { DestinationDefinition } from '@segment/actions-core'
 import type { Settings } from './generated-types'
 import updateUserProfile from './updateUserProfile'
+import trackEvent from './trackEvent'
 
 const destination: DestinationDefinition<Settings> = {
   name: 'Braze Cloud Mode',
@@ -13,6 +14,13 @@ const destination: DestinationDefinition<Settings> = {
       api_key: {
         label: 'API Key',
         description: 'Created under Developer Console in the Braze Dashboard.',
+        type: 'string',
+        required: true
+      },
+      app_id: {
+        label: 'App ID',
+        description:
+          'The app identifier used to reference specific Apps in requests made to the Braze API. Created under Developer Console in the Braze Dashboard.',
         type: 'string',
         required: true
       },
@@ -37,7 +45,8 @@ const destination: DestinationDefinition<Settings> = {
     }
   },
   actions: {
-    updateUserProfile
+    updateUserProfile,
+    trackEvent
   }
 }
 
