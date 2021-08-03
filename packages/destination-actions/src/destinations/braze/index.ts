@@ -3,6 +3,8 @@ import type { Settings } from './generated-types'
 import updateUserProfile from './updateUserProfile'
 import trackEvent from './trackEvent'
 
+import trackPurchase from './trackPurchase'
+
 const destination: DestinationDefinition<Settings> = {
   name: 'Braze Cloud Mode',
   slug: 'actions-braze-cloud',
@@ -46,7 +48,8 @@ const destination: DestinationDefinition<Settings> = {
   },
   actions: {
     updateUserProfile,
-    trackEvent
+    trackEvent,
+    trackPurchase
   }
 }
 

@@ -17,9 +17,9 @@ function toISO8601(date: DateInput): DateOutput {
 }
 
 const action: ActionDefinition<Settings, Payload> = {
-  title: 'Track Event',
-  description: 'Record custom events in Braze',
-  defaultSubscription: 'type = "track" and event != "Order Completed"',
+  title: 'Track Purchase',
+  description: 'Record purchases in Braze',
+  defaultSubscription: 'event = "Order Completed"',
   fields: {
     external_id: {
       label: 'External User ID',
@@ -56,15 +56,6 @@ const action: ActionDefinition<Settings, Payload> = {
         '@path': '$.properties.braze_id'
       }
     },
-    name: {
-      label: 'Event Name',
-      description: 'The event name',
-      type: 'string',
-      required: true,
-      default: {
-        '@path': '$.event'
-      }
-    },
     time: {
       label: 'Time',
       description: 'When the event occurred.',
@@ -72,6 +63,36 @@ const action: ActionDefinition<Settings, Payload> = {
       required: true,
       default: {
         '@path': '$.receivedAt'
+      }
+    },
+    products: {
+      label: 'Products',
+      description: 'Products purchased',
+      type: 'object',
+      multiple: true,
+      required: true,
+      properties: {
+        product_id: {
+          label: 'Product ID',
+          type: 'string',
+          required: true
+        },
+        currency: {
+          label: 'Currency',
+          type: 'string'
+        },
+        price: {
+          label: 'Price',
+          type: 'number',
+          required: true
+        },
+        quantity: {
+          label: 'Quantity',
+          type: 'integer'
+        }
+      },
+      default: {
+        '@path': '$.properties.products'
       }
     },
     properties: {
@@ -101,22 +122,32 @@ const action: ActionDefinition<Settings, Payload> = {
       )
     }
 
+    // Skip when there are no products to send to Braze
+    if (payload.products.length === 0) {
+      return
+    }
+
+    const base = {
+      braze_id,
+      external_id,
+      user_alias,
+      app_id: settings.app_id,
+      time: toISO8601(payload.time),
+      properties: payload.properties,
+      _update_existing_only: payload._update_existing_only
+    }
+
+    const purchases = payload.products.map((product) => ({
+      ...base,
+      product_id: product.product_id,
+      currency: product.currency ?? 'USD',
+      price: product.price,
+      quantity: product.quantity
+    }))
+
     return request(`${settings.endpoint}/users/track`, {
       method: 'post',
-      json: {
-        events: [
-          {
-            braze_id,
-            external_id,
-            user_alias,
-            app_id: settings.app_id,
-            name: payload.name,
-            time: toISO8601(payload.time),
-            properties: payload.properties,
-            _update_existing_only: payload._update_existing_only
-          }
-        ]
-      }
+      json: { purchases }
     })
   }
 }

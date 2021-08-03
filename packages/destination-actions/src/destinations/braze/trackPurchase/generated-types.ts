@@ -17,13 +17,18 @@ export interface Payload {
    */
   braze_id?: string | null
   /**
-   * The event name
-   */
-  name: string
-  /**
    * When the event occurred.
    */
   time: string | number
+  /**
+   * Products purchased
+   */
+  products: {
+    product_id: string
+    currency?: string
+    price: number
+    quantity?: number
+  }[]
   /**
    * Properties of the event
    */
