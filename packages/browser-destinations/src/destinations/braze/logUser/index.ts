@@ -155,69 +155,49 @@ const action: BrowserActionDefinition<Settings, typeof appboy, Payload> = {
       client.changeUser(payload.external_id)
     }
 
-    if (payload.image_url !== undefined) {
-      client.getUser().setAvatarImageUrl(payload.image_url)
-    }
-    if (payload.country !== undefined) {
-      client.getUser().setCountry(payload.country)
-    }
-    if (payload.current_location?.key !== undefined) {
-      client
-        .getUser()
-        .setCustomLocationAttribute(
-          payload.current_location.key,
-          payload.current_location.latitude,
-          payload.current_location.longitude
-        )
-    }
+    const user = client.getUser()
+
+    payload.image_url !== undefined && user.setAvatarImageUrl(payload.image_url)
+    payload.country !== undefined && user.setCountry(payload.country)
+
+    payload.current_location?.key !== undefined &&
+      user.setCustomLocationAttribute(
+        payload.current_location.key,
+        payload.current_location.latitude,
+        payload.current_location.longitude
+      )
+
     if (payload.dob !== undefined) {
       if (payload.dob === null) {
-        client.getUser().setDateOfBirth(null, null, null)
+        user.setDateOfBirth(null, null, null)
       } else {
         const date = dayjs(payload.dob)
-        client.getUser().setDateOfBirth(date.year(), date.month() + 1, date.date())
+        user.setDateOfBirth(date.year(), date.month() + 1, date.date())
       }
     }
+
     if (payload.custom_attributes !== undefined) {
       Object.entries(payload.custom_attributes).forEach(([key, value]) => {
         if (!known_traits.includes(key)) {
-          client.getUser().setCustomUserAttribute(key, value as string | number | boolean | Date | string[] | null)
+          user.setCustomUserAttribute(key, value as string | number | boolean | Date | string[] | null)
         }
       })
     }
-    if (payload.email_subscribe !== undefined)
-      client
-        .getUser()
-        .setEmailNotificationSubscriptionType(payload.email_subscribe as appboy.User.NotificationSubscriptionTypes)
-    if (payload.email !== undefined) {
-      client.getUser().setEmail(payload.email)
-    }
-    if (payload.first_name !== undefined) {
-      client.getUser().setFirstName(payload.first_name)
-    }
-    if (payload.gender !== undefined) {
-      client.getUser().setGender(payload.gender as appboy.User.Genders)
-    }
-    if (payload.home_city !== undefined) {
-      client.getUser().setHomeCity(payload.home_city)
-    }
-    if (payload.language !== undefined) {
-      client.getUser().setLanguage(payload.language)
-    }
-    if (payload.current_location !== undefined) {
-      client.getUser().setLastKnownLocation(payload.current_location.latitude, payload.current_location.longitude)
-    }
-    if (payload.last_name !== undefined) {
-      client.getUser().setLastName(payload.last_name)
-    }
-    if (payload.phone !== undefined) {
-      client.getUser().setPhoneNumber(payload.phone)
-    }
-    if (payload.push_subscribe !== undefined) {
-      client
-        .getUser()
-        .setPushNotificationSubscriptionType(payload.push_subscribe as appboy.User.NotificationSubscriptionTypes)
-    }
+
+    payload.email_subscribe !== undefined &&
+      user.setEmailNotificationSubscriptionType(payload.email_subscribe as appboy.User.NotificationSubscriptionTypes)
+
+    payload.email !== undefined && user.setEmail(payload.email)
+    payload.first_name !== undefined && user.setFirstName(payload.first_name)
+    payload.gender !== undefined && user.setGender(payload.gender as appboy.User.Genders)
+    payload.home_city !== undefined && user.setHomeCity(payload.home_city)
+    payload.language !== undefined && user.setLanguage(payload.language)
+    payload.current_location !== undefined &&
+      user.setLastKnownLocation(payload.current_location.latitude, payload.current_location.longitude)
+    payload.last_name !== undefined && user.setLastName(payload.last_name)
+    payload.phone !== undefined && user.setPhoneNumber(payload.phone)
+    payload.push_subscribe !== undefined &&
+      user.setPushNotificationSubscriptionType(payload.push_subscribe as appboy.User.NotificationSubscriptionTypes)
   }
 }
 

@@ -63,8 +63,8 @@ const action: BrowserActionDefinition<Settings, typeof appboy, Payload> = {
       const result = client.logPurchase(
         product.productId,
         product.price,
-        product.currencyCode,
-        product.quantity,
+        product.currencyCode ?? 'USD',
+        product.quantity ?? 1,
         product.purchaseProperties
       )
 

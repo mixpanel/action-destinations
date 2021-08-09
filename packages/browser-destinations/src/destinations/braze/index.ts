@@ -60,6 +60,7 @@ export const destination: BrowserDestinationDefinition<Settings, typeof appboy> 
     }
 
     await dependencies.loadScript('https://js.appboycdn.com/web-sdk/3.3/service-worker.js')
+
     const initialized = appboy.initialize(settings.api_key, config)
     if (!initialized) {
       throw new Error('Failed to initialize AppBoy')
