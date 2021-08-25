@@ -18,7 +18,10 @@ const entries = files.reduce((acc, current) => {
   const [_dot, _src, _destinations, destination, ..._rest] = current.split('/')
   return {
     ...acc,
-    [destination]: current
+    [destination]: {
+      import: current,
+      dependOn: 'runtime'
+    }
   }
 }, {})
 
@@ -36,7 +39,10 @@ if (process.env.ANALYZE) {
 }
 
 module.exports = {
-  entry: entries,
+  entry: {
+    runtime: ['@segment/actions-core', '@segment/analytics-next', 'dayjs', 'tslib'],
+    ...entries
+  },
   mode: process.env.NODE_ENV || 'development',
   devtool: 'source-map',
   output: {
@@ -97,17 +103,7 @@ module.exports = {
           }
         }
       })
-    ],
-    splitChunks: {
-      cacheGroups: {
-        default: false,
-        defaultVendors: false,
-        commons: {
-          chunks: 'all',
-          minChunks: 2
-        }
-      }
-    }
+    ]
   },
   plugins
 }
